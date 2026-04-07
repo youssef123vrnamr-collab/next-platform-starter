@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>PS3 Remote Controller</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    body {
+      background: linear-gradient(145deg, #0a0f1e 0%, #0c1222 100%);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #eee;
+      padding: 1rem;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    /* Header */
+    .header {
+      text-align: center;
+      padding: 1rem;
+      background: rgba(0,0,0,0.4);
+      border-radius: 2rem;
+      margin-bottom: 1.5rem;
+      backdrop-filter: blur(10px);
+    }
+    .header h1 {
+      font-size: 1.6rem;
+      background: linear-gradient(135deg, #00a6ff, #ff4d4d);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .ip-section {
+      display: flex;
+      gap: 0.5rem;
+      margin: 1rem 0;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .ip-section input {
+      flex: 1;
+      padding: 0.8rem 1rem;
+      border-radius: 2rem;
+      border: none;
+      background: #1e2a3a;
+      color: white;
+      font-size: 1rem;
+      text-align: center;
+      direction: ltr;
+      font-family: monospace;
+    }
+    .ip-section button {
+      padding: 0.8rem 1.2rem;
+      border-radius: 2rem;
+      border: none;
+      background: #00a6ff;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .ip-section button:active { transform: scale(0.96); }
+    /* Status */
+    .status {
+      background: #1e2a3a;
+      padding: 0.6rem;
+      border-radius: 2rem;
+      text-align: center;
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+    }
+    /* Video Player */
+    .video-box {
+      background: #000;
+      border-radius: 1.5rem;
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+      aspect-ratio: 16 / 9;
+      position: relative;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+    }
+    .video-box video, .video-box iframe {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background: black;
+    }
+    .video-placeholder {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      background: #111;
+      color: #888;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    /* Games Grid */
+    .games-section {
+      margin: 1.5rem 0;
+    }
+    .games-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.8rem;
+    }
+    .games-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 0.8rem;
+      max-height: 300px;
+      overflow-y: auto;
+      padding: 0.2rem;
+    }
+    .game-card {
+      background: #1e2a3a;
+      border-radius: 1rem;
+      padding: 0.8rem;
+      text-align: center;
+      cursor: pointer;
+      transition: 0.1s linear;
+      border: 1px solid #2d3e4e;
+    }
+    .game-card:active { background: #00a6ff; transform: scale(0.97); }
+    .game-icon { font-size: 2rem; margin-bottom: 0.3rem; }
+    .game-title {
+      font-size: 0.8rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    /* Controller */
+    .controller {
+      background: rgba(30,42,58,0.8);
+      backdrop-filter: blur(15px);
+      border-radius: 2rem;
+      padding: 1rem;
+      margin-top: 1.5rem;
+    }
+    .dpad {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    .dpad-row {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin: 0.3rem 0;
+    }
+    .ctrl-btn {
+      background: #2d3e4e;
+      border: none;
+      color: white;
+      font-size: 1.8rem;
+      width: 70px;
+      height: 70px;
+      border-radius: 60px;
+      box-shadow: 0 5px 0 #0a0f1e;
+      cursor: pointer;
+      transition: 0.05s linear;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .ctrl-btn:active {
+      transform: translateY(3px);
+      box-shadow: none;
+    }
+    .action-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.8rem;
+      margin: 1rem 0;
+    }
+    .action-btn {
+      background: #ff4d4d;
+      width: 60px;
+      height: 60px;
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+    .special-btn {
+      background: #00a6ff;
+    }
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #00a6ffcc;
+      backdrop-filter: blur(8px);
+      padding: 0.5rem 1.2rem;
+      border-radius: 2rem;
+      font-size: 0.9rem;
+      z-index: 999;
+      transition: 0.2s;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .toast.show {
+      opacity: 1;
+    }
+    @media (max-width: 500px) {
+      .ctrl-btn { width: 55px; height: 55px; font-size: 1.4rem; }
+      .game-card { padding: 0.5rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>🎮 PS3 Remote Control</h1>
+    <div class="ip-section">
+      <input type="text" id="ps3Ip" placeholder="مثال: 192.168.1.100" value="192.168.1.100">
+      <button id="connectBtn">🔌 اتصال</button>
+    </div>
+    <div class="status" id="statusText">⚫ غير متصل</div>
+  </div>
+
+  <!-- Video Streaming Section -->
+  <div class="video-box" id="videoBox">
+    <div class="video-placeholder" id="videoPlaceholder">
+      <i class="material-icons" style="font-size:48px">📺</i>
+      <span>سيظهر بث الشاشة هنا</span>
+      <small style="font-size:11px">قم بإعداد PSRP أو رابط البث في الإعدادات</small>
+    </div>
+    <video id="streamVideo" style="display:none" controls autoplay muted playsinline></video>
+    <iframe id="streamIframe" style="display:none" allowfullscreen></iframe>
+  </div>
+
+  <!-- Games List -->
+  <div class="games-section">
+    <div class="games-header">
+      <span>🎮 قائمة الألعاب</span>
+      <button id="refreshGamesBtn" style="background:#2d3e4e; border:none; padding:0.3rem 1rem; border-radius:1rem; color:white">🔄 تحديث</button>
+    </div>
+    <div class="games-grid" id="gamesGrid">
+      <div style="text-align:center; padding:1rem; color:#888;">اضغط اتصال أولاً</div>
+    </div>
+  </div>
+
+  <!-- Controller Pad -->
+  <div class="controller">
+    <div class="dpad">
+      <div class="dpad-row"><button class="ctrl-btn" data-btn="up">▲</button></div>
+      <div class="dpad-row">
+        <button class="ctrl-btn" data-btn="left">◀</button>
+        <button class="ctrl-btn" data-btn="select">●</button>
+        <button class="ctrl-btn" data-btn="right">▶</button>
+      </div>
+      <div class="dpad-row"><button class="ctrl-btn" data-btn="down">▼</button></div>
+    </div>
+    <div class="action-buttons">
+      <button class="ctrl-btn action-btn" data-btn="cross">X</button>
+      <button class="ctrl-btn action-btn" data-btn="circle">O</button>
+      <button class="ctrl-btn action-btn" data-btn="square">□</button>
+      <button class="ctrl-btn action-btn" data-btn="triangle">▲</button>
+    </div>
+    <div class="action-buttons">
+      <button class="ctrl-btn special-btn" data-btn="select">Select</button>
+      <button class="ctrl-btn special-btn" data-btn="start">Start</button>
+      <button class="ctrl-btn special-btn" data-btn="ps">PS</button>
+    </div>
+  </div>
+</div>
+<div id="toastMsg" class="toast">تم الإرسال</div>
+
+<script>
+  // ----------------------------- PS3 WebMAN MOD API -------------------------
+  let currentPS3Ip = localStorage.getItem('ps3_ip') || '';
+  if(currentPS3Ip) document.getElementById('ps3Ip').value = currentPS3Ip;
+  
+  const statusDiv = document.getElementById('statusText');
+  const gamesGrid = document.getElementById('gamesGrid');
+  const connectBtn = document.getElementById('connectBtn');
+  const refreshBtn = document.getElementById('refreshGamesBtn');
+  
+  // Helper: send command to PS3 via webMAN MOD
+  async function sendCommand(endpoint, showToastMsg = true) {
+    if(!currentPS3Ip) { showToast('❌ لم يتم تحديد IP'); return false; }
+    try {
+      const url = `http://${currentPS3Ip}${endpoint}`;
+      const res = await fetch(url, { mode: 'no-cors' }); // no-cors لتجنب مشاكل CORS
+      if(showToastMsg) showToast(`✅ تم الإرسال`);
+      return true;
+    } catch(e) {
+      console.warn(e);
+      showToast(`⚠️ فشل الإرسال: تأكد من IP`);
+      return false;
+    }
+  }
+  
+  // Button mapping (webMAN MOD pad.ps3 parameters)
+  const buttonMap = {
+    'up': 'up', 'down': 'down', 'left': 'left', 'right': 'right',
+    'cross': 'cross', 'circle': 'circle', 'square': 'square', 'triangle': 'triangle',
+    'select': 'select', 'start': 'start', 'ps': 'ps'
+  };
+  
+  // Attach all controller buttons
+  document.querySelectorAll('.ctrl-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const cmd = btn.getAttribute('data-btn');
+      if(cmd && buttonMap[cmd]) {
+        await sendCommand(`/pad.ps3?${buttonMap[cmd]}`, true);
+      }
+    });
+  });
+  
+  // Connect & Test
+  async function testConnection(ip) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 3000);
+      const res = await fetch(`http://${ip}/`, { signal: controller.signal, mode: 'no-cors' });
+      clearTimeout(timeoutId);
+      // مع no-cors لا يمكن قراءة الـ response ولكن إذا لم يرمي خطأ فالاتصال ناجح غالبًا
+      return true;
+    } catch(e) {
+      return false;
+    }
+  }
+  
+  connectBtn.addEventListener('click', async () => {
+    let ip = document.getElementById('ps3Ip').value.trim();
+    if(!ip) { showToast('أدخل عنوان IP'); return; }
+    currentPS3Ip = ip;
+    localStorage.setItem('ps3_ip', ip);
+    statusDiv.innerText = '🔄 جاري الاتصال...';
+    const connected = await testConnection(ip);
+    if(connected) {
+      statusDiv.innerHTML = '✅ متصل بـ PS3 (webMAN MOD)';
+      showToast('تم الاتصال بنجاح');
+      loadGamesList();
+      setupVideoStream(); // محاولة إعداد البث إذا كان هناك خادم
+    } else {
+      statusDiv.innerHTML = '❌ فشل الاتصال - تأكد من IP وتشغيل webMAN';
+      showToast('فشل الاتصال');
+    }
+  });
+  
+  // Load games list from webMAN MOD (endpoint: /get_ps3_games.ps3)
+  async function loadGamesList() {
+    if(!currentPS3Ip) { gamesGrid.innerHTML = '<div style="color:#aaa;">يرجى الاتصال أولاً</div>'; return; }
+    gamesGrid.innerHTML = '<div style="text-align:center;">⏳ جاري تحميل الألعاب...</div>';
+    try {
+      const url = `http://${currentPS3Ip}/get_ps3_games.ps3`;
+      const res = await fetch(url);
+      const text = await res.text();
+      // النص يحتوي على قائمة بمسارات ISO/JB Folder
+      parseGamesList(text);
+    } catch(e) {
+      console.error(e);
+      gamesGrid.innerHTML = '<div style="color:#f66;">⚠️ تعذر تحميل الألعاب (قد لا يدعم webMAN هذا الـ endpoint)</div>';
+    }
+  }
+  
+  function parseGamesList(data) {
+    const lines = data.split(/\r?\n/);
+    const games = [];
+    for(let line of lines) {
+      line = line.trim();
+      if(line.startsWith('/dev_hdd0/game/') || line.startsWith('/dev_usb') || line.endsWith('.iso') || line.includes('PS3ISO')) {
+        let title = line.split('/').pop().replace(/_/g,' ').replace('.iso','');
+        if(title.length < 2) title = line;
+        games.push({ path: line, title: title });
+      }
+    }
+    if(games.length === 0) {
+      gamesGrid.innerHTML = '<div style="color:#aaa;">لم يتم العثور على ألعاب. تأكد من وجود ألعاب في webMAN.</div>';
+      return;
+    }
+    gamesGrid.innerHTML = '';
+    games.forEach(game => {
+      const card = document.createElement('div');
+      card.className = 'game-card';
+      card.innerHTML = `<div class="game-icon">🎮</div><div class="game-title">${escapeHtml(game.title.substring(0, 30))}</div>`;
+      card.onclick = () => launchGame(game.path);
+      gamesGrid.appendChild(card);
+    });
+  }
+  
+  async function launchGame(gamePath) {
+    if(!currentPS3Ip) return;
+    showToast(`تشغيل: ${gamePath.split('/').pop()}`);
+    await sendCommand(`/mount.ps3${gamePath}`, false);
+    // محاولة تشغيل اللعبة بعد التحميل
+    setTimeout(async () => {
+      await sendCommand(`/play.ps3`, false);
+      showToast('تم إطلاق اللعبة');
+    }, 500);
+  }
+  
+  // Video Streaming Setup (placeholder or custom stream)
+  function setupVideoStream() {
+    const videoPlaceholder = document.getElementById('videoPlaceholder');
+    const videoElem = document.getElementById('streamVideo');
+    const iframeElem = document.getElementById('streamIframe');
+    // محاولة استخدام PSRP الافتراضي على المنفذ 8080 أو 8554
+    const streamUrl = `http://${currentPS3Ip}:8080/stream`; // افتراضي لـ PSRP
+    // اختبار إذا كان الخادم يعمل
+    fetch(streamUrl, { method: 'HEAD', mode: 'no-cors' }).catch(()=>{});
+    // لأن no-cors لا يعطي معلومات دقيقة، سنعرض خيار للمستخدم
+    const userConfirmed = confirm('هل قمت بإعداد خادم بث مثل PSRP؟\nاضغط موافق لعرض الفيديو (قد لا يعمل إذا لم يكن الخادم جاهزًا)');
+    if(userConfirmed) {
+      videoPlaceholder.style.display = 'none';
+      videoElem.style.display = 'block';
+      videoElem.src = streamUrl;
+      videoElem.play().catch(e => {
+        console.warn(e);
+        videoPlaceholder.style.display = 'flex';
+        videoElem.style.display = 'none';
+        showToast('تعذر تشغيل البث، تأكد من تشغيل خادم PSRP');
+      });
+    } else {
+      videoPlaceholder.innerHTML = `<i class="material-icons" style="font-size:48px">🖥️</i><span>البث المباشر غير متاح</span><small>قم بتثبيت PSRP على جهازك وشغّل الخادم، ثم أعد المحاولة.</small>`;
+    }
+  }
+  
+  // Refresh games manually
+  refreshBtn.addEventListener('click', loadGamesList);
+  
+  // Helper functions
+  function showToast(msg) {
+    const toast = document.getElementById('toastMsg');
+    toast.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2500);
+  }
+  
+  function escapeHtml(str) {
+    if(!str) return '';
+    return str.replace(/[&<>]/g, function(m) {
+      if(m === '&') return '&amp;';
+      if(m === '<') return '&lt;';
+      if(m === '>') return '&gt;';
+      return m;
+    });
+  }
+  
+  // إذا كان هناك IP مخزن مسبقاً نحاول الاتصال تلقائياً
+  if(currentPS3Ip) {
+    setTimeout(() => connectBtn.click(), 500);
+  }
+</script>
+</body>
+</html>
