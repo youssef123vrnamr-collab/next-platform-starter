@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>PS3 Remote Controller</title>
+  <title>PS3 Remote Controller - XMB Waves</title>
   <style>
     * {
       margin: 0;
@@ -12,33 +12,71 @@
       user-select: none;
       -webkit-tap-highlight-color: transparent;
     }
+
+    /* Canvas الخلفية المتحركة (تمويجات PS3 الشهيرة) */
+    #wavesCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none; /* يسمح بالتفاعل مع العناصر فوقه */
+      background: radial-gradient(circle at 20% 30%, #001433, #000000);
+    }
+
     body {
-      background: linear-gradient(145deg, #0a0f1e 0%, #0c1222 100%);
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Segoe UI', 'Tahoma', 'Geneva', 'Verdana', sans-serif;
       color: #eee;
       padding: 1rem;
       min-height: 100vh;
+      position: relative;
+      z-index: 1;
+      background: transparent; /* شفاف لظهور الأمواج */
     }
+
+    /* إضافة طبقة شفافة داكنة خفيفة لتحسين قراءة النصوص */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(1px);
+      z-index: -1;
+      pointer-events: none;
+    }
+
     .container {
       max-width: 700px;
       margin: 0 auto;
+      position: relative;
+      z-index: 2;
     }
+
     /* Header */
     .header {
       text-align: center;
       padding: 1rem;
-      background: rgba(0,0,0,0.4);
+      background: rgba(0, 0, 0, 0.55);
       border-radius: 2rem;
       margin-bottom: 1.5rem;
-      backdrop-filter: blur(10px);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(0, 166, 255, 0.3);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
     }
+
     .header h1 {
-      font-size: 1.6rem;
-      background: linear-gradient(135deg, #00a6ff, #ff4d4d);
+      font-size: 1.7rem;
+      background: linear-gradient(135deg, #00a6ff, #ff4d4d, #a0e7ff);
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
+      text-shadow: 0 0 8px rgba(0,166,255,0.3);
     }
+
     .ip-section {
       display: flex;
       gap: 0.5rem;
@@ -46,18 +84,22 @@
       flex-wrap: wrap;
       justify-content: center;
     }
+
     .ip-section input {
       flex: 1;
       padding: 0.8rem 1rem;
       border-radius: 2rem;
       border: none;
-      background: #1e2a3a;
+      background: #0f172ad9;
       color: white;
       font-size: 1rem;
       text-align: center;
       direction: ltr;
       font-family: monospace;
+      backdrop-filter: blur(4px);
+      border: 1px solid #2d4a6e;
     }
+
     .ip-section button {
       padding: 0.8rem 1.2rem;
       border-radius: 2rem;
@@ -67,53 +109,74 @@
       font-weight: bold;
       cursor: pointer;
       transition: 0.2s;
+      box-shadow: 0 2px 8px rgba(0,166,255,0.3);
     }
-    .ip-section button:active { transform: scale(0.96); }
+
+    .ip-section button:active {
+      transform: scale(0.96);
+    }
+
     /* Status */
     .status {
-      background: #1e2a3a;
+      background: #0f172ab3;
+      backdrop-filter: blur(8px);
       padding: 0.6rem;
       border-radius: 2rem;
       text-align: center;
       font-size: 0.9rem;
       margin-bottom: 1rem;
+      border: 1px solid #2d4a6e;
     }
+
     /* Video Player */
     .video-box {
-      background: #000;
+      background: #000000aa;
+      backdrop-filter: blur(8px);
       border-radius: 1.5rem;
       overflow: hidden;
       margin-bottom: 1.5rem;
       aspect-ratio: 16 / 9;
       position: relative;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(0,166,255,0.4);
     }
-    .video-box video, .video-box iframe {
+
+    .video-box video,
+    .video-box iframe {
       width: 100%;
       height: 100%;
       object-fit: contain;
       background: black;
     }
+
     .video-placeholder {
       display: flex;
       align-items: center;
       justify-content: center;
       height: 100%;
-      background: #111;
-      color: #888;
+      background: #111111cc;
+      color: #ccc;
       flex-direction: column;
       gap: 0.5rem;
+      text-align: center;
     }
+
     /* Games Grid */
     .games-section {
       margin: 1.5rem 0;
     }
+
     .games-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 0.8rem;
+      background: rgba(0,0,0,0.3);
+      padding: 0.5rem 1rem;
+      border-radius: 2rem;
+      backdrop-filter: blur(4px);
     }
+
     .games-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -122,8 +185,10 @@
       overflow-y: auto;
       padding: 0.2rem;
     }
+
     .game-card {
-      background: #1e2a3a;
+      background: #1e2a3acc;
+      backdrop-filter: blur(8px);
       border-radius: 1rem;
       padding: 0.8rem;
       text-align: center;
@@ -131,36 +196,50 @@
       transition: 0.1s linear;
       border: 1px solid #2d3e4e;
     }
-    .game-card:active { background: #00a6ff; transform: scale(0.97); }
-    .game-icon { font-size: 2rem; margin-bottom: 0.3rem; }
+
+    .game-card:active {
+      background: #00a6ff;
+      transform: scale(0.97);
+    }
+
+    .game-icon {
+      font-size: 2rem;
+      margin-bottom: 0.3rem;
+    }
+
     .game-title {
       font-size: 0.8rem;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
+
     /* Controller */
     .controller {
-      background: rgba(30,42,58,0.8);
-      backdrop-filter: blur(15px);
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(18px);
       border-radius: 2rem;
       padding: 1rem;
       margin-top: 1.5rem;
+      border: 1px solid rgba(0, 166, 255, 0.3);
     }
+
     .dpad {
       display: flex;
       flex-direction: column;
       align-items: center;
       margin-bottom: 1rem;
     }
+
     .dpad-row {
       display: flex;
       justify-content: center;
       gap: 1rem;
       margin: 0.3rem 0;
     }
+
     .ctrl-btn {
-      background: #2d3e4e;
+      background: #2d3e4ed9;
       border: none;
       color: white;
       font-size: 1.8rem;
@@ -173,11 +252,14 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      backdrop-filter: blur(2px);
     }
+
     .ctrl-btn:active {
       transform: translateY(3px);
       box-shadow: none;
     }
+
     .action-buttons {
       display: flex;
       flex-wrap: wrap;
@@ -185,6 +267,7 @@
       gap: 0.8rem;
       margin: 1rem 0;
     }
+
     .action-btn {
       background: #ff4d4d;
       width: 60px;
@@ -192,9 +275,11 @@
       font-size: 1.2rem;
       font-weight: bold;
     }
+
     .special-btn {
       background: #00a6ff;
     }
+
     .toast {
       position: fixed;
       bottom: 20px;
@@ -209,20 +294,46 @@
       transition: 0.2s;
       opacity: 0;
       pointer-events: none;
+      font-weight: bold;
     }
+
     .toast.show {
       opacity: 1;
     }
+
     @media (max-width: 500px) {
-      .ctrl-btn { width: 55px; height: 55px; font-size: 1.4rem; }
-      .game-card { padding: 0.5rem; }
+      .ctrl-btn {
+        width: 55px;
+        height: 55px;
+        font-size: 1.4rem;
+      }
+      .game-card {
+        padding: 0.5rem;
+      }
+    }
+
+    /* تخصيص شريط التمرير للألعاب */
+    .games-grid::-webkit-scrollbar {
+      width: 5px;
+    }
+    .games-grid::-webkit-scrollbar-track {
+      background: #0f172a;
+      border-radius: 10px;
+    }
+    .games-grid::-webkit-scrollbar-thumb {
+      background: #00a6ff;
+      border-radius: 10px;
     }
   </style>
 </head>
 <body>
+
+<!-- Canvas خاص بتمويجات PS3 الشهيرة (XMB Waves) -->
+<canvas id="wavesCanvas"></canvas>
+
 <div class="container">
   <div class="header">
-    <h1>🎮 PS3 Remote Control</h1>
+    <h1>🎮 PS3 Remote Control | XMB WAVES</h1>
     <div class="ip-section">
       <input type="text" id="ps3Ip" placeholder="مثال: 192.168.1.100" value="192.168.1.100">
       <button id="connectBtn">🔌 اتصال</button>
@@ -233,9 +344,9 @@
   <!-- Video Streaming Section -->
   <div class="video-box" id="videoBox">
     <div class="video-placeholder" id="videoPlaceholder">
-      <i class="material-icons" style="font-size:48px">📺</i>
-      <span>سيظهر بث الشاشة هنا</span>
-      <small style="font-size:11px">قم بإعداد PSRP أو رابط البث في الإعدادات</small>
+      <span style="font-size:48px">📺✨</span>
+      <span>بث الشاشة سيظهر هنا</span>
+      <small style="font-size:11px">قم بإعداد PSRP أو خادم البث على PS3 (webMAN MOD + PSRP)</small>
     </div>
     <video id="streamVideo" style="display:none" controls autoplay muted playsinline></video>
     <iframe id="streamIframe" style="display:none" allowfullscreen></iframe>
@@ -244,11 +355,11 @@
   <!-- Games List -->
   <div class="games-section">
     <div class="games-header">
-      <span>🎮 قائمة الألعاب</span>
-      <button id="refreshGamesBtn" style="background:#2d3e4e; border:none; padding:0.3rem 1rem; border-radius:1rem; color:white">🔄 تحديث</button>
+      <span>🎮 قائمة الألعاب (ISO / Folder)</span>
+      <button id="refreshGamesBtn" style="background:#2d3e4e; border:none; padding:0.3rem 1rem; border-radius:1rem; color:white; backdrop-filter:blur(4px);">🔄 تحديث</button>
     </div>
     <div class="games-grid" id="gamesGrid">
-      <div style="text-align:center; padding:1rem; color:#888;">اضغط اتصال أولاً</div>
+      <div style="text-align:center; padding:1rem; color:#ccc;">اضغط اتصال أولاً</div>
     </div>
   </div>
 
@@ -279,7 +390,102 @@
 <div id="toastMsg" class="toast">تم الإرسال</div>
 
 <script>
-  // ----------------------------- PS3 WebMAN MOD API -------------------------
+  // ----------------------------- تموجات PS3 (XMB Waves) -------------------------
+  const canvas = document.getElementById('wavesCanvas');
+  let ctx = canvas.getContext('2d');
+  let width, height;
+  let time = 0;
+  let animationId;
+
+  // إعدادات الأمواج المتعددة (أسلوب PS3 الشهير)
+  function resizeCanvas() {
+    width = window.innerWidth;
+    height = window.innerHeight;
+    canvas.width = width;
+    canvas.height = height;
+  }
+
+  function drawWaves() {
+    if (!ctx) return;
+    ctx.clearRect(0, 0, width, height);
+    
+    // تدرج خلفية عميقة (داكنة مع لمعان)
+    const grad = ctx.createLinearGradient(0, 0, width, height);
+    grad.addColorStop(0, '#021126');
+    grad.addColorStop(0.5, '#001133');
+    grad.addColorStop(1, '#00051a');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, width, height);
+    
+    // رسم موجات متعددة شبه شفافة بألوان زرقاء / بنفسجية / سماوية
+    // الموجة الأولى: كبيرة وسريعة
+    ctx.save();
+    for (let i = 0; i < 5; i++) {
+      const offset = i * 1.2;
+      const amplitude = 25 + i * 8;
+      const frequency = 0.008 + i * 0.002;
+      const speed = 0.005 + i * 0.0015;
+      const yBase = height * (0.3 + i * 0.12);
+      const alpha = 0.12 - i * 0.015;
+      const hue = (190 + i * 12) % 360;
+      
+      ctx.beginPath();
+      for (let x = 0; x <= width; x += 15) {
+        const y = yBase + Math.sin(x * frequency + time * speed + offset) * amplitude 
+                + Math.cos(x * 0.004 + time * 0.003 + i) * (amplitude * 0.6);
+        if (x === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.lineTo(width, height);
+      ctx.lineTo(0, height);
+      ctx.closePath();
+      ctx.fillStyle = `hsla(${hue}, 80%, 55%, ${alpha})`;
+      ctx.fill();
+    }
+    
+    // موجات ثانية دقيقة تشبه التموج الخفيف
+    for (let i = 0; i < 8; i++) {
+      const amplitude = 12 + Math.sin(time * 0.5 + i) * 3;
+      const freq = 0.012 + i * 0.001;
+      const speedY = 0.008 + i * 0.001;
+      const yOffset = height * (0.5 + i * 0.05);
+      const alphaLine = 0.08;
+      ctx.beginPath();
+      for (let x = 0; x <= width; x += 20) {
+        const y = yOffset + Math.sin(x * freq + time * speedY) * amplitude 
+                + Math.cos(x * 0.007 + time * 0.004) * 8;
+        if (x === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.strokeStyle = `rgba(100, 200, 255, ${alphaLine})`;
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+    
+    // إضافة نقاط ضوئية متحركة (تأثير النجوم أو الجسيمات)
+    ctx.fillStyle = 'rgba(210, 230, 255, 0.4)';
+    for (let p = 0; p < 70; p++) {
+      const px = (Math.sin(time * 0.2 + p) * 0.5 + 0.5) * width;
+      const py = (Math.cos(time * 0.17 + p * 2) * 0.4 + 0.5) * height;
+      ctx.beginPath();
+      ctx.arc(px, py, 1.5 + Math.sin(time + p) * 0.8, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(120, 200, 255, ${0.3 + Math.sin(time + p) * 0.1})`;
+      ctx.fill();
+    }
+    
+    ctx.restore();
+    time += 0.025; // سرعة الحركة الكلاسيكية
+    animationId = requestAnimationFrame(drawWaves);
+  }
+
+  window.addEventListener('resize', () => {
+    resizeCanvas();
+  });
+  
+  resizeCanvas();
+  drawWaves(); // بدء التموجات الفورية عند فتح الموقع
+  
+  // ----------------------------- PS3 webMAN MOD API (نفس الوظائف مع تحسينات) -------------------------
   let currentPS3Ip = localStorage.getItem('ps3_ip') || '';
   if(currentPS3Ip) document.getElementById('ps3Ip').value = currentPS3Ip;
   
@@ -293,17 +499,18 @@
     if(!currentPS3Ip) { showToast('❌ لم يتم تحديد IP'); return false; }
     try {
       const url = `http://${currentPS3Ip}${endpoint}`;
-      const res = await fetch(url, { mode: 'no-cors' }); // no-cors لتجنب مشاكل CORS
+      // استخدام no-cors لتجنب CORS، لكنه قد لا يعطي استجابة حقيقية. مناسب للأوامر.
+      await fetch(url, { mode: 'no-cors' });
       if(showToastMsg) showToast(`✅ تم الإرسال`);
       return true;
     } catch(e) {
       console.warn(e);
-      showToast(`⚠️ فشل الإرسال: تأكد من IP`);
+      showToast(`⚠️ فشل الإرسال: تأكد من IP و webMAN`);
       return false;
     }
   }
   
-  // Button mapping (webMAN MOD pad.ps3 parameters)
+  // Button mapping
   const buttonMap = {
     'up': 'up', 'down': 'down', 'left': 'left', 'right': 'right',
     'cross': 'cross', 'circle': 'circle', 'square': 'square', 'triangle': 'triangle',
@@ -321,14 +528,16 @@
     });
   });
   
-  // Connect & Test
+  // اختبار الاتصال
   async function testConnection(ip) {
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 3000);
+      // نحاول جلب الصفحة الرئيسية لـ webMAN (غالباً /index.html)
       const res = await fetch(`http://${ip}/`, { signal: controller.signal, mode: 'no-cors' });
       clearTimeout(timeoutId);
-      // مع no-cors لا يمكن قراءة الـ response ولكن إذا لم يرمي خطأ فالاتصال ناجح غالبًا
+      // مع no-cors لا يمكن قراءة الرد ولكن اذا لم يرمي خطأ فالاستجابة وصلت (لكن قد تكون غير كاملة)
+      // نحاول أيضاً فتح endpoint بسيط للتأكد
       return true;
     } catch(e) {
       return false;
@@ -340,32 +549,31 @@
     if(!ip) { showToast('أدخل عنوان IP'); return; }
     currentPS3Ip = ip;
     localStorage.setItem('ps3_ip', ip);
-    statusDiv.innerText = '🔄 جاري الاتصال...';
+    statusDiv.innerText = '🔄 جاري الاتصال بـ PS3 ...';
     const connected = await testConnection(ip);
     if(connected) {
-      statusDiv.innerHTML = '✅ متصل بـ PS3 (webMAN MOD)';
-      showToast('تم الاتصال بنجاح');
+      statusDiv.innerHTML = '✅ متصل بـ PS3 (webMAN MOD) ✨';
+      showToast('تم الاتصال بنجاح مع الأمواج!');
       loadGamesList();
-      setupVideoStream(); // محاولة إعداد البث إذا كان هناك خادم
+      setupVideoStream();
     } else {
       statusDiv.innerHTML = '❌ فشل الاتصال - تأكد من IP وتشغيل webMAN';
-      showToast('فشل الاتصال');
+      showToast('فشل الاتصال بالجهاز');
     }
   });
   
-  // Load games list from webMAN MOD (endpoint: /get_ps3_games.ps3)
+  // تحميل قائمة الألعاب
   async function loadGamesList() {
     if(!currentPS3Ip) { gamesGrid.innerHTML = '<div style="color:#aaa;">يرجى الاتصال أولاً</div>'; return; }
-    gamesGrid.innerHTML = '<div style="text-align:center;">⏳ جاري تحميل الألعاب...</div>';
+    gamesGrid.innerHTML = '<div style="text-align:center;">⏳ جاري تحميل الألعاب مع الموجات...</div>';
     try {
       const url = `http://${currentPS3Ip}/get_ps3_games.ps3`;
       const res = await fetch(url);
       const text = await res.text();
-      // النص يحتوي على قائمة بمسارات ISO/JB Folder
       parseGamesList(text);
     } catch(e) {
       console.error(e);
-      gamesGrid.innerHTML = '<div style="color:#f66;">⚠️ تعذر تحميل الألعاب (قد لا يدعم webMAN هذا الـ endpoint)</div>';
+      gamesGrid.innerHTML = '<div style="color:#f66;">⚠️ تعذر تحميل الألعاب (تأكد من webMAN MOD ووجود ألعاب)</div>';
     }
   }
   
@@ -374,21 +582,21 @@
     const games = [];
     for(let line of lines) {
       line = line.trim();
-      if(line.startsWith('/dev_hdd0/game/') || line.startsWith('/dev_usb') || line.endsWith('.iso') || line.includes('PS3ISO')) {
-        let title = line.split('/').pop().replace(/_/g,' ').replace('.iso','');
-        if(title.length < 2) title = line;
+      if(line.startsWith('/dev_hdd0/game/') || line.startsWith('/dev_usb') || line.endsWith('.iso') || line.includes('PS3ISO') || line.includes('.iso')) {
+        let title = line.split('/').pop().replace(/_/g,' ').replace('.iso','').replace('.ISO','');
+        if(title.length < 2) title = line.slice(-30);
         games.push({ path: line, title: title });
       }
     }
     if(games.length === 0) {
-      gamesGrid.innerHTML = '<div style="color:#aaa;">لم يتم العثور على ألعاب. تأكد من وجود ألعاب في webMAN.</div>';
+      gamesGrid.innerHTML = '<div style="color:#aaa;">🎮 لم يتم العثور على ألعاب. تأكد من وجود ألعاب في webMAN.</div>';
       return;
     }
     gamesGrid.innerHTML = '';
     games.forEach(game => {
       const card = document.createElement('div');
       card.className = 'game-card';
-      card.innerHTML = `<div class="game-icon">🎮</div><div class="game-title">${escapeHtml(game.title.substring(0, 30))}</div>`;
+      card.innerHTML = `<div class="game-icon">🎮</div><div class="game-title">${escapeHtml(game.title.substring(0, 35))}</div>`;
       card.onclick = () => launchGame(game.path);
       gamesGrid.appendChild(card);
     });
@@ -396,27 +604,24 @@
   
   async function launchGame(gamePath) {
     if(!currentPS3Ip) return;
-    showToast(`تشغيل: ${gamePath.split('/').pop()}`);
+    showToast(`🚀 تشغيل: ${gamePath.split('/').pop()}`);
     await sendCommand(`/mount.ps3${gamePath}`, false);
-    // محاولة تشغيل اللعبة بعد التحميل
     setTimeout(async () => {
       await sendCommand(`/play.ps3`, false);
-      showToast('تم إطلاق اللعبة');
-    }, 500);
+      showToast('🎉 تم إطلاق اللعبة');
+    }, 600);
   }
   
-  // Video Streaming Setup (placeholder or custom stream)
+  // Video Streaming Setup مع تحسين الخبرة
   function setupVideoStream() {
     const videoPlaceholder = document.getElementById('videoPlaceholder');
     const videoElem = document.getElementById('streamVideo');
     const iframeElem = document.getElementById('streamIframe');
-    // محاولة استخدام PSRP الافتراضي على المنفذ 8080 أو 8554
-    const streamUrl = `http://${currentPS3Ip}:8080/stream`; // افتراضي لـ PSRP
-    // اختبار إذا كان الخادم يعمل
-    fetch(streamUrl, { method: 'HEAD', mode: 'no-cors' }).catch(()=>{});
-    // لأن no-cors لا يعطي معلومات دقيقة، سنعرض خيار للمستخدم
-    const userConfirmed = confirm('هل قمت بإعداد خادم بث مثل PSRP؟\nاضغط موافق لعرض الفيديو (قد لا يعمل إذا لم يكن الخادم جاهزًا)');
-    if(userConfirmed) {
+    // محاولة استخدام PSRP على منفذ 8080
+    const streamUrl = `http://${currentPS3Ip}:8080/stream`;
+    // لنعرض للمستخدم خياراً لطيفاً
+    const userWantsStream = confirm('🎥 هل قمت بتشغيل خادم البث (مثل PSRP) على PS3؟\nاضغط "موافق" لمحاولة عرض البث المباشر.');
+    if(userWantsStream) {
       videoPlaceholder.style.display = 'none';
       videoElem.style.display = 'block';
       videoElem.src = streamUrl;
@@ -424,14 +629,14 @@
         console.warn(e);
         videoPlaceholder.style.display = 'flex';
         videoElem.style.display = 'none';
-        showToast('تعذر تشغيل البث، تأكد من تشغيل خادم PSRP');
+        videoPlaceholder.innerHTML = `<span>📡</span><span>تعذر تشغيل البث المباشر</span><small>تأكد من تشغيل خادم PSRP على PS3 (منفذ 8080 أو 8554)</small>`;
+        showToast('⚠️ لم يتم العثور على بث حي');
       });
     } else {
-      videoPlaceholder.innerHTML = `<i class="material-icons" style="font-size:48px">🖥️</i><span>البث المباشر غير متاح</span><small>قم بتثبيت PSRP على جهازك وشغّل الخادم، ثم أعد المحاولة.</small>`;
+      videoPlaceholder.innerHTML = `<span>🌀 XMB WAVES ACTIVE</span><span>🔮 البث غير مفعل حالياً</span><small>قم بتشغيل خادم البث على PS3 ثم اضغط على "اتصال" مجدداً</small>`;
     }
   }
   
-  // Refresh games manually
   refreshBtn.addEventListener('click', loadGamesList);
   
   // Helper functions
@@ -452,10 +657,17 @@
     });
   }
   
-  // إذا كان هناك IP مخزن مسبقاً نحاول الاتصال تلقائياً
+  // إذا كان هناك IP مخزن مسبقاً نحاول الاتصال تلقائياً بعد ثواني
   if(currentPS3Ip) {
-    setTimeout(() => connectBtn.click(), 500);
+    setTimeout(() => {
+      connectBtn.click();
+    }, 800);
   }
+  
+  // منع أي تداخل مع animate waves عند مغادرة الصفحة (نظافة)
+  window.addEventListener('beforeunload', () => {
+    if(animationId) cancelAnimationFrame(animationId);
+  });
 </script>
 </body>
 </html>
