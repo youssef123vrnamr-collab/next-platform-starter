@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>PS3 Remote Controller - XMB Waves</title>
+  <title>PS3 Remote - Screen Inside Controller</title>
   <style>
     * {
       margin: 0;
@@ -13,7 +13,7 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    /* Canvas الخلفية المتحركة (تمويجات PS3 الشهيرة) */
+    /* Waves Background */
     #wavesCanvas {
       position: fixed;
       top: 0;
@@ -21,7 +21,7 @@
       width: 100%;
       height: 100%;
       z-index: 0;
-      pointer-events: none; /* يسمح بالتفاعل مع العناصر فوقه */
+      pointer-events: none;
       background: radial-gradient(circle at 20% 30%, #001433, #000000);
     }
 
@@ -32,10 +32,9 @@
       min-height: 100vh;
       position: relative;
       z-index: 1;
-      background: transparent; /* شفاف لظهور الأمواج */
+      background: transparent;
     }
 
-    /* إضافة طبقة شفافة داكنة خفيفة لتحسين قراءة النصوص */
     body::before {
       content: "";
       position: fixed;
@@ -43,14 +42,14 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 0, 0, 0.35);
-      backdrop-filter: blur(1px);
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(2px);
       z-index: -1;
       pointer-events: none;
     }
 
     .container {
-      max-width: 700px;
+      max-width: 950px;
       margin: 0 auto;
       position: relative;
       z-index: 2;
@@ -59,40 +58,38 @@
     /* Header */
     .header {
       text-align: center;
-      padding: 1rem;
+      padding: 0.8rem;
       background: rgba(0, 0, 0, 0.55);
       border-radius: 2rem;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1rem;
       backdrop-filter: blur(12px);
       border: 1px solid rgba(0, 166, 255, 0.3);
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
     }
 
     .header h1 {
-      font-size: 1.7rem;
-      background: linear-gradient(135deg, #00a6ff, #ff4d4d, #a0e7ff);
+      font-size: 1.3rem;
+      background: linear-gradient(135deg, #00a6ff, #ff4d4d);
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
-      text-shadow: 0 0 8px rgba(0,166,255,0.3);
     }
 
     .ip-section {
       display: flex;
       gap: 0.5rem;
-      margin: 1rem 0;
+      margin: 0.5rem 0;
       flex-wrap: wrap;
       justify-content: center;
     }
 
     .ip-section input {
       flex: 1;
-      padding: 0.8rem 1rem;
+      padding: 0.5rem 0.8rem;
       border-radius: 2rem;
       border: none;
       background: #0f172ad9;
       color: white;
-      font-size: 1rem;
+      font-size: 0.85rem;
       text-align: center;
       direction: ltr;
       font-family: monospace;
@@ -101,54 +98,91 @@
     }
 
     .ip-section button {
-      padding: 0.8rem 1.2rem;
+      padding: 0.5rem 1rem;
       border-radius: 2rem;
       border: none;
       background: #00a6ff;
       color: white;
       font-weight: bold;
       cursor: pointer;
-      transition: 0.2s;
-      box-shadow: 0 2px 8px rgba(0,166,255,0.3);
     }
 
-    .ip-section button:active {
-      transform: scale(0.96);
-    }
-
-    /* Status */
     .status {
       background: #0f172ab3;
       backdrop-filter: blur(8px);
-      padding: 0.6rem;
+      padding: 0.3rem;
       border-radius: 2rem;
       text-align: center;
-      font-size: 0.9rem;
+      font-size: 0.75rem;
       margin-bottom: 1rem;
       border: 1px solid #2d4a6e;
     }
 
-    /* Video Player */
-    .video-box {
-      background: #000000aa;
-      backdrop-filter: blur(8px);
-      border-radius: 1.5rem;
-      overflow: hidden;
-      margin-bottom: 1.5rem;
-      aspect-ratio: 16 / 9;
-      position: relative;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
-      border: 1px solid rgba(0,166,255,0.4);
+    /* Controller with built-in screen */
+    .controller-with-screen {
+      background: rgba(20, 30, 45, 0.85);
+      backdrop-filter: blur(20px);
+      border-radius: 3rem;
+      padding: 1.2rem;
+      border: 1px solid rgba(0, 166, 255, 0.4);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.6);
     }
 
-    .video-box video,
-    .video-box iframe {
+    /* Main layout: Left, Center (Screen), Right */
+    .controller-main {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    /* Left side: D-Pad + Left Stick */
+    .left-panel {
+      flex: 1;
+      min-width: 130px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    /* Right side: Action Buttons + Right Stick */
+    .right-panel {
+      flex: 1;
+      min-width: 130px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    /* Center: Screen + Select/Start/PS */
+    .center-panel {
+      flex: 1.5;
+      min-width: 200px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    /* Screen box */
+    .screen-box {
+      background: #000000aa;
+      border-radius: 1rem;
+      overflow: hidden;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border: 2px solid rgba(0, 166, 255, 0.6);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    }
+    .screen-box video, .screen-box iframe {
       width: 100%;
       height: 100%;
       object-fit: contain;
       background: black;
     }
-
     .video-placeholder {
       display: flex;
       align-items: center;
@@ -157,128 +191,172 @@
       background: #111111cc;
       color: #ccc;
       flex-direction: column;
-      gap: 0.5rem;
+      gap: 0.3rem;
+      font-size: 0.7rem;
       text-align: center;
     }
 
-    /* Games Grid */
-    .games-section {
-      margin: 1.5rem 0;
-    }
-
-    .games-header {
+    /* System buttons under screen */
+    .sys-buttons {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 0.8rem;
-      background: rgba(0,0,0,0.3);
-      padding: 0.5rem 1rem;
-      border-radius: 2rem;
-      backdrop-filter: blur(4px);
-    }
-
-    .games-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
       gap: 0.8rem;
-      max-height: 300px;
-      overflow-y: auto;
-      padding: 0.2rem;
+      justify-content: center;
+      flex-wrap: wrap;
     }
-
-    .game-card {
-      background: #1e2a3acc;
-      backdrop-filter: blur(8px);
-      border-radius: 1rem;
-      padding: 0.8rem;
-      text-align: center;
-      cursor: pointer;
-      transition: 0.1s linear;
-      border: 1px solid #2d3e4e;
-    }
-
-    .game-card:active {
-      background: #00a6ff;
-      transform: scale(0.97);
-    }
-
-    .game-icon {
-      font-size: 2rem;
-      margin-bottom: 0.3rem;
-    }
-
-    .game-title {
-      font-size: 0.8rem;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    /* Controller */
-    .controller {
-      background: rgba(15, 23, 42, 0.75);
-      backdrop-filter: blur(18px);
+    .sys-btn {
+      background: #2d3e4e;
+      padding: 0.4rem 0.9rem;
       border-radius: 2rem;
-      padding: 1rem;
-      margin-top: 1.5rem;
-      border: 1px solid rgba(0, 166, 255, 0.3);
+      font-size: 0.8rem;
+      font-weight: bold;
+      min-width: 70px;
+      box-shadow: 0 2px 0 #0a0f1e;
+      border: none;
+      color: white;
+      cursor: pointer;
+      transition: 0.05s linear;
+    }
+    .sys-btn:active {
+      transform: translateY(2px);
+      box-shadow: none;
+    }
+    .ps-btn {
+      background: #00a6ff;
     }
 
+    /* D-Pad */
     .dpad {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin-bottom: 1rem;
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 3rem;
+      padding: 0.5rem;
+      display: inline-block;
     }
-
     .dpad-row {
       display: flex;
       justify-content: center;
-      gap: 1rem;
-      margin: 0.3rem 0;
+      gap: 0.4rem;
+      margin: 0.2rem 0;
     }
-
-    .ctrl-btn {
-      background: #2d3e4ed9;
+    .dpad-btn {
+      background: #1e2f3f;
       border: none;
       color: white;
-      font-size: 1.8rem;
-      width: 70px;
-      height: 70px;
-      border-radius: 60px;
-      box-shadow: 0 5px 0 #0a0f1e;
+      font-size: 1.4rem;
+      width: 50px;
+      height: 50px;
+      border-radius: 50px;
+      box-shadow: 0 3px 0 #0a0f1e;
       cursor: pointer;
       transition: 0.05s linear;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      backdrop-filter: blur(2px);
+      font-weight: bold;
     }
-
-    .ctrl-btn:active {
+    .dpad-btn:active {
       transform: translateY(3px);
       box-shadow: none;
     }
 
-    .action-buttons {
+    /* Analog Sticks */
+    .analog-stick {
+      background: #1e2f3f;
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
       display: flex;
-      flex-wrap: wrap;
+      align-items: center;
       justify-content: center;
-      gap: 0.8rem;
-      margin: 1rem 0;
+      box-shadow: 0 4px 0 #0a0f1e;
+      cursor: pointer;
+      transition: 0.05s linear;
+    }
+    .analog-stick:active {
+      transform: translateY(3px);
+      box-shadow: none;
+    }
+    .stick-inner {
+      width: 40px;
+      height: 40px;
+      background: #2d4a6e;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+    }
+    .stick-label {
+      font-size: 0.6rem;
+      color: #aad0ff;
+      margin-top: 0.2rem;
+      text-align: center;
     }
 
+    /* Action Buttons */
+    .action-buttons {
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 3rem;
+      padding: 0.6rem;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.5rem;
+      align-items: center;
+      justify-items: center;
+    }
     .action-btn {
-      background: #ff4d4d;
-      width: 60px;
-      height: 60px;
-      font-size: 1.2rem;
+      width: 55px;
+      height: 55px;
+      border-radius: 55px;
+      font-size: 1.4rem;
       font-weight: bold;
+      box-shadow: 0 3px 0 #0a0f1e;
+      transition: 0.05s linear;
+      border: none;
+      color: white;
     }
+    .action-btn:active {
+      transform: translateY(3px);
+      box-shadow: none;
+    }
+    .btn-cross { background: #2c8c5e; }
+    .btn-circle { background: #c93a3a; }
+    .btn-square { background: #b86f9c; }
+    .btn-triangle { background: #5a9e4e; }
 
-    .special-btn {
-      background: #00a6ff;
+    /* Games List */
+    .games-section {
+      margin-top: 1.5rem;
     }
+    .games-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+      background: rgba(0,0,0,0.3);
+      padding: 0.3rem 0.8rem;
+      border-radius: 2rem;
+      font-size: 0.8rem;
+    }
+    .games-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 0.5rem;
+      max-height: 220px;
+      overflow-y: auto;
+      padding: 0.2rem;
+    }
+    .game-card {
+      background: #1e2a3acc;
+      backdrop-filter: blur(8px);
+      border-radius: 1rem;
+      padding: 0.5rem;
+      text-align: center;
+      cursor: pointer;
+      border: 1px solid #2d3e4e;
+    }
+    .game-card:active {
+      background: #00a6ff;
+      transform: scale(0.97);
+    }
+    .game-icon { font-size: 1.4rem; }
+    .game-title { font-size: 0.7rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
     .toast {
       position: fixed;
@@ -287,103 +365,132 @@
       transform: translateX(-50%);
       background: #00a6ffcc;
       backdrop-filter: blur(8px);
-      padding: 0.5rem 1.2rem;
+      padding: 0.4rem 1rem;
       border-radius: 2rem;
-      font-size: 0.9rem;
+      font-size: 0.75rem;
       z-index: 999;
-      transition: 0.2s;
       opacity: 0;
       pointer-events: none;
-      font-weight: bold;
+      transition: 0.2s;
     }
+    .toast.show { opacity: 1; }
 
-    .toast.show {
-      opacity: 1;
-    }
-
-    @media (max-width: 500px) {
-      .ctrl-btn {
-        width: 55px;
-        height: 55px;
-        font-size: 1.4rem;
+    /* Responsive */
+    @media (max-width: 700px) {
+      .controller-main {
+        flex-direction: column;
       }
-      .game-card {
-        padding: 0.5rem;
+      .left-panel, .right-panel {
+        flex-direction: row;
+        justify-content: center;
+        gap: 1rem;
+        width: 100%;
+      }
+      .dpad, .action-buttons {
+        transform: scale(0.9);
       }
     }
-
-    /* تخصيص شريط التمرير للألعاب */
-    .games-grid::-webkit-scrollbar {
-      width: 5px;
+    @media (max-width: 480px) {
+      .dpad-btn, .action-btn {
+        width: 45px;
+        height: 45px;
+        font-size: 1.2rem;
+      }
+      .analog-stick {
+        width: 60px;
+        height: 60px;
+      }
+      .stick-inner {
+        width: 35px;
+        height: 35px;
+        font-size: 1.2rem;
+      }
     }
-    .games-grid::-webkit-scrollbar-track {
-      background: #0f172a;
-      border-radius: 10px;
-    }
-    .games-grid::-webkit-scrollbar-thumb {
-      background: #00a6ff;
-      border-radius: 10px;
-    }
+    .games-grid::-webkit-scrollbar { width: 4px; }
+    .games-grid::-webkit-scrollbar-track { background: #0f172a; border-radius: 10px; }
+    .games-grid::-webkit-scrollbar-thumb { background: #00a6ff; border-radius: 10px; }
   </style>
 </head>
 <body>
 
-<!-- Canvas خاص بتمويجات PS3 الشهيرة (XMB Waves) -->
 <canvas id="wavesCanvas"></canvas>
 
 <div class="container">
   <div class="header">
-    <h1>🎮 PS3 Remote Control | XMB WAVES</h1>
+    <h1>🎮 PS3 Remote | Screen Inside Controller</h1>
     <div class="ip-section">
-      <input type="text" id="ps3Ip" placeholder="مثال: 192.168.1.100" value="192.168.1.100">
+      <input type="text" id="ps3Ip" placeholder="192.168.1.100" value="192.168.1.100">
       <button id="connectBtn">🔌 اتصال</button>
     </div>
     <div class="status" id="statusText">⚫ غير متصل</div>
   </div>
 
-  <!-- Video Streaming Section -->
-  <div class="video-box" id="videoBox">
-    <div class="video-placeholder" id="videoPlaceholder">
-      <span style="font-size:48px">📺✨</span>
-      <span>بث الشاشة سيظهر هنا</span>
-      <small style="font-size:11px">قم بإعداد PSRP أو خادم البث على PS3 (webMAN MOD + PSRP)</small>
+  <!-- يد التحكم مع شاشة مدمجة في المنتصف -->
+  <div class="controller-with-screen">
+    <div class="controller-main">
+      <!-- الجهة اليسرى: D-Pad + عصا يسرى -->
+      <div class="left-panel">
+        <div class="dpad">
+          <div class="dpad-row"><button class="dpad-btn ctrl-btn" data-btn="up">▲</button></div>
+          <div class="dpad-row">
+            <button class="dpad-btn ctrl-btn" data-btn="left">◀</button>
+            <button class="dpad-btn ctrl-btn" data-btn="select" style="background:#1e2f3f; font-size:0.7rem;">●</button>
+            <button class="dpad-btn ctrl-btn" data-btn="right">▶</button>
+          </div>
+          <div class="dpad-row"><button class="dpad-btn ctrl-btn" data-btn="down">▼</button></div>
+        </div>
+        <div>
+          <div class="analog-stick ctrl-btn" data-stick="left" data-btn="left_stick">
+            <div class="stick-inner">🎮</div>
+          </div>
+          <div class="stick-label">العصا اليسرى (L3)</div>
+        </div>
+      </div>
+
+      <!-- المنتصف: الشاشة + أزرار النظام -->
+      <div class="center-panel">
+        <div class="screen-box" id="videoBox">
+          <div class="video-placeholder" id="videoPlaceholder">
+            <span style="font-size:28px">📺✨</span>
+            <span>بث مباشر</span>
+            <small>PSRP على PS3</small>
+          </div>
+          <video id="streamVideo" style="display:none" controls autoplay muted playsinline></video>
+          <iframe id="streamIframe" style="display:none"></iframe>
+        </div>
+        <div class="sys-buttons">
+          <button class="sys-btn ctrl-btn" data-btn="select">Select</button>
+          <button class="sys-btn ctrl-btn" data-btn="start">Start</button>
+          <button class="sys-btn ps-btn ctrl-btn" data-btn="ps">🎮 PS</button>
+        </div>
+      </div>
+
+      <!-- الجهة اليمنى: أزرار Action + عصا يمنى -->
+      <div class="right-panel">
+        <div class="action-buttons">
+          <button class="action-btn btn-triangle ctrl-btn" data-btn="triangle">▲</button>
+          <button class="action-btn btn-circle ctrl-btn" data-btn="circle">O</button>
+          <button class="action-btn btn-cross ctrl-btn" data-btn="cross">X</button>
+          <button class="action-btn btn-square ctrl-btn" data-btn="square">□</button>
+        </div>
+        <div>
+          <div class="analog-stick ctrl-btn" data-stick="right" data-btn="right_stick">
+            <div class="stick-inner">🎮</div>
+          </div>
+          <div class="stick-label">العصا اليمنى (R3)</div>
+        </div>
+      </div>
     </div>
-    <video id="streamVideo" style="display:none" controls autoplay muted playsinline></video>
-    <iframe id="streamIframe" style="display:none" allowfullscreen></iframe>
   </div>
 
-  <!-- Games List -->
+  <!-- قائمة الألعاب -->
   <div class="games-section">
     <div class="games-header">
       <span>🎮 قائمة الألعاب (ISO / Folder)</span>
-      <button id="refreshGamesBtn" style="background:#2d3e4e; border:none; padding:0.3rem 1rem; border-radius:1rem; color:white; backdrop-filter:blur(4px);">🔄 تحديث</button>
+      <button id="refreshGamesBtn" style="background:#2d3e4e; border:none; padding:0.2rem 0.7rem; border-radius:1rem; color:white;">🔄 تحديث</button>
     </div>
     <div class="games-grid" id="gamesGrid">
       <div style="text-align:center; padding:1rem; color:#ccc;">اضغط اتصال أولاً</div>
-    </div>
-  </div>
-
-  <!-- Controller Pad -->
-  <div class="controller">
-    <div class="dpad">
-      <div class="dpad-row"><button class="ctrl-btn" data-btn="up">▲</button></div>
-      <div class="dpad-row">
-        <button class="ctrl-btn" data-btn="left">◀</button>
-        <button class="ctrl-btn" data-btn="select">●</button>
-        <button class="ctrl-btn" data-btn="right">▶</button>
-      </div>
-      <div class="dpad-row"><button class="ctrl-btn" data-btn="down">▼</button></div>
-    </div>
-    <div class="action-buttons">
-      <button class="ctrl-btn action-btn" data-btn="cross">X</button>
-      <button class="ctrl-btn action-btn" data-btn="circle">O</button>
-      <button class="ctrl-btn action-btn" data-btn="square">□</button>
-      <button class="ctrl-btn action-btn" data-btn="triangle">▲</button>
-    </div>
-    <div class="action-buttons">
-      <button class="ctrl-btn special-btn" data-btn="select">Select</button>
-      <button class="ctrl-btn special-btn" data-btn="start">Start</button>
-      <button class="ctrl-btn special-btn" data-btn="ps">PS</button>
     </div>
   </div>
 </div>
@@ -397,7 +504,6 @@
   let time = 0;
   let animationId;
 
-  // إعدادات الأمواج المتعددة (أسلوب PS3 الشهير)
   function resizeCanvas() {
     width = window.innerWidth;
     height = window.innerHeight;
@@ -408,17 +514,12 @@
   function drawWaves() {
     if (!ctx) return;
     ctx.clearRect(0, 0, width, height);
-    
-    // تدرج خلفية عميقة (داكنة مع لمعان)
     const grad = ctx.createLinearGradient(0, 0, width, height);
     grad.addColorStop(0, '#021126');
     grad.addColorStop(0.5, '#001133');
     grad.addColorStop(1, '#00051a');
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, width, height);
-    
-    // رسم موجات متعددة شبه شفافة بألوان زرقاء / بنفسجية / سماوية
-    // الموجة الأولى: كبيرة وسريعة
     ctx.save();
     for (let i = 0; i < 5; i++) {
       const offset = i * 1.2;
@@ -428,7 +529,6 @@
       const yBase = height * (0.3 + i * 0.12);
       const alpha = 0.12 - i * 0.015;
       const hue = (190 + i * 12) % 360;
-      
       ctx.beginPath();
       for (let x = 0; x <= width; x += 15) {
         const y = yBase + Math.sin(x * frequency + time * speed + offset) * amplitude 
@@ -442,8 +542,6 @@
       ctx.fillStyle = `hsla(${hue}, 80%, 55%, ${alpha})`;
       ctx.fill();
     }
-    
-    // موجات ثانية دقيقة تشبه التموج الخفيف
     for (let i = 0; i < 8; i++) {
       const amplitude = 12 + Math.sin(time * 0.5 + i) * 3;
       const freq = 0.012 + i * 0.001;
@@ -461,8 +559,6 @@
       ctx.lineWidth = 2;
       ctx.stroke();
     }
-    
-    // إضافة نقاط ضوئية متحركة (تأثير النجوم أو الجسيمات)
     ctx.fillStyle = 'rgba(210, 230, 255, 0.4)';
     for (let p = 0; p < 70; p++) {
       const px = (Math.sin(time * 0.2 + p) * 0.5 + 0.5) * width;
@@ -472,20 +568,16 @@
       ctx.fillStyle = `rgba(120, 200, 255, ${0.3 + Math.sin(time + p) * 0.1})`;
       ctx.fill();
     }
-    
     ctx.restore();
-    time += 0.025; // سرعة الحركة الكلاسيكية
+    time += 0.025;
     animationId = requestAnimationFrame(drawWaves);
   }
 
-  window.addEventListener('resize', () => {
-    resizeCanvas();
-  });
-  
+  window.addEventListener('resize', () => resizeCanvas());
   resizeCanvas();
-  drawWaves(); // بدء التموجات الفورية عند فتح الموقع
-  
-  // ----------------------------- PS3 webMAN MOD API (نفس الوظائف مع تحسينات) -------------------------
+  drawWaves();
+
+  // ----------------------------- PS3 webMAN MOD API + Vibration -------------------------
   let currentPS3Ip = localStorage.getItem('ps3_ip') || '';
   if(currentPS3Ip) document.getElementById('ps3Ip').value = currentPS3Ip;
   
@@ -494,50 +586,61 @@
   const connectBtn = document.getElementById('connectBtn');
   const refreshBtn = document.getElementById('refreshGamesBtn');
   
-  // Helper: send command to PS3 via webMAN MOD
-  async function sendCommand(endpoint, showToastMsg = true) {
+  function vibrate(pattern) {
+    if (window.navigator && window.navigator.vibrate) {
+      window.navigator.vibrate(pattern);
+    }
+  }
+  
+  async function sendCommand(endpoint, showToastMsg = true, vibratePattern = 50) {
     if(!currentPS3Ip) { showToast('❌ لم يتم تحديد IP'); return false; }
     try {
       const url = `http://${currentPS3Ip}${endpoint}`;
-      // استخدام no-cors لتجنب CORS، لكنه قد لا يعطي استجابة حقيقية. مناسب للأوامر.
       await fetch(url, { mode: 'no-cors' });
       if(showToastMsg) showToast(`✅ تم الإرسال`);
+      vibrate(vibratePattern);
       return true;
     } catch(e) {
       console.warn(e);
-      showToast(`⚠️ فشل الإرسال: تأكد من IP و webMAN`);
+      showToast(`⚠️ فشل الإرسال`);
+      vibrate([100, 50, 100]);
       return false;
     }
   }
   
-  // Button mapping
   const buttonMap = {
     'up': 'up', 'down': 'down', 'left': 'left', 'right': 'right',
     'cross': 'cross', 'circle': 'circle', 'square': 'square', 'triangle': 'triangle',
-    'select': 'select', 'start': 'start', 'ps': 'ps'
+    'select': 'select', 'start': 'start', 'ps': 'ps',
+    'left_stick': 'l3', 'right_stick': 'r3'
   };
   
-  // Attach all controller buttons
-  document.querySelectorAll('.ctrl-btn').forEach(btn => {
-    btn.addEventListener('click', async (e) => {
-      e.stopPropagation();
-      const cmd = btn.getAttribute('data-btn');
-      if(cmd && buttonMap[cmd]) {
-        await sendCommand(`/pad.ps3?${buttonMap[cmd]}`, true);
-      }
+  function attachAllButtons() {
+    document.querySelectorAll('.ctrl-btn').forEach(btn => {
+      if(btn.hasListener) return;
+      btn.hasListener = true;
+      btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        let cmd = btn.getAttribute('data-btn');
+        if (btn.getAttribute('data-stick') === 'left') cmd = 'left_stick';
+        if (btn.getAttribute('data-stick') === 'right') cmd = 'right_stick';
+        
+        if(cmd && buttonMap[cmd]) {
+          let vibe = (cmd === 'ps' || cmd === 'left_stick' || cmd === 'right_stick') ? 80 : 40;
+          await sendCommand(`/pad.ps3?${buttonMap[cmd]}`, true, vibe);
+        }
+      });
     });
-  });
+  }
   
-  // اختبار الاتصال
+  attachAllButtons();
+  
   async function testConnection(ip) {
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 3000);
-      // نحاول جلب الصفحة الرئيسية لـ webMAN (غالباً /index.html)
-      const res = await fetch(`http://${ip}/`, { signal: controller.signal, mode: 'no-cors' });
+      await fetch(`http://${ip}/`, { signal: controller.signal, mode: 'no-cors' });
       clearTimeout(timeoutId);
-      // مع no-cors لا يمكن قراءة الرد ولكن اذا لم يرمي خطأ فالاستجابة وصلت (لكن قد تكون غير كاملة)
-      // نحاول أيضاً فتح endpoint بسيط للتأكد
       return true;
     } catch(e) {
       return false;
@@ -553,19 +656,20 @@
     const connected = await testConnection(ip);
     if(connected) {
       statusDiv.innerHTML = '✅ متصل بـ PS3 (webMAN MOD) ✨';
-      showToast('تم الاتصال بنجاح مع الأمواج!');
+      showToast('تم الاتصال بنجاح + دعم الاهتزاز');
+      vibrate(200);
       loadGamesList();
       setupVideoStream();
     } else {
       statusDiv.innerHTML = '❌ فشل الاتصال - تأكد من IP وتشغيل webMAN';
-      showToast('فشل الاتصال بالجهاز');
+      showToast('فشل الاتصال');
+      vibrate([100, 200, 100]);
     }
   });
   
-  // تحميل قائمة الألعاب
   async function loadGamesList() {
     if(!currentPS3Ip) { gamesGrid.innerHTML = '<div style="color:#aaa;">يرجى الاتصال أولاً</div>'; return; }
-    gamesGrid.innerHTML = '<div style="text-align:center;">⏳ جاري تحميل الألعاب مع الموجات...</div>';
+    gamesGrid.innerHTML = '<div style="text-align:center;">⏳ جاري تحميل الألعاب...</div>';
     try {
       const url = `http://${currentPS3Ip}/get_ps3_games.ps3`;
       const res = await fetch(url);
@@ -573,7 +677,7 @@
       parseGamesList(text);
     } catch(e) {
       console.error(e);
-      gamesGrid.innerHTML = '<div style="color:#f66;">⚠️ تعذر تحميل الألعاب (تأكد من webMAN MOD ووجود ألعاب)</div>';
+      gamesGrid.innerHTML = '<div style="color:#f66;">⚠️ تعذر تحميل الألعاب (تأكد من webMAN MOD)</div>';
     }
   }
   
@@ -582,14 +686,14 @@
     const games = [];
     for(let line of lines) {
       line = line.trim();
-      if(line.startsWith('/dev_hdd0/game/') || line.startsWith('/dev_usb') || line.endsWith('.iso') || line.includes('PS3ISO') || line.includes('.iso')) {
-        let title = line.split('/').pop().replace(/_/g,' ').replace('.iso','').replace('.ISO','');
+      if(line.startsWith('/dev_hdd0/game/') || line.startsWith('/dev_usb') || line.endsWith('.iso') || line.includes('PS3ISO')) {
+        let title = line.split('/').pop().replace(/_/g,' ').replace('.iso','');
         if(title.length < 2) title = line.slice(-30);
         games.push({ path: line, title: title });
       }
     }
     if(games.length === 0) {
-      gamesGrid.innerHTML = '<div style="color:#aaa;">🎮 لم يتم العثور على ألعاب. تأكد من وجود ألعاب في webMAN.</div>';
+      gamesGrid.innerHTML = '<div style="color:#aaa;">🎮 لم يتم العثور على ألعاب.</div>';
       return;
     }
     gamesGrid.innerHTML = '';
@@ -605,22 +709,20 @@
   async function launchGame(gamePath) {
     if(!currentPS3Ip) return;
     showToast(`🚀 تشغيل: ${gamePath.split('/').pop()}`);
+    vibrate(100);
     await sendCommand(`/mount.ps3${gamePath}`, false);
     setTimeout(async () => {
       await sendCommand(`/play.ps3`, false);
       showToast('🎉 تم إطلاق اللعبة');
+      vibrate([150, 100]);
     }, 600);
   }
   
-  // Video Streaming Setup مع تحسين الخبرة
   function setupVideoStream() {
     const videoPlaceholder = document.getElementById('videoPlaceholder');
     const videoElem = document.getElementById('streamVideo');
-    const iframeElem = document.getElementById('streamIframe');
-    // محاولة استخدام PSRP على منفذ 8080
     const streamUrl = `http://${currentPS3Ip}:8080/stream`;
-    // لنعرض للمستخدم خياراً لطيفاً
-    const userWantsStream = confirm('🎥 هل قمت بتشغيل خادم البث (مثل PSRP) على PS3؟\nاضغط "موافق" لمحاولة عرض البث المباشر.');
+    const userWantsStream = confirm('🎥 هل قمت بتشغيل خادم البث (PSRP) على PS3؟\nاضغط موافق لمحاولة عرض البث المباشر.');
     if(userWantsStream) {
       videoPlaceholder.style.display = 'none';
       videoElem.style.display = 'block';
@@ -629,17 +731,16 @@
         console.warn(e);
         videoPlaceholder.style.display = 'flex';
         videoElem.style.display = 'none';
-        videoPlaceholder.innerHTML = `<span>📡</span><span>تعذر تشغيل البث المباشر</span><small>تأكد من تشغيل خادم PSRP على PS3 (منفذ 8080 أو 8554)</small>`;
-        showToast('⚠️ لم يتم العثور على بث حي');
+        videoPlaceholder.innerHTML = `<span>📡</span><span>تعذر تشغيل البث</span><small>تأكد من تشغيل PSRP (منفذ 8080)</small>`;
+        showToast('⚠️ لا يوجد بث حي');
       });
     } else {
-      videoPlaceholder.innerHTML = `<span>🌀 XMB WAVES ACTIVE</span><span>🔮 البث غير مفعل حالياً</span><small>قم بتشغيل خادم البث على PS3 ثم اضغط على "اتصال" مجدداً</small>`;
+      videoPlaceholder.innerHTML = `<span>🌀 XMB WAVES</span><span>🔮 البث غير مفعل</span><small>يمكنك تفعيله لاحقاً</small>`;
     }
   }
   
   refreshBtn.addEventListener('click', loadGamesList);
   
-  // Helper functions
   function showToast(msg) {
     const toast = document.getElementById('toastMsg');
     toast.textContent = msg;
@@ -649,22 +750,11 @@
   
   function escapeHtml(str) {
     if(!str) return '';
-    return str.replace(/[&<>]/g, function(m) {
-      if(m === '&') return '&amp;';
-      if(m === '<') return '&lt;';
-      if(m === '>') return '&gt;';
-      return m;
-    });
+    return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : (m === '<' ? '&lt;' : '&gt;'));
   }
   
-  // إذا كان هناك IP مخزن مسبقاً نحاول الاتصال تلقائياً بعد ثواني
-  if(currentPS3Ip) {
-    setTimeout(() => {
-      connectBtn.click();
-    }, 800);
-  }
+  if(currentPS3Ip) setTimeout(() => connectBtn.click(), 800);
   
-  // منع أي تداخل مع animate waves عند مغادرة الصفحة (نظافة)
   window.addEventListener('beforeunload', () => {
     if(animationId) cancelAnimationFrame(animationId);
   });
