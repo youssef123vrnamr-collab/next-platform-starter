@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>PS3 Remote - Dual Analog Sticks at Bottom</title>
+  <title>PS3 Remote - Screen Inside Controller</title>
   <style>
     * {
       margin: 0;
@@ -49,7 +49,7 @@
     }
 
     .container {
-      max-width: 800px;
+      max-width: 950px;
       margin: 0 auto;
       position: relative;
       z-index: 2;
@@ -118,31 +118,71 @@
       border: 1px solid #2d4a6e;
     }
 
-    /* Screen on top */
-    .screen-container {
-      background: rgba(0, 0, 0, 0.5);
-      border-radius: 1.5rem;
-      padding: 0.5rem;
-      margin-bottom: 1.5rem;
+    /* Controller with built-in screen */
+    .controller-with-screen {
+      background: rgba(20, 30, 45, 0.85);
+      backdrop-filter: blur(20px);
+      border-radius: 3rem;
+      padding: 1.2rem;
       border: 1px solid rgba(0, 166, 255, 0.4);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.6);
     }
 
-    .video-box {
+    /* Main layout: Left, Center (Screen), Right */
+    .controller-main {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    /* Left side: D-Pad + Left Stick */
+    .left-panel {
+      flex: 1;
+      min-width: 130px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    /* Right side: Action Buttons + Right Stick */
+    .right-panel {
+      flex: 1;
+      min-width: 130px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    /* Center: Screen + Select/Start/PS */
+    .center-panel {
+      flex: 1.5;
+      min-width: 200px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    /* Screen box */
+    .screen-box {
       background: #000000aa;
       border-radius: 1rem;
       overflow: hidden;
+      width: 100%;
       aspect-ratio: 16 / 9;
       border: 2px solid rgba(0, 166, 255, 0.6);
-      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.5);
     }
-
-    .video-box video, .video-box iframe {
+    .screen-box video, .screen-box iframe {
       width: 100%;
       height: 100%;
       object-fit: contain;
       background: black;
     }
-
     .video-placeholder {
       display: flex;
       align-items: center;
@@ -152,145 +192,20 @@
       color: #ccc;
       flex-direction: column;
       gap: 0.3rem;
-      font-size: 0.8rem;
+      font-size: 0.7rem;
       text-align: center;
     }
 
-    /* Controller Body */
-    .controller-body {
-      background: rgba(20, 30, 45, 0.85);
-      backdrop-filter: blur(20px);
-      border-radius: 3rem;
-      padding: 1.2rem;
-      border: 1px solid rgba(0, 166, 255, 0.4);
-      box-shadow: 0 15px 30px rgba(0,0,0,0.6);
-    }
-
-    /* First row: D-Pad (left) and Action Buttons (right) */
-    .row-buttons {
-      display: flex;
-      justify-content: center;
-      gap: 2rem;
-      flex-wrap: wrap;
-      margin-bottom: 1.5rem;
-    }
-
-    .dpad {
-      background: rgba(0, 0, 0, 0.5);
-      border-radius: 3rem;
-      padding: 0.6rem;
-      display: inline-block;
-    }
-    .dpad-row {
-      display: flex;
-      justify-content: center;
-      gap: 0.5rem;
-      margin: 0.2rem 0;
-    }
-    .dpad-btn {
-      background: #1e2f3f;
-      border: none;
-      color: white;
-      font-size: 1.5rem;
-      width: 55px;
-      height: 55px;
-      border-radius: 50px;
-      box-shadow: 0 3px 0 #0a0f1e;
-      cursor: pointer;
-      transition: 0.05s linear;
-      font-weight: bold;
-    }
-    .dpad-btn:active {
-      transform: translateY(3px);
-      box-shadow: none;
-    }
-
-    .action-buttons {
-      background: rgba(0, 0, 0, 0.4);
-      border-radius: 3rem;
-      padding: 0.6rem;
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 0.6rem;
-      align-items: center;
-      justify-items: center;
-    }
-    .action-btn {
-      width: 60px;
-      height: 60px;
-      border-radius: 60px;
-      font-size: 1.5rem;
-      font-weight: bold;
-      box-shadow: 0 3px 0 #0a0f1e;
-      transition: 0.05s linear;
-      border: none;
-      color: white;
-    }
-    .action-btn:active {
-      transform: translateY(3px);
-      box-shadow: none;
-    }
-    .btn-cross { background: #2c8c5e; }
-    .btn-circle { background: #c93a3a; }
-    .btn-square { background: #b86f9c; }
-    .btn-triangle { background: #5a9e4e; }
-
-    /* Second row: Analog Sticks (left and right) + System buttons in center */
-    .row-sticks {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 1.5rem;
-      flex-wrap: wrap;
-      margin-top: 0.5rem;
-    }
-
-    .stick-area {
-      text-align: center;
-    }
-    .analog-stick {
-      background: #1e2f3f;
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 0 #0a0f1e;
-      cursor: pointer;
-      transition: 0.05s linear;
-      margin: 0 auto;
-    }
-    .analog-stick:active {
-      transform: translateY(3px);
-      box-shadow: none;
-    }
-    .stick-inner {
-      width: 45px;
-      height: 45px;
-      background: #2d4a6e;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.6rem;
-    }
-    .stick-label {
-      font-size: 0.65rem;
-      color: #aad0ff;
-      margin-top: 0.3rem;
-    }
-
-    .center-sys {
+    /* System buttons under screen */
+    .sys-buttons {
       display: flex;
       gap: 0.8rem;
-      background: rgba(0,0,0,0.3);
-      padding: 0.5rem 1rem;
-      border-radius: 3rem;
+      justify-content: center;
+      flex-wrap: wrap;
     }
     .sys-btn {
       background: #2d3e4e;
-      padding: 0.4rem 1rem;
+      padding: 0.4rem 0.9rem;
       border-radius: 2rem;
       font-size: 0.8rem;
       font-weight: bold;
@@ -308,6 +223,102 @@
     .ps-btn {
       background: #00a6ff;
     }
+
+    /* D-Pad */
+    .dpad {
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 3rem;
+      padding: 0.5rem;
+      display: inline-block;
+    }
+    .dpad-row {
+      display: flex;
+      justify-content: center;
+      gap: 0.4rem;
+      margin: 0.2rem 0;
+    }
+    .dpad-btn {
+      background: #1e2f3f;
+      border: none;
+      color: white;
+      font-size: 1.4rem;
+      width: 50px;
+      height: 50px;
+      border-radius: 50px;
+      box-shadow: 0 3px 0 #0a0f1e;
+      cursor: pointer;
+      transition: 0.05s linear;
+      font-weight: bold;
+    }
+    .dpad-btn:active {
+      transform: translateY(3px);
+      box-shadow: none;
+    }
+
+    /* Analog Sticks */
+    .analog-stick {
+      background: #1e2f3f;
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 0 #0a0f1e;
+      cursor: pointer;
+      transition: 0.05s linear;
+    }
+    .analog-stick:active {
+      transform: translateY(3px);
+      box-shadow: none;
+    }
+    .stick-inner {
+      width: 40px;
+      height: 40px;
+      background: #2d4a6e;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+    }
+    .stick-label {
+      font-size: 0.6rem;
+      color: #aad0ff;
+      margin-top: 0.2rem;
+      text-align: center;
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 3rem;
+      padding: 0.6rem;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.5rem;
+      align-items: center;
+      justify-items: center;
+    }
+    .action-btn {
+      width: 55px;
+      height: 55px;
+      border-radius: 55px;
+      font-size: 1.4rem;
+      font-weight: bold;
+      box-shadow: 0 3px 0 #0a0f1e;
+      transition: 0.05s linear;
+      border: none;
+      color: white;
+    }
+    .action-btn:active {
+      transform: translateY(3px);
+      box-shadow: none;
+    }
+    .btn-cross { background: #2c8c5e; }
+    .btn-circle { background: #c93a3a; }
+    .btn-square { background: #b86f9c; }
+    .btn-triangle { background: #5a9e4e; }
 
     /* Games List */
     .games-section {
@@ -365,25 +376,34 @@
     .toast.show { opacity: 1; }
 
     /* Responsive */
-    @media (max-width: 600px) {
+    @media (max-width: 700px) {
+      .controller-main {
+        flex-direction: column;
+      }
+      .left-panel, .right-panel {
+        flex-direction: row;
+        justify-content: center;
+        gap: 1rem;
+        width: 100%;
+      }
+      .dpad, .action-buttons {
+        transform: scale(0.9);
+      }
+    }
+    @media (max-width: 480px) {
       .dpad-btn, .action-btn {
-        width: 48px;
-        height: 48px;
-        font-size: 1.3rem;
+        width: 45px;
+        height: 45px;
+        font-size: 1.2rem;
       }
       .analog-stick {
-        width: 65px;
-        height: 65px;
+        width: 60px;
+        height: 60px;
       }
       .stick-inner {
-        width: 38px;
-        height: 38px;
-        font-size: 1.3rem;
-      }
-      .sys-btn {
-        padding: 0.3rem 0.7rem;
-        min-width: 60px;
-        font-size: 0.7rem;
+        width: 35px;
+        height: 35px;
+        font-size: 1.2rem;
       }
     }
     .games-grid::-webkit-scrollbar { width: 4px; }
@@ -397,7 +417,7 @@
 
 <div class="container">
   <div class="header">
-    <h1>🎮 PS3 Remote | Sticks at Bottom</h1>
+    <h1>🎮 PS3 Remote | Screen Inside Controller</h1>
     <div class="ip-section">
       <input type="text" id="ps3Ip" placeholder="192.168.1.100" value="192.168.1.100">
       <button id="connectBtn">🔌 اتصال</button>
@@ -405,61 +425,60 @@
     <div class="status" id="statusText">⚫ غير متصل</div>
   </div>
 
-  <!-- شاشة العرض في الأعلى -->
-  <div class="screen-container">
-    <div class="video-box" id="videoBox">
-      <div class="video-placeholder" id="videoPlaceholder">
-        <span style="font-size:32px">📺✨</span>
-        <span>شاشة البث المباشر</span>
-        <small>قم بتشغيل PSRP على PS3</small>
-      </div>
-      <video id="streamVideo" style="display:none" controls autoplay muted playsinline></video>
-      <iframe id="streamIframe" style="display:none"></iframe>
-    </div>
-  </div>
-
-  <!-- يد التحكم: الأزرار في الصف العلوي، العصي في الصف السفلي -->
-  <div class="controller-body">
-    <!-- الصف الأول: D-Pad (يسار) + Action Buttons (يمين) -->
-    <div class="row-buttons">
-      <div class="dpad">
-        <div class="dpad-row"><button class="dpad-btn ctrl-btn" data-btn="up">▲</button></div>
-        <div class="dpad-row">
-          <button class="dpad-btn ctrl-btn" data-btn="left">◀</button>
-          <button class="dpad-btn ctrl-btn" data-btn="select" style="background:#1e2f3f; font-size:0.8rem;">●</button>
-          <button class="dpad-btn ctrl-btn" data-btn="right">▶</button>
+  <!-- يد التحكم مع شاشة مدمجة في المنتصف -->
+  <div class="controller-with-screen">
+    <div class="controller-main">
+      <!-- الجهة اليسرى: D-Pad + عصا يسرى -->
+      <div class="left-panel">
+        <div class="dpad">
+          <div class="dpad-row"><button class="dpad-btn ctrl-btn" data-btn="up">▲</button></div>
+          <div class="dpad-row">
+            <button class="dpad-btn ctrl-btn" data-btn="left">◀</button>
+            <button class="dpad-btn ctrl-btn" data-btn="select" style="background:#1e2f3f; font-size:0.7rem;">●</button>
+            <button class="dpad-btn ctrl-btn" data-btn="right">▶</button>
+          </div>
+          <div class="dpad-row"><button class="dpad-btn ctrl-btn" data-btn="down">▼</button></div>
         </div>
-        <div class="dpad-row"><button class="dpad-btn ctrl-btn" data-btn="down">▼</button></div>
-      </div>
-
-      <div class="action-buttons">
-        <button class="action-btn btn-triangle ctrl-btn" data-btn="triangle">▲</button>
-        <button class="action-btn btn-circle ctrl-btn" data-btn="circle">O</button>
-        <button class="action-btn btn-cross ctrl-btn" data-btn="cross">X</button>
-        <button class="action-btn btn-square ctrl-btn" data-btn="square">□</button>
-      </div>
-    </div>
-
-    <!-- الصف الثاني: العصا اليسرى (تحت D-Pad) ، أزرار النظام في الوسط، العصا اليمنى (تحت Action) -->
-    <div class="row-sticks">
-      <div class="stick-area">
-        <div class="analog-stick ctrl-btn" data-stick="left" data-btn="left_stick">
-          <div class="stick-inner">🎮</div>
+        <div>
+          <div class="analog-stick ctrl-btn" data-stick="left" data-btn="left_stick">
+            <div class="stick-inner">🎮</div>
+          </div>
+          <div class="stick-label">العصا اليسرى (L3)</div>
         </div>
-        <div class="stick-label">العصا اليسرى (L3)</div>
       </div>
 
-      <div class="center-sys">
-        <button class="sys-btn ctrl-btn" data-btn="select">Select</button>
-        <button class="sys-btn ctrl-btn" data-btn="start">Start</button>
-        <button class="sys-btn ps-btn ctrl-btn" data-btn="ps">🎮 PS</button>
-      </div>
-
-      <div class="stick-area">
-        <div class="analog-stick ctrl-btn" data-stick="right" data-btn="right_stick">
-          <div class="stick-inner">🎮</div>
+      <!-- المنتصف: الشاشة + أزرار النظام -->
+      <div class="center-panel">
+        <div class="screen-box" id="videoBox">
+          <div class="video-placeholder" id="videoPlaceholder">
+            <span style="font-size:28px">📺✨</span>
+            <span>بث مباشر</span>
+            <small>PSRP على PS3</small>
+          </div>
+          <video id="streamVideo" style="display:none" controls autoplay muted playsinline></video>
+          <iframe id="streamIframe" style="display:none"></iframe>
         </div>
-        <div class="stick-label">العصا اليمنى (R3)</div>
+        <div class="sys-buttons">
+          <button class="sys-btn ctrl-btn" data-btn="select">Select</button>
+          <button class="sys-btn ctrl-btn" data-btn="start">Start</button>
+          <button class="sys-btn ps-btn ctrl-btn" data-btn="ps">🎮 PS</button>
+        </div>
+      </div>
+
+      <!-- الجهة اليمنى: أزرار Action + عصا يمنى -->
+      <div class="right-panel">
+        <div class="action-buttons">
+          <button class="action-btn btn-triangle ctrl-btn" data-btn="triangle">▲</button>
+          <button class="action-btn btn-circle ctrl-btn" data-btn="circle">O</button>
+          <button class="action-btn btn-cross ctrl-btn" data-btn="cross">X</button>
+          <button class="action-btn btn-square ctrl-btn" data-btn="square">□</button>
+        </div>
+        <div>
+          <div class="analog-stick ctrl-btn" data-stick="right" data-btn="right_stick">
+            <div class="stick-inner">🎮</div>
+          </div>
+          <div class="stick-label">العصا اليمنى (R3)</div>
+        </div>
       </div>
     </div>
   </div>
