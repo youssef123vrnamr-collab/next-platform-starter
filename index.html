@@ -1,763 +1,626 @@
 <!DOCTYPE html>
-<html dir="rtl" lang="ar">
+<html lang="ar">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>PS3 Remote - Screen Inside Controller</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      user-select: none;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    /* Waves Background */
-    #wavesCanvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 0;
-      pointer-events: none;
-      background: radial-gradient(circle at 20% 30%, #001433, #000000);
-    }
-
-    body {
-      font-family: 'Segoe UI', 'Tahoma', 'Geneva', 'Verdana', sans-serif;
-      color: #eee;
-      padding: 1rem;
-      min-height: 100vh;
-      position: relative;
-      z-index: 1;
-      background: transparent;
-    }
-
-    body::before {
-      content: "";
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.4);
-      backdrop-filter: blur(2px);
-      z-index: -1;
-      pointer-events: none;
-    }
-
-    .container {
-      max-width: 950px;
-      margin: 0 auto;
-      position: relative;
-      z-index: 2;
-    }
-
-    /* Header */
-    .header {
-      text-align: center;
-      padding: 0.8rem;
-      background: rgba(0, 0, 0, 0.55);
-      border-radius: 2rem;
-      margin-bottom: 1rem;
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(0, 166, 255, 0.3);
-    }
-
-    .header h1 {
-      font-size: 1.3rem;
-      background: linear-gradient(135deg, #00a6ff, #ff4d4d);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
-
-    .ip-section {
-      display: flex;
-      gap: 0.5rem;
-      margin: 0.5rem 0;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-
-    .ip-section input {
-      flex: 1;
-      padding: 0.5rem 0.8rem;
-      border-radius: 2rem;
-      border: none;
-      background: #0f172ad9;
-      color: white;
-      font-size: 0.85rem;
-      text-align: center;
-      direction: ltr;
-      font-family: monospace;
-      backdrop-filter: blur(4px);
-      border: 1px solid #2d4a6e;
-    }
-
-    .ip-section button {
-      padding: 0.5rem 1rem;
-      border-radius: 2rem;
-      border: none;
-      background: #00a6ff;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    .status {
-      background: #0f172ab3;
-      backdrop-filter: blur(8px);
-      padding: 0.3rem;
-      border-radius: 2rem;
-      text-align: center;
-      font-size: 0.75rem;
-      margin-bottom: 1rem;
-      border: 1px solid #2d4a6e;
-    }
-
-    /* Controller with built-in screen */
-    .controller-with-screen {
-      background: rgba(20, 30, 45, 0.85);
-      backdrop-filter: blur(20px);
-      border-radius: 3rem;
-      padding: 1.2rem;
-      border: 1px solid rgba(0, 166, 255, 0.4);
-      box-shadow: 0 15px 30px rgba(0,0,0,0.6);
-    }
-
-    /* Main layout: Left, Center (Screen), Right */
-    .controller-main {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      align-items: center;
-      gap: 0.8rem;
-    }
-
-    /* Left side: D-Pad + Left Stick */
-    .left-panel {
-      flex: 1;
-      min-width: 130px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    /* Right side: Action Buttons + Right Stick */
-    .right-panel {
-      flex: 1;
-      min-width: 130px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    /* Center: Screen + Select/Start/PS */
-    .center-panel {
-      flex: 1.5;
-      min-width: 200px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.8rem;
-    }
-
-    /* Screen box */
-    .screen-box {
-      background: #000000aa;
-      border-radius: 1rem;
-      overflow: hidden;
-      width: 100%;
-      aspect-ratio: 16 / 9;
-      border: 2px solid rgba(0, 166, 255, 0.6);
-      box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-    }
-    .screen-box video, .screen-box iframe {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      background: black;
-    }
-    .video-placeholder {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100%;
-      background: #111111cc;
-      color: #ccc;
-      flex-direction: column;
-      gap: 0.3rem;
-      font-size: 0.7rem;
-      text-align: center;
-    }
-
-    /* System buttons under screen */
-    .sys-buttons {
-      display: flex;
-      gap: 0.8rem;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-    .sys-btn {
-      background: #2d3e4e;
-      padding: 0.4rem 0.9rem;
-      border-radius: 2rem;
-      font-size: 0.8rem;
-      font-weight: bold;
-      min-width: 70px;
-      box-shadow: 0 2px 0 #0a0f1e;
-      border: none;
-      color: white;
-      cursor: pointer;
-      transition: 0.05s linear;
-    }
-    .sys-btn:active {
-      transform: translateY(2px);
-      box-shadow: none;
-    }
-    .ps-btn {
-      background: #00a6ff;
-    }
-
-    /* D-Pad */
-    .dpad {
-      background: rgba(0, 0, 0, 0.5);
-      border-radius: 3rem;
-      padding: 0.5rem;
-      display: inline-block;
-    }
-    .dpad-row {
-      display: flex;
-      justify-content: center;
-      gap: 0.4rem;
-      margin: 0.2rem 0;
-    }
-    .dpad-btn {
-      background: #1e2f3f;
-      border: none;
-      color: white;
-      font-size: 1.4rem;
-      width: 50px;
-      height: 50px;
-      border-radius: 50px;
-      box-shadow: 0 3px 0 #0a0f1e;
-      cursor: pointer;
-      transition: 0.05s linear;
-      font-weight: bold;
-    }
-    .dpad-btn:active {
-      transform: translateY(3px);
-      box-shadow: none;
-    }
-
-    /* Analog Sticks */
-    .analog-stick {
-      background: #1e2f3f;
-      width: 70px;
-      height: 70px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 0 #0a0f1e;
-      cursor: pointer;
-      transition: 0.05s linear;
-    }
-    .analog-stick:active {
-      transform: translateY(3px);
-      box-shadow: none;
-    }
-    .stick-inner {
-      width: 40px;
-      height: 40px;
-      background: #2d4a6e;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.4rem;
-    }
-    .stick-label {
-      font-size: 0.6rem;
-      color: #aad0ff;
-      margin-top: 0.2rem;
-      text-align: center;
-    }
-
-    /* Action Buttons */
-    .action-buttons {
-      background: rgba(0, 0, 0, 0.4);
-      border-radius: 3rem;
-      padding: 0.6rem;
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 0.5rem;
-      align-items: center;
-      justify-items: center;
-    }
-    .action-btn {
-      width: 55px;
-      height: 55px;
-      border-radius: 55px;
-      font-size: 1.4rem;
-      font-weight: bold;
-      box-shadow: 0 3px 0 #0a0f1e;
-      transition: 0.05s linear;
-      border: none;
-      color: white;
-    }
-    .action-btn:active {
-      transform: translateY(3px);
-      box-shadow: none;
-    }
-    .btn-cross { background: #2c8c5e; }
-    .btn-circle { background: #c93a3a; }
-    .btn-square { background: #b86f9c; }
-    .btn-triangle { background: #5a9e4e; }
-
-    /* Games List */
-    .games-section {
-      margin-top: 1.5rem;
-    }
-    .games-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 0.5rem;
-      background: rgba(0,0,0,0.3);
-      padding: 0.3rem 0.8rem;
-      border-radius: 2rem;
-      font-size: 0.8rem;
-    }
-    .games-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-      gap: 0.5rem;
-      max-height: 220px;
-      overflow-y: auto;
-      padding: 0.2rem;
-    }
-    .game-card {
-      background: #1e2a3acc;
-      backdrop-filter: blur(8px);
-      border-radius: 1rem;
-      padding: 0.5rem;
-      text-align: center;
-      cursor: pointer;
-      border: 1px solid #2d3e4e;
-    }
-    .game-card:active {
-      background: #00a6ff;
-      transform: scale(0.97);
-    }
-    .game-icon { font-size: 1.4rem; }
-    .game-title { font-size: 0.7rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-    .toast {
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #00a6ffcc;
-      backdrop-filter: blur(8px);
-      padding: 0.4rem 1rem;
-      border-radius: 2rem;
-      font-size: 0.75rem;
-      z-index: 999;
-      opacity: 0;
-      pointer-events: none;
-      transition: 0.2s;
-    }
-    .toast.show { opacity: 1; }
-
-    /* Responsive */
-    @media (max-width: 700px) {
-      .controller-main {
-        flex-direction: column;
-      }
-      .left-panel, .right-panel {
-        flex-direction: row;
-        justify-content: center;
-        gap: 1rem;
-        width: 100%;
-      }
-      .dpad, .action-buttons {
-        transform: scale(0.9);
-      }
-    }
-    @media (max-width: 480px) {
-      .dpad-btn, .action-btn {
-        width: 45px;
-        height: 45px;
-        font-size: 1.2rem;
-      }
-      .analog-stick {
-        width: 60px;
-        height: 60px;
-      }
-      .stick-inner {
-        width: 35px;
-        height: 35px;
-        font-size: 1.2rem;
-      }
-    }
-    .games-grid::-webkit-scrollbar { width: 4px; }
-    .games-grid::-webkit-scrollbar-track { background: #0f172a; border-radius: 10px; }
-    .games-grid::-webkit-scrollbar-thumb { background: #00a6ff; border-radius: 10px; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>💰 Galactic Kareem - فلوس كريم + جوستيك</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            background: radial-gradient(circle at 20% 30%, #0a0f2a, #030617);
+            font-family: 'Segoe UI', 'Orbitron', monospace;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+        }
+        .game-container {
+            max-width: 1400px;
+            width: 100%;
+            background: rgba(0,0,0,0.5);
+            border-radius: 48px;
+            padding: 20px;
+        }
+        .main-panel {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .canvas-area {
+            flex: 3;
+            min-width: 300px;
+            position: relative;
+        }
+        canvas {
+            width: 100%;
+            height: auto;
+            background: #03061a;
+            border-radius: 28px;
+            box-shadow: 0 0 0 3px gold;
+            cursor: none;
+            aspect-ratio: 1000 / 600;
+        }
+        .info-bar {
+            display: flex;
+            justify-content: space-between;
+            background: rgba(0,0,0,0.8);
+            border-radius: 40px;
+            padding: 12px 20px;
+            margin: 15px 0;
+            color: white;
+            flex-wrap: wrap;
+            gap: 15px;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        .timer-box {
+            background: #000000aa;
+            padding: 5px 15px;
+            border-radius: 30px;
+            color: #ffaa44;
+            font-size: 1.4rem;
+            font-family: monospace;
+        }
+        .shop-panel {
+            flex: 1;
+            min-width: 240px;
+            background: rgba(0,0,0,0.85);
+            border-radius: 28px;
+            padding: 15px;
+            backdrop-filter: blur(8px);
+        }
+        .joystick-container {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            width: 120px;
+            height: 120px;
+            background: rgba(0,0,0,0.6);
+            border-radius: 60px;
+            backdrop-filter: blur(4px);
+            border: 2px solid gold;
+            z-index: 10;
+        }
+        .joystick-base {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background: #2a3a60;
+            border-radius: 50%;
+            top: 10px;
+            left: 10px;
+        }
+        .joystick-thumb {
+            position: absolute;
+            width: 45px;
+            height: 45px;
+            background: gold;
+            border-radius: 50%;
+            top: 37.5px;
+            left: 37.5px;
+            transition: transform 0.02s;
+            cursor: pointer;
+        }
+        button {
+            background: linear-gradient(135deg, #2a3a60, #152238);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 40px;
+            font-weight: bold;
+            margin: 5px;
+            border: 1px solid gold;
+            cursor: pointer;
+        }
+        .shop-item {
+            background: #0f1a2f;
+            border-radius: 20px;
+            padding: 12px;
+            margin: 12px 0;
+            text-align: center;
+        }
+        .big-timer {
+            font-size: 2rem;
+            font-weight: bold;
+            background: #000;
+            padding: 5px 15px;
+            border-radius: 50px;
+            display: inline-block;
+            letter-spacing: 3px;
+        }
+        @media (max-width: 800px) {
+            .joystick-container { width: 90px; height: 90px; }
+            .joystick-base { width: 70px; height: 70px; top: 10px; left: 10px; }
+            .joystick-thumb { width: 30px; height: 30px; top: 30px; left: 30px; }
+            .timer-box { font-size: 1rem; }
+        }
+    </style>
 </head>
 <body>
-
-<canvas id="wavesCanvas"></canvas>
-
-<div class="container">
-  <div class="header">
-    <h1>🎮 PS3 Remote | Screen Inside Controller</h1>
-    <div class="ip-section">
-      <input type="text" id="ps3Ip" placeholder="192.168.1.100" value="192.168.1.100">
-      <button id="connectBtn">🔌 اتصال</button>
+<div class="game-container">
+    <div class="main-panel">
+        <div class="canvas-area">
+            <canvas id="gameCanvas" width="1000" height="600"></canvas>
+            <div class="joystick-container" id="joystickContainer">
+                <div class="joystick-base"></div>
+                <div class="joystick-thumb" id="joystickThumb"></div>
+            </div>
+        </div>
+        <div class="shop-panel">
+            <h3 style="color:gold; text-align:center;">🛒 متجر كريم</h3>
+            <div id="shipsList"></div>
+            <div class="shop-item">
+                <h4>❤️ شراء قلب</h4>
+                <button id="buyHeartBtn">💰 100 عملة</button>
+            </div>
+            <div class="shop-item">
+                <h4>🚀 ترقية الصاروخ</h4>
+                <button id="upgradeRocketBtn">💰 200 عملة</button>
+                <span>المستوى: <span id="rocketLevel">1</span></span>
+            </div>
+            <button id="resetGameBtn" style="background:#aa3333;">⚠️ إعادة ضبط اللعبة</button>
+            <button id="skipRoundBtn" style="background:#ff8800;">⚡ شراء الدور التالي (إنهاء مبكر)</button>
+        </div>
     </div>
-    <div class="status" id="statusText">⚫ غير متصل</div>
-  </div>
-
-  <!-- يد التحكم مع شاشة مدمجة في المنتصف -->
-  <div class="controller-with-screen">
-    <div class="controller-main">
-      <!-- الجهة اليسرى: D-Pad + عصا يسرى -->
-      <div class="left-panel">
-        <div class="dpad">
-          <div class="dpad-row"><button class="dpad-btn ctrl-btn" data-btn="up">▲</button></div>
-          <div class="dpad-row">
-            <button class="dpad-btn ctrl-btn" data-btn="left">◀</button>
-            <button class="dpad-btn ctrl-btn" data-btn="select" style="background:#1e2f3f; font-size:0.7rem;">●</button>
-            <button class="dpad-btn ctrl-btn" data-btn="right">▶</button>
-          </div>
-          <div class="dpad-row"><button class="dpad-btn ctrl-btn" data-btn="down">▼</button></div>
-        </div>
-        <div>
-          <div class="analog-stick ctrl-btn" data-stick="left" data-btn="left_stick">
-            <div class="stick-inner">🎮</div>
-          </div>
-          <div class="stick-label">العصا اليسرى (L3)</div>
-        </div>
-      </div>
-
-      <!-- المنتصف: الشاشة + أزرار النظام -->
-      <div class="center-panel">
-        <div class="screen-box" id="videoBox">
-          <div class="video-placeholder" id="videoPlaceholder">
-            <span style="font-size:28px">📺✨</span>
-            <span>بث مباشر</span>
-            <small>PSRP على PS3</small>
-          </div>
-          <video id="streamVideo" style="display:none" controls autoplay muted playsinline></video>
-          <iframe id="streamIframe" style="display:none"></iframe>
-        </div>
-        <div class="sys-buttons">
-          <button class="sys-btn ctrl-btn" data-btn="select">Select</button>
-          <button class="sys-btn ctrl-btn" data-btn="start">Start</button>
-          <button class="sys-btn ps-btn ctrl-btn" data-btn="ps">🎮 PS</button>
-        </div>
-      </div>
-
-      <!-- الجهة اليمنى: أزرار Action + عصا يمنى -->
-      <div class="right-panel">
-        <div class="action-buttons">
-          <button class="action-btn btn-triangle ctrl-btn" data-btn="triangle">▲</button>
-          <button class="action-btn btn-circle ctrl-btn" data-btn="circle">O</button>
-          <button class="action-btn btn-cross ctrl-btn" data-btn="cross">X</button>
-          <button class="action-btn btn-square ctrl-btn" data-btn="square">□</button>
-        </div>
-        <div>
-          <div class="analog-stick ctrl-btn" data-stick="right" data-btn="right_stick">
-            <div class="stick-inner">🎮</div>
-          </div>
-          <div class="stick-label">العصا اليمنى (R3)</div>
-        </div>
-      </div>
+    <div class="info-bar">
+        <span>🌀 الدور: <span id="roundNum">1</span></span>
+        <span>❤️ الحياة: <span id="lives">5</span></span>
+        <span>💰 العملات: <span id="coins">0</span> <span style="color:gold;">(كريم!)</span></span>
+        <span>⭐ نقاط الدور: <span id="roundScore">0</span></span>
+        <span class="timer-box">⏱️ <span id="timer" class="big-timer">10:00</span></span>
     </div>
-  </div>
-
-  <!-- قائمة الألعاب -->
-  <div class="games-section">
-    <div class="games-header">
-      <span>🎮 قائمة الألعاب (ISO / Folder)</span>
-      <button id="refreshGamesBtn" style="background:#2d3e4e; border:none; padding:0.2rem 0.7rem; border-radius:1rem; color:white;">🔄 تحديث</button>
-    </div>
-    <div class="games-grid" id="gamesGrid">
-      <div style="text-align:center; padding:1rem; color:#ccc;">اضغط اتصال أولاً</div>
-    </div>
-  </div>
+    <div id="gameMessage" style="text-align:center; margin-top:10px; color:#ffbb77; font-size:1.2rem;"></div>
 </div>
-<div id="toastMsg" class="toast">تم الإرسال</div>
 
 <script>
-  // ----------------------------- تموجات PS3 (XMB Waves) -------------------------
-  const canvas = document.getElementById('wavesCanvas');
-  let ctx = canvas.getContext('2d');
-  let width, height;
-  let time = 0;
-  let animationId;
-
-  function resizeCanvas() {
-    width = window.innerWidth;
-    height = window.innerHeight;
-    canvas.width = width;
-    canvas.height = height;
-  }
-
-  function drawWaves() {
-    if (!ctx) return;
-    ctx.clearRect(0, 0, width, height);
-    const grad = ctx.createLinearGradient(0, 0, width, height);
-    grad.addColorStop(0, '#021126');
-    grad.addColorStop(0.5, '#001133');
-    grad.addColorStop(1, '#00051a');
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, width, height);
-    ctx.save();
-    for (let i = 0; i < 5; i++) {
-      const offset = i * 1.2;
-      const amplitude = 25 + i * 8;
-      const frequency = 0.008 + i * 0.002;
-      const speed = 0.005 + i * 0.0015;
-      const yBase = height * (0.3 + i * 0.12);
-      const alpha = 0.12 - i * 0.015;
-      const hue = (190 + i * 12) % 360;
-      ctx.beginPath();
-      for (let x = 0; x <= width; x += 15) {
-        const y = yBase + Math.sin(x * frequency + time * speed + offset) * amplitude 
-                + Math.cos(x * 0.004 + time * 0.003 + i) * (amplitude * 0.6);
-        if (x === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      }
-      ctx.lineTo(width, height);
-      ctx.lineTo(0, height);
-      ctx.closePath();
-      ctx.fillStyle = `hsla(${hue}, 80%, 55%, ${alpha})`;
-      ctx.fill();
-    }
-    for (let i = 0; i < 8; i++) {
-      const amplitude = 12 + Math.sin(time * 0.5 + i) * 3;
-      const freq = 0.012 + i * 0.001;
-      const speedY = 0.008 + i * 0.001;
-      const yOffset = height * (0.5 + i * 0.05);
-      const alphaLine = 0.08;
-      ctx.beginPath();
-      for (let x = 0; x <= width; x += 20) {
-        const y = yOffset + Math.sin(x * freq + time * speedY) * amplitude 
-                + Math.cos(x * 0.007 + time * 0.004) * 8;
-        if (x === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      }
-      ctx.strokeStyle = `rgba(100, 200, 255, ${alphaLine})`;
-      ctx.lineWidth = 2;
-      ctx.stroke();
-    }
-    ctx.fillStyle = 'rgba(210, 230, 255, 0.4)';
-    for (let p = 0; p < 70; p++) {
-      const px = (Math.sin(time * 0.2 + p) * 0.5 + 0.5) * width;
-      const py = (Math.cos(time * 0.17 + p * 2) * 0.4 + 0.5) * height;
-      ctx.beginPath();
-      ctx.arc(px, py, 1.5 + Math.sin(time + p) * 0.8, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(120, 200, 255, ${0.3 + Math.sin(time + p) * 0.1})`;
-      ctx.fill();
-    }
-    ctx.restore();
-    time += 0.025;
-    animationId = requestAnimationFrame(drawWaves);
-  }
-
-  window.addEventListener('resize', () => resizeCanvas());
-  resizeCanvas();
-  drawWaves();
-
-  // ----------------------------- PS3 webMAN MOD API + Vibration -------------------------
-  let currentPS3Ip = localStorage.getItem('ps3_ip') || '';
-  if(currentPS3Ip) document.getElementById('ps3Ip').value = currentPS3Ip;
-  
-  const statusDiv = document.getElementById('statusText');
-  const gamesGrid = document.getElementById('gamesGrid');
-  const connectBtn = document.getElementById('connectBtn');
-  const refreshBtn = document.getElementById('refreshGamesBtn');
-  
-  function vibrate(pattern) {
-    if (window.navigator && window.navigator.vibrate) {
-      window.navigator.vibrate(pattern);
-    }
-  }
-  
-  async function sendCommand(endpoint, showToastMsg = true, vibratePattern = 50) {
-    if(!currentPS3Ip) { showToast('❌ لم يتم تحديد IP'); return false; }
-    try {
-      const url = `http://${currentPS3Ip}${endpoint}`;
-      await fetch(url, { mode: 'no-cors' });
-      if(showToastMsg) showToast(`✅ تم الإرسال`);
-      vibrate(vibratePattern);
-      return true;
-    } catch(e) {
-      console.warn(e);
-      showToast(`⚠️ فشل الإرسال`);
-      vibrate([100, 50, 100]);
-      return false;
-    }
-  }
-  
-  const buttonMap = {
-    'up': 'up', 'down': 'down', 'left': 'left', 'right': 'right',
-    'cross': 'cross', 'circle': 'circle', 'square': 'square', 'triangle': 'triangle',
-    'select': 'select', 'start': 'start', 'ps': 'ps',
-    'left_stick': 'l3', 'right_stick': 'r3'
-  };
-  
-  function attachAllButtons() {
-    document.querySelectorAll('.ctrl-btn').forEach(btn => {
-      if(btn.hasListener) return;
-      btn.hasListener = true;
-      btn.addEventListener('click', async (e) => {
-        e.stopPropagation();
-        let cmd = btn.getAttribute('data-btn');
-        if (btn.getAttribute('data-stick') === 'left') cmd = 'left_stick';
-        if (btn.getAttribute('data-stick') === 'right') cmd = 'right_stick';
+    (function(){
+        // ------------------- إعدادات اللعبة -------------------
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
         
-        if(cmd && buttonMap[cmd]) {
-          let vibe = (cmd === 'ps' || cmd === 'left_stick' || cmd === 'right_stick') ? 80 : 40;
-          await sendCommand(`/pad.ps3?${buttonMap[cmd]}`, true, vibe);
+        // متغيرات الأدوار
+        let currentRound = 1;
+        let roundActive = true;
+        let roundTimeLeft = 600; // 10 دقائق
+        let roundScore = 0;
+        let gameRunning = true;
+        
+        // اللاعب
+        let player = {
+            x: canvas.width/2 - 25,
+            y: canvas.height - 80,
+            width: 45,
+            height: 45,
+            speed: 5.5,
+            lives: 5,
+            shipId: "basic",
+            ownedShips: ["basic"],
+            velX: 0,
+            velY: 0
+        };
+        
+        // العملات - كريمة جداً
+        let coins = 500;   // نبدأ بـ 500 عملة عشان يشتري على طول
+        let rocketLevel = 1;
+        let rockets = [];
+        let rocketCooldown = 0;
+        
+        let enemies = [];
+        let stars = [];
+        let particles = [];
+        let frameCounter = 0;
+        
+        let enemySpawnRate = 45;
+        let starSpawnRate = 30;
+        let baseEnemySpeed = 1.8;
+        
+        // أنواع الأعداء
+        const enemyTypes = [
+            { name: "طائر ناري", color: "#ff6633", shape: "bird", hp: 1, points: 30, emoji: "🐦‍🔥", speedMult: 1.2 },
+            { name: "عفريت فضائي", color: "#aa44ff", shape: "alien", hp: 2, points: 50, emoji: "👾", speedMult: 0.9 },
+            { name: "فرخة طائرة", color: "#ffcc44", shape: "chicken", hp: 1, points: 25, emoji: "🐔", speedMult: 1.4 },
+            { name: "وحش عملاق", color: "#884400", shape: "monster", hp: 4, points: 120, emoji: "👹", speedMult: 0.6 },
+            { name: "زواحف فضية", color: "#aaccff", shape: "lizard", hp: 2, points: 60, emoji: "🦎", speedMult: 1.1 },
+            { name: "درون قاتل", color: "#ff44aa", shape: "drone", hp: 1, points: 40, emoji: "🚁", speedMult: 1.5 },
+            { name: "ملك الظلام", color: "#2a0a3a", shape: "boss", hp: 6, points: 250, emoji: "👑", speedMult: 0.5 },
+            { name: "نجم الشهاب", color: "#ffaa22", shape: "comet", hp: 1, points: 80, emoji: "☄️", speedMult: 1.8 }
+        ];
+        
+        const ships = {
+            "basic": { name: "صاروخ ابتدائي", speed: 5, width: 45, height: 45, price: 0, emoji: "🚀", color: "#4aa3ff" },
+            "falcon": { name: "صقر الفضاء", speed: 6.5, width: 48, height: 48, price: 300, emoji: "🦅", color: "#66ccff" },
+            "phantom": { name: "الشبح المظلم", speed: 7, width: 42, height: 42, price: 500, emoji: "🌙", color: "#9966ff" },
+            "thunder": { name: "صاعقة الجليد", speed: 8, width: 40, height: 40, price: 800, emoji: "⚡", color: "#aaffdd" },
+            "titan": { name: "المدرع الخارق", speed: 4.5, width: 55, height: 55, price: 1000, emoji: "🛡️", color: "#88aa88" }
+        };
+        
+        // حفظ وتحميل
+        function saveGame() {
+            let data = { currentRound, coins, player: { lives: player.lives, shipId: player.shipId, ownedShips: player.ownedShips }, rocketLevel, roundScore, roundTimeLeft };
+            localStorage.setItem("galacticKareem", JSON.stringify(data));
         }
-      });
-    });
-  }
-  
-  attachAllButtons();
-  
-  async function testConnection(ip) {
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 3000);
-      await fetch(`http://${ip}/`, { signal: controller.signal, mode: 'no-cors' });
-      clearTimeout(timeoutId);
-      return true;
-    } catch(e) {
-      return false;
-    }
-  }
-  
-  connectBtn.addEventListener('click', async () => {
-    let ip = document.getElementById('ps3Ip').value.trim();
-    if(!ip) { showToast('أدخل عنوان IP'); return; }
-    currentPS3Ip = ip;
-    localStorage.setItem('ps3_ip', ip);
-    statusDiv.innerText = '🔄 جاري الاتصال بـ PS3 ...';
-    const connected = await testConnection(ip);
-    if(connected) {
-      statusDiv.innerHTML = '✅ متصل بـ PS3 (webMAN MOD) ✨';
-      showToast('تم الاتصال بنجاح + دعم الاهتزاز');
-      vibrate(200);
-      loadGamesList();
-      setupVideoStream();
-    } else {
-      statusDiv.innerHTML = '❌ فشل الاتصال - تأكد من IP وتشغيل webMAN';
-      showToast('فشل الاتصال');
-      vibrate([100, 200, 100]);
-    }
-  });
-  
-  async function loadGamesList() {
-    if(!currentPS3Ip) { gamesGrid.innerHTML = '<div style="color:#aaa;">يرجى الاتصال أولاً</div>'; return; }
-    gamesGrid.innerHTML = '<div style="text-align:center;">⏳ جاري تحميل الألعاب...</div>';
-    try {
-      const url = `http://${currentPS3Ip}/get_ps3_games.ps3`;
-      const res = await fetch(url);
-      const text = await res.text();
-      parseGamesList(text);
-    } catch(e) {
-      console.error(e);
-      gamesGrid.innerHTML = '<div style="color:#f66;">⚠️ تعذر تحميل الألعاب (تأكد من webMAN MOD)</div>';
-    }
-  }
-  
-  function parseGamesList(data) {
-    const lines = data.split(/\r?\n/);
-    const games = [];
-    for(let line of lines) {
-      line = line.trim();
-      if(line.startsWith('/dev_hdd0/game/') || line.startsWith('/dev_usb') || line.endsWith('.iso') || line.includes('PS3ISO')) {
-        let title = line.split('/').pop().replace(/_/g,' ').replace('.iso','');
-        if(title.length < 2) title = line.slice(-30);
-        games.push({ path: line, title: title });
-      }
-    }
-    if(games.length === 0) {
-      gamesGrid.innerHTML = '<div style="color:#aaa;">🎮 لم يتم العثور على ألعاب.</div>';
-      return;
-    }
-    gamesGrid.innerHTML = '';
-    games.forEach(game => {
-      const card = document.createElement('div');
-      card.className = 'game-card';
-      card.innerHTML = `<div class="game-icon">🎮</div><div class="game-title">${escapeHtml(game.title.substring(0, 35))}</div>`;
-      card.onclick = () => launchGame(game.path);
-      gamesGrid.appendChild(card);
-    });
-  }
-  
-  async function launchGame(gamePath) {
-    if(!currentPS3Ip) return;
-    showToast(`🚀 تشغيل: ${gamePath.split('/').pop()}`);
-    vibrate(100);
-    await sendCommand(`/mount.ps3${gamePath}`, false);
-    setTimeout(async () => {
-      await sendCommand(`/play.ps3`, false);
-      showToast('🎉 تم إطلاق اللعبة');
-      vibrate([150, 100]);
-    }, 600);
-  }
-  
-  function setupVideoStream() {
-    const videoPlaceholder = document.getElementById('videoPlaceholder');
-    const videoElem = document.getElementById('streamVideo');
-    const streamUrl = `http://${currentPS3Ip}:8080/stream`;
-    const userWantsStream = confirm('🎥 هل قمت بتشغيل خادم البث (PSRP) على PS3؟\nاضغط موافق لمحاولة عرض البث المباشر.');
-    if(userWantsStream) {
-      videoPlaceholder.style.display = 'none';
-      videoElem.style.display = 'block';
-      videoElem.src = streamUrl;
-      videoElem.play().catch(e => {
-        console.warn(e);
-        videoPlaceholder.style.display = 'flex';
-        videoElem.style.display = 'none';
-        videoPlaceholder.innerHTML = `<span>📡</span><span>تعذر تشغيل البث</span><small>تأكد من تشغيل PSRP (منفذ 8080)</small>`;
-        showToast('⚠️ لا يوجد بث حي');
-      });
-    } else {
-      videoPlaceholder.innerHTML = `<span>🌀 XMB WAVES</span><span>🔮 البث غير مفعل</span><small>يمكنك تفعيله لاحقاً</small>`;
-    }
-  }
-  
-  refreshBtn.addEventListener('click', loadGamesList);
-  
-  function showToast(msg) {
-    const toast = document.getElementById('toastMsg');
-    toast.textContent = msg;
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 2500);
-  }
-  
-  function escapeHtml(str) {
-    if(!str) return '';
-    return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : (m === '<' ? '&lt;' : '&gt;'));
-  }
-  
-  if(currentPS3Ip) setTimeout(() => connectBtn.click(), 800);
-  
-  window.addEventListener('beforeunload', () => {
-    if(animationId) cancelAnimationFrame(animationId);
-  });
+        
+        function loadGame() {
+            let raw = localStorage.getItem("galacticKareem");
+            if(raw) {
+                try {
+                    let data = JSON.parse(raw);
+                    currentRound = data.currentRound || 1;
+                    coins = data.coins || 500;
+                    player.lives = data.player.lives || 5;
+                    player.shipId = data.player.shipId || "basic";
+                    player.ownedShips = data.player.ownedShips || ["basic"];
+                    rocketLevel = data.rocketLevel || 1;
+                    roundScore = data.roundScore || 0;
+                    roundTimeLeft = data.roundTimeLeft || 600;
+                } catch(e) {}
+            }
+            if(!player.ownedShips.includes(player.shipId)) player.shipId = "basic";
+            applyShipStats();
+            updateUI();
+        }
+        
+        function applyShipStats() {
+            let ship = ships[player.shipId];
+            if(ship) {
+                player.speed = ship.speed;
+                player.width = ship.width;
+                player.height = ship.height;
+                player.x = Math.min(Math.max(player.x, 10), canvas.width - player.width - 10);
+                player.y = Math.min(Math.max(player.y, 10), canvas.height - player.height - 10);
+            }
+        }
+        
+        function updateUI() {
+            document.getElementById("roundNum").innerText = currentRound;
+            document.getElementById("lives").innerText = player.lives;
+            document.getElementById("coins").innerText = coins;
+            document.getElementById("roundScore").innerText = roundScore;
+            document.getElementById("rocketLevel").innerText = rocketLevel;
+            let minutes = Math.floor(roundTimeLeft / 60);
+            let seconds = roundTimeLeft % 60;
+            document.getElementById("timer").innerHTML = `${minutes}:${seconds.toString().padStart(2,'0')}`;
+            // تحديث المتجر
+            let shipsDiv = document.getElementById("shipsList");
+            shipsDiv.innerHTML = "";
+            for(let [id, data] of Object.entries(ships)) {
+                let owned = player.ownedShips.includes(id);
+                let active = (player.shipId === id);
+                let btn = document.createElement("button");
+                btn.innerText = `${data.emoji} ${data.name} ${owned ? (active ? " (مستخدم)" : " (مملوك)") : `💰 ${data.price}`}`;
+                btn.disabled = (owned && active);
+                btn.onclick = () => {
+                    if(owned && !active) {
+                        player.shipId = id;
+                        applyShipStats();
+                        saveGame();
+                        updateUI();
+                        showMessage(`تم تجهيز ${data.name}`, "gold");
+                    } else if(!owned && coins >= data.price) {
+                        coins -= data.price;
+                        player.ownedShips.push(id);
+                        saveGame();
+                        updateUI();
+                        showMessage(`اشتريت ${data.name}!`, "lightgreen");
+                    } else if(!owned) {
+                        showMessage(`لا تملك ${data.price} عملة`, "#ffaa88");
+                    }
+                };
+                shipsDiv.appendChild(btn);
+            }
+        }
+        
+        function showMessage(msg, color="#ffdd99") {
+            let msgDiv = document.getElementById("gameMessage");
+            msgDiv.innerHTML = msg;
+            msgDiv.style.color = color;
+            setTimeout(()=>{ if(msgDiv.innerHTML === msg) msgDiv.innerHTML = ""; }, 2500);
+        }
+        
+        function completeRound() {
+            if(!roundActive) return;
+            roundActive = false;
+            gameRunning = false;
+            let reward = 300 + currentRound * 20; // مكافأة كبيرة
+            coins += reward;
+            saveGame();
+            updateUI();
+            showMessage(`🎉 أكملت الدور ${currentRound}! 🎉 مكافأة: ${reward} عملة. اضغط "شراء الدور التالي"`, "gold");
+            let buyBtn = document.createElement("button");
+            buyBtn.innerText = `🔄 شراء الدور ${currentRound+1} (💰 ${getNextRoundCost()})`;
+            buyBtn.style.position = "fixed";
+            buyBtn.style.bottom = "20px";
+            buyBtn.style.left = "50%";
+            buyBtn.style.transform = "translateX(-50%)";
+            buyBtn.style.zIndex = "100";
+            buyBtn.style.background = "gold";
+            buyBtn.style.color = "black";
+            buyBtn.style.fontSize = "1.3rem";
+            buyBtn.style.padding = "12px 24px";
+            buyBtn.id = "buyRoundBtn";
+            buyBtn.onclick = () => {
+                let cost = getNextRoundCost();
+                if(coins >= cost) {
+                    coins -= cost;
+                    currentRound++;
+                    roundScore = 0;
+                    roundTimeLeft = 600;
+                    roundActive = true;
+                    gameRunning = true;
+                    enemies = [];
+                    stars = [];
+                    rockets = [];
+                    particles = [];
+                    frameCounter = 0;
+                    applyRoundDifficulty();
+                    saveGame();
+                    updateUI();
+                    document.getElementById("buyRoundBtn")?.remove();
+                    showMessage(`🚀 بدأ الدور ${currentRound}! حظاً موفقاً.`, "#88ff88");
+                } else {
+                    showMessage(`💰 لا تملك ${cost} عملة لشراء الدور!`, "#ffaa66");
+                }
+            };
+            document.body.appendChild(buyBtn);
+        }
+        
+        function getNextRoundCost() {
+            return 100 + currentRound * 15;
+        }
+        
+        function skipRound() {
+            if(roundActive && gameRunning) completeRound();
+            else showMessage("لا يمكن الشراء الآن", "#ff8888");
+        }
+        
+        function applyRoundDifficulty() {
+            let factor = 1 + (currentRound-1) * 0.12;
+            enemySpawnRate = Math.max(20, Math.floor(45 / factor));
+            starSpawnRate = Math.max(20, Math.floor(35 / factor));
+            baseEnemySpeed = 1.5 + (currentRound-1) * 0.2;
+            baseEnemySpeed = Math.min(baseEnemySpeed, 6);
+        }
+        
+        // Spawn
+        function spawnEnemy() {
+            let type = { ...enemyTypes[Math.floor(Math.random() * enemyTypes.length)] };
+            let hp = type.hp;
+            if(currentRound > 20) hp += Math.floor(currentRound/20);
+            enemies.push({
+                x: Math.random() * (canvas.width - 70) + 35,
+                y: -30,
+                width: 42,
+                height: 42,
+                type: type,
+                hp: hp,
+                maxHp: hp,
+                speedY: baseEnemySpeed * (type.speedMult || 1),
+                rotation: 0
+            });
+        }
+        
+        function spawnStar() {
+            stars.push({
+                x: Math.random() * (canvas.width - 24) + 12,
+                y: -15,
+                radius: 10,
+                value: 50, // كل نجمة 50 عملة
+                speedY: 2 + Math.random() * 2
+            });
+        }
+        
+        function autoFire() {
+            if(!roundActive || !gameRunning) return;
+            if(rocketCooldown <= 0) {
+                let cd = Math.max(10, 25 - rocketLevel * 2);
+                rocketCooldown = cd;
+                rockets.push({
+                    x: player.x + player.width/2 - 4,
+                    y: player.y - 10,
+                    width: 8,
+                    height: 12,
+                    damage: 1 + Math.floor(rocketLevel / 2),
+                    speedY: -10
+                });
+                playSound(1200);
+            } else rocketCooldown--;
+        }
+        
+        function updateRockets() {
+            for(let i=0; i<rockets.length; i++) {
+                rockets[i].y += rockets[i].speedY;
+                if(rockets[i].y + rockets[i].height < 0 || rockets[i].y > canvas.height) {
+                    rockets.splice(i,1); i--; continue;
+                }
+                let hit = false;
+                for(let j=0; j<enemies.length; j++) {
+                    let e = enemies[j];
+                    let left = e.x - e.width/2, right = e.x + e.width/2;
+                    let top = e.y - e.height/2, bottom = e.y + e.height/2;
+                    if(rockets[i].x < right && rockets[i].x+rockets[i].width > left &&
+                       rockets[i].y < bottom && rockets[i].y+rockets[i].height > top) {
+                        e.hp -= rockets[i].damage;
+                        if(e.hp <= 0) {
+                            coins += e.type.points;
+                            roundScore += e.type.points;
+                            addParticles(e.x, e.y, "#ffaa44");
+                            enemies.splice(j,1);
+                            updateUI();
+                            saveGame();
+                        } else addParticles(rockets[i].x, rockets[i].y, "#ffaa66");
+                        rockets.splice(i,1);
+                        hit = true;
+                        break;
+                    }
+                }
+                if(hit) i--;
+            }
+        }
+        
+        function updateStars() {
+            for(let i=0; i<stars.length; i++) {
+                stars[i].y += stars[i].speedY;
+                if(stars[i].y > canvas.height+40) {
+                    stars.splice(i,1); i--; continue;
+                }
+                let playerRect = {x: player.x, y: player.y, w: player.width, h: player.height};
+                let starRect = {x: stars[i].x - stars[i].radius, y: stars[i].y - stars[i].radius, w: stars[i].radius*2, h: stars[i].radius*2};
+                if(playerRect.x < starRect.x+starRect.w && playerRect.x+playerRect.w > starRect.x &&
+                   playerRect.y < starRect.y+starRect.h && playerRect.y+playerRect.h > starRect.y) {
+                    coins += stars[i].value;
+                    roundScore += stars[i].value;
+                    addParticles(stars[i].x, stars[i].y, "#FFD966");
+                    stars.splice(i,1);
+                    i--;
+                    updateUI();
+                    saveGame();
+                }
+            }
+        }
+        
+        function updateEnemies() {
+            for(let i=0; i<enemies.length; i++) {
+                enemies[i].y += enemies[i].speedY;
+                enemies[i].rotation += 0.05;
+                if(enemies[i].y > canvas.height+70) {
+                    enemies.splice(i,1); i--; continue;
+                }
+                let playerRect = {x: player.x, y: player.y, w: player.width, h: player.height};
+                let enemyRect = {x: enemies[i].x - enemies[i].width/2, y: enemies[i].y - enemies[i].height/2, w: enemies[i].width, h: enemies[i].height};
+                if(playerRect.x < enemyRect.x+enemyRect.w && playerRect.x+playerRect.w > enemyRect.x &&
+                   playerRect.y < enemyRect.y+enemyRect.h && playerRect.y+playerRect.h > enemyRect.y) {
+                    player.lives--;
+                    addParticles(playerRect.x+playerRect.w/2, playerRect.y+playerRect.h/2, "#FF0000");
+                    enemies.splice(i,1);
+                    i--;
+                    updateUI();
+                    if(player.lives <= 0) {
+                        gameRunning = false;
+                        roundActive = false;
+                        showMessage("💀 لقد خسرت! اضغط إعادة ضبط اللعبة 💀", "#ff6666");
+                    }
+                    playSound(440);
+                    break;
+                }
+            }
+        }
+        
+        function updateTimer() {
+            if(roundActive && gameRunning && roundTimeLeft > 0) {
+                roundTimeLeft -= 1/60;
+                if(roundTimeLeft <= 0) { roundTimeLeft = 0; completeRound(); }
+                updateUI();
+            }
+        }
+        
+        // رسم الأعداء واللاعب
+        function drawEnemy(e) {
+            ctx.save(); ctx.translate(e.x, e.y); ctx.rotate(e.rotation);
+            ctx.fillStyle = e.type.color; ctx.shadowBlur = 5;
+            if(e.type.shape === "bird") {
+                ctx.beginPath(); ctx.moveTo(0,-15); ctx.lineTo(-15,5); ctx.lineTo(-5,0); ctx.lineTo(0,10); ctx.lineTo(5,0); ctx.lineTo(15,5); ctx.fill();
+                ctx.fillStyle = "#ffaa00"; ctx.beginPath(); ctx.ellipse(0,-5,5,8,0,0,Math.PI*2); ctx.fill();
+            } else if(e.type.shape === "alien") {
+                ctx.fillRect(-15,-15,30,30); ctx.fillStyle="#000"; ctx.fillRect(-10,-10,5,5); ctx.fillRect(5,-10,5,5);
+            } else if(e.type.shape === "chicken") {
+                ctx.beginPath(); ctx.ellipse(0,0,15,12,0,0,Math.PI*2); ctx.fill();
+                ctx.fillStyle="#ff6600"; ctx.beginPath(); ctx.moveTo(-5,-12); ctx.lineTo(0,-20); ctx.lineTo(5,-12); ctx.fill();
+            } else if(e.type.shape === "monster") {
+                ctx.fillRect(-20,-15,40,30); ctx.fillStyle="#ff0000"; ctx.fillRect(-15,-20,10,10); ctx.fillRect(5,-20,10,10);
+            } else if(e.type.shape === "lizard") {
+                ctx.beginPath(); ctx.ellipse(0,0,18,10,0,0,Math.PI*2); ctx.fill(); ctx.fillRect(-20,-5,10,10); ctx.fillRect(10,-5,10,10);
+            } else if(e.type.shape === "drone") {
+                ctx.fillStyle="#888"; ctx.fillRect(-12,-8,24,16); ctx.fillStyle="#ff4444"; ctx.beginPath(); ctx.arc(0,-12,6,0,Math.PI*2); ctx.fill();
+            } else if(e.type.shape === "boss") {
+                ctx.fillStyle="#3a0a4a"; ctx.fillRect(-25,-25,50,50); ctx.fillStyle="gold"; ctx.fillRect(-15,-30,30,10);
+                ctx.fillStyle="#ffaa44"; ctx.beginPath(); ctx.arc(-10,-10,6,0,Math.PI*2); ctx.arc(10,-10,6,0,Math.PI*2); ctx.fill();
+            } else ctx.fillRect(-12,-12,24,24);
+            if(e.maxHp>1){ ctx.fillStyle="red"; ctx.fillRect(-20,-25,40,5); ctx.fillStyle="lime"; ctx.fillRect(-20,-25,40*(e.hp/e.maxHp),5); }
+            ctx.restore();
+        }
+        
+        function drawPlayer() {
+            let ship = ships[player.shipId];
+            ctx.save(); ctx.shadowBlur=8; ctx.fillStyle=ship.color;
+            ctx.beginPath(); ctx.roundRect(player.x, player.y, player.width, player.height, 10); ctx.fill();
+            ctx.fillStyle="#ff8844"; ctx.beginPath(); ctx.moveTo(player.x+player.width/2, player.y-8); ctx.lineTo(player.x+player.width-8, player.y+12); ctx.lineTo(player.x+8, player.y+12); ctx.fill();
+            ctx.fillStyle="#ccddff"; ctx.beginPath(); ctx.arc(player.x+player.width/2, player.y+player.height*0.3, player.width*0.2, 0, Math.PI*2); ctx.fill();
+            ctx.restore();
+        }
+        
+        function drawStarsBG() { for(let s of stars){ ctx.fillStyle="gold"; ctx.shadowBlur=6; ctx.beginPath(); ctx.arc(s.x, s.y, s.radius-2, 0, Math.PI*2); ctx.fill(); } }
+        function drawRockets() { for(let r of rockets){ ctx.fillStyle="#ffaa44"; ctx.fillRect(r.x, r.y, r.width, r.height); ctx.fillStyle="orange"; ctx.fillRect(r.x+2, r.y-3, 4, 5); } }
+        function drawParticles() { for(let p of particles){ ctx.globalAlpha=p.life; ctx.fillStyle=p.color; ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI*2); ctx.fill(); } ctx.globalAlpha=1; }
+        function addParticles(x,y,color){ for(let i=0;i<8;i++) particles.push({x,y, vx:(Math.random()-0.5)*4, vy:(Math.random()-0.5)*4-1, life:0.8, color, size:Math.random()*4+2}); }
+        function updateParticles(){ for(let i=0;i<particles.length;i++){ particles[i].x+=particles[i].vx; particles[i].y+=particles[i].vy; particles[i].life-=0.02; particles[i].vy+=0.1; if(particles[i].life<=0||particles[i].y>canvas.height+50){ particles.splice(i,1); i--; } } }
+        function drawBackground(){ ctx.fillStyle="#03061a"; ctx.fillRect(0,0,canvas.width,canvas.height); for(let i=0;i<200;i++){ ctx.fillStyle=`rgba(255,240,180,${Math.random()*0.3})`; ctx.beginPath(); ctx.arc((i*131)%canvas.width, (i*253+Date.now()*0.02)%canvas.height, 1.2, 0, Math.PI*2); ctx.fill(); } }
+        function playSound(freq){ try{ let audioCtx=new (window.AudioContext||window.webkitAudioContext)(); let osc=audioCtx.createOscillator(); let gain=audioCtx.createGain(); osc.connect(gain); gain.connect(audioCtx.destination); osc.frequency.value=freq; gain.gain.value=0.08; osc.start(); gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime+0.1); osc.stop(audioCtx.currentTime+0.1); }catch(e){} }
+        
+        // جوستيك
+        let joystickActive = false, joystickCenter = {x:0,y:0}, joystickVector = {x:0,y:0};
+        const jCont = document.getElementById("joystickContainer"), jThumb = document.getElementById("joystickThumb");
+        function handleStart(e){ e.preventDefault(); joystickActive=true; const rect=jCont.getBoundingClientRect(); joystickCenter.x=rect.left+rect.width/2; joystickCenter.y=rect.top+rect.height/2; handleMove(e); }
+        function handleMove(e){ if(!joystickActive) return; let cx,cy; if(e.touches){ cx=e.touches[0].clientX; cy=e.touches[0].clientY; }else{ cx=e.clientX; cy=e.clientY; } let dx=cx-joystickCenter.x, dy=cy-joystickCenter.y; let dist=Math.hypot(dx,dy), maxDist=40; if(dist>maxDist){ dx=dx/dist*maxDist; dy=dy/dist*maxDist; } jThumb.style.transform=`translate(${dx}px, ${dy}px)`; joystickVector.x=dx/maxDist; joystickVector.y=dy/maxDist; }
+        function handleEnd(){ joystickActive=false; jThumb.style.transform="translate(0px,0px)"; joystickVector.x=0; joystickVector.y=0; }
+        jCont.addEventListener("mousedown",handleStart); window.addEventListener("mousemove",handleMove); window.addEventListener("mouseup",handleEnd); jCont.addEventListener("touchstart",handleStart); window.addEventListener("touchmove",handleMove); window.addEventListener("touchend",handleEnd);
+        
+        let keyState={};
+        window.addEventListener("keydown",(e)=>{ keyState[e.code]=true; if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight","KeyW","KeyA","KeyS","KeyD"].includes(e.code)) e.preventDefault(); });
+        window.addEventListener("keyup",(e)=>{ keyState[e.code]=false; });
+        function updatePlayerMovement(){
+            if(!gameRunning||!roundActive) return;
+            let mx=joystickVector.x, my=joystickVector.y;
+            if(keyState.ArrowLeft||keyState.KeyA) mx-=1; if(keyState.ArrowRight||keyState.KeyD) mx+=1;
+            if(keyState.ArrowUp||keyState.KeyW) my-=1; if(keyState.ArrowDown||keyState.KeyS) my+=1;
+            let len=Math.hypot(mx,my); if(len>0){ mx/=len; my/=len; }
+            player.x+=mx*player.speed; player.y+=my*player.speed;
+            player.x=Math.min(Math.max(player.x,10), canvas.width-player.width-10);
+            player.y=Math.min(Math.max(player.y,10), canvas.height-player.height-10);
+        }
+        
+        // حلقة اللعبة
+        function gameLoop(){
+            if(gameRunning && roundActive){
+                frameCounter++;
+                if(frameCounter%enemySpawnRate===0) spawnEnemy();
+                if(frameCounter%starSpawnRate===0) spawnStar();
+                updatePlayerMovement();
+                autoFire();
+                updateRockets();
+                updateStars();
+                updateEnemies();
+                updateParticles();
+                updateTimer();
+            }
+            drawBackground();
+            for(let e of enemies) drawEnemy(e);
+            drawStarsBG();
+            drawRockets();
+            drawPlayer();
+            drawParticles();
+            requestAnimationFrame(gameLoop);
+        }
+        
+        // أزرار
+        document.getElementById("buyHeartBtn").onclick=()=>{ if(coins>=100){ coins-=100; player.lives=Math.min(player.lives+1,10); saveGame(); updateUI(); showMessage("❤️ اشتريت قلباً!","lightgreen"); } else showMessage("تحتاج 100 عملة","#ffaa88"); };
+        document.getElementById("upgradeRocketBtn").onclick=()=>{ if(coins>=200){ coins-=200; rocketLevel++; saveGame(); updateUI(); showMessage(`🔫 ترقية الصاروخ إلى المستوى ${rocketLevel}`,"#aaffaa"); } else showMessage("تحتاج 200 عملة","#ffaa88"); };
+        document.getElementById("resetGameBtn").onclick=()=>{ localStorage.removeItem("galacticKareem"); location.reload(); };
+        document.getElementById("skipRoundBtn").onclick=skipRound;
+        
+        if(!CanvasRenderingContext2D.prototype.roundRect){
+            CanvasRenderingContext2D.prototype.roundRect=function(x,y,w,h,r){ if(w<2*r) r=w/2; if(h<2*r) r=h/2; this.moveTo(x+r,y); this.lineTo(x+w-r,y); this.quadraticCurveTo(x+w,y,x+w,y+r); this.lineTo(x+w,y+h-r); this.quadraticCurveTo(x+w,y+h,x+w-r,y+h); this.lineTo(x+r,y+h); this.quadraticCurveTo(x,y+h,x,y+h-r); this.lineTo(x,y+r); this.quadraticCurveTo(x,y,x+r,y); return this; };
+        }
+        
+        function init(){ loadGame(); applyShipStats(); applyRoundDifficulty(); updateUI(); gameLoop(); setInterval(()=>{ if(roundActive && gameRunning) updateUI(); }, 1000); }
+        init();
+    })();
 </script>
 </body>
 </html>
