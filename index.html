@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>PS3 Remote - Dual Analog Sticks at Bottom</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Waves Background */
+    #wavesCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+      background: radial-gradient(circle at 20% 30%, #001433, #000000);
+    }
+
+    body {
+      font-family: 'Segoe UI', 'Tahoma', 'Geneva', 'Verdana', sans-serif;
+      color: #eee;
+      padding: 1rem;
+      min-height: 100vh;
+      position: relative;
+      z-index: 1;
+      background: transparent;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(2px);
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Header */
+    .header {
+      text-align: center;
+      padding: 0.8rem;
+      background: rgba(0, 0, 0, 0.55);
+      border-radius: 2rem;
+      margin-bottom: 1rem;
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(0, 166, 255, 0.3);
+    }
+
+    .header h1 {
+      font-size: 1.3rem;
+      background: linear-gradient(135deg, #00a6ff, #ff4d4d);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .ip-section {
+      display: flex;
+      gap: 0.5rem;
+      margin: 0.5rem 0;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .ip-section input {
+      flex: 1;
+      padding: 0.5rem 0.8rem;
+      border-radius: 2rem;
+      border: none;
+      background: #0f172ad9;
+      color: white;
+      font-size: 0.85rem;
+      text-align: center;
+      direction: ltr;
+      font-family: monospace;
+      backdrop-filter: blur(4px);
+      border: 1px solid #2d4a6e;
+    }
+
+    .ip-section button {
+      padding: 0.5rem 1rem;
+      border-radius: 2rem;
+      border: none;
+      background: #00a6ff;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .status {
+      background: #0f172ab3;
+      backdrop-filter: blur(8px);
+      padding: 0.3rem;
+      border-radius: 2rem;
+      text-align: center;
+      font-size: 0.75rem;
+      margin-bottom: 1rem;
+      border: 1px solid #2d4a6e;
+    }
+
+    /* Screen on top */
+    .screen-container {
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 1.5rem;
+      padding: 0.5rem;
+      margin-bottom: 1.5rem;
+      border: 1px solid rgba(0, 166, 255, 0.4);
+    }
+
+    .video-box {
+      background: #000000aa;
+      border-radius: 1rem;
+      overflow: hidden;
+      aspect-ratio: 16 / 9;
+      border: 2px solid rgba(0, 166, 255, 0.6);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+    }
+
+    .video-box video, .video-box iframe {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background: black;
+    }
+
+    .video-placeholder {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      background: #111111cc;
+      color: #ccc;
+      flex-direction: column;
+      gap: 0.3rem;
+      font-size: 0.8rem;
+      text-align: center;
+    }
+
+    /* Controller Body */
+    .controller-body {
+      background: rgba(20, 30, 45, 0.85);
+      backdrop-filter: blur(20px);
+      border-radius: 3rem;
+      padding: 1.2rem;
+      border: 1px solid rgba(0, 166, 255, 0.4);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.6);
+    }
+
+    /* First row: D-Pad (left) and Action Buttons (right) */
+    .row-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+    }
+
+    .dpad {
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 3rem;
+      padding: 0.6rem;
+      display: inline-block;
+    }
+    .dpad-row {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      margin: 0.2rem 0;
+    }
+    .dpad-btn {
+      background: #1e2f3f;
+      border: none;
+      color: white;
+      font-size: 1.5rem;
+      width: 55px;
+      height: 55px;
+      border-radius: 50px;
+      box-shadow: 0 3px 0 #0a0f1e;
+      cursor: pointer;
+      transition: 0.05s linear;
+      font-weight: bold;
+    }
+    .dpad-btn:active {
+      transform: translateY(3px);
+      box-shadow: none;
+    }
+
+    .action-buttons {
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 3rem;
+      padding: 0.6rem;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.6rem;
+      align-items: center;
+      justify-items: center;
+    }
+    .action-btn {
+      width: 60px;
+      height: 60px;
+      border-radius: 60px;
+      font-size: 1.5rem;
+      font-weight: bold;
+      box-shadow: 0 3px 0 #0a0f1e;
+      transition: 0.05s linear;
+      border: none;
+      color: white;
+    }
+    .action-btn:active {
+      transform: translateY(3px);
+      box-shadow: none;
+    }
+    .btn-cross { background: #2c8c5e; }
+    .btn-circle { background: #c93a3a; }
+    .btn-square { background: #b86f9c; }
+    .btn-triangle { background: #5a9e4e; }
+
+    /* Second row: Analog Sticks (left and right) + System buttons in center */
+    .row-sticks {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      margin-top: 0.5rem;
+    }
+
+    .stick-area {
+      text-align: center;
+    }
+    .analog-stick {
+      background: #1e2f3f;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 0 #0a0f1e;
+      cursor: pointer;
+      transition: 0.05s linear;
+      margin: 0 auto;
+    }
+    .analog-stick:active {
+      transform: translateY(3px);
+      box-shadow: none;
+    }
+    .stick-inner {
+      width: 45px;
+      height: 45px;
+      background: #2d4a6e;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+    }
+    .stick-label {
+      font-size: 0.65rem;
+      color: #aad0ff;
+      margin-top: 0.3rem;
+    }
+
+    .center-sys {
+      display: flex;
+      gap: 0.8rem;
+      background: rgba(0,0,0,0.3);
+      padding: 0.5rem 1rem;
+      border-radius: 3rem;
+    }
+    .sys-btn {
+      background: #2d3e4e;
+      padding: 0.4rem 1rem;
+      border-radius: 2rem;
+      font-size: 0.8rem;
+      font-weight: bold;
+      min-width: 70px;
+      box-shadow: 0 2px 0 #0a0f1e;
+      border: none;
+      color: white;
+      cursor: pointer;
+      transition: 0.05s linear;
+    }
+    .sys-btn:active {
+      transform: translateY(2px);
+      box-shadow: none;
+    }
+    .ps-btn {
+      background: #00a6ff;
+    }
+
+    /* Games List */
+    .games-section {
+      margin-top: 1.5rem;
+    }
+    .games-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+      background: rgba(0,0,0,0.3);
+      padding: 0.3rem 0.8rem;
+      border-radius: 2rem;
+      font-size: 0.8rem;
+    }
+    .games-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 0.5rem;
+      max-height: 220px;
+      overflow-y: auto;
+      padding: 0.2rem;
+    }
+    .game-card {
+      background: #1e2a3acc;
+      backdrop-filter: blur(8px);
+      border-radius: 1rem;
+      padding: 0.5rem;
+      text-align: center;
+      cursor: pointer;
+      border: 1px solid #2d3e4e;
+    }
+    .game-card:active {
+      background: #00a6ff;
+      transform: scale(0.97);
+    }
+    .game-icon { font-size: 1.4rem; }
+    .game-title { font-size: 0.7rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #00a6ffcc;
+      backdrop-filter: blur(8px);
+      padding: 0.4rem 1rem;
+      border-radius: 2rem;
+      font-size: 0.75rem;
+      z-index: 999;
+      opacity: 0;
+      pointer-events: none;
+      transition: 0.2s;
+    }
+    .toast.show { opacity: 1; }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .dpad-btn, .action-btn {
+        width: 48px;
+        height: 48px;
+        font-size: 1.3rem;
+      }
+      .analog-stick {
+        width: 65px;
+        height: 65px;
+      }
+      .stick-inner {
+        width: 38px;
+        height: 38px;
+        font-size: 1.3rem;
+      }
+      .sys-btn {
+        padding: 0.3rem 0.7rem;
+        min-width: 60px;
+        font-size: 0.7rem;
+      }
+    }
+    .games-grid::-webkit-scrollbar { width: 4px; }
+    .games-grid::-webkit-scrollbar-track { background: #0f172a; border-radius: 10px; }
+    .games-grid::-webkit-scrollbar-thumb { background: #00a6ff; border-radius: 10px; }
+  </style>
+</head>
+<body>
+
+<canvas id="wavesCanvas"></canvas>
+
+<div class="container">
+  <div class="header">
+    <h1>🎮 PS3 Remote | Sticks at Bottom</h1>
+    <div class="ip-section">
+      <input type="text" id="ps3Ip" placeholder="192.168.1.100" value="192.168.1.100">
+      <button id="connectBtn">🔌 اتصال</button>
+    </div>
+    <div class="status" id="statusText">⚫ غير متصل</div>
+  </div>
+
+  <!-- شاشة العرض في الأعلى -->
+  <div class="screen-container">
+    <div class="video-box" id="videoBox">
+      <div class="video-placeholder" id="videoPlaceholder">
+        <span style="font-size:32px">📺✨</span>
+        <span>شاشة البث المباشر</span>
+        <small>قم بتشغيل PSRP على PS3</small>
+      </div>
+      <video id="streamVideo" style="display:none" controls autoplay muted playsinline></video>
+      <iframe id="streamIframe" style="display:none"></iframe>
+    </div>
+  </div>
+
+  <!-- يد التحكم: الأزرار في الصف العلوي، العصي في الصف السفلي -->
+  <div class="controller-body">
+    <!-- الصف الأول: D-Pad (يسار) + Action Buttons (يمين) -->
+    <div class="row-buttons">
+      <div class="dpad">
+        <div class="dpad-row"><button class="dpad-btn ctrl-btn" data-btn="up">▲</button></div>
+        <div class="dpad-row">
+          <button class="dpad-btn ctrl-btn" data-btn="left">◀</button>
+          <button class="dpad-btn ctrl-btn" data-btn="select" style="background:#1e2f3f; font-size:0.8rem;">●</button>
+          <button class="dpad-btn ctrl-btn" data-btn="right">▶</button>
+        </div>
+        <div class="dpad-row"><button class="dpad-btn ctrl-btn" data-btn="down">▼</button></div>
+      </div>
+
+      <div class="action-buttons">
+        <button class="action-btn btn-triangle ctrl-btn" data-btn="triangle">▲</button>
+        <button class="action-btn btn-circle ctrl-btn" data-btn="circle">O</button>
+        <button class="action-btn btn-cross ctrl-btn" data-btn="cross">X</button>
+        <button class="action-btn btn-square ctrl-btn" data-btn="square">□</button>
+      </div>
+    </div>
+
+    <!-- الصف الثاني: العصا اليسرى (تحت D-Pad) ، أزرار النظام في الوسط، العصا اليمنى (تحت Action) -->
+    <div class="row-sticks">
+      <div class="stick-area">
+        <div class="analog-stick ctrl-btn" data-stick="left" data-btn="left_stick">
+          <div class="stick-inner">🎮</div>
+        </div>
+        <div class="stick-label">العصا اليسرى (L3)</div>
+      </div>
+
+      <div class="center-sys">
+        <button class="sys-btn ctrl-btn" data-btn="select">Select</button>
+        <button class="sys-btn ctrl-btn" data-btn="start">Start</button>
+        <button class="sys-btn ps-btn ctrl-btn" data-btn="ps">🎮 PS</button>
+      </div>
+
+      <div class="stick-area">
+        <div class="analog-stick ctrl-btn" data-stick="right" data-btn="right_stick">
+          <div class="stick-inner">🎮</div>
+        </div>
+        <div class="stick-label">العصا اليمنى (R3)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- قائمة الألعاب -->
+  <div class="games-section">
+    <div class="games-header">
+      <span>🎮 قائمة الألعاب (ISO / Folder)</span>
+      <button id="refreshGamesBtn" style="background:#2d3e4e; border:none; padding:0.2rem 0.7rem; border-radius:1rem; color:white;">🔄 تحديث</button>
+    </div>
+    <div class="games-grid" id="gamesGrid">
+      <div style="text-align:center; padding:1rem; color:#ccc;">اضغط اتصال أولاً</div>
+    </div>
+  </div>
+</div>
+<div id="toastMsg" class="toast">تم الإرسال</div>
+
+<script>
+  // ----------------------------- تموجات PS3 (XMB Waves) -------------------------
+  const canvas = document.getElementById('wavesCanvas');
+  let ctx = canvas.getContext('2d');
+  let width, height;
+  let time = 0;
+  let animationId;
+
+  function resizeCanvas() {
+    width = window.innerWidth;
+    height = window.innerHeight;
+    canvas.width = width;
+    canvas.height = height;
+  }
+
+  function drawWaves() {
+    if (!ctx) return;
+    ctx.clearRect(0, 0, width, height);
+    const grad = ctx.createLinearGradient(0, 0, width, height);
+    grad.addColorStop(0, '#021126');
+    grad.addColorStop(0.5, '#001133');
+    grad.addColorStop(1, '#00051a');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, width, height);
+    ctx.save();
+    for (let i = 0; i < 5; i++) {
+      const offset = i * 1.2;
+      const amplitude = 25 + i * 8;
+      const frequency = 0.008 + i * 0.002;
+      const speed = 0.005 + i * 0.0015;
+      const yBase = height * (0.3 + i * 0.12);
+      const alpha = 0.12 - i * 0.015;
+      const hue = (190 + i * 12) % 360;
+      ctx.beginPath();
+      for (let x = 0; x <= width; x += 15) {
+        const y = yBase + Math.sin(x * frequency + time * speed + offset) * amplitude 
+                + Math.cos(x * 0.004 + time * 0.003 + i) * (amplitude * 0.6);
+        if (x === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.lineTo(width, height);
+      ctx.lineTo(0, height);
+      ctx.closePath();
+      ctx.fillStyle = `hsla(${hue}, 80%, 55%, ${alpha})`;
+      ctx.fill();
+    }
+    for (let i = 0; i < 8; i++) {
+      const amplitude = 12 + Math.sin(time * 0.5 + i) * 3;
+      const freq = 0.012 + i * 0.001;
+      const speedY = 0.008 + i * 0.001;
+      const yOffset = height * (0.5 + i * 0.05);
+      const alphaLine = 0.08;
+      ctx.beginPath();
+      for (let x = 0; x <= width; x += 20) {
+        const y = yOffset + Math.sin(x * freq + time * speedY) * amplitude 
+                + Math.cos(x * 0.007 + time * 0.004) * 8;
+        if (x === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.strokeStyle = `rgba(100, 200, 255, ${alphaLine})`;
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+    ctx.fillStyle = 'rgba(210, 230, 255, 0.4)';
+    for (let p = 0; p < 70; p++) {
+      const px = (Math.sin(time * 0.2 + p) * 0.5 + 0.5) * width;
+      const py = (Math.cos(time * 0.17 + p * 2) * 0.4 + 0.5) * height;
+      ctx.beginPath();
+      ctx.arc(px, py, 1.5 + Math.sin(time + p) * 0.8, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(120, 200, 255, ${0.3 + Math.sin(time + p) * 0.1})`;
+      ctx.fill();
+    }
+    ctx.restore();
+    time += 0.025;
+    animationId = requestAnimationFrame(drawWaves);
+  }
+
+  window.addEventListener('resize', () => resizeCanvas());
+  resizeCanvas();
+  drawWaves();
+
+  // ----------------------------- PS3 webMAN MOD API + Vibration -------------------------
+  let currentPS3Ip = localStorage.getItem('ps3_ip') || '';
+  if(currentPS3Ip) document.getElementById('ps3Ip').value = currentPS3Ip;
+  
+  const statusDiv = document.getElementById('statusText');
+  const gamesGrid = document.getElementById('gamesGrid');
+  const connectBtn = document.getElementById('connectBtn');
+  const refreshBtn = document.getElementById('refreshGamesBtn');
+  
+  function vibrate(pattern) {
+    if (window.navigator && window.navigator.vibrate) {
+      window.navigator.vibrate(pattern);
+    }
+  }
+  
+  async function sendCommand(endpoint, showToastMsg = true, vibratePattern = 50) {
+    if(!currentPS3Ip) { showToast('❌ لم يتم تحديد IP'); return false; }
+    try {
+      const url = `http://${currentPS3Ip}${endpoint}`;
+      await fetch(url, { mode: 'no-cors' });
+      if(showToastMsg) showToast(`✅ تم الإرسال`);
+      vibrate(vibratePattern);
+      return true;
+    } catch(e) {
+      console.warn(e);
+      showToast(`⚠️ فشل الإرسال`);
+      vibrate([100, 50, 100]);
+      return false;
+    }
+  }
+  
+  const buttonMap = {
+    'up': 'up', 'down': 'down', 'left': 'left', 'right': 'right',
+    'cross': 'cross', 'circle': 'circle', 'square': 'square', 'triangle': 'triangle',
+    'select': 'select', 'start': 'start', 'ps': 'ps',
+    'left_stick': 'l3', 'right_stick': 'r3'
+  };
+  
+  function attachAllButtons() {
+    document.querySelectorAll('.ctrl-btn').forEach(btn => {
+      if(btn.hasListener) return;
+      btn.hasListener = true;
+      btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        let cmd = btn.getAttribute('data-btn');
+        if (btn.getAttribute('data-stick') === 'left') cmd = 'left_stick';
+        if (btn.getAttribute('data-stick') === 'right') cmd = 'right_stick';
+        
+        if(cmd && buttonMap[cmd]) {
+          let vibe = (cmd === 'ps' || cmd === 'left_stick' || cmd === 'right_stick') ? 80 : 40;
+          await sendCommand(`/pad.ps3?${buttonMap[cmd]}`, true, vibe);
+        }
+      });
+    });
+  }
+  
+  attachAllButtons();
+  
+  async function testConnection(ip) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 3000);
+      await fetch(`http://${ip}/`, { signal: controller.signal, mode: 'no-cors' });
+      clearTimeout(timeoutId);
+      return true;
+    } catch(e) {
+      return false;
+    }
+  }
+  
+  connectBtn.addEventListener('click', async () => {
+    let ip = document.getElementById('ps3Ip').value.trim();
+    if(!ip) { showToast('أدخل عنوان IP'); return; }
+    currentPS3Ip = ip;
+    localStorage.setItem('ps3_ip', ip);
+    statusDiv.innerText = '🔄 جاري الاتصال بـ PS3 ...';
+    const connected = await testConnection(ip);
+    if(connected) {
+      statusDiv.innerHTML = '✅ متصل بـ PS3 (webMAN MOD) ✨';
+      showToast('تم الاتصال بنجاح + دعم الاهتزاز');
+      vibrate(200);
+      loadGamesList();
+      setupVideoStream();
+    } else {
+      statusDiv.innerHTML = '❌ فشل الاتصال - تأكد من IP وتشغيل webMAN';
+      showToast('فشل الاتصال');
+      vibrate([100, 200, 100]);
+    }
+  });
+  
+  async function loadGamesList() {
+    if(!currentPS3Ip) { gamesGrid.innerHTML = '<div style="color:#aaa;">يرجى الاتصال أولاً</div>'; return; }
+    gamesGrid.innerHTML = '<div style="text-align:center;">⏳ جاري تحميل الألعاب...</div>';
+    try {
+      const url = `http://${currentPS3Ip}/get_ps3_games.ps3`;
+      const res = await fetch(url);
+      const text = await res.text();
+      parseGamesList(text);
+    } catch(e) {
+      console.error(e);
+      gamesGrid.innerHTML = '<div style="color:#f66;">⚠️ تعذر تحميل الألعاب (تأكد من webMAN MOD)</div>';
+    }
+  }
+  
+  function parseGamesList(data) {
+    const lines = data.split(/\r?\n/);
+    const games = [];
+    for(let line of lines) {
+      line = line.trim();
+      if(line.startsWith('/dev_hdd0/game/') || line.startsWith('/dev_usb') || line.endsWith('.iso') || line.includes('PS3ISO')) {
+        let title = line.split('/').pop().replace(/_/g,' ').replace('.iso','');
+        if(title.length < 2) title = line.slice(-30);
+        games.push({ path: line, title: title });
+      }
+    }
+    if(games.length === 0) {
+      gamesGrid.innerHTML = '<div style="color:#aaa;">🎮 لم يتم العثور على ألعاب.</div>';
+      return;
+    }
+    gamesGrid.innerHTML = '';
+    games.forEach(game => {
+      const card = document.createElement('div');
+      card.className = 'game-card';
+      card.innerHTML = `<div class="game-icon">🎮</div><div class="game-title">${escapeHtml(game.title.substring(0, 35))}</div>`;
+      card.onclick = () => launchGame(game.path);
+      gamesGrid.appendChild(card);
+    });
+  }
+  
+  async function launchGame(gamePath) {
+    if(!currentPS3Ip) return;
+    showToast(`🚀 تشغيل: ${gamePath.split('/').pop()}`);
+    vibrate(100);
+    await sendCommand(`/mount.ps3${gamePath}`, false);
+    setTimeout(async () => {
+      await sendCommand(`/play.ps3`, false);
+      showToast('🎉 تم إطلاق اللعبة');
+      vibrate([150, 100]);
+    }, 600);
+  }
+  
+  function setupVideoStream() {
+    const videoPlaceholder = document.getElementById('videoPlaceholder');
+    const videoElem = document.getElementById('streamVideo');
+    const streamUrl = `http://${currentPS3Ip}:8080/stream`;
+    const userWantsStream = confirm('🎥 هل قمت بتشغيل خادم البث (PSRP) على PS3؟\nاضغط موافق لمحاولة عرض البث المباشر.');
+    if(userWantsStream) {
+      videoPlaceholder.style.display = 'none';
+      videoElem.style.display = 'block';
+      videoElem.src = streamUrl;
+      videoElem.play().catch(e => {
+        console.warn(e);
+        videoPlaceholder.style.display = 'flex';
+        videoElem.style.display = 'none';
+        videoPlaceholder.innerHTML = `<span>📡</span><span>تعذر تشغيل البث</span><small>تأكد من تشغيل PSRP (منفذ 8080)</small>`;
+        showToast('⚠️ لا يوجد بث حي');
+      });
+    } else {
+      videoPlaceholder.innerHTML = `<span>🌀 XMB WAVES</span><span>🔮 البث غير مفعل</span><small>يمكنك تفعيله لاحقاً</small>`;
+    }
+  }
+  
+  refreshBtn.addEventListener('click', loadGamesList);
+  
+  function showToast(msg) {
+    const toast = document.getElementById('toastMsg');
+    toast.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2500);
+  }
+  
+  function escapeHtml(str) {
+    if(!str) return '';
+    return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : (m === '<' ? '&lt;' : '&gt;'));
+  }
+  
+  if(currentPS3Ip) setTimeout(() => connectBtn.click(), 800);
+  
+  window.addEventListener('beforeunload', () => {
+    if(animationId) cancelAnimationFrame(animationId);
+  });
+</script>
+</body>
+</html>
