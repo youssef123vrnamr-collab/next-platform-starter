@@ -555,7 +555,7 @@
     <div id="state-no-admin">
       <div class="invite-card">
         <div class="crown">👑</div>
-        <h3>لا يوجد مشرف بعد!</h3>
+        <h3>🚀 لا يوجد مشرف بعد!</h3>
         <p>أنت أول شخص هنا.<br />سجّل دخولك لتصبح المشرف الوحيد للمنصة.</p>
         <button class="btn-google" onclick="handleAdminLogin()">
           <svg width="20" height="20" viewBox="0 0 24 24">
@@ -569,22 +569,14 @@
       </div>
     </div>
 
-    <!-- STATE 2: يوجد مشرف لكن المستخدم الحالي ليس مشرفاً -->
+    <!-- STATE 2: يوجد مشرف لكن المستخدم الحالي ليس مشرفاً (تم إخفاء زر الدخول) -->
     <div id="state-blocked">
       <div class="blocked-card">
         <div class="lock-icon">🔐</div>
         <h3>المنصة محمية</h3>
         <p>هذه المنصة لها مشرف بالفعل.<br />لا يمكن إضافة مشرف آخر.</p>
+        <p style="margin-top:16px; font-size:12px;">👑 تم تعيين مشرف مسبقاً</p>
       </div>
-      <button class="btn-google" style="margin-top:16px" onclick="handleAdminLogin()">
-        <svg width="18" height="18" viewBox="0 0 24 24">
-          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-          <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-        </svg>
-        دخول المشرف بـ Google
-      </button>
     </div>
 
     <!-- STATE 3: المستخدم الحالي هو المشرف -->
@@ -600,7 +592,7 @@
       <button class="btn-add-video" onclick="openAddModal(); closePanel();">🎬 رفع فيديو جديد</button>
 
       <div class="tools-box">
-        <div class="tools-title">أدوات المشرف على كل فيديو</div>
+        <div class="tools-title">🛠️ أدوات المشرف على كل فيديو</div>
         <div class="tool-item"><span>🔒</span><span>قفل / فتح الفيديو</span></div>
         <div class="tool-item"><span>✏️</span><span>تعديل العنوان والوصف</span></div>
         <div class="tool-item" style="border-bottom:none"><span>🗑️</span><span>حذف الفيديو</span></div>
@@ -631,12 +623,12 @@
 <!-- ===== FILTERS BAR ===== -->
 <div id="filters-bar">
   <div class="filter-btns">
-    <button class="filter-btn active" data-filter="all" onclick="setFilter('all',this)">الكل</button>
+    <button class="filter-btn active" data-filter="all" onclick="setFilter('all',this)">📋 الكل</button>
     <button class="filter-btn" data-filter="unlocked" onclick="setFilter('unlocked',this)">🔓 مفتوح</button>
     <button class="filter-btn" data-filter="locked" onclick="setFilter('locked',this)">🔒 مقفول</button>
   </div>
   <div class="filter-right">
-    <input id="search-input" placeholder="بحث عن فيديو..." oninput="renderVideos()" />
+    <input id="search-input" placeholder="🔍 بحث عن فيديو..." oninput="renderVideos()" />
     <button id="add-video-btn" onclick="openAddModal()">+ رفع فيديو</button>
   </div>
 </div>
@@ -651,7 +643,7 @@
 
 <!-- ===== FOOTER ===== -->
 <footer>
-  <span>GAMEVERSE</span> — منصة الجيمنج الاحترافية
+  <span>GAMEVERSE</span> — منصة الجيمنج الاحترافية 🎮
 </footer>
 
 <!-- ===== ADD VIDEO MODAL ===== -->
@@ -698,7 +690,7 @@
 </div>
 
 <script type="module">
-  // ===== FIREBASE CONFIG =====
+  // ===== FIREBASE CONFIG (تمكين قاعدة البيانات) =====
   const FIREBASE_CONFIG = {
     apiKey: "AIzaSyB-TFF6yvJyq21RxMD7KuAgNuVOBlXgNhY",
     authDomain: "ginang-ca81d.firebaseapp.com",
@@ -939,7 +931,7 @@
   window.handleAdminLogin = async function() {
     const { fb } = state;
     if (!fb) {
-      // Demo mode
+      // Demo mode - بدون Firebase
       state.adminExists = true; state.isAdmin = true;
       state.user = { displayName: 'مشرف تجريبي', photoURL: '', uid: 'demo', email: 'demo@test.com' };
       updateUI();
@@ -948,8 +940,13 @@
     }
     try {
       const { auth, db, GoogleAuthProvider, signInWithPopup, signInWithRedirect, collection, getDocs, setDoc, doc, query, where } = fb;
+      // التحقق من وجود مشرف مسبقاً
       const adminSnap = await getDocs(query(collection(db, 'users'), where('isAdmin','==',true)));
-      if (!adminSnap.empty) { state.adminExists = true; updateUI(); return; }
+      if (!adminSnap.empty) {
+        // يوجد مشرف بالفعل، لا نسمح بتسجيل دخول آخر كمشرف
+        alert('⚠️ المنصة لديها مشرف بالفعل. لا يمكنك التسجيل كمشرف.');
+        return;
+      }
 
       const provider = new GoogleAuthProvider();
       const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
@@ -971,12 +968,17 @@
       }
 
       if (result && result.user) {
+        // بعد نجاح الدخول، نتأكد مرة أخرى ألا يوجد مشرف (تجنب سباق)
         const freshSnap = await getDocs(query(collection(db, 'users'), where('isAdmin','==',true)));
         if (freshSnap.empty) {
           await saveAdminUser(result.user);
+        } else {
+          alert('⚠️ تم تعيين مشرف بالفعل أثناء عملية الدخول. لن تصبح مشرفاً.');
+          // تسجيل خروج المستخدم لأن لا صلاحية
+          await signOut(auth);
         }
       }
-    } catch(e) { console.error('Login error:', e); }
+    } catch(e) { console.error('Login error:', e); alert('حدث خطأ في تسجيل الدخول.'); }
   };
 
   async function saveAdminUser(fbUser) {
@@ -995,6 +997,7 @@
     const { fb } = state;
     if (fb) await fb.signOut(fb.auth);
     state.user = null; state.isAdmin = false;
+    // لا نغير adminExists لأنه لا يزال موجود
     closePanel(); updateUI();
   };
 
@@ -1010,7 +1013,7 @@
   };
 
   window.handleDelete = async function(id) {
-    if (!confirm('هل أنت متأكد من حذف هذا الفيديو؟')) return;
+    if (!confirm('🗑️ هل أنت متأكد من حذف هذا الفيديو؟')) return;
     const { fb } = state;
     if (fb) await fb.deleteDoc(fb.doc(fb.db, 'videos', id));
     state.videos = state.videos.filter(v => v.id !== id);
@@ -1051,7 +1054,7 @@
   const configured = FIREBASE_CONFIG.apiKey !== 'YOUR_API_KEY';
 
   if (!configured) {
-    // Demo mode
+    // Demo mode (بدون Firebase)
     state.videos = [
       { id: 'd1', youtubeId: 'dQw4w9WgXcQ', title: 'فيديو تجريبي ١', description: 'وصف تجريبي', locked: false },
       { id: 'd2', youtubeId: '9bZkp7q19f0', title: 'أفضل لحظات الجيمنج', description: '', locked: false },
@@ -1074,11 +1077,15 @@
       const db = getFirestore(app);
       state.fb = { auth, db, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged, collection, getDocs, addDoc, deleteDoc, doc, updateDoc, setDoc, getDoc, query, orderBy, where };
 
+      // معالجة redirect result
       getRedirectResult(auth).then(async (result) => {
         if (result && result.user) {
           const adminSnap = await getDocs(query(collection(db, 'users'), where('isAdmin','==',true)));
           if (adminSnap.empty) {
             await saveAdminUser(result.user);
+          } else {
+            await signOut(auth);
+            alert('⚠️ المنصة لها مشرف بالفعل. تم تسجيل خروجك.');
           }
         }
       }).catch(e => console.error('Redirect result error:', e));
@@ -1096,6 +1103,7 @@
             const userData = userSnap.exists() ? userSnap.data() : null;
             state.user = { uid: fbUser.uid, email: fbUser.email, displayName: fbUser.displayName, photoURL: fbUser.photoURL };
             state.isAdmin = userData?.isAdmin === true;
+            // إذا كان المستخدم مسجل دخوله لكن ليس مشرفاً والمشرف موجود، لا مشكلة
           } catch { state.user = null; state.isAdmin = false; }
         } else { state.user = null; state.isAdmin = false; }
 
