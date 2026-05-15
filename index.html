@@ -1,763 +1,935 @@
 <!DOCTYPE html>
-<html dir="rtl" lang="ar">
+<html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>PS3 Remote - Screen Inside Controller</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      user-select: none;
-      -webkit-tap-highlight-color: transparent;
-    }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>GAMEVERSE</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@700&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #050510; min-height: 100vh; font-family: 'Segoe UI', Tahoma, sans-serif; direction: rtl; }
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: #050510; }
+  ::-webkit-scrollbar-thumb { background: rgba(0,255,150,0.3); border-radius: 3px; }
+  input::placeholder { color: rgba(255,255,255,0.3) !important; }
 
-    /* Waves Background */
-    #wavesCanvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 0;
-      pointer-events: none;
-      background: radial-gradient(circle at 20% 30%, #001433, #000000);
-    }
+  /* ===== NAVBAR ===== */
+  #navbar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+    background: rgba(5,5,15,0.93); backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(0,255,150,0.1);
+    height: 64px; display: flex; align-items: center;
+    padding: 0 24px; justify-content: space-between;
+  }
+  .nav-logo { display: flex; align-items: center; gap: 12px; }
+  .nav-logo-icon {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, #00ff96, #00b4ff);
+    border-radius: 8px; display: flex; align-items: center; justify-content: center;
+    font-size: 18px; font-weight: 900; color: #000;
+    box-shadow: 0 0 20px rgba(0,255,150,0.4);
+  }
+  .nav-logo-text {
+    font-family: 'Rajdhani', sans-serif; font-size: 20px; font-weight: 700;
+    background: linear-gradient(90deg, #00ff96, #00b4ff);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    letter-spacing: 2px;
+  }
+  .nav-links { display: flex; gap: 28px; align-items: center; }
+  .nav-links a {
+    color: rgba(255,255,255,0.6); text-decoration: none;
+    font-size: 14px; font-weight: 600; transition: color 0.2s;
+  }
+  .nav-links a:hover { color: #00ff96; }
+  .nav-right { display: flex; align-items: center; gap: 12px; }
 
-    body {
-      font-family: 'Segoe UI', 'Tahoma', 'Geneva', 'Verdana', sans-serif;
-      color: #eee;
-      padding: 1rem;
-      min-height: 100vh;
-      position: relative;
-      z-index: 1;
-      background: transparent;
-    }
+  #admin-badge {
+    display: none; align-items: center; gap: 8px;
+  }
+  #admin-badge img {
+    width: 30px; height: 30px; border-radius: 50%; border: 2px solid #00ff96;
+  }
+  #admin-badge span { color: #00ff96; font-size: 12px; font-weight: 700; }
 
-    body::before {
-      content: "";
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.4);
-      backdrop-filter: blur(2px);
-      z-index: -1;
-      pointer-events: none;
-    }
+  /* GEAR BUTTON */
+  #gear-btn {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px; width: 42px; height: 42px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all 0.2s; position: relative;
+  }
+  #gear-btn:hover, #gear-btn.active {
+    background: rgba(255,107,0,0.18);
+    border-color: rgba(255,107,0,0.45);
+  }
+  #gear-btn svg { transition: all 0.2s; }
+  #gear-dot {
+    position: absolute; top: 7px; right: 7px;
+    width: 7px; height: 7px; border-radius: 50%;
+    background: #00ff96; box-shadow: 0 0 6px #00ff96;
+    display: none;
+  }
 
-    .container {
-      max-width: 950px;
-      margin: 0 auto;
-      position: relative;
-      z-index: 2;
-    }
+  /* ===== SIDE PANEL ===== */
+  #overlay {
+    position: fixed; inset: 0; z-index: 1998;
+    background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+    display: none;
+  }
+  #side-panel {
+    position: fixed; top: 0; right: 0; bottom: 0;
+    width: 320px; z-index: 1999;
+    background: linear-gradient(180deg, #0a0a20 0%, #070714 100%);
+    border-left: 1px solid rgba(0,255,150,0.18);
+    box-shadow: -20px 0 60px rgba(0,0,0,0.7);
+    transform: translateX(100%);
+    transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+    display: flex; flex-direction: column; overflow-y: auto;
+  }
+  #side-panel.open { transform: translateX(0); }
 
-    /* Header */
-    .header {
-      text-align: center;
-      padding: 0.8rem;
-      background: rgba(0, 0, 0, 0.55);
-      border-radius: 2rem;
-      margin-bottom: 1rem;
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(0, 166, 255, 0.3);
-    }
+  .panel-header {
+    padding: 24px 20px 20px;
+    border-bottom: 1px solid rgba(0,255,150,0.1);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .panel-header-left { display: flex; align-items: center; gap: 10px; }
+  .panel-header-icon {
+    width: 34px; height: 34px;
+    background: linear-gradient(135deg, #ff6b00, #ff9900);
+    border-radius: 8px; display: flex; align-items: center; justify-content: center;
+  }
+  .panel-header-title { color: #fff; font-weight: 700; font-size: 16px; }
+  .panel-close {
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px; width: 34px; height: 34px;
+    color: rgba(255,255,255,0.6); font-size: 18px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+  }
+  .panel-body { padding: 24px 20px; flex: 1; }
 
-    .header h1 {
-      font-size: 1.3rem;
-      background: linear-gradient(135deg, #00a6ff, #ff4d4d);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
+  /* Panel states */
+  #state-no-admin, #state-blocked, #state-is-admin { display: none; }
 
-    .ip-section {
-      display: flex;
-      gap: 0.5rem;
-      margin: 0.5rem 0;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
+  /* No admin card */
+  .invite-card {
+    background: linear-gradient(135deg, rgba(0,255,150,0.07), rgba(0,180,255,0.04));
+    border: 1px solid rgba(0,255,150,0.2);
+    border-radius: 14px; padding: 24px; text-align: center; margin-bottom: 20px;
+  }
+  .invite-card .crown { font-size: 44px; margin-bottom: 14px; }
+  .invite-card h3 { color: #00ff96; margin: 0 0 8px; font-size: 16px; }
+  .invite-card p { color: rgba(255,255,255,0.5); font-size: 13px; margin: 0 0 22px; line-height: 1.7; }
 
-    .ip-section input {
-      flex: 1;
-      padding: 0.5rem 0.8rem;
-      border-radius: 2rem;
-      border: none;
-      background: #0f172ad9;
-      color: white;
-      font-size: 0.85rem;
-      text-align: center;
-      direction: ltr;
-      font-family: monospace;
-      backdrop-filter: blur(4px);
-      border: 1px solid #2d4a6e;
-    }
+  .btn-google {
+    width: 100%; padding: 13px;
+    background: linear-gradient(135deg, #00ff96, #00b4ff);
+    border: none; border-radius: 10px;
+    color: #000; font-size: 14px; font-weight: 800;
+    cursor: pointer; box-shadow: 0 0 25px rgba(0,255,150,0.3);
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+  }
 
-    .ip-section button {
-      padding: 0.5rem 1rem;
-      border-radius: 2rem;
-      border: none;
-      background: #00a6ff;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-    }
+  /* Blocked card */
+  .blocked-card {
+    background: rgba(255,60,60,0.07);
+    border: 1px solid rgba(255,60,60,0.18);
+    border-radius: 14px; padding: 28px; text-align: center;
+  }
+  .blocked-card .lock-icon { font-size: 44px; margin-bottom: 14px; }
+  .blocked-card h3 { color: #ff6060; margin: 0 0 8px; font-size: 16px; }
+  .blocked-card p { color: rgba(255,255,255,0.45); font-size: 13px; line-height: 1.7; }
 
-    .status {
-      background: #0f172ab3;
-      backdrop-filter: blur(8px);
-      padding: 0.3rem;
-      border-radius: 2rem;
-      text-align: center;
-      font-size: 0.75rem;
-      margin-bottom: 1rem;
-      border: 1px solid #2d4a6e;
-    }
+  /* Admin logged in */
+  .admin-profile {
+    background: rgba(0,255,150,0.05);
+    border: 1px solid rgba(0,255,150,0.14);
+    border-radius: 12px; padding: 16px;
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 20px;
+  }
+  .admin-profile img {
+    width: 44px; height: 44px; border-radius: 50%;
+    border: 2px solid #00ff96; flex-shrink: 0;
+  }
+  .admin-profile .name { color: #fff; font-weight: 700; font-size: 14px; }
+  .admin-profile .role { color: #00ff96; font-size: 11px; font-weight: 700; letter-spacing: 1px; }
 
-    /* Controller with built-in screen */
-    .controller-with-screen {
-      background: rgba(20, 30, 45, 0.85);
-      backdrop-filter: blur(20px);
-      border-radius: 3rem;
-      padding: 1.2rem;
-      border: 1px solid rgba(0, 166, 255, 0.4);
-      box-shadow: 0 15px 30px rgba(0,0,0,0.6);
-    }
+  .btn-add-video {
+    width: 100%; padding: 13px 16px;
+    background: linear-gradient(135deg, #00ff96, #00b4ff);
+    border: none; border-radius: 10px;
+    color: #000; font-size: 14px; font-weight: 800;
+    cursor: pointer; margin-bottom: 10px;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+  }
 
-    /* Main layout: Left, Center (Screen), Right */
-    .controller-main {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      align-items: center;
-      gap: 0.8rem;
-    }
+  .tools-box {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 10px; padding: 14px 16px; margin-bottom: 10px;
+  }
+  .tools-box .tools-title {
+    color: rgba(255,255,255,0.35); font-size: 11px;
+    margin-bottom: 12px; letter-spacing: 1px; font-weight: 700;
+  }
+  .tool-item {
+    padding: 9px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .tool-item span { color: rgba(255,255,255,0.7); font-size: 13px; }
 
-    /* Left side: D-Pad + Left Stick */
-    .left-panel {
-      flex: 1;
-      min-width: 130px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 1rem;
-    }
+  .btn-signout {
+    width: 100%; padding: 11px;
+    background: rgba(255,60,60,0.08); border: 1px solid rgba(255,60,60,0.22);
+    border-radius: 10px; color: #ff6060;
+    font-size: 13px; font-weight: 700; cursor: pointer;
+    margin-top: 10px;
+  }
 
-    /* Right side: Action Buttons + Right Stick */
-    .right-panel {
-      flex: 1;
-      min-width: 130px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 1rem;
-    }
+  /* ===== HERO ===== */
+  #hero {
+    position: relative; height: 420px;
+    background: linear-gradient(135deg, #050510 0%, #0a0a2e 50%, #050510 100%);
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden; margin-top: 64px;
+  }
+  .hero-grid {
+    position: absolute; inset: 0;
+    background-image: linear-gradient(rgba(0,255,150,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,150,0.04) 1px,transparent 1px);
+    background-size: 40px 40px;
+  }
+  .hero-glow-1 {
+    position: absolute; width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(0,180,255,0.12) 0%, transparent 70%);
+    top: -150px; left: -150px;
+  }
+  .hero-glow-2 {
+    position: absolute; width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(0,255,150,0.1) 0%, transparent 70%);
+    bottom: -150px; right: -150px;
+  }
+  .hero-content { position: relative; text-align: center; z-index: 1; }
+  .hero-tag {
+    font-size: 11px; letter-spacing: 6px; font-weight: 700;
+    color: #00ff96; margin-bottom: 16px;
+  }
+  .hero-title {
+    font-size: 64px; font-weight: 900; margin: 0 0 16px;
+    font-family: 'Rajdhani', sans-serif;
+    background: linear-gradient(135deg, #fff 0%, #00ff96 50%, #00b4ff 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1.1;
+  }
+  .hero-sub {
+    color: rgba(255,255,255,0.55); font-size: 18px; margin: 0 0 32px;
+  }
+  .hero-btn {
+    padding: 12px 28px;
+    background: linear-gradient(135deg, #00ff96, #00b4ff);
+    border-radius: 10px; color: #000; font-weight: 800; font-size: 15px;
+    display: inline-block; box-shadow: 0 0 30px rgba(0,255,150,0.35);
+    cursor: pointer; border: none;
+  }
 
-    /* Center: Screen + Select/Start/PS */
-    .center-panel {
-      flex: 1.5;
-      min-width: 200px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.8rem;
-    }
+  /* ===== FILTERS ===== */
+  #filters-bar {
+    padding: 24px 24px 0;
+    display: flex; gap: 12px; align-items: center;
+    flex-wrap: wrap; justify-content: space-between;
+  }
+  .filter-btns { display: flex; gap: 8px; }
+  .filter-btn {
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px; padding: 8px 18px;
+    color: rgba(255,255,255,0.6); font-size: 13px; font-weight: 600;
+    cursor: pointer; font-family: 'Segoe UI', sans-serif;
+    transition: all 0.2s;
+  }
+  .filter-btn.active {
+    background: linear-gradient(135deg, #00ff96, #00b4ff);
+    border-color: transparent; color: #000; font-weight: 800;
+  }
+  .filter-right { display: flex; gap: 12px; align-items: center; }
+  #search-input {
+    padding: 9px 16px; background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1); border-radius: 10px;
+    color: #fff; font-size: 13px; width: 200px;
+    font-family: 'Segoe UI', sans-serif; outline: none;
+  }
+  #add-video-btn {
+    background: linear-gradient(135deg, #00ff96, #00b4ff); border: none;
+    border-radius: 10px; padding: 9px 20px; color: #000;
+    font-size: 13px; font-weight: 800; cursor: pointer;
+    box-shadow: 0 0 20px rgba(0,255,150,0.3); display: none;
+  }
 
-    /* Screen box */
-    .screen-box {
-      background: #000000aa;
-      border-radius: 1rem;
-      overflow: hidden;
-      width: 100%;
-      aspect-ratio: 16 / 9;
-      border: 2px solid rgba(0, 166, 255, 0.6);
-      box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-    }
-    .screen-box video, .screen-box iframe {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      background: black;
-    }
-    .video-placeholder {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100%;
-      background: #111111cc;
-      color: #ccc;
-      flex-direction: column;
-      gap: 0.3rem;
-      font-size: 0.7rem;
-      text-align: center;
-    }
+  /* ===== VIDEO GRID ===== */
+  #video-grid {
+    padding: 24px;
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+  }
 
-    /* System buttons under screen */
-    .sys-buttons {
-      display: flex;
-      gap: 0.8rem;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-    .sys-btn {
-      background: #2d3e4e;
-      padding: 0.4rem 0.9rem;
-      border-radius: 2rem;
-      font-size: 0.8rem;
-      font-weight: bold;
-      min-width: 70px;
-      box-shadow: 0 2px 0 #0a0f1e;
-      border: none;
-      color: white;
-      cursor: pointer;
-      transition: 0.05s linear;
-    }
-    .sys-btn:active {
-      transform: translateY(2px);
-      box-shadow: none;
-    }
-    .ps-btn {
-      background: #00a6ff;
-    }
+  /* VIDEO CARD */
+  .video-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px; overflow: hidden; transition: all 0.3s;
+  }
+  .video-card:hover {
+    border-color: rgba(0,255,150,0.3); transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4), 0 0 20px rgba(0,255,150,0.08);
+  }
+  .video-thumb-wrap {
+    position: relative; padding-bottom: 56.25%; background: #000;
+  }
+  .video-thumb {
+    position: absolute; inset: 0; background-size: cover; background-position: center;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+  }
+  .video-thumb.locked { cursor: not-allowed; }
+  .thumb-gradient {
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 50%);
+  }
+  .play-btn {
+    background: rgba(0,0,0,0.7); border-radius: 50%;
+    width: 64px; height: 64px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px; z-index: 1; border: 3px solid rgba(255,255,255,0.7);
+    position: relative;
+  }
+  .video-iframe {
+    position: absolute; inset: 0; width: 100%; height: 100%; border: none;
+  }
+  .video-info { padding: 16px; }
+  .video-meta { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+  .video-title { margin: 0 0 4px; color: #fff; font-size: 15px; font-weight: 700; line-height: 1.4; }
+  .video-desc { margin: 0; color: rgba(255,255,255,0.45); font-size: 12px; line-height: 1.5; }
+  .badge-locked {
+    background: rgba(255,60,60,0.15); border: 1px solid rgba(255,60,60,0.3);
+    border-radius: 6px; padding: 2px 8px; color: #ff6060;
+    font-size: 11px; font-weight: 700; white-space: nowrap;
+  }
+  .admin-actions {
+    margin-top: 12px; padding-top: 12px;
+    border-top: 1px solid rgba(255,255,255,0.07);
+    display: flex; gap: 8px; flex-wrap: wrap;
+  }
+  .act-btn {
+    border-radius: 6px; padding: 5px 10px;
+    font-size: 11px; font-weight: 700; cursor: pointer; font-family: 'Segoe UI', sans-serif;
+  }
+  .btn-lock { background: rgba(255,165,0,0.1); border: 1px solid rgba(255,165,0,0.3); color: #ffa500; }
+  .btn-unlock { background: rgba(0,255,150,0.1); border: 1px solid rgba(0,255,150,0.3); color: #00ff96; }
+  .btn-edit { background: rgba(0,180,255,0.1); border: 1px solid rgba(0,180,255,0.3); color: #00b4ff; }
+  .btn-del { background: rgba(255,60,60,0.1); border: 1px solid rgba(255,60,60,0.3); color: #ff6060; }
 
-    /* D-Pad */
-    .dpad {
-      background: rgba(0, 0, 0, 0.5);
-      border-radius: 3rem;
-      padding: 0.5rem;
-      display: inline-block;
-    }
-    .dpad-row {
-      display: flex;
-      justify-content: center;
-      gap: 0.4rem;
-      margin: 0.2rem 0;
-    }
-    .dpad-btn {
-      background: #1e2f3f;
-      border: none;
-      color: white;
-      font-size: 1.4rem;
-      width: 50px;
-      height: 50px;
-      border-radius: 50px;
-      box-shadow: 0 3px 0 #0a0f1e;
-      cursor: pointer;
-      transition: 0.05s linear;
-      font-weight: bold;
-    }
-    .dpad-btn:active {
-      transform: translateY(3px);
-      box-shadow: none;
-    }
+  /* ===== EMPTY STATE ===== */
+  #empty-state {
+    grid-column: 1/-1; text-align: center; padding: 80px 0;
+    color: rgba(255,255,255,0.3); font-size: 16px; display: none;
+  }
 
-    /* Analog Sticks */
-    .analog-stick {
-      background: #1e2f3f;
-      width: 70px;
-      height: 70px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 0 #0a0f1e;
-      cursor: pointer;
-      transition: 0.05s linear;
-    }
-    .analog-stick:active {
-      transform: translateY(3px);
-      box-shadow: none;
-    }
-    .stick-inner {
-      width: 40px;
-      height: 40px;
-      background: #2d4a6e;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.4rem;
-    }
-    .stick-label {
-      font-size: 0.6rem;
-      color: #aad0ff;
-      margin-top: 0.2rem;
-      text-align: center;
-    }
+  /* ===== FOOTER ===== */
+  footer {
+    text-align: center; padding: 40px 24px;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    color: rgba(255,255,255,0.3); font-size: 13px;
+  }
+  footer span { color: #00ff96; font-weight: 700; }
 
-    /* Action Buttons */
-    .action-buttons {
-      background: rgba(0, 0, 0, 0.4);
-      border-radius: 3rem;
-      padding: 0.6rem;
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 0.5rem;
-      align-items: center;
-      justify-items: center;
-    }
-    .action-btn {
-      width: 55px;
-      height: 55px;
-      border-radius: 55px;
-      font-size: 1.4rem;
-      font-weight: bold;
-      box-shadow: 0 3px 0 #0a0f1e;
-      transition: 0.05s linear;
-      border: none;
-      color: white;
-    }
-    .action-btn:active {
-      transform: translateY(3px);
-      box-shadow: none;
-    }
-    .btn-cross { background: #2c8c5e; }
-    .btn-circle { background: #c93a3a; }
-    .btn-square { background: #b86f9c; }
-    .btn-triangle { background: #5a9e4e; }
-
-    /* Games List */
-    .games-section {
-      margin-top: 1.5rem;
-    }
-    .games-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 0.5rem;
-      background: rgba(0,0,0,0.3);
-      padding: 0.3rem 0.8rem;
-      border-radius: 2rem;
-      font-size: 0.8rem;
-    }
-    .games-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-      gap: 0.5rem;
-      max-height: 220px;
-      overflow-y: auto;
-      padding: 0.2rem;
-    }
-    .game-card {
-      background: #1e2a3acc;
-      backdrop-filter: blur(8px);
-      border-radius: 1rem;
-      padding: 0.5rem;
-      text-align: center;
-      cursor: pointer;
-      border: 1px solid #2d3e4e;
-    }
-    .game-card:active {
-      background: #00a6ff;
-      transform: scale(0.97);
-    }
-    .game-icon { font-size: 1.4rem; }
-    .game-title { font-size: 0.7rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-    .toast {
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #00a6ffcc;
-      backdrop-filter: blur(8px);
-      padding: 0.4rem 1rem;
-      border-radius: 2rem;
-      font-size: 0.75rem;
-      z-index: 999;
-      opacity: 0;
-      pointer-events: none;
-      transition: 0.2s;
-    }
-    .toast.show { opacity: 1; }
-
-    /* Responsive */
-    @media (max-width: 700px) {
-      .controller-main {
-        flex-direction: column;
-      }
-      .left-panel, .right-panel {
-        flex-direction: row;
-        justify-content: center;
-        gap: 1rem;
-        width: 100%;
-      }
-      .dpad, .action-buttons {
-        transform: scale(0.9);
-      }
-    }
-    @media (max-width: 480px) {
-      .dpad-btn, .action-btn {
-        width: 45px;
-        height: 45px;
-        font-size: 1.2rem;
-      }
-      .analog-stick {
-        width: 60px;
-        height: 60px;
-      }
-      .stick-inner {
-        width: 35px;
-        height: 35px;
-        font-size: 1.2rem;
-      }
-    }
-    .games-grid::-webkit-scrollbar { width: 4px; }
-    .games-grid::-webkit-scrollbar-track { background: #0f172a; border-radius: 10px; }
-    .games-grid::-webkit-scrollbar-thumb { background: #00a6ff; border-radius: 10px; }
-  </style>
+  /* ===== MODAL ===== */
+  .modal-overlay {
+    position: fixed; inset: 0; z-index: 9999;
+    background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .modal-box {
+    background: linear-gradient(135deg, #0d0d2b, #0a1628);
+    border-radius: 20px; padding: 36px; width: 460px; max-width: 95vw;
+  }
+  .modal-title { color: #fff; margin: 0 0 24px; font-size: 22px; }
+  .modal-field { margin-bottom: 16px; }
+  .modal-label { display: block; color: rgba(255,255,255,0.6); font-size: 13px; margin-bottom: 6px; }
+  .modal-input {
+    width: 100%; padding: 11px 14px;
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px; color: #fff; font-size: 13px;
+    font-family: 'Segoe UI', sans-serif; outline: none;
+    box-sizing: border-box; direction: rtl;
+  }
+  .modal-error { color: #ff6060; font-size: 13px; margin: 0 0 16px; }
+  .modal-btns { display: flex; gap: 12px; justify-content: flex-end; }
+  .btn-cancel {
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px; padding: 10px 24px; color: rgba(255,255,255,0.6);
+    font-size: 14px; cursor: pointer;
+  }
+  .btn-confirm-add {
+    background: linear-gradient(135deg, #00ff96, #00b4ff); border: none;
+    border-radius: 10px; padding: 10px 28px; color: #000;
+    font-size: 14px; font-weight: 800; cursor: pointer;
+  }
+  .btn-confirm-edit {
+    background: linear-gradient(135deg, #00b4ff, #0066ff); border: none;
+    border-radius: 10px; padding: 10px 28px; color: #fff;
+    font-size: 14px; font-weight: 800; cursor: pointer;
+  }
+</style>
 </head>
 <body>
 
-<canvas id="wavesCanvas"></canvas>
-
-<div class="container">
-  <div class="header">
-    <h1>🎮 PS3 Remote | Screen Inside Controller</h1>
-    <div class="ip-section">
-      <input type="text" id="ps3Ip" placeholder="192.168.1.100" value="192.168.1.100">
-      <button id="connectBtn">🔌 اتصال</button>
+<!-- ===== NAVBAR ===== -->
+<nav id="navbar">
+  <div class="nav-logo">
+    <div class="nav-logo-icon">G</div>
+    <span class="nav-logo-text">GAMEVERSE</span>
+  </div>
+  <div class="nav-links">
+    <a href="#">الرئيسية</a>
+    <a href="#">الفيديوهات</a>
+    <a href="#">المجتمع</a>
+  </div>
+  <div class="nav-right">
+    <div id="admin-badge">
+      <img id="admin-avatar" src="" alt="" />
+      <span id="admin-name">👑</span>
     </div>
-    <div class="status" id="statusText">⚫ غير متصل</div>
+    <button id="gear-btn" onclick="togglePanel()" title="لوحة المشرف">
+      <svg width="18" height="18" viewBox="0 0 24 24" id="gear-icon" fill="rgba(255,255,255,0.35)">
+        <path d="M19.14 12.94c.04-.3.06-.61.06-.94s-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96a7.02 7.02 0 0 0-1.62-.94l-.36-2.54A.484.484 0 0 0 14 2h-4a.484.484 0 0 0-.48.41l-.36 2.54a7.02 7.02 0 0 0-1.62.94l-2.39-.96a.48.48 0 0 0-.59.22L2.74 8.47a.47.47 0 0 0 .12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.47.47 0 0 0-.12.61l1.92 3.32c.12.22.37.3.59.22l2.39-.96c.5.36 1.04.67 1.62.94l.36 2.54c.05.28.3.48.48.48h4c.28 0 .47-.2.48-.48l.36-2.54a7.02 7.02 0 0 0 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32a.47.47 0 0 0-.12-.61l-2.03-1.58zM12 15.6A3.6 3.6 0 1 1 12 8.4a3.6 3.6 0 0 1 0 7.2z"/>
+      </svg>
+      <div id="gear-dot"></div>
+    </button>
+  </div>
+</nav>
+
+<!-- ===== SIDE PANEL OVERLAY ===== -->
+<div id="overlay" onclick="closePanel()"></div>
+
+<!-- ===== SIDE PANEL ===== -->
+<div id="side-panel">
+  <div class="panel-header">
+    <div class="panel-header-left">
+      <div class="panel-header-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff">
+          <path d="M19.14 12.94c.04-.3.06-.61.06-.94s-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96a7.02 7.02 0 0 0-1.62-.94l-.36-2.54A.484.484 0 0 0 14 2h-4a.484.484 0 0 0-.48.41l-.36 2.54a7.02 7.02 0 0 0-1.62.94l-2.39-.96a.48.48 0 0 0-.59.22L2.74 8.47a.47.47 0 0 0 .12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.47.47 0 0 0-.12.61l1.92 3.32c.12.22.37.3.59.22l2.39-.96c.5.36 1.04.67 1.62.94l.36 2.54c.05.28.3.48.48.48h4c.28 0 .47-.2.48-.48l.36-2.54a7.02 7.02 0 0 0 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32a.47.47 0 0 0-.12-.61l-2.03-1.58zM12 15.6A3.6 3.6 0 1 1 12 8.4a3.6 3.6 0 0 1 0 7.2z"/>
+        </svg>
+      </div>
+      <span class="panel-header-title">لوحة التحكم</span>
+    </div>
+    <button class="panel-close" onclick="closePanel()">✕</button>
   </div>
 
-  <!-- يد التحكم مع شاشة مدمجة في المنتصف -->
-  <div class="controller-with-screen">
-    <div class="controller-main">
-      <!-- الجهة اليسرى: D-Pad + عصا يسرى -->
-      <div class="left-panel">
-        <div class="dpad">
-          <div class="dpad-row"><button class="dpad-btn ctrl-btn" data-btn="up">▲</button></div>
-          <div class="dpad-row">
-            <button class="dpad-btn ctrl-btn" data-btn="left">◀</button>
-            <button class="dpad-btn ctrl-btn" data-btn="select" style="background:#1e2f3f; font-size:0.7rem;">●</button>
-            <button class="dpad-btn ctrl-btn" data-btn="right">▶</button>
-          </div>
-          <div class="dpad-row"><button class="dpad-btn ctrl-btn" data-btn="down">▼</button></div>
-        </div>
-        <div>
-          <div class="analog-stick ctrl-btn" data-stick="left" data-btn="left_stick">
-            <div class="stick-inner">🎮</div>
-          </div>
-          <div class="stick-label">العصا اليسرى (L3)</div>
-        </div>
-      </div>
+  <div class="panel-body">
 
-      <!-- المنتصف: الشاشة + أزرار النظام -->
-      <div class="center-panel">
-        <div class="screen-box" id="videoBox">
-          <div class="video-placeholder" id="videoPlaceholder">
-            <span style="font-size:28px">📺✨</span>
-            <span>بث مباشر</span>
-            <small>PSRP على PS3</small>
-          </div>
-          <video id="streamVideo" style="display:none" controls autoplay muted playsinline></video>
-          <iframe id="streamIframe" style="display:none"></iframe>
-        </div>
-        <div class="sys-buttons">
-          <button class="sys-btn ctrl-btn" data-btn="select">Select</button>
-          <button class="sys-btn ctrl-btn" data-btn="start">Start</button>
-          <button class="sys-btn ps-btn ctrl-btn" data-btn="ps">🎮 PS</button>
-        </div>
-      </div>
-
-      <!-- الجهة اليمنى: أزرار Action + عصا يمنى -->
-      <div class="right-panel">
-        <div class="action-buttons">
-          <button class="action-btn btn-triangle ctrl-btn" data-btn="triangle">▲</button>
-          <button class="action-btn btn-circle ctrl-btn" data-btn="circle">O</button>
-          <button class="action-btn btn-cross ctrl-btn" data-btn="cross">X</button>
-          <button class="action-btn btn-square ctrl-btn" data-btn="square">□</button>
-        </div>
-        <div>
-          <div class="analog-stick ctrl-btn" data-stick="right" data-btn="right_stick">
-            <div class="stick-inner">🎮</div>
-          </div>
-          <div class="stick-label">العصا اليمنى (R3)</div>
-        </div>
+    <!-- STATE 1: لا يوجد مشرف -->
+    <div id="state-no-admin">
+      <div class="invite-card">
+        <div class="crown">👑</div>
+        <h3>لا يوجد مشرف بعد!</h3>
+        <p>أنت أول شخص هنا.<br />سجّل دخولك لتصبح المشرف الوحيد للمنصة.</p>
+        <button class="btn-google" onclick="handleAdminLogin()">
+          <svg width="18" height="18" viewBox="0 0 24 24">
+            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+          </svg>
+          ادخل كمشرف بـ Google
+        </button>
       </div>
     </div>
+
+    <!-- STATE 2: يوجد مشرف لكن المستخدم الحالي ليس مشرفاً -->
+    <div id="state-blocked">
+      <div class="blocked-card">
+        <div class="lock-icon">🔐</div>
+        <h3>المنصة محمية</h3>
+        <p>هذه المنصة لها مشرف بالفعل.<br />لا يمكن إضافة مشرف آخر.</p>
+      </div>
+    </div>
+
+    <!-- STATE 3: المستخدم الحالي هو المشرف -->
+    <div id="state-is-admin">
+      <div class="admin-profile">
+        <img id="panel-avatar" src="" alt="" />
+        <div>
+          <div class="name" id="panel-name">—</div>
+          <div class="role">👑 مشرف المنصة</div>
+        </div>
+      </div>
+
+      <button class="btn-add-video" onclick="openAddModal(); closePanel();">🎬 رفع فيديو جديد</button>
+
+      <div class="tools-box">
+        <div class="tools-title">أدوات المشرف على كل فيديو</div>
+        <div class="tool-item"><span>🔒</span><span>قفل / فتح الفيديو</span></div>
+        <div class="tool-item"><span>✏️</span><span>تعديل العنوان والوصف</span></div>
+        <div class="tool-item" style="border-bottom:none"><span>🗑️</span><span>حذف الفيديو</span></div>
+      </div>
+
+      <button class="btn-signout" onclick="handleSignOut()">تسجيل الخروج</button>
+    </div>
+
   </div>
+</div>
 
-  <!-- قائمة الألعاب -->
-  <div class="games-section">
-    <div class="games-header">
-      <span>🎮 قائمة الألعاب (ISO / Folder)</span>
-      <button id="refreshGamesBtn" style="background:#2d3e4e; border:none; padding:0.2rem 0.7rem; border-radius:1rem; color:white;">🔄 تحديث</button>
+<!-- ===== HERO ===== -->
+<div id="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-glow-1"></div>
+  <div class="hero-glow-2"></div>
+  <div class="hero-content">
+    <div class="hero-tag">🎮 منصة الجيمنج الأولى</div>
+    <h1 class="hero-title">GAMEVERSE</h1>
+    <p class="hero-sub">اكتشف أفضل فيديوهات الجيمنج في مكان واحد</p>
+    <button class="hero-btn" onclick="document.getElementById('video-grid').scrollIntoView({behavior:'smooth'})">
+      استكشف الفيديوهات ↓
+    </button>
+  </div>
+</div>
+
+<!-- ===== FILTERS BAR ===== -->
+<div id="filters-bar">
+  <div class="filter-btns">
+    <button class="filter-btn active" data-filter="all" onclick="setFilter('all',this)">الكل</button>
+    <button class="filter-btn" data-filter="unlocked" onclick="setFilter('unlocked',this)">🔓 مفتوح</button>
+    <button class="filter-btn" data-filter="locked" onclick="setFilter('locked',this)">🔒 مقفول</button>
+  </div>
+  <div class="filter-right">
+    <input id="search-input" placeholder="بحث عن فيديو..." oninput="renderVideos()" />
+    <button id="add-video-btn" onclick="openAddModal()">+ رفع فيديو</button>
+  </div>
+</div>
+
+<!-- ===== VIDEO GRID ===== -->
+<div id="video-grid">
+  <div id="empty-state">
+    <div style="font-size:48px;margin-bottom:16px">🎮</div>
+    <span id="empty-text">لا توجد فيديوهات حتى الآن</span>
+  </div>
+</div>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <span>GAMEVERSE</span> — منصة الجيمنج الاحترافية
+</footer>
+
+<!-- ===== ADD VIDEO MODAL ===== -->
+<div id="add-modal" class="modal-overlay" style="display:none">
+  <div class="modal-box" style="border:1px solid rgba(0,255,150,0.25)">
+    <h2 class="modal-title">🎬 إضافة فيديو جديد</h2>
+    <div class="modal-field">
+      <label class="modal-label">رابط يوتيوب *</label>
+      <input id="add-url" class="modal-input" placeholder="https://www.youtube.com/watch?v=..." oninput="clearAddError()" />
     </div>
-    <div class="games-grid" id="gamesGrid">
-      <div style="text-align:center; padding:1rem; color:#ccc;">اضغط اتصال أولاً</div>
+    <div class="modal-field">
+      <label class="modal-label">عنوان الفيديو *</label>
+      <input id="add-title" class="modal-input" placeholder="اسم الفيديو" oninput="clearAddError()" />
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">الوصف (اختياري)</label>
+      <input id="add-desc" class="modal-input" placeholder="وصف قصير..." />
+    </div>
+    <p id="add-error" class="modal-error" style="display:none"></p>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeAddModal()">إلغاء</button>
+      <button class="btn-confirm-add" onclick="submitAddVideo()">إضافة ✓</button>
     </div>
   </div>
 </div>
-<div id="toastMsg" class="toast">تم الإرسال</div>
 
-<script>
-  // ----------------------------- تموجات PS3 (XMB Waves) -------------------------
-  const canvas = document.getElementById('wavesCanvas');
-  let ctx = canvas.getContext('2d');
-  let width, height;
-  let time = 0;
-  let animationId;
+<!-- ===== EDIT VIDEO MODAL ===== -->
+<div id="edit-modal" class="modal-overlay" style="display:none">
+  <div class="modal-box" style="border:1px solid rgba(0,180,255,0.25)">
+    <h2 class="modal-title">✏ تعديل الفيديو</h2>
+    <div class="modal-field">
+      <label class="modal-label">العنوان</label>
+      <input id="edit-title" class="modal-input" />
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">الوصف</label>
+      <input id="edit-desc" class="modal-input" />
+    </div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeEditModal()">إلغاء</button>
+      <button class="btn-confirm-edit" onclick="submitEdit()">حفظ ✓</button>
+    </div>
+  </div>
+</div>
 
-  function resizeCanvas() {
-    width = window.innerWidth;
-    height = window.innerHeight;
-    canvas.width = width;
-    canvas.height = height;
-  }
-
-  function drawWaves() {
-    if (!ctx) return;
-    ctx.clearRect(0, 0, width, height);
-    const grad = ctx.createLinearGradient(0, 0, width, height);
-    grad.addColorStop(0, '#021126');
-    grad.addColorStop(0.5, '#001133');
-    grad.addColorStop(1, '#00051a');
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, width, height);
-    ctx.save();
-    for (let i = 0; i < 5; i++) {
-      const offset = i * 1.2;
-      const amplitude = 25 + i * 8;
-      const frequency = 0.008 + i * 0.002;
-      const speed = 0.005 + i * 0.0015;
-      const yBase = height * (0.3 + i * 0.12);
-      const alpha = 0.12 - i * 0.015;
-      const hue = (190 + i * 12) % 360;
-      ctx.beginPath();
-      for (let x = 0; x <= width; x += 15) {
-        const y = yBase + Math.sin(x * frequency + time * speed + offset) * amplitude 
-                + Math.cos(x * 0.004 + time * 0.003 + i) * (amplitude * 0.6);
-        if (x === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      }
-      ctx.lineTo(width, height);
-      ctx.lineTo(0, height);
-      ctx.closePath();
-      ctx.fillStyle = `hsla(${hue}, 80%, 55%, ${alpha})`;
-      ctx.fill();
-    }
-    for (let i = 0; i < 8; i++) {
-      const amplitude = 12 + Math.sin(time * 0.5 + i) * 3;
-      const freq = 0.012 + i * 0.001;
-      const speedY = 0.008 + i * 0.001;
-      const yOffset = height * (0.5 + i * 0.05);
-      const alphaLine = 0.08;
-      ctx.beginPath();
-      for (let x = 0; x <= width; x += 20) {
-        const y = yOffset + Math.sin(x * freq + time * speedY) * amplitude 
-                + Math.cos(x * 0.007 + time * 0.004) * 8;
-        if (x === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      }
-      ctx.strokeStyle = `rgba(100, 200, 255, ${alphaLine})`;
-      ctx.lineWidth = 2;
-      ctx.stroke();
-    }
-    ctx.fillStyle = 'rgba(210, 230, 255, 0.4)';
-    for (let p = 0; p < 70; p++) {
-      const px = (Math.sin(time * 0.2 + p) * 0.5 + 0.5) * width;
-      const py = (Math.cos(time * 0.17 + p * 2) * 0.4 + 0.5) * height;
-      ctx.beginPath();
-      ctx.arc(px, py, 1.5 + Math.sin(time + p) * 0.8, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(120, 200, 255, ${0.3 + Math.sin(time + p) * 0.1})`;
-      ctx.fill();
-    }
-    ctx.restore();
-    time += 0.025;
-    animationId = requestAnimationFrame(drawWaves);
-  }
-
-  window.addEventListener('resize', () => resizeCanvas());
-  resizeCanvas();
-  drawWaves();
-
-  // ----------------------------- PS3 webMAN MOD API + Vibration -------------------------
-  let currentPS3Ip = localStorage.getItem('ps3_ip') || '';
-  if(currentPS3Ip) document.getElementById('ps3Ip').value = currentPS3Ip;
-  
-  const statusDiv = document.getElementById('statusText');
-  const gamesGrid = document.getElementById('gamesGrid');
-  const connectBtn = document.getElementById('connectBtn');
-  const refreshBtn = document.getElementById('refreshGamesBtn');
-  
-  function vibrate(pattern) {
-    if (window.navigator && window.navigator.vibrate) {
-      window.navigator.vibrate(pattern);
-    }
-  }
-  
-  async function sendCommand(endpoint, showToastMsg = true, vibratePattern = 50) {
-    if(!currentPS3Ip) { showToast('❌ لم يتم تحديد IP'); return false; }
-    try {
-      const url = `http://${currentPS3Ip}${endpoint}`;
-      await fetch(url, { mode: 'no-cors' });
-      if(showToastMsg) showToast(`✅ تم الإرسال`);
-      vibrate(vibratePattern);
-      return true;
-    } catch(e) {
-      console.warn(e);
-      showToast(`⚠️ فشل الإرسال`);
-      vibrate([100, 50, 100]);
-      return false;
-    }
-  }
-  
-  const buttonMap = {
-    'up': 'up', 'down': 'down', 'left': 'left', 'right': 'right',
-    'cross': 'cross', 'circle': 'circle', 'square': 'square', 'triangle': 'triangle',
-    'select': 'select', 'start': 'start', 'ps': 'ps',
-    'left_stick': 'l3', 'right_stick': 'r3'
+<!-- ===== FIREBASE + APP SCRIPT ===== -->
+<script type="module">
+  // ===== FIREBASE CONFIG =====
+  const FIREBASE_CONFIG = {
+    apiKey: "AIzaSyB-TFF6yvJyq21RxMD7KuAgNuVOBlXgNhY",
+    authDomain: "ginang-ca81d.firebaseapp.com",
+    projectId: "ginang-ca81d",
+    storageBucket: "ginang-ca81d.firebasestorage.app",
+    messagingSenderId: "556233466817",
+    appId: "1:556233466817:web:f86580ee42b9e7f0f90540",
   };
-  
-  function attachAllButtons() {
-    document.querySelectorAll('.ctrl-btn').forEach(btn => {
-      if(btn.hasListener) return;
-      btn.hasListener = true;
-      btn.addEventListener('click', async (e) => {
-        e.stopPropagation();
-        let cmd = btn.getAttribute('data-btn');
-        if (btn.getAttribute('data-stick') === 'left') cmd = 'left_stick';
-        if (btn.getAttribute('data-stick') === 'right') cmd = 'right_stick';
-        
-        if(cmd && buttonMap[cmd]) {
-          let vibe = (cmd === 'ps' || cmd === 'left_stick' || cmd === 'right_stick') ? 80 : 40;
-          await sendCommand(`/pad.ps3?${buttonMap[cmd]}`, true, vibe);
-        }
-      });
-    });
+
+  // ===== STATE =====
+  let state = {
+    user: null,
+    isAdmin: false,
+    adminExists: false,
+    videos: [],
+    filter: "all",
+    editingId: null,
+    fb: null,
+  };
+
+  // ===== HELPERS =====
+  function extractYouTubeId(url) {
+    const regexes = [
+      /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
+      /youtube\.com\/shorts\/([^&\n?#]+)/
+    ];
+    for (const r of regexes) { const m = url.match(r); if (m) return m[1]; }
+    return null;
   }
-  
-  attachAllButtons();
-  
-  async function testConnection(ip) {
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 3000);
-      await fetch(`http://${ip}/`, { signal: controller.signal, mode: 'no-cors' });
-      clearTimeout(timeoutId);
+  function getThumb(id) { return `https://img.youtube.com/vi/${id}/maxresdefault.jpg`; }
+
+  // ===== UI UPDATERS =====
+  window.updateUI = function() {
+    const { user, isAdmin, adminExists } = state;
+
+    // Navbar gear style
+    const gearBtn = document.getElementById('gear-btn');
+    const gearIcon = document.getElementById('gear-icon');
+    const gearDot = document.getElementById('gear-dot');
+    if (isAdmin) {
+      gearBtn.classList.add('active');
+      gearIcon.setAttribute('fill','#ff9900');
+      gearDot.style.display = 'block';
+    } else {
+      gearBtn.classList.remove('active');
+      gearIcon.setAttribute('fill','rgba(255,255,255,0.35)');
+      gearDot.style.display = 'none';
+    }
+
+    // Admin badge in navbar
+    const badge = document.getElementById('admin-badge');
+    if (isAdmin && user) {
+      badge.style.display = 'flex';
+      document.getElementById('admin-avatar').src = user.photoURL || '';
+      document.getElementById('admin-name').textContent = '👑 ' + (user.displayName || '').split(' ')[0];
+    } else {
+      badge.style.display = 'none';
+    }
+
+    // Add video button in filter bar
+    document.getElementById('add-video-btn').style.display = isAdmin ? 'block' : 'none';
+
+    // Panel states
+    document.getElementById('state-no-admin').style.display = (!adminExists && !isAdmin) ? 'block' : 'none';
+    document.getElementById('state-blocked').style.display = (adminExists && !isAdmin) ? 'block' : 'none';
+    document.getElementById('state-is-admin').style.display = isAdmin ? 'block' : 'none';
+
+    if (isAdmin && user) {
+      document.getElementById('panel-avatar').src = user.photoURL || '';
+      document.getElementById('panel-name').textContent = user.displayName || '';
+    }
+
+    renderVideos();
+  };
+
+  window.renderVideos = function() {
+    const grid = document.getElementById('video-grid');
+    const search = document.getElementById('search-input').value.toLowerCase();
+    const filter = state.filter;
+    const isAdmin = state.isAdmin;
+
+    let filtered = state.videos.filter(v => {
+      if (filter === 'locked' && !v.locked) return false;
+      if (filter === 'unlocked' && v.locked) return false;
+      if (search && !v.title.toLowerCase().includes(search)) return false;
       return true;
-    } catch(e) {
-      return false;
-    }
-  }
-  
-  connectBtn.addEventListener('click', async () => {
-    let ip = document.getElementById('ps3Ip').value.trim();
-    if(!ip) { showToast('أدخل عنوان IP'); return; }
-    currentPS3Ip = ip;
-    localStorage.setItem('ps3_ip', ip);
-    statusDiv.innerText = '🔄 جاري الاتصال بـ PS3 ...';
-    const connected = await testConnection(ip);
-    if(connected) {
-      statusDiv.innerHTML = '✅ متصل بـ PS3 (webMAN MOD) ✨';
-      showToast('تم الاتصال بنجاح + دعم الاهتزاز');
-      vibrate(200);
-      loadGamesList();
-      setupVideoStream();
+    });
+
+    // Clear old cards but keep empty state div
+    [...grid.querySelectorAll('.video-card')].forEach(el => el.remove());
+    const emptyState = document.getElementById('empty-state');
+
+    if (filtered.length === 0) {
+      emptyState.style.display = 'block';
+      document.getElementById('empty-text').textContent =
+        'لا توجد فيديوهات حتى الآن' + (isAdmin ? ' — ابدأ بإضافة فيديو!' : '');
     } else {
-      statusDiv.innerHTML = '❌ فشل الاتصال - تأكد من IP وتشغيل webMAN';
-      showToast('فشل الاتصال');
-      vibrate([100, 200, 100]);
+      emptyState.style.display = 'none';
+      filtered.forEach(v => {
+        const card = buildCard(v, isAdmin);
+        grid.appendChild(card);
+      });
     }
-  });
-  
-  async function loadGamesList() {
-    if(!currentPS3Ip) { gamesGrid.innerHTML = '<div style="color:#aaa;">يرجى الاتصال أولاً</div>'; return; }
-    gamesGrid.innerHTML = '<div style="text-align:center;">⏳ جاري تحميل الألعاب...</div>';
-    try {
-      const url = `http://${currentPS3Ip}/get_ps3_games.ps3`;
-      const res = await fetch(url);
-      const text = await res.text();
-      parseGamesList(text);
-    } catch(e) {
-      console.error(e);
-      gamesGrid.innerHTML = '<div style="color:#f66;">⚠️ تعذر تحميل الألعاب (تأكد من webMAN MOD)</div>';
+  };
+
+  function buildCard(v, isAdmin) {
+    const card = document.createElement('div');
+    card.className = 'video-card';
+    card.dataset.id = v.id;
+
+    const thumbWrap = document.createElement('div');
+    thumbWrap.className = 'video-thumb-wrap';
+
+    const thumb = document.createElement('div');
+    thumb.className = 'video-thumb' + (v.locked ? ' locked' : '');
+    thumb.style.backgroundImage = `url(${getThumb(v.youtubeId)})`;
+    if (!v.locked) {
+      thumb.onclick = () => {
+        const iframe = document.createElement('iframe');
+        iframe.className = 'video-iframe';
+        iframe.src = `https://www.youtube.com/embed/${v.youtubeId}?autoplay=1`;
+        iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+        iframe.allowFullscreen = true;
+        thumbWrap.innerHTML = '';
+        thumbWrap.appendChild(iframe);
+      };
     }
+
+    const grad = document.createElement('div'); grad.className = 'thumb-gradient';
+    const playBtn = document.createElement('div'); playBtn.className = 'play-btn';
+    playBtn.textContent = v.locked ? '🔒' : '▶';
+    thumb.appendChild(grad); thumb.appendChild(playBtn);
+    thumbWrap.appendChild(thumb);
+
+    const info = document.createElement('div'); info.className = 'video-info';
+    const meta = document.createElement('div'); meta.className = 'video-meta';
+    const textDiv = document.createElement('div'); textDiv.style.flex = '1';
+    const titleEl = document.createElement('h3'); titleEl.className = 'video-title'; titleEl.textContent = v.title;
+    textDiv.appendChild(titleEl);
+    if (v.description) {
+      const descEl = document.createElement('p'); descEl.className = 'video-desc'; descEl.textContent = v.description;
+      textDiv.appendChild(descEl);
+    }
+    meta.appendChild(textDiv);
+    if (v.locked) {
+      const badge = document.createElement('span'); badge.className = 'badge-locked'; badge.textContent = 'مقفول';
+      meta.appendChild(badge);
+    }
+    info.appendChild(meta);
+
+    if (isAdmin) {
+      const actions = document.createElement('div'); actions.className = 'admin-actions';
+
+      const lockBtn = document.createElement('button');
+      lockBtn.className = 'act-btn ' + (v.locked ? 'btn-unlock' : 'btn-lock');
+      lockBtn.textContent = v.locked ? '🔓 فتح' : '🔒 قفل';
+      lockBtn.onclick = () => handleToggleLock(v.id);
+
+      const editBtn = document.createElement('button');
+      editBtn.className = 'act-btn btn-edit'; editBtn.textContent = '✏ تعديل';
+      editBtn.onclick = () => openEditModal(v);
+
+      const delBtn = document.createElement('button');
+      delBtn.className = 'act-btn btn-del'; delBtn.textContent = '🗑 حذف';
+      delBtn.onclick = () => handleDelete(v.id);
+
+      actions.appendChild(lockBtn); actions.appendChild(editBtn); actions.appendChild(delBtn);
+      info.appendChild(actions);
+    }
+
+    card.appendChild(thumbWrap); card.appendChild(info);
+    return card;
   }
-  
-  function parseGamesList(data) {
-    const lines = data.split(/\r?\n/);
-    const games = [];
-    for(let line of lines) {
-      line = line.trim();
-      if(line.startsWith('/dev_hdd0/game/') || line.startsWith('/dev_usb') || line.endsWith('.iso') || line.includes('PS3ISO')) {
-        let title = line.split('/').pop().replace(/_/g,' ').replace('.iso','');
-        if(title.length < 2) title = line.slice(-30);
-        games.push({ path: line, title: title });
-      }
+
+  // ===== PANEL =====
+  window.togglePanel = function() {
+    const panel = document.getElementById('side-panel');
+    const overlay = document.getElementById('overlay');
+    const isOpen = panel.classList.contains('open');
+    if (isOpen) { panel.classList.remove('open'); overlay.style.display = 'none'; }
+    else { panel.classList.add('open'); overlay.style.display = 'block'; }
+  };
+  window.closePanel = function() {
+    document.getElementById('side-panel').classList.remove('open');
+    document.getElementById('overlay').style.display = 'none';
+  };
+
+  // ===== FILTER =====
+  window.setFilter = function(f, btn) {
+    state.filter = f;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderVideos();
+  };
+
+  // ===== ADD VIDEO MODAL =====
+  window.openAddModal = function() { document.getElementById('add-modal').style.display = 'flex'; };
+  window.closeAddModal = function() {
+    document.getElementById('add-modal').style.display = 'none';
+    document.getElementById('add-url').value = '';
+    document.getElementById('add-title').value = '';
+    document.getElementById('add-desc').value = '';
+    clearAddError();
+  };
+  window.clearAddError = function() { document.getElementById('add-error').style.display = 'none'; };
+  window.submitAddVideo = async function() {
+    const url = document.getElementById('add-url').value;
+    const title = document.getElementById('add-title').value.trim();
+    const desc = document.getElementById('add-desc').value.trim();
+    const id = extractYouTubeId(url);
+    if (!id) { showAddError('رابط يوتيوب غير صحيح'); return; }
+    if (!title) { showAddError('أدخل عنواناً للفيديو'); return; }
+    await handleAddVideo({ youtubeId: id, title, description: desc, locked: false });
+    closeAddModal();
+  };
+  function showAddError(msg) {
+    const el = document.getElementById('add-error');
+    el.textContent = msg; el.style.display = 'block';
+  }
+
+  // ===== EDIT MODAL =====
+  window.openEditModal = function(v) {
+    state.editingId = v.id;
+    document.getElementById('edit-title').value = v.title;
+    document.getElementById('edit-desc').value = v.description || '';
+    document.getElementById('edit-modal').style.display = 'flex';
+  };
+  window.closeEditModal = function() { document.getElementById('edit-modal').style.display = 'none'; state.editingId = null; };
+  window.submitEdit = async function() {
+    const title = document.getElementById('edit-title').value;
+    const desc = document.getElementById('edit-desc').value;
+    await handleEdit(state.editingId, { title, description: desc });
+    closeEditModal();
+  };
+
+  // ===== FIREBASE ACTIONS =====
+  window.handleAdminLogin = async function() {
+    const { fb } = state;
+    if (!fb) {
+      // Demo mode
+      state.adminExists = true; state.isAdmin = true;
+      state.user = { displayName: 'مشرف تجريبي', photoURL: '', uid: 'demo', email: 'demo@test.com' };
+      closePanel(); updateUI(); return;
     }
-    if(games.length === 0) {
-      gamesGrid.innerHTML = '<div style="color:#aaa;">🎮 لم يتم العثور على ألعاب.</div>';
-      return;
+    try {
+      const { auth, db, GoogleAuthProvider, signInWithPopup, collection, getDocs, query, where, doc, setDoc } = fb;
+      const adminSnap = await getDocs(query(collection(db, 'users'), where('isAdmin','==',true)));
+      if (!adminSnap.empty) { state.adminExists = true; updateUI(); return; }
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      const fbUser = result.user;
+      await setDoc(doc(db, 'users', fbUser.uid), {
+        email: fbUser.email, displayName: fbUser.displayName,
+        photoURL: fbUser.photoURL, isAdmin: true, createdAt: new Date(),
+      });
+      state.user = { uid: fbUser.uid, email: fbUser.email, displayName: fbUser.displayName, photoURL: fbUser.photoURL };
+      state.isAdmin = true; state.adminExists = true;
+      closePanel(); updateUI();
+    } catch(e) { console.error(e); }
+  };
+
+  window.handleSignOut = async function() {
+    const { fb } = state;
+    if (fb) await fb.signOut(fb.auth);
+    state.user = null; state.isAdmin = false;
+    closePanel(); updateUI();
+  };
+
+  window.handleAddVideo = async function(videoData) {
+    const { fb } = state;
+    if (fb) {
+      const ref = await fb.addDoc(fb.collection(fb.db, 'videos'), { ...videoData, createdAt: new Date() });
+      state.videos.unshift({ id: ref.id, ...videoData, createdAt: new Date() });
+    } else {
+      state.videos.unshift({ ...videoData, id: Date.now().toString(), createdAt: new Date() });
     }
-    gamesGrid.innerHTML = '';
-    games.forEach(game => {
-      const card = document.createElement('div');
-      card.className = 'game-card';
-      card.innerHTML = `<div class="game-icon">🎮</div><div class="game-title">${escapeHtml(game.title.substring(0, 35))}</div>`;
-      card.onclick = () => launchGame(game.path);
-      gamesGrid.appendChild(card);
+    renderVideos();
+  };
+
+  window.handleDelete = async function(id) {
+    if (!confirm('هل أنت متأكد من حذف هذا الفيديو؟')) return;
+    const { fb } = state;
+    if (fb) await fb.deleteDoc(fb.doc(fb.db, 'videos', id));
+    state.videos = state.videos.filter(v => v.id !== id);
+    renderVideos();
+  };
+
+  window.handleToggleLock = async function(id) {
+    const { fb } = state;
+    const video = state.videos.find(v => v.id === id);
+    const newLocked = !video.locked;
+    if (fb) await fb.updateDoc(fb.doc(fb.db, 'videos', id), { locked: newLocked });
+    state.videos = state.videos.map(v => v.id === id ? { ...v, locked: newLocked } : v);
+    renderVideos();
+  };
+
+  window.handleEdit = async function(id, updates) {
+    const { fb } = state;
+    if (fb) await fb.updateDoc(fb.doc(fb.db, 'videos', id), updates);
+    state.videos = state.videos.map(v => v.id === id ? { ...v, ...updates } : v);
+    renderVideos();
+  };
+
+  // ===== LOAD VIDEOS =====
+  async function loadVideos(db, collection, getDocs, query, orderBy) {
+    try {
+      const q = query(collection(db, 'videos'), orderBy('createdAt', 'desc'));
+      const snap = await getDocs(q);
+      state.videos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    } catch {
+      try {
+        const snap = await getDocs(collection(db, 'videos'));
+        state.videos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      } catch { state.videos = []; }
+    }
+    renderVideos();
+  }
+
+  // ===== INIT =====
+  const configured = FIREBASE_CONFIG.apiKey !== 'YOUR_API_KEY';
+
+  if (!configured) {
+    // Demo mode
+    state.videos = [
+      { id: 'd1', youtubeId: 'dQw4w9WgXcQ', title: 'فيديو تجريبي ١', description: 'وصف تجريبي', locked: false },
+      { id: 'd2', youtubeId: '9bZkp7q19f0', title: 'أفضل لحظات الجيمنج', description: '', locked: false },
+      { id: 'd3', youtubeId: 'kJQP7kiw5Fk', title: 'فيديو مقفول', description: 'مقفول حالياً', locked: true },
+    ];
+    state.adminExists = false;
+    updateUI();
+  } else {
+    Promise.all([
+      import('https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js'),
+      import('https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js'),
+      import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js'),
+    ]).then(([
+      { initializeApp },
+      { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged },
+      { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, updateDoc, setDoc, getDoc, query, orderBy, where }
+    ]) => {
+      const app = initializeApp(FIREBASE_CONFIG);
+      const auth = getAuth(app);
+      const db = getFirestore(app);
+      state.fb = { auth, db, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, collection, getDocs, addDoc, deleteDoc, doc, updateDoc, setDoc, getDoc, query, orderBy, where };
+
+      // Check if admin exists
+      getDocs(query(collection(db, 'users'), where('isAdmin','==',true)))
+        .then(snap => { state.adminExists = !snap.empty; updateUI(); })
+        .catch(() => { state.adminExists = false; updateUI(); });
+
+      // Auth listener
+      onAuthStateChanged(auth, async (fbUser) => {
+        if (fbUser) {
+          try {
+            const userRef = doc(db, 'users', fbUser.uid);
+            const userSnap = await getDoc(userRef);
+            const userData = userSnap.exists() ? userSnap.data() : null;
+            state.user = { uid: fbUser.uid, email: fbUser.email, displayName: fbUser.displayName, photoURL: fbUser.photoURL };
+            state.isAdmin = userData?.isAdmin === true;
+          } catch { state.user = null; state.isAdmin = false; }
+        } else { state.user = null; state.isAdmin = false; }
+        updateUI();
+        loadVideos(db, collection, getDocs, query, orderBy);
+      });
     });
   }
-  
-  async function launchGame(gamePath) {
-    if(!currentPS3Ip) return;
-    showToast(`🚀 تشغيل: ${gamePath.split('/').pop()}`);
-    vibrate(100);
-    await sendCommand(`/mount.ps3${gamePath}`, false);
-    setTimeout(async () => {
-      await sendCommand(`/play.ps3`, false);
-      showToast('🎉 تم إطلاق اللعبة');
-      vibrate([150, 100]);
-    }, 600);
-  }
-  
-  function setupVideoStream() {
-    const videoPlaceholder = document.getElementById('videoPlaceholder');
-    const videoElem = document.getElementById('streamVideo');
-    const streamUrl = `http://${currentPS3Ip}:8080/stream`;
-    const userWantsStream = confirm('🎥 هل قمت بتشغيل خادم البث (PSRP) على PS3؟\nاضغط موافق لمحاولة عرض البث المباشر.');
-    if(userWantsStream) {
-      videoPlaceholder.style.display = 'none';
-      videoElem.style.display = 'block';
-      videoElem.src = streamUrl;
-      videoElem.play().catch(e => {
-        console.warn(e);
-        videoPlaceholder.style.display = 'flex';
-        videoElem.style.display = 'none';
-        videoPlaceholder.innerHTML = `<span>📡</span><span>تعذر تشغيل البث</span><small>تأكد من تشغيل PSRP (منفذ 8080)</small>`;
-        showToast('⚠️ لا يوجد بث حي');
-      });
-    } else {
-      videoPlaceholder.innerHTML = `<span>🌀 XMB WAVES</span><span>🔮 البث غير مفعل</span><small>يمكنك تفعيله لاحقاً</small>`;
-    }
-  }
-  
-  refreshBtn.addEventListener('click', loadGamesList);
-  
-  function showToast(msg) {
-    const toast = document.getElementById('toastMsg');
-    toast.textContent = msg;
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 2500);
-  }
-  
-  function escapeHtml(str) {
-    if(!str) return '';
-    return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : (m === '<' ? '&lt;' : '&gt;'));
-  }
-  
-  if(currentPS3Ip) setTimeout(() => connectBtn.click(), 800);
-  
-  window.addEventListener('beforeunload', () => {
-    if(animationId) cancelAnimationFrame(animationId);
-  });
 </script>
 </body>
 </html>
