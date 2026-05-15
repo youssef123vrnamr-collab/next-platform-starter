@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GAMEVERSE | منصة الجيمنج</title>
-<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@700&display=swap" rel="stylesheet">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>GAMEVERSE</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@700&display=swap" rel="stylesheet" />
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: #050510; min-height: 100vh; font-family: 'Segoe UI', Tahoma, sans-serif; direction: rtl; }
@@ -44,6 +44,8 @@
   .nav-right { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
 
   /* ===== RESPONSIVE ===== */
+
+  /* Tablet */
   @media (max-width: 768px) {
     .nav-links { gap: 16px; }
     .nav-links a { font-size: 13px; }
@@ -53,6 +55,8 @@
     #video-grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); padding: 16px; gap: 16px; }
     #filters-bar { padding: 16px 16px 0; }
   }
+
+  /* Mobile */
   @media (max-width: 600px) {
     .nav-links { display: none; }
     #navbar { padding: 0 12px; height: 56px; }
@@ -60,24 +64,31 @@
     .nav-logo-icon { width: 30px; height: 30px; font-size: 15px; }
     #gear-btn { width: 44px; height: 44px; flex-shrink: 0; }
     #admin-badge span { display: none; }
+
     #hero { height: auto; min-height: 300px; padding: 40px 16px; margin-top: 56px; }
     .hero-tag { font-size: 10px; letter-spacing: 3px; }
     .hero-title { font-size: 36px; }
     .hero-sub { font-size: 13px; margin-bottom: 24px; }
     .hero-btn { padding: 10px 22px; font-size: 13px; }
+
     #filters-bar { padding: 14px 12px 0; flex-direction: column; align-items: stretch; gap: 10px; }
     .filter-btns { display: flex; }
     .filter-btn { flex: 1; padding: 8px 4px; font-size: 12px; text-align: center; }
     .filter-right { flex-direction: column; gap: 8px; }
     #search-input { width: 100%; }
     #add-video-btn { width: 100%; text-align: center; }
+
     #video-grid { grid-template-columns: 1fr; padding: 12px; gap: 14px; }
+
     #side-panel { width: 100%; max-width: 100%; }
+
     .modal-box { padding: 24px 18px; border-radius: 16px; }
     .modal-title { font-size: 18px; margin-bottom: 18px; }
     .modal-btns { flex-direction: column-reverse; gap: 8px; }
     .btn-cancel, .btn-confirm-add, .btn-confirm-edit { width: 100%; text-align: center; padding: 12px; }
   }
+
+  /* Very small */
   @media (max-width: 360px) {
     .hero-title { font-size: 28px; }
     .filter-btn { font-size: 11px; padding: 7px 3px; }
@@ -150,8 +161,10 @@
   }
   .panel-body { padding: 24px 20px; flex: 1; }
 
+  /* Panel states */
   #state-no-admin, #state-blocked, #state-is-admin { display: none; }
 
+  /* No admin card */
   .invite-card {
     background: linear-gradient(135deg, rgba(0,255,150,0.07), rgba(0,180,255,0.04));
     border: 1px solid rgba(0,255,150,0.2);
@@ -170,6 +183,7 @@
     display: flex; align-items: center; justify-content: center; gap: 10px;
   }
 
+  /* Blocked card */
   .blocked-card {
     background: rgba(255,60,60,0.07);
     border: 1px solid rgba(255,60,60,0.18);
@@ -179,6 +193,7 @@
   .blocked-card h3 { color: #ff6060; margin: 0 0 8px; font-size: 16px; }
   .blocked-card p { color: rgba(255,255,255,0.45); font-size: 13px; line-height: 1.7; }
 
+  /* Admin logged in */
   .admin-profile {
     background: rgba(0,255,150,0.05);
     border: 1px solid rgba(0,255,150,0.14);
@@ -223,7 +238,6 @@
     border-radius: 10px; color: #ff6060;
     font-size: 13px; font-weight: 700; cursor: pointer;
     margin-top: 10px;
-    display: flex; align-items: center; justify-content: center; gap: 8px;
   }
 
   /* ===== HERO ===== */
@@ -309,112 +323,300 @@
     gap: 20px;
   }
 
+  /* VIDEO CARD */
   .video-card {
-    background: linear-gradient(145deg, rgba(15,15,35,0.98), rgba(8,8,24,0.98));
-    border-radius: 20px; overflow: hidden;
-    transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px; overflow: hidden; transition: all 0.3s;
+  }
+  .video-card:hover {
+    border-color: rgba(0,255,150,0.3); transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4), 0 0 20px rgba(0,255,150,0.08);
+  }
+  .video-thumb-wrap {
+    position: relative; padding-bottom: 56.25%; background: #000;
+  }
+  .video-thumb {
+    position: absolute; inset: 0; background-size: cover; background-position: center;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+  }
+  .video-thumb.locked { cursor: not-allowed; }
+  .thumb-gradient {
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 50%);
+  }
+  .play-btn {
+    background: rgba(0,0,0,0.7); border-radius: 50%;
+    width: 64px; height: 64px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px; z-index: 1; border: 3px solid rgba(255,255,255,0.7);
     position: relative;
-    padding: 2px;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.06), inset 0 1px 0 rgba(255,255,255,0.04);
   }
-  .video-card::before {
-    content: ''; position: absolute; inset: 0; border-radius: 20px; padding: 2px;
-    background: linear-gradient(135deg, rgba(0,255,150,0.25) 0%, rgba(0,180,255,0.1) 30%, rgba(255,255,255,0.04) 50%, rgba(0,180,255,0.1) 70%, rgba(0,255,150,0.25) 100%);
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor; mask-composite: exclude;
-    opacity: 0.7; transition: opacity 0.4s; pointer-events: none;
+  .video-iframe {
+    position: absolute; inset: 0; width: 100%; height: 100%; border: none;
   }
-  .video-card::after {
-    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; border-radius: 20px 20px 0 0;
-    background: linear-gradient(90deg, transparent 0%, rgba(0,255,150,0.6) 30%, rgba(0,220,255,0.6) 50%, rgba(0,255,150,0.6) 70%, transparent 100%);
-    opacity: 0.6;
-  }
-  .video-card > * { position: relative; z-index: 1; }
-  .video-card:hover::before { opacity: 1; }
-  .video-card:hover::after { opacity: 1; }
-  .video-card:hover { transform: translateY(-8px) scale(1.01); box-shadow: 0 28px 56px rgba(0,0,0,0.6), 0 0 40px rgba(0,255,150,0.12), 0 0 80px rgba(0,180,255,0.06), 0 0 0 1px rgba(0,255,150,0.2); }
-  @keyframes cardPop { 0% { transform: scale(0.92); opacity: 0; } 60% { transform: scale(1.03); } 100% { transform: scale(1); opacity: 1; } }
-  .video-card.new-card { animation: cardPop 0.45s cubic-bezier(0.34,1.56,0.64,1) both; }
-  .video-thumb-wrap { position: relative; padding-bottom: 56.25%; background: #000; border-radius: 18px 18px 0 0; overflow: hidden; }
-  .video-thumb { position: absolute; inset: 0; background-size: cover; background-position: center; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.3s ease; }
-  .video-card:hover .video-thumb:not(.locked) { transform: scale(1.03); }
-  .video-thumb.locked { cursor: not-allowed; filter: grayscale(40%) brightness(0.7); }
-  .thumb-gradient { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 40%, transparent 100%); }
-  .play-btn { background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); border-radius: 50%; width: 64px; height: 64px; display: flex; align-items: center; justify-content: center; font-size: 26px; z-index: 1; border: 2px solid rgba(255,255,255,0.5); box-shadow: 0 0 30px rgba(0,0,0,0.5); transition: all 0.2s; }
-  .video-card:hover .play-btn { background: rgba(0,255,150,0.2); border-color: #00ff96; box-shadow: 0 0 25px rgba(0,255,150,0.4); transform: scale(1.1); }
-  .video-iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; }
-  .video-info { padding: 16px 18px 18px; }
+  .video-info { padding: 16px; }
   .video-meta { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
-  .video-title { margin: 0 0 6px; color: #fff; font-size: 15px; font-weight: 700; line-height: 1.4; }
-  .video-desc { margin: 0; color: rgba(255,255,255,0.45); font-size: 12px; line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-  .badge-locked { background: rgba(255,60,60,0.15); border: 1px solid rgba(255,60,60,0.3); border-radius: 6px; padding: 2px 8px; color: #ff6060; font-size: 11px; font-weight: 700; white-space: nowrap; }
-  .admin-actions { margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.07); display: flex; gap: 8px; flex-wrap: wrap; }
-  .act-btn { border-radius: 6px; padding: 5px 10px; font-size: 11px; font-weight: 700; cursor: pointer; }
+  .video-title { margin: 0 0 4px; color: #fff; font-size: 15px; font-weight: 700; line-height: 1.4; }
+  .video-desc { margin: 0; color: rgba(255,255,255,0.45); font-size: 12px; line-height: 1.5; }
+  .badge-locked {
+    background: rgba(255,60,60,0.15); border: 1px solid rgba(255,60,60,0.3);
+    border-radius: 6px; padding: 2px 8px; color: #ff6060;
+    font-size: 11px; font-weight: 700; white-space: nowrap;
+  }
+  .admin-actions {
+    margin-top: 12px; padding-top: 12px;
+    border-top: 1px solid rgba(255,255,255,0.07);
+    display: flex; gap: 8px; flex-wrap: wrap;
+  }
+  .act-btn {
+    border-radius: 6px; padding: 5px 10px;
+    font-size: 11px; font-weight: 700; cursor: pointer; font-family: 'Segoe UI', sans-serif;
+  }
   .btn-lock { background: rgba(255,165,0,0.1); border: 1px solid rgba(255,165,0,0.3); color: #ffa500; }
   .btn-unlock { background: rgba(0,255,150,0.1); border: 1px solid rgba(0,255,150,0.3); color: #00ff96; }
   .btn-edit { background: rgba(0,180,255,0.1); border: 1px solid rgba(0,180,255,0.3); color: #00b4ff; }
   .btn-del { background: rgba(255,60,60,0.1); border: 1px solid rgba(255,60,60,0.3); color: #ff6060; }
-  #empty-state { grid-column: 1/-1; text-align: center; padding: 80px 0; color: rgba(255,255,255,0.3); font-size: 16px; display: none; }
-  footer { text-align: center; padding: 40px 24px; border-top: 1px solid rgba(255,255,255,0.05); color: rgba(255,255,255,0.3); font-size: 13px; }
+
+  /* ===== EMPTY STATE ===== */
+  #empty-state {
+    grid-column: 1/-1; text-align: center; padding: 80px 0;
+    color: rgba(255,255,255,0.3); font-size: 16px; display: none;
+  }
+
+  /* ===== FOOTER ===== */
+  footer {
+    text-align: center; padding: 40px 24px;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    color: rgba(255,255,255,0.3); font-size: 13px;
+  }
   footer span { color: #00ff96; font-weight: 700; }
 
   /* ===== MODAL ===== */
-  .modal-overlay { position: fixed; inset: 0; z-index: 9999; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; }
-  .modal-box { background: linear-gradient(135deg, #0d0d2b, #0a1628); border-radius: 20px; padding: 36px; width: 460px; max-width: 95vw; }
+  .modal-overlay {
+    position: fixed; inset: 0; z-index: 9999;
+    background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .modal-box {
+    background: linear-gradient(135deg, #0d0d2b, #0a1628);
+    border-radius: 20px; padding: 36px; width: 460px; max-width: 95vw;
+  }
   .modal-title { color: #fff; margin: 0 0 24px; font-size: 22px; }
   .modal-field { margin-bottom: 16px; }
   .modal-label { display: block; color: rgba(255,255,255,0.6); font-size: 13px; margin-bottom: 6px; }
-  .modal-input { width: 100%; padding: 11px 14px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: #fff; font-size: 13px; outline: none; box-sizing: border-box; direction: rtl; }
+  .modal-input {
+    width: 100%; padding: 11px 14px;
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px; color: #fff; font-size: 13px;
+    font-family: 'Segoe UI', sans-serif; outline: none;
+    box-sizing: border-box; direction: rtl;
+  }
   .modal-error { color: #ff6060; font-size: 13px; margin: 0 0 16px; }
   .modal-btns { display: flex; gap: 12px; justify-content: flex-end; }
-  .btn-cancel { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 10px 24px; color: rgba(255,255,255,0.6); font-size: 14px; cursor: pointer; }
-  .btn-confirm-add { background: linear-gradient(135deg, #00ff96, #00b4ff); border: none; border-radius: 10px; padding: 10px 28px; color: #000; font-size: 14px; font-weight: 800; cursor: pointer; }
-  .btn-confirm-edit { background: linear-gradient(135deg, #00b4ff, #0066ff); border: none; border-radius: 10px; padding: 10px 28px; color: #fff; font-size: 14px; font-weight: 800; cursor: pointer; }
-  .modal-textarea { width: 100%; padding: 11px 14px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: #fff; font-size: 13px; outline: none; box-sizing: border-box; direction: rtl; resize: vertical; min-height: 80px; max-height: 180px; line-height: 1.6; }
-  .modal-textarea:focus, .modal-input:focus { border-color: rgba(0,255,150,0.4); }
+  .btn-cancel {
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px; padding: 10px 24px; color: rgba(255,255,255,0.6);
+    font-size: 14px; cursor: pointer;
+  }
+  .btn-confirm-add {
+    background: linear-gradient(135deg, #00ff96, #00b4ff); border: none;
+    border-radius: 10px; padding: 10px 28px; color: #000;
+    font-size: 14px; font-weight: 800; cursor: pointer;
+  }
+  .btn-confirm-edit {
+    background: linear-gradient(135deg, #00b4ff, #0066ff); border: none;
+    border-radius: 10px; padding: 10px 28px; color: #fff;
+    font-size: 14px; font-weight: 800; cursor: pointer;
+  }
 </style>
 </head>
 <body>
 
 <!-- ===== NAVBAR ===== -->
 <nav id="navbar">
-  <div class="nav-logo"><div class="nav-logo-icon">G</div><span class="nav-logo-text">GAMEVERSE</span></div>
-  <div class="nav-links"><a href="#">الرئيسية</a><a href="#">الفيديوهات</a><a href="#">المجتمع</a></div>
+  <div class="nav-logo">
+    <div class="nav-logo-icon">G</div>
+    <span class="nav-logo-text">GAMEVERSE</span>
+  </div>
+  <div class="nav-links">
+    <a href="#">الرئيسية</a>
+    <a href="#">الفيديوهات</a>
+    <a href="#">المجتمع</a>
+  </div>
   <div class="nav-right">
-    <div id="admin-badge"><img id="admin-avatar" src=""><span id="admin-name">👑</span></div>
+    <div id="admin-badge">
+      <img id="admin-avatar" src="" alt="" />
+      <span id="admin-name">👑</span>
+    </div>
     <button id="gear-btn" onclick="togglePanel()" title="لوحة المشرف">
-      <svg width="18" height="18" viewBox="0 0 24 24" id="gear-icon" fill="rgba(255,255,255,0.35)"><path d="M19.14 12.94c.04-.3.06-.61.06-.94s-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96a7.02 7.02 0 0 0-1.62-.94l-.36-2.54A.484.484 0 0 0 14 2h-4a.484.484 0 0 0-.48.41l-.36 2.54a7.02 7.02 0 0 0-1.62.94l-2.39-.96a.48.48 0 0 0-.59.22L2.74 8.47a.47.47 0 0 0 .12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.47.47 0 0 0-.12.61l1.92 3.32c.12.22.37.3.59.22l2.39-.96c.5.36 1.04.67 1.62.94l.36 2.54c.05.28.3.48.48.48h4c.28 0 .47-.2.48-.48l.36-2.54a7.02 7.02 0 0 0 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32a.47.47 0 0 0-.12-.61l-2.03-1.58zM12 15.6A3.6 3.6 0 1 1 12 8.4a3.6 3.6 0 0 1 0 7.2z"/></svg>
+      <svg width="18" height="18" viewBox="0 0 24 24" id="gear-icon" fill="rgba(255,255,255,0.35)">
+        <path d="M19.14 12.94c.04-.3.06-.61.06-.94s-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96a7.02 7.02 0 0 0-1.62-.94l-.36-2.54A.484.484 0 0 0 14 2h-4a.484.484 0 0 0-.48.41l-.36 2.54a7.02 7.02 0 0 0-1.62.94l-2.39-.96a.48.48 0 0 0-.59.22L2.74 8.47a.47.47 0 0 0 .12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.47.47 0 0 0-.12.61l1.92 3.32c.12.22.37.3.59.22l2.39-.96c.5.36 1.04.67 1.62.94l.36 2.54c.05.28.3.48.48.48h4c.28 0 .47-.2.48-.48l.36-2.54a7.02 7.02 0 0 0 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32a.47.47 0 0 0-.12-.61l-2.03-1.58zM12 15.6A3.6 3.6 0 1 1 12 8.4a3.6 3.6 0 0 1 0 7.2z"/>
+      </svg>
       <div id="gear-dot"></div>
     </button>
   </div>
 </nav>
 
+<!-- ===== SIDE PANEL OVERLAY ===== -->
 <div id="overlay" onclick="closePanel()"></div>
+
+<!-- ===== SIDE PANEL ===== -->
 <div id="side-panel">
   <div class="panel-header">
-    <div class="panel-header-left"><div class="panel-header-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><path d="M19.14 12.94c.04-.3.06-.61.06-.94s-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96a7.02 7.02 0 0 0-1.62-.94l-.36-2.54A.484.484 0 0 0 14 2h-4a.484.484 0 0 0-.48.41l-.36 2.54a7.02 7.02 0 0 0-1.62.94l-2.39-.96a.48.48 0 0 0-.59.22L2.74 8.47a.47.47 0 0 0 .12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.47.47 0 0 0-.12.61l1.92 3.32c.12.22.37.3.59.22l2.39-.96c.5.36 1.04.67 1.62.94l.36 2.54c.05.28.3.48.48.48h4c.28 0 .47-.2.48-.48l.36-2.54a7.02 7.02 0 0 0 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32a.47.47 0 0 0-.12-.61l-2.03-1.58zM12 15.6A3.6 3.6 0 1 1 12 8.4a3.6 3.6 0 0 1 0 7.2z"/></svg></div><span class="panel-header-title">لوحة التحكم</span></div>
+    <div class="panel-header-left">
+      <div class="panel-header-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff">
+          <path d="M19.14 12.94c.04-.3.06-.61.06-.94s-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96a7.02 7.02 0 0 0-1.62-.94l-.36-2.54A.484.484 0 0 0 14 2h-4a.484.484 0 0 0-.48.41l-.36 2.54a7.02 7.02 0 0 0-1.62.94l-2.39-.96a.48.48 0 0 0-.59.22L2.74 8.47a.47.47 0 0 0 .12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.47.47 0 0 0-.12.61l1.92 3.32c.12.22.37.3.59.22l2.39-.96c.5.36 1.04.67 1.62.94l.36 2.54c.05.28.3.48.48.48h4c.28 0 .47-.2.48-.48l.36-2.54a7.02 7.02 0 0 0 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32a.47.47 0 0 0-.12-.61l-2.03-1.58zM12 15.6A3.6 3.6 0 1 1 12 8.4a3.6 3.6 0 0 1 0 7.2z"/>
+        </svg>
+      </div>
+      <span class="panel-header-title">لوحة التحكم</span>
+    </div>
     <button class="panel-close" onclick="closePanel()">✕</button>
   </div>
+
   <div class="panel-body">
-    <div id="state-no-admin"><div class="invite-card"><div class="crown">👑</div><h3>🚀 لا يوجد مشرف بعد!</h3><p>أنت أول شخص هنا.<br>سجّل دخولك لتصبح المشرف الوحيد للمنصة.</p><button class="btn-google" onclick="handleAdminLogin()"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg> تسجيل الدخول كمشرف بـ Google</button></div></div>
-    <div id="state-blocked"><div class="blocked-card"><div class="lock-icon">🔐</div><h3>المنصة محمية</h3><p>هذه المنصة لها مشرف بالفعل.<br>لا يمكن إضافة مشرف آخر.</p></div></div>
-    <div id="state-is-admin"><div class="admin-profile"><img id="panel-avatar" src=""><div><div class="name" id="panel-name">—</div><div class="role">👑 مشرف المنصة</div></div></div><button class="btn-add-video" onclick="openAddModal(); closePanel();">🎬 رفع فيديو جديد</button><div class="tools-box"><div class="tools-title">🛠️ أدوات المشرف على كل فيديو</div><div class="tool-item"><span>🔒</span><span>قفل / فتح الفيديو</span></div><div class="tool-item"><span>✏️</span><span>تعديل العنوان والوصف</span></div><div class="tool-item" style="border-bottom:none"><span>🗑️</span><span>حذف الفيديو</span></div></div><button class="btn-signout" onclick="handleSignOut()">🚪 تسجيل الخروج</button></div>
+    <div id="debug-info" style="display:none;color:#ffff00;font-size:11px;margin-bottom:14px;padding:8px;background:rgba(255,255,0,0.05);border-radius:8px;border:1px solid rgba(255,255,0,0.2);font-family:monospace;"></div>
+
+    <!-- STATE 1: لا يوجد مشرف -->
+    <div id="state-no-admin">
+      <div class="invite-card">
+        <div class="crown">👑</div>
+        <h3>لا يوجد مشرف بعد!</h3>
+        <p>أنت أول شخص هنا.<br />سجّل دخولك لتصبح المشرف الوحيد للمنصة.</p>
+        <button class="btn-google" onclick="handleAdminLogin()">
+          <svg width="18" height="18" viewBox="0 0 24 24">
+            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+          </svg>
+          ادخل كمشرف بـ Google
+        </button>
+      </div>
+    </div>
+
+    <!-- STATE 2: يوجد مشرف لكن المستخدم الحالي ليس مشرفاً -->
+    <div id="state-blocked">
+      <div class="blocked-card">
+        <div class="lock-icon">🔐</div>
+        <h3>المنصة محمية</h3>
+        <p>هذه المنصة لها مشرف بالفعل.<br />لا يمكن إضافة مشرف آخر.</p>
+      </div>
+    </div>
+
+    <!-- STATE 3: المستخدم الحالي هو المشرف -->
+    <div id="state-is-admin">
+      <div class="admin-profile">
+        <img id="panel-avatar" src="" alt="" />
+        <div>
+          <div class="name" id="panel-name">—</div>
+          <div class="role">👑 مشرف المنصة</div>
+        </div>
+      </div>
+
+      <button class="btn-add-video" onclick="openAddModal(); closePanel();">🎬 رفع فيديو جديد</button>
+
+      <div class="tools-box">
+        <div class="tools-title">أدوات المشرف على كل فيديو</div>
+        <div class="tool-item"><span>🔒</span><span>قفل / فتح الفيديو</span></div>
+        <div class="tool-item"><span>✏️</span><span>تعديل العنوان والوصف</span></div>
+        <div class="tool-item" style="border-bottom:none"><span>🗑️</span><span>حذف الفيديو</span></div>
+      </div>
+
+      <button class="btn-signout" onclick="handleSignOut()">تسجيل الخروج</button>
+    </div>
+
   </div>
 </div>
 
-<div id="hero"><div class="hero-grid"></div><div class="hero-glow-1"></div><div class="hero-glow-2"></div><div class="hero-content"><div class="hero-tag">🎮 منصة الجيمنج الأولى</div><h1 class="hero-title">GAMEVERSE</h1><p class="hero-sub">اكتشف أفضل فيديوهات الجيمنج في مكان واحد</p><button class="hero-btn" onclick="document.getElementById('video-grid').scrollIntoView({behavior:'smooth'})">استكشف الفيديوهات ↓</button></div></div>
+<!-- ===== HERO ===== -->
+<div id="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-glow-1"></div>
+  <div class="hero-glow-2"></div>
+  <div class="hero-content">
+    <div class="hero-tag">🎮 منصة الجيمنج الأولى</div>
+    <h1 class="hero-title">GAMEVERSE</h1>
+    <p class="hero-sub">اكتشف أفضل فيديوهات الجيمنج في مكان واحد</p>
+    <button class="hero-btn" onclick="document.getElementById('video-grid').scrollIntoView({behavior:'smooth'})">
+      استكشف الفيديوهات ↓
+    </button>
+  </div>
+</div>
 
-<div id="filters-bar"><div class="filter-btns"><button class="filter-btn active" data-filter="all" onclick="setFilter('all',this)">📋 الكل</button><button class="filter-btn" data-filter="unlocked" onclick="setFilter('unlocked',this)">🔓 مفتوح</button><button class="filter-btn" data-filter="locked" onclick="setFilter('locked',this)">🔒 مقفول</button></div><div class="filter-right"><input id="search-input" placeholder="🔍 بحث عن فيديو..." oninput="renderVideos()"><button id="add-video-btn" onclick="openAddModal()">+ رفع فيديو</button></div></div>
+<!-- ===== FILTERS BAR ===== -->
+<div id="filters-bar">
+  <div class="filter-btns">
+    <button class="filter-btn active" data-filter="all" onclick="setFilter('all',this)">الكل</button>
+    <button class="filter-btn" data-filter="unlocked" onclick="setFilter('unlocked',this)">🔓 مفتوح</button>
+    <button class="filter-btn" data-filter="locked" onclick="setFilter('locked',this)">🔒 مقفول</button>
+  </div>
+  <div class="filter-right">
+    <input id="search-input" placeholder="بحث عن فيديو..." oninput="renderVideos()" />
+    <button id="add-video-btn" onclick="openAddModal()">+ رفع فيديو</button>
+  </div>
+</div>
 
-<div id="video-grid"><div id="empty-state"><div style="font-size:48px;margin-bottom:16px">🎮</div><span id="empty-text">لا توجد فيديوهات حتى الآن</span></div></div>
+<!-- ===== VIDEO GRID ===== -->
+<div id="video-grid">
+  <div id="empty-state">
+    <div style="font-size:48px;margin-bottom:16px">🎮</div>
+    <span id="empty-text">لا توجد فيديوهات حتى الآن</span>
+  </div>
+</div>
 
-<footer><span>GAMEVERSE</span> — منصة الجيمنج الاحترافية 🎮</footer>
+<!-- ===== FOOTER ===== -->
+<footer>
+  <span>GAMEVERSE</span> — منصة الجيمنج الاحترافية
+</footer>
 
-<div id="add-modal" class="modal-overlay" style="display:none"><div class="modal-box" style="border:1px solid rgba(0,255,150,0.25)"><h2 class="modal-title">🎬 إضافة فيديو جديد</h2><div class="modal-field"><label class="modal-label">رابط يوتيوب *</label><input id="add-url" class="modal-input" placeholder="https://www.youtube.com/watch?v=..." oninput="clearAddError()"></div><div class="modal-field"><label class="modal-label">عنوان الفيديو *</label><input id="add-title" class="modal-input" placeholder="اسم الفيديو" oninput="clearAddError()"></div><div class="modal-field"><label class="modal-label">الوصف (اختياري)</label><textarea id="add-desc" class="modal-textarea" placeholder="وصف قصير عن الفيديو..."></textarea></div><p id="add-error" class="modal-error" style="display:none"></p><div class="modal-btns"><button class="btn-cancel" onclick="closeAddModal()">إلغاء</button><button class="btn-confirm-add" onclick="submitAddVideo()">إضافة ✓</button></div></div></div>
+<!-- ===== ADD VIDEO MODAL ===== -->
+<div id="add-modal" class="modal-overlay" style="display:none">
+  <div class="modal-box" style="border:1px solid rgba(0,255,150,0.25)">
+    <h2 class="modal-title">🎬 إضافة فيديو جديد</h2>
+    <div class="modal-field">
+      <label class="modal-label">رابط يوتيوب *</label>
+      <input id="add-url" class="modal-input" placeholder="https://www.youtube.com/watch?v=..." oninput="clearAddError()" />
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">عنوان الفيديو *</label>
+      <input id="add-title" class="modal-input" placeholder="اسم الفيديو" oninput="clearAddError()" />
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">الوصف (اختياري)</label>
+      <input id="add-desc" class="modal-input" placeholder="وصف قصير..." />
+    </div>
+    <p id="add-error" class="modal-error" style="display:none"></p>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeAddModal()">إلغاء</button>
+      <button class="btn-confirm-add" onclick="submitAddVideo()">إضافة ✓</button>
+    </div>
+  </div>
+</div>
 
-<div id="edit-modal" class="modal-overlay" style="display:none"><div class="modal-box" style="border:1px solid rgba(0,180,255,0.25)"><h2 class="modal-title">✏ تعديل الفيديو</h2><div class="modal-field"><label class="modal-label">العنوان</label><input id="edit-title" class="modal-input"></div><div class="modal-field"><label class="modal-label">الوصف</label><textarea id="edit-desc" class="modal-textarea" placeholder="وصف الفيديو..."></textarea></div><div class="modal-btns"><button class="btn-cancel" onclick="closeEditModal()">إلغاء</button><button class="btn-confirm-edit" onclick="submitEdit()">حفظ ✓</button></div></div></div>
+<!-- ===== EDIT VIDEO MODAL ===== -->
+<div id="edit-modal" class="modal-overlay" style="display:none">
+  <div class="modal-box" style="border:1px solid rgba(0,180,255,0.25)">
+    <h2 class="modal-title">✏ تعديل الفيديو</h2>
+    <div class="modal-field">
+      <label class="modal-label">العنوان</label>
+      <input id="edit-title" class="modal-input" />
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">الوصف</label>
+      <input id="edit-desc" class="modal-input" />
+    </div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeEditModal()">إلغاء</button>
+      <button class="btn-confirm-edit" onclick="submitEdit()">حفظ ✓</button>
+    </div>
+  </div>
+</div>
 
+<!-- ===== FIREBASE + APP SCRIPT ===== -->
 <script type="module">
+  // ===== FIREBASE CONFIG =====
   const FIREBASE_CONFIG = {
     apiKey: "AIzaSyB-TFF6yvJyq21RxMD7KuAgNuVOBlXgNhY",
     authDomain: "ginang-ca81d.firebaseapp.com",
@@ -424,28 +626,73 @@
     appId: "1:556233466817:web:f86580ee42b9e7f0f90540",
   };
 
-  let state = { user: null, isAdmin: false, adminExists: false, videos: [], filter: "all", editingId: null, fb: null };
+  // ===== STATE =====
+  let state = {
+    user: null,
+    isAdmin: false,
+    adminExists: false,
+    videos: [],
+    filter: "all",
+    editingId: null,
+    fb: null,
+  };
 
+  // ===== HELPERS =====
   function extractYouTubeId(url) {
-    const regexes = [ /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/, /youtube\.com\/shorts\/([^&\n?#]+)/ ];
+    const regexes = [
+      /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
+      /youtube\.com\/shorts\/([^&\n?#]+)/
+    ];
     for (const r of regexes) { const m = url.match(r); if (m) return m[1]; }
     return null;
   }
   function getThumb(id) { return `https://img.youtube.com/vi/${id}/maxresdefault.jpg`; }
-  function openPanelAuto() { const panel = document.getElementById('side-panel'), overlay = document.getElementById('overlay'); if (!panel.classList.contains('open')) { panel.classList.add('open'); overlay.style.display = 'block'; } }
 
+  // ===== UI UPDATERS =====
   window.updateUI = function() {
     const { user, isAdmin, adminExists } = state;
-    document.getElementById('gear-btn').classList[isAdmin ? 'add' : 'remove']('active');
-    document.getElementById('gear-icon').setAttribute('fill', isAdmin ? '#ff9900' : 'rgba(255,255,255,0.35)');
-    document.getElementById('gear-dot').style.display = isAdmin ? 'block' : 'none';
+
+    // Navbar gear style
+    const gearBtn = document.getElementById('gear-btn');
+    const gearIcon = document.getElementById('gear-icon');
+    const gearDot = document.getElementById('gear-dot');
+    if (isAdmin) {
+      gearBtn.classList.add('active');
+      gearIcon.setAttribute('fill','#ff9900');
+      gearDot.style.display = 'block';
+    } else {
+      gearBtn.classList.remove('active');
+      gearIcon.setAttribute('fill','rgba(255,255,255,0.35)');
+      gearDot.style.display = 'none';
+    }
+
+    // Admin badge in navbar
     const badge = document.getElementById('admin-badge');
-    if (isAdmin && user) { badge.style.display = 'flex'; document.getElementById('admin-avatar').src = user.photoURL || ''; document.getElementById('admin-name').textContent = '👑 ' + (user.displayName || '').split(' ')[0]; } else { badge.style.display = 'none'; }
+    if (isAdmin && user) {
+      badge.style.display = 'flex';
+      document.getElementById('admin-avatar').src = user.photoURL || '';
+      document.getElementById('admin-name').textContent = '👑 ' + (user.displayName || '').split(' ')[0];
+    } else {
+      badge.style.display = 'none';
+    }
+
+    // Add video button in filter bar
     document.getElementById('add-video-btn').style.display = isAdmin ? 'block' : 'none';
+
+    // Debug info
+    const dbg = document.getElementById('debug-info');
+    if (dbg) dbg.textContent = 'FB:' + (state.fb ? 'متصل✅' : 'غير متصل❌') + ' | adminExists:' + adminExists + ' | isAdmin:' + isAdmin;
+
+    // Panel states
     document.getElementById('state-no-admin').style.display = (!adminExists && !isAdmin) ? 'block' : 'none';
     document.getElementById('state-blocked').style.display = (adminExists && !isAdmin) ? 'block' : 'none';
     document.getElementById('state-is-admin').style.display = isAdmin ? 'block' : 'none';
-    if (isAdmin && user) { document.getElementById('panel-avatar').src = user.photoURL || ''; document.getElementById('panel-name').textContent = user.displayName || ''; }
+
+    if (isAdmin && user) {
+      document.getElementById('panel-avatar').src = user.photoURL || '';
+      document.getElementById('panel-name').textContent = user.displayName || '';
+    }
+
     renderVideos();
   };
 
@@ -454,117 +701,328 @@
     const search = document.getElementById('search-input').value.toLowerCase();
     const filter = state.filter;
     const isAdmin = state.isAdmin;
-    let filtered = state.videos.filter(v => { if (filter === 'locked' && !v.locked) return false; if (filter === 'unlocked' && v.locked) return false; if (search && !v.title.toLowerCase().includes(search)) return false; return true; });
+
+    let filtered = state.videos.filter(v => {
+      if (filter === 'locked' && !v.locked) return false;
+      if (filter === 'unlocked' && v.locked) return false;
+      if (search && !v.title.toLowerCase().includes(search)) return false;
+      return true;
+    });
+
+    // Clear old cards but keep empty state div
     [...grid.querySelectorAll('.video-card')].forEach(el => el.remove());
     const emptyState = document.getElementById('empty-state');
-    if (filtered.length === 0) { emptyState.style.display = 'block'; document.getElementById('empty-text').textContent = 'لا توجد فيديوهات حتى الآن' + (isAdmin ? ' — ابدأ بإضافة فيديو!' : ''); } 
-    else { emptyState.style.display = 'none'; filtered.forEach(v => { const card = buildCard(v, isAdmin); grid.appendChild(card); }); }
+
+    if (filtered.length === 0) {
+      emptyState.style.display = 'block';
+      document.getElementById('empty-text').textContent =
+        'لا توجد فيديوهات حتى الآن' + (isAdmin ? ' — ابدأ بإضافة فيديو!' : '');
+    } else {
+      emptyState.style.display = 'none';
+      filtered.forEach(v => {
+        const card = buildCard(v, isAdmin);
+        grid.appendChild(card);
+      });
+    }
   };
 
   function buildCard(v, isAdmin) {
-    const card = document.createElement('div'); card.className = 'video-card' + (v._isNew ? ' new-card' : ''); if (v._isNew) v._isNew = false; card.dataset.id = v.id;
-    const thumbWrap = document.createElement('div'); thumbWrap.className = 'video-thumb-wrap';
-    const thumb = document.createElement('div'); thumb.className = 'video-thumb' + (v.locked ? ' locked' : ''); thumb.style.backgroundImage = `url(${getThumb(v.youtubeId)})`;
-    if (!v.locked) { thumb.onclick = () => { const iframe = document.createElement('iframe'); iframe.className = 'video-iframe'; iframe.src = `https://www.youtube.com/embed/${v.youtubeId}?autoplay=1`; iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"; iframe.allowFullscreen = true; thumbWrap.innerHTML = ''; thumbWrap.appendChild(iframe); }; }
+    const card = document.createElement('div');
+    card.className = 'video-card';
+    card.dataset.id = v.id;
+
+    const thumbWrap = document.createElement('div');
+    thumbWrap.className = 'video-thumb-wrap';
+
+    const thumb = document.createElement('div');
+    thumb.className = 'video-thumb' + (v.locked ? ' locked' : '');
+    thumb.style.backgroundImage = `url(${getThumb(v.youtubeId)})`;
+    if (!v.locked) {
+      thumb.onclick = () => {
+        const iframe = document.createElement('iframe');
+        iframe.className = 'video-iframe';
+        iframe.src = `https://www.youtube.com/embed/${v.youtubeId}?autoplay=1`;
+        iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+        iframe.allowFullscreen = true;
+        thumbWrap.innerHTML = '';
+        thumbWrap.appendChild(iframe);
+      };
+    }
+
     const grad = document.createElement('div'); grad.className = 'thumb-gradient';
-    const playBtn = document.createElement('div'); playBtn.className = 'play-btn'; playBtn.textContent = v.locked ? '🔒' : '▶';
-    thumb.appendChild(grad); thumb.appendChild(playBtn); thumbWrap.appendChild(thumb);
+    const playBtn = document.createElement('div'); playBtn.className = 'play-btn';
+    playBtn.textContent = v.locked ? '🔒' : '▶';
+    thumb.appendChild(grad); thumb.appendChild(playBtn);
+    thumbWrap.appendChild(thumb);
+
     const info = document.createElement('div'); info.className = 'video-info';
     const meta = document.createElement('div'); meta.className = 'video-meta';
     const textDiv = document.createElement('div'); textDiv.style.flex = '1';
-    const titleEl = document.createElement('h3'); titleEl.className = 'video-title'; titleEl.textContent = v.title; textDiv.appendChild(titleEl);
-    if (v.description) { const descEl = document.createElement('p'); descEl.className = 'video-desc'; descEl.textContent = v.description; textDiv.appendChild(descEl); }
+    const titleEl = document.createElement('h3'); titleEl.className = 'video-title'; titleEl.textContent = v.title;
+    textDiv.appendChild(titleEl);
+    if (v.description) {
+      const descEl = document.createElement('p'); descEl.className = 'video-desc'; descEl.textContent = v.description;
+      textDiv.appendChild(descEl);
+    }
     meta.appendChild(textDiv);
-    if (v.locked) { const badge = document.createElement('span'); badge.className = 'badge-locked'; badge.textContent = 'مقفول'; meta.appendChild(badge); }
+    if (v.locked) {
+      const badge = document.createElement('span'); badge.className = 'badge-locked'; badge.textContent = 'مقفول';
+      meta.appendChild(badge);
+    }
     info.appendChild(meta);
+
     if (isAdmin) {
       const actions = document.createElement('div'); actions.className = 'admin-actions';
-      const lockBtn = document.createElement('button'); lockBtn.className = 'act-btn ' + (v.locked ? 'btn-unlock' : 'btn-lock'); lockBtn.textContent = v.locked ? '🔓 فتح' : '🔒 قفل'; lockBtn.onclick = () => handleToggleLock(v.id);
-      const editBtn = document.createElement('button'); editBtn.className = 'act-btn btn-edit'; editBtn.textContent = '✏ تعديل'; editBtn.onclick = () => openEditModal(v);
-      const delBtn = document.createElement('button'); delBtn.className = 'act-btn btn-del'; delBtn.textContent = '🗑 حذف'; delBtn.onclick = () => handleDelete(v.id);
-      actions.appendChild(lockBtn); actions.appendChild(editBtn); actions.appendChild(delBtn); info.appendChild(actions);
+
+      const lockBtn = document.createElement('button');
+      lockBtn.className = 'act-btn ' + (v.locked ? 'btn-unlock' : 'btn-lock');
+      lockBtn.textContent = v.locked ? '🔓 فتح' : '🔒 قفل';
+      lockBtn.onclick = () => handleToggleLock(v.id);
+
+      const editBtn = document.createElement('button');
+      editBtn.className = 'act-btn btn-edit'; editBtn.textContent = '✏ تعديل';
+      editBtn.onclick = () => openEditModal(v);
+
+      const delBtn = document.createElement('button');
+      delBtn.className = 'act-btn btn-del'; delBtn.textContent = '🗑 حذف';
+      delBtn.onclick = () => handleDelete(v.id);
+
+      actions.appendChild(lockBtn); actions.appendChild(editBtn); actions.appendChild(delBtn);
+      info.appendChild(actions);
     }
-    card.appendChild(thumbWrap); card.appendChild(info); return card;
+
+    card.appendChild(thumbWrap); card.appendChild(info);
+    return card;
   }
 
-  window.togglePanel = function() { const panel = document.getElementById('side-panel'), overlay = document.getElementById('overlay'); if (panel.classList.contains('open')) { panel.classList.remove('open'); overlay.style.display = 'none'; } else { panel.classList.add('open'); overlay.style.display = 'block'; } };
-  window.closePanel = function() { document.getElementById('side-panel').classList.remove('open'); document.getElementById('overlay').style.display = 'none'; };
-  window.setFilter = function(f, btn) { state.filter = f; document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); renderVideos(); };
-  window.openAddModal = function() { document.getElementById('add-modal').style.display = 'flex'; };
-  window.closeAddModal = function() { document.getElementById('add-modal').style.display = 'none'; document.getElementById('add-url').value = ''; document.getElementById('add-title').value = ''; document.getElementById('add-desc').value = ''; clearAddError(); };
-  window.clearAddError = function() { document.getElementById('add-error').style.display = 'none'; };
-  window.submitAddVideo = async function() { const url = document.getElementById('add-url').value, title = document.getElementById('add-title').value.trim(), desc = document.getElementById('add-desc').value.trim(), id = extractYouTubeId(url); if (!id) { showAddError('رابط يوتيوب غير صحيح'); return; } if (!title) { showAddError('أدخل عنواناً للفيديو'); return; } await handleAddVideo({ youtubeId: id, title, description: desc, locked: false }); closeAddModal(); };
-  function showAddError(msg) { const el = document.getElementById('add-error'); el.textContent = msg; el.style.display = 'block'; }
-  window.openEditModal = function(v) { state.editingId = v.id; document.getElementById('edit-title').value = v.title; document.getElementById('edit-desc').value = v.description || ''; document.getElementById('edit-modal').style.display = 'flex'; };
-  window.closeEditModal = function() { document.getElementById('edit-modal').style.display = 'none'; state.editingId = null; };
-  window.submitEdit = async function() { const title = document.getElementById('edit-title').value.trim(), desc = document.getElementById('edit-desc').value.trim(); if (!title) return; await handleEdit(state.editingId, { title, description: desc }); closeEditModal(); };
+  // ===== PANEL =====
+  window.togglePanel = function() {
+    const panel = document.getElementById('side-panel');
+    const overlay = document.getElementById('overlay');
+    const isOpen = panel.classList.contains('open');
+    if (isOpen) { panel.classList.remove('open'); overlay.style.display = 'none'; }
+    else { panel.classList.add('open'); overlay.style.display = 'block'; }
+  };
+  window.closePanel = function() {
+    document.getElementById('side-panel').classList.remove('open');
+    document.getElementById('overlay').style.display = 'none';
+  };
 
+  // ===== FILTER =====
+  window.setFilter = function(f, btn) {
+    state.filter = f;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderVideos();
+  };
+
+  // ===== ADD VIDEO MODAL =====
+  window.openAddModal = function() { document.getElementById('add-modal').style.display = 'flex'; };
+  window.closeAddModal = function() {
+    document.getElementById('add-modal').style.display = 'none';
+    document.getElementById('add-url').value = '';
+    document.getElementById('add-title').value = '';
+    document.getElementById('add-desc').value = '';
+    clearAddError();
+  };
+  window.clearAddError = function() { document.getElementById('add-error').style.display = 'none'; };
+  window.submitAddVideo = async function() {
+    const url = document.getElementById('add-url').value;
+    const title = document.getElementById('add-title').value.trim();
+    const desc = document.getElementById('add-desc').value.trim();
+    const id = extractYouTubeId(url);
+    if (!id) { showAddError('رابط يوتيوب غير صحيح'); return; }
+    if (!title) { showAddError('أدخل عنواناً للفيديو'); return; }
+    await handleAddVideo({ youtubeId: id, title, description: desc, locked: false });
+    closeAddModal();
+  };
+  function showAddError(msg) {
+    const el = document.getElementById('add-error');
+    el.textContent = msg; el.style.display = 'block';
+  }
+
+  // ===== EDIT MODAL =====
+  window.openEditModal = function(v) {
+    state.editingId = v.id;
+    document.getElementById('edit-title').value = v.title;
+    document.getElementById('edit-desc').value = v.description || '';
+    document.getElementById('edit-modal').style.display = 'flex';
+  };
+  window.closeEditModal = function() { document.getElementById('edit-modal').style.display = 'none'; state.editingId = null; };
+  window.submitEdit = async function() {
+    const title = document.getElementById('edit-title').value;
+    const desc = document.getElementById('edit-desc').value;
+    await handleEdit(state.editingId, { title, description: desc });
+    closeEditModal();
+  };
+
+  // ===== FIREBASE ACTIONS =====
   window.handleAdminLogin = async function() {
-    if (!state.fb) { alert('جاري تحميل Firebase... حاول مرة أخرى'); return; }
+    const { fb } = state;
+    if (!fb) {
+      state.adminExists = true; state.isAdmin = true;
+      state.user = { displayName: 'مشرف تجريبي', photoURL: '', uid: 'demo', email: 'demo@test.com' };
+      closePanel(); updateUI(); return;
+    }
     try {
-      const { auth, db, GoogleAuthProvider, signInWithPopup, signInWithRedirect, collection, getDocs, setDoc, doc, query, where } = state.fb;
+      const { auth, db, GoogleAuthProvider, signInWithPopup, signInWithRedirect, collection, getDocs, setDoc, doc, query, where } = fb;
+      // تحقق أولاً: هل يوجد مشرف مسجل؟
       const adminSnap = await getDocs(query(collection(db, 'users'), where('isAdmin','==',true)));
-      if (!adminSnap.empty) { alert('⚠️ المنصة لديها مشرف بالفعل.'); return; }
+      if (!adminSnap.empty) { state.adminExists = true; updateUI(); return; }
+
       const provider = new GoogleAuthProvider();
-      const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
       let result = null;
-      if (isMobile) { await signInWithRedirect(auth, provider); return; }
-      try { result = await signInWithPopup(auth, provider); } catch(popupErr) { if (popupErr.code === 'auth/popup-blocked' || popupErr.code === 'auth/popup-closed-by-user') { await signInWithRedirect(auth, provider); return; } throw popupErr; }
+      try {
+        // جرب Popup أولاً (أسرع على الديسك توب)
+        result = await signInWithPopup(auth, provider);
+      } catch(popupErr) {
+        // لو Popup فشل (موبايل أو blocked)، استخدم Redirect
+        if (popupErr.code === 'auth/popup-blocked' || popupErr.code === 'auth/popup-closed-by-user' || popupErr.code === 'auth/cancelled-popup-request') {
+          await signInWithRedirect(auth, provider);
+          return; // بيكمل في getRedirectResult
+        }
+        throw popupErr;
+      }
+
+      // Popup نجح — سجّل المشرف مباشرة
       if (result && result.user) {
         const freshSnap = await getDocs(query(collection(db, 'users'), where('isAdmin','==',true)));
-        if (freshSnap.empty) await saveAdminUser(result.user);
-        else { alert('⚠️ تم تعيين مشرف بالفعل. لن تصبح مشرفاً.'); await state.fb.signOut(auth); }
+        if (freshSnap.empty) {
+          await saveAdminUser(result.user);
+        }
       }
-    } catch(e) { console.error(e); alert('خطأ في تسجيل الدخول: '+e.message); }
+    } catch(e) { console.error('Login error:', e); }
   };
 
   async function saveAdminUser(fbUser) {
     const { db, doc, setDoc } = state.fb;
-    await setDoc(doc(db, 'users', fbUser.uid), { email: fbUser.email, displayName: fbUser.displayName, photoURL: fbUser.photoURL, isAdmin: true, createdAt: new Date() });
+    await setDoc(doc(db, 'users', fbUser.uid), {
+      email: fbUser.email, displayName: fbUser.displayName,
+      photoURL: fbUser.photoURL, isAdmin: true, createdAt: new Date(),
+    });
     state.user = { uid: fbUser.uid, email: fbUser.email, displayName: fbUser.displayName, photoURL: fbUser.photoURL };
     state.isAdmin = true; state.adminExists = true;
-    updateUI(); openPanelAuto();
+    closePanel(); updateUI();
   }
 
-  window.handleSignOut = async function() { if (state.fb) await state.fb.signOut(state.fb.auth); state.user = null; state.isAdmin = false; closePanel(); updateUI(); };
-  window.handleAddVideo = async function(videoData) { if (state.fb) { const ref = await state.fb.addDoc(state.fb.collection(state.fb.db, 'videos'), { ...videoData, createdAt: new Date() }); state.videos.unshift({ id: ref.id, ...videoData, createdAt: new Date(), _isNew: true }); } else { state.videos.unshift({ ...videoData, id: Date.now().toString(), createdAt: new Date(), _isNew: true }); } renderVideos(); };
-  window.handleDelete = async function(id) { if (!confirm('🗑️ حذف؟')) return; if (state.fb) await state.fb.deleteDoc(state.fb.doc(state.fb.db, 'videos', id)); state.videos = state.videos.filter(v => v.id !== id); renderVideos(); };
-  window.handleToggleLock = async function(id) { const video = state.videos.find(v => v.id === id); const newLocked = !video.locked; if (state.fb) await state.fb.updateDoc(state.fb.doc(state.fb.db, 'videos', id), { locked: newLocked }); state.videos = state.videos.map(v => v.id === id ? { ...v, locked: newLocked } : v); renderVideos(); };
-  window.handleEdit = async function(id, updates) { if (state.fb) await state.fb.updateDoc(state.fb.doc(state.fb.db, 'videos', id), updates); state.videos = state.videos.map(v => v.id === id ? { ...v, ...updates } : v); renderVideos(); };
-  async function loadVideos(db, collection, getDocs, query, orderBy) { try { const q = query(collection(db, 'videos'), orderBy('createdAt', 'desc')); const snap = await getDocs(q); state.videos = snap.docs.map(d => ({ id: d.id, ...d.data() })); } catch { try { const snap = await getDocs(collection(db, 'videos')); state.videos = snap.docs.map(d => ({ id: d.id, ...d.data() })); } catch { state.videos = []; } } renderVideos(); }
+  window.handleSignOut = async function() {
+    const { fb } = state;
+    if (fb) await fb.signOut(fb.auth);
+    state.user = null; state.isAdmin = false;
+    closePanel(); updateUI();
+  };
 
-  function forceAdminCheck() {
-    if (state.fb && state.fb.auth && state.fb.auth.currentUser) {
-      const user = state.fb.auth.currentUser;
-      const docRef = state.fb.doc(state.fb.db, 'users', user.uid);
-      state.fb.getDoc(docRef).then(docSnap => {
-        if (docSnap.exists() && docSnap.data().isAdmin === true) {
-          if (!state.isAdmin) { state.isAdmin = true; state.adminExists = true; state.user = { uid: user.uid, displayName: user.displayName, photoURL: user.photoURL }; updateUI(); openPanelAuto(); console.log('✅ تم تفعيل وضع المشرف تلقائياً'); }
+  window.handleAddVideo = async function(videoData) {
+    const { fb } = state;
+    if (fb) {
+      const ref = await fb.addDoc(fb.collection(fb.db, 'videos'), { ...videoData, createdAt: new Date() });
+      state.videos.unshift({ id: ref.id, ...videoData, createdAt: new Date() });
+    } else {
+      state.videos.unshift({ ...videoData, id: Date.now().toString(), createdAt: new Date() });
+    }
+    renderVideos();
+  };
+
+  window.handleDelete = async function(id) {
+    if (!confirm('هل أنت متأكد من حذف هذا الفيديو؟')) return;
+    const { fb } = state;
+    if (fb) await fb.deleteDoc(fb.doc(fb.db, 'videos', id));
+    state.videos = state.videos.filter(v => v.id !== id);
+    renderVideos();
+  };
+
+  window.handleToggleLock = async function(id) {
+    const { fb } = state;
+    const video = state.videos.find(v => v.id === id);
+    const newLocked = !video.locked;
+    if (fb) await fb.updateDoc(fb.doc(fb.db, 'videos', id), { locked: newLocked });
+    state.videos = state.videos.map(v => v.id === id ? { ...v, locked: newLocked } : v);
+    renderVideos();
+  };
+
+  window.handleEdit = async function(id, updates) {
+    const { fb } = state;
+    if (fb) await fb.updateDoc(fb.doc(fb.db, 'videos', id), updates);
+    state.videos = state.videos.map(v => v.id === id ? { ...v, ...updates } : v);
+    renderVideos();
+  };
+
+  // ===== LOAD VIDEOS =====
+  async function loadVideos(db, collection, getDocs, query, orderBy) {
+    try {
+      const q = query(collection(db, 'videos'), orderBy('createdAt', 'desc'));
+      const snap = await getDocs(q);
+      state.videos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    } catch {
+      try {
+        const snap = await getDocs(collection(db, 'videos'));
+        state.videos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      } catch { state.videos = []; }
+    }
+    renderVideos();
+  }
+
+  // ===== INIT =====
+  const configured = FIREBASE_CONFIG.apiKey !== 'YOUR_API_KEY';
+
+  if (!configured) {
+    // Demo mode
+    state.videos = [
+      { id: 'd1', youtubeId: 'dQw4w9WgXcQ', title: 'فيديو تجريبي ١', description: 'وصف تجريبي', locked: false },
+      { id: 'd2', youtubeId: '9bZkp7q19f0', title: 'أفضل لحظات الجيمنج', description: '', locked: false },
+      { id: 'd3', youtubeId: 'kJQP7kiw5Fk', title: 'فيديو مقفول', description: 'مقفول حالياً', locked: true },
+    ];
+    state.adminExists = false;
+    updateUI();
+  } else {
+    Promise.all([
+      import('https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js'),
+      import('https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js'),
+      import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js'),
+    ]).then(([
+      { initializeApp },
+      { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged },
+      { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, updateDoc, setDoc, getDoc, query, orderBy, where }
+    ]) => {
+      const app = initializeApp(FIREBASE_CONFIG);
+      const auth = getAuth(app);
+      const db = getFirestore(app);
+      state.fb = { auth, db, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged, collection, getDocs, addDoc, deleteDoc, doc, updateDoc, setDoc, getDoc, query, orderBy, where };
+
+      // Handle redirect result (after Google redirect on mobile)
+      getRedirectResult(auth).then(async (result) => {
+        if (result && result.user) {
+          // تحقق مجدداً: هل لا يزال لا يوجد مشرف؟
+          const adminSnap = await getDocs(query(collection(db, 'users'), where('isAdmin','==',true)));
+          if (adminSnap.empty) {
+            await saveAdminUser(result.user);
+          } else {
+            // المستخدم موجود بالفعل في الـ auth — onAuthStateChanged سيتولى الأمر
+          }
         }
-      }).catch(console.error);
-    } else { setTimeout(forceAdminCheck, 1000); }
-  }
+      }).catch(e => console.error('Redirect result error:', e));
 
-  Promise.all([
-    import('https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js'),
-    import('https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js'),
-    import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js'),
-  ]).then(([ { initializeApp }, { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged }, { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, updateDoc, setDoc, getDoc, query, orderBy, where } ]) => {
-    const app = initializeApp(FIREBASE_CONFIG);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-    state.fb = { auth, db, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged, collection, getDocs, addDoc, deleteDoc, doc, updateDoc, setDoc, getDoc, query, orderBy, where };
-    getRedirectResult(auth).then(async (result) => { if (result && result.user) { const snap = await getDocs(query(collection(db, 'users'), where('isAdmin','==',true))); if (snap.empty) await saveAdminUser(result.user); else await signOut(auth); } }).catch(e=>console.error);
-    getDocs(query(collection(db, 'users'), where('isAdmin','==',true))).then(snap => { state.adminExists = !snap.empty; updateUI(); }).catch(()=>{ state.adminExists=false; updateUI(); });
-    let prevIsAdmin = false;
-    onAuthStateChanged(auth, async (fbUser) => {
-      if (fbUser) { try { const userSnap = await getDoc(doc(db, 'users', fbUser.uid)); const userData = userSnap.exists() ? userSnap.data() : null; state.user = { uid: fbUser.uid, email: fbUser.email, displayName: fbUser.displayName, photoURL: fbUser.photoURL }; state.isAdmin = userData?.isAdmin === true; } catch { state.user = null; state.isAdmin = false; } } else { state.user = null; state.isAdmin = false; }
-      if (state.isAdmin && !prevIsAdmin) { updateUI(); openPanelAuto(); } else { updateUI(); }
-      prevIsAdmin = state.isAdmin;
-      loadVideos(db, collection, getDocs, query, orderBy);
+      // Check if admin exists
+      getDocs(query(collection(db, 'users'), where('isAdmin','==',true)))
+        .then(snap => { state.adminExists = !snap.empty; updateUI(); })
+        .catch(() => { state.adminExists = false; updateUI(); });
+
+      // Auth listener
+      onAuthStateChanged(auth, async (fbUser) => {
+        if (fbUser) {
+          try {
+            const userRef = doc(db, 'users', fbUser.uid);
+            const userSnap = await getDoc(userRef);
+            const userData = userSnap.exists() ? userSnap.data() : null;
+            state.user = { uid: fbUser.uid, email: fbUser.email, displayName: fbUser.displayName, photoURL: fbUser.photoURL };
+            state.isAdmin = userData?.isAdmin === true;
+          } catch { state.user = null; state.isAdmin = false; }
+        } else { state.user = null; state.isAdmin = false; }
+        updateUI();
+        loadVideos(db, collection, getDocs, query, orderBy);
+      });
     });
-    setTimeout(forceAdminCheck, 3000);
-  }).catch(err => { console.error(err); state.videos = [ { id:'demo1', youtubeId:'dQw4w9WgXcQ', title:'فيديو تجريبي', locked:false } ]; updateUI(); });
+  }
 </script>
 </body>
 </html>
