@@ -855,27 +855,37 @@
   window.handleAdminLogin = async function() {
     const { fb } = state;
     if (!fb) {
-      // Demo mode
       state.adminExists = true; state.isAdmin = true;
       state.user = { displayName: 'مشرف تجريبي', photoURL: '', uid: 'demo', email: 'demo@test.com' };
       closePanel(); updateUI(); return;
     }
     try {
-      const { auth, db, GoogleAuthProvider, signInWithPopup, collection, getDocs, query, where, doc, setDoc } = fb;
+      const { auth, db, GoogleAuthProvider, signInWithPopup, signInWithRedirect, collection, getDocs, query, where } = fb;
       const adminSnap = await getDocs(query(collection(db, 'users'), where('isAdmin','==',true)));
       if (!adminSnap.empty) { state.adminExists = true; updateUI(); return; }
       const provider = new GoogleAuthProvider();
-      const result = await signInWithPopup(auth, provider);
-      const fbUser = result.user;
-      await setDoc(doc(db, 'users', fbUser.uid), {
-        email: fbUser.email, displayName: fbUser.displayName,
-        photoURL: fbUser.photoURL, isAdmin: true, createdAt: new Date(),
-      });
-      state.user = { uid: fbUser.uid, email: fbUser.email, displayName: fbUser.displayName, photoURL: fbUser.photoURL };
-      state.isAdmin = true; state.adminExists = true;
-      closePanel(); updateUI();
+      // Use redirect on mobile, popup on desktop
+      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+      if (isMobile) {
+        await signInWithRedirect(auth, provider);
+        // Page will reload — result handled in onAuthStateChanged
+      } else {
+        const result = await signInWithPopup(auth, provider);
+        await saveAdminUser(result.user);
+      }
     } catch(e) { console.error(e); }
   };
+
+  async function saveAdminUser(fbUser) {
+    const { db, doc, setDoc } = state.fb;
+    await setDoc(doc(db, 'users', fbUser.uid), {
+      email: fbUser.email, displayName: fbUser.displayName,
+      photoURL: fbUser.photoURL, isAdmin: true, createdAt: new Date(),
+    });
+    state.user = { uid: fbUser.uid, email: fbUser.email, displayName: fbUser.displayName, photoURL: fbUser.photoURL };
+    state.isAdmin = true; state.adminExists = true;
+    closePanel(); updateUI();
+  }
 
   window.handleSignOut = async function() {
     const { fb } = state;
@@ -953,13 +963,23 @@
       import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js'),
     ]).then(([
       { initializeApp },
-      { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged },
+      { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged },
       { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, updateDoc, setDoc, getDoc, query, orderBy, where }
     ]) => {
       const app = initializeApp(FIREBASE_CONFIG);
       const auth = getAuth(app);
       const db = getFirestore(app);
-      state.fb = { auth, db, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, collection, getDocs, addDoc, deleteDoc, doc, updateDoc, setDoc, getDoc, query, orderBy, where };
+      state.fb = { auth, db, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged, collection, getDocs, addDoc, deleteDoc, doc, updateDoc, setDoc, getDoc, query, orderBy, where };
+
+      // Handle redirect result (mobile login)
+      getRedirectResult(auth).then(async (result) => {
+        if (result && result.user) {
+          const adminSnap = await getDocs(query(collection(db, 'users'), where('isAdmin','==',true)));
+          if (adminSnap.empty) {
+            await saveAdminUser(result.user);
+          }
+        }
+      }).catch(e => console.error(e));
 
       // Check if admin exists
       getDocs(query(collection(db, 'users'), where('isAdmin','==',true)))
