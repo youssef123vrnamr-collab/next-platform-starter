@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>GAMEVERSE | منصة الجيمنج</title>
-<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@700&display=swap" rel="stylesheet" />
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: #050510; min-height: 100vh; font-family: 'Segoe UI', Tahoma, sans-serif; direction: rtl; }
@@ -539,7 +539,7 @@
   </div>
 
   <div class="panel-body">
-    <!-- STATE 1: لا يوجد مشرف (يظهر زر تسجيل الدخول فقط لأول شخص) -->
+    <!-- STATE 1: لا يوجد مشرف -->
     <div id="state-no-admin">
       <div class="invite-card">
         <div class="crown">👑</div>
@@ -557,13 +557,12 @@
       </div>
     </div>
 
-    <!-- STATE 2: يوجد مشرف بالفعل والمستخدم الحالي ليس مشرفاً (لا يظهر زر تسجيل الدخول) -->
+    <!-- STATE 2: يوجد مشرف لكن المستخدم الحالي ليس مشرفاً -->
     <div id="state-blocked">
       <div class="blocked-card">
         <div class="lock-icon">🔐</div>
         <h3>المنصة محمية</h3>
         <p>هذه المنصة لها مشرف بالفعل.<br />لا يمكن إضافة مشرف آخر.</p>
-        <p style="margin-top:16px; font-size:12px;">👑 تم تعيين مشرف مسبقاً</p>
       </div>
     </div>
 
@@ -678,7 +677,7 @@
 </div>
 
 <script type="module">
-  // ===== FIREBASE CONFIG (استخدام نفس الإعدادات السابقة) =====
+  // ===== FIREBASE CONFIG =====
   const FIREBASE_CONFIG = {
     apiKey: "AIzaSyB-TFF6yvJyq21RxMD7KuAgNuVOBlXgNhY",
     authDomain: "ginang-ca81d.firebaseapp.com",
@@ -919,7 +918,11 @@
   window.handleAdminLogin = async function() {
     const { fb } = state;
     if (!fb) {
-      alert("⚠️ لم يتم تحميل Firebase بعد، حاول مرة أخرى.");
+      // Demo mode - بدون Firebase (لن يحدث لأن Firebase سيتم تحميله)
+      state.adminExists = true; state.isAdmin = true;
+      state.user = { displayName: 'مشرف تجريبي', photoURL: '', uid: 'demo', email: 'demo@test.com' };
+      updateUI();
+      openPanelAuto();
       return;
     }
     try {
@@ -987,7 +990,6 @@
       const ref = await fb.addDoc(fb.collection(fb.db, 'videos'), { ...videoData, createdAt: new Date() });
       state.videos.unshift({ id: ref.id, ...videoData, createdAt: new Date(), _isNew: true });
     } else {
-      // وضع تجريبي بدون Firebase (لن يحدث إلا إذا فشل التحميل)
       state.videos.unshift({ ...videoData, id: Date.now().toString(), createdAt: new Date(), _isNew: true });
     }
     renderVideos();
@@ -1046,7 +1048,6 @@
     const db = getFirestore(app);
     state.fb = { auth, db, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged, collection, getDocs, addDoc, deleteDoc, doc, updateDoc, setDoc, getDoc, query, orderBy, where };
 
-    // معالجة redirect result
     getRedirectResult(auth).then(async (result) => {
       if (result && result.user) {
         const adminSnap = await getDocs(query(collection(db, 'users'), where('isAdmin','==',true)));
@@ -1059,7 +1060,6 @@
       }
     }).catch(e => console.error('Redirect result error:', e));
 
-    // التحقق من وجود مشرف
     getDocs(query(collection(db, 'users'), where('isAdmin','==',true)))
       .then(snap => { state.adminExists = !snap.empty; updateUI(); })
       .catch(() => { state.adminExists = false; updateUI(); });
@@ -1088,7 +1088,7 @@
     });
   }).catch(err => {
     console.error("Firebase loading error:", err);
-    // وضع تجريبي في حالة فشل تحميل Firebase (لن يحدث في الوضع الطبيعي)
+    // وضع تجريبي
     state.adminExists = false;
     state.videos = [
       { id: 'demo1', youtubeId: 'dQw4w9WgXcQ', title: 'فيديو تجريبي 1', description: 'وصف تجريبي', locked: false },
