@@ -476,6 +476,7 @@
   </div>
 
   <div class="panel-body">
+    <div id="debug-info" style="color:#ffff00;font-size:11px;margin-bottom:14px;padding:8px;background:rgba(255,255,0,0.05);border-radius:8px;border:1px solid rgba(255,255,0,0.2);font-family:monospace;"></div>
 
     <!-- STATE 1: لا يوجد مشرف -->
     <div id="state-no-admin">
@@ -677,6 +678,10 @@
 
     // Add video button in filter bar
     document.getElementById('add-video-btn').style.display = isAdmin ? 'block' : 'none';
+
+    // Debug info
+    const dbg = document.getElementById('debug-info');
+    if (dbg) dbg.textContent = 'FB:' + (state.fb ? 'متصل✅' : 'غير متصل❌') + ' | adminExists:' + adminExists + ' | isAdmin:' + isAdmin;
 
     // Panel states
     document.getElementById('state-no-admin').style.display = (!adminExists && !isAdmin) ? 'block' : 'none';
