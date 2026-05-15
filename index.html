@@ -915,7 +915,12 @@
     state.user = { uid: fbUser.uid, email: fbUser.email, displayName: fbUser.displayName, photoURL: fbUser.photoURL };
     state.isAdmin = true;
     state.adminExists = true;
-    closePanel(); updateUI();
+    updateUI();
+    // افتح البانيل عشان المشرف يشوف لوحة التحكم
+    const panel = document.getElementById('side-panel');
+    const overlay = document.getElementById('overlay');
+    panel.classList.add('open');
+    overlay.style.display = 'block';
   }
 
   async function saveAdminUser(fbUser) {
@@ -926,7 +931,12 @@
     });
     state.user = { uid: fbUser.uid, email: fbUser.email, displayName: fbUser.displayName, photoURL: fbUser.photoURL };
     state.isAdmin = true; state.adminExists = true;
-    closePanel(); updateUI();
+    updateUI();
+    // افتح البانيل عشان المشرف يشوف لوحة التحكم
+    const panel = document.getElementById('side-panel');
+    const overlay = document.getElementById('overlay');
+    panel.classList.add('open');
+    overlay.style.display = 'block';
   }
 
   window.handleSignOut = async function() {
