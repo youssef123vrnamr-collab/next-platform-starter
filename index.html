@@ -864,15 +864,7 @@
       const adminSnap = await getDocs(query(collection(db, 'users'), where('isAdmin','==',true)));
       if (!adminSnap.empty) { state.adminExists = true; updateUI(); return; }
       const provider = new GoogleAuthProvider();
-      // Use redirect on mobile, popup on desktop
-      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-      if (isMobile) {
-        await signInWithRedirect(auth, provider);
-        // Page will reload — result handled in onAuthStateChanged
-      } else {
-        const result = await signInWithPopup(auth, provider);
-        await saveAdminUser(result.user);
-      }
+      await signInWithRedirect(auth, provider);
     } catch(e) { console.error(e); }
   };
 
