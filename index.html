@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GAMEVERSE | منصة الجيمنج</title>
-<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@700&display=swap" rel="stylesheet">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: #050510; min-height: 100vh; font-family: 'Segoe UI', Tahoma, sans-serif; direction: rtl; }
@@ -89,7 +89,6 @@
   }
   #admin-badge img {
     width: 30px; height: 30px; border-radius: 50%; border: 2px solid #00ff96;
-    background: #2a2a3a;
   }
   #admin-badge span { color: #00ff96; font-size: 12px; font-weight: 700; }
 
@@ -162,7 +161,7 @@
   .invite-card h3 { color: #00ff96; margin: 0 0 8px; font-size: 16px; }
   .invite-card p { color: rgba(255,255,255,0.5); font-size: 13px; margin: 0 0 22px; line-height: 1.7; }
 
-  .btn-primary {
+  .btn-google {
     width: 100%; padding: 13px;
     background: linear-gradient(135deg, #00ff96, #00b4ff);
     border: none; border-radius: 10px;
@@ -190,7 +189,6 @@
   .admin-profile img {
     width: 44px; height: 44px; border-radius: 50%;
     border: 2px solid #00ff96; flex-shrink: 0;
-    background: #2a2a3a;
   }
   .admin-profile .name { color: #fff; font-weight: 700; font-size: 14px; }
   .admin-profile .role { color: #00ff96; font-size: 11px; font-weight: 700; letter-spacing: 1px; }
@@ -541,19 +539,25 @@
   </div>
 
   <div class="panel-body">
-    <!-- STATE 1: لا يوجد مشرف (يظهر الزر فقط في هذه الحالة) -->
+    <!-- STATE 1: لا يوجد مشرف (يظهر زر تسجيل الدخول فقط لأول شخص) -->
     <div id="state-no-admin">
       <div class="invite-card">
         <div class="crown">👑</div>
         <h3>🚀 لا يوجد مشرف بعد!</h3>
-        <p>أنت أول شخص هنا.<br />سجّل دخولك كمدير لتصبح المشرف الوحيد للمنصة.</p>
-        <button class="btn-primary" onclick="becomeAdmin()">
-          👑 تسجيل الدخول كمشرف
+        <p>أنت أول شخص هنا.<br />سجّل دخولك لتصبح المشرف الوحيد للمنصة.</p>
+        <button class="btn-google" onclick="handleAdminLogin()">
+          <svg width="20" height="20" viewBox="0 0 24 24">
+            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+          </svg>
+          تسجيل الدخول كمشرف بـ Google
         </button>
       </div>
     </div>
 
-    <!-- STATE 2: يوجد مشرف بالفعل والمستخدم الحالي ليس مشرفاً -->
+    <!-- STATE 2: يوجد مشرف بالفعل والمستخدم الحالي ليس مشرفاً (لا يظهر زر تسجيل الدخول) -->
     <div id="state-blocked">
       <div class="blocked-card">
         <div class="lock-icon">🔐</div>
@@ -566,9 +570,9 @@
     <!-- STATE 3: المستخدم الحالي هو المشرف -->
     <div id="state-is-admin">
       <div class="admin-profile">
-        <img id="panel-avatar" src="https://ui-avatars.com/api/?background=00ff96&color=000&bold=true&size=44&name=Admin" alt="" />
+        <img id="panel-avatar" src="" alt="" />
         <div>
-          <div class="name" id="panel-name">المشرف العام</div>
+          <div class="name" id="panel-name">—</div>
           <div class="role">👑 مشرف المنصة</div>
         </div>
       </div>
@@ -673,78 +677,27 @@
   </div>
 </div>
 
-<script>
-  // ========== نظام التخزين المحلي (بدون Firebase) ==========
-  // المفتاح: admin_exists - true/false
-  // الفيديوهات: gameverse_videos
-  
+<script type="module">
+  // ===== FIREBASE CONFIG (استخدام نفس الإعدادات السابقة) =====
+  const FIREBASE_CONFIG = {
+    apiKey: "AIzaSyB-TFF6yvJyq21RxMD7KuAgNuVOBlXgNhY",
+    authDomain: "ginang-ca81d.firebaseapp.com",
+    projectId: "ginang-ca81d",
+    storageBucket: "ginang-ca81d.firebasestorage.app",
+    messagingSenderId: "556233466817",
+    appId: "1:556233466817:web:f86580ee42b9e7f0f90540",
+  };
+
   let state = {
+    user: null,
     isAdmin: false,
     adminExists: false,
     videos: [],
     filter: "all",
     editingId: null,
+    fb: null,
   };
 
-  // تحميل البيانات من localStorage
-  function loadData() {
-    const storedAdmin = localStorage.getItem('gameverse_admin_exists');
-    state.adminExists = storedAdmin === 'true';
-    
-    // التحقق من وجود مشرف حالي في الجلسة
-    const currentAdmin = sessionStorage.getItem('gameverse_current_admin');
-    state.isAdmin = (currentAdmin === 'true' && state.adminExists);
-    
-    const storedVideos = localStorage.getItem('gameverse_videos');
-    if (storedVideos) {
-      state.videos = JSON.parse(storedVideos);
-    } else {
-      // فيديوهات تجريبية افتراضية
-      state.videos = [
-        { id: 'v1', youtubeId: 'dQw4w9WgXcQ', title: '🎮 فيديو تجريبي 1', description: 'أول فيديو على المنصة', locked: false, createdAt: Date.now() },
-        { id: 'v2', youtubeId: '9bZkp7q19f0', title: '🔥 أفضل لحظات الجيمنج', description: 'لحظات لا تنسى', locked: false, createdAt: Date.now() - 100000 },
-        { id: 'v3', youtubeId: 'kJQP7kiw5Fk', title: '🔒 فيديو مقفول', description: 'هذا الفيديو مقفول حالياً', locked: true, createdAt: Date.now() - 200000 },
-      ];
-      saveVideos();
-    }
-  }
-
-  function saveVideos() {
-    localStorage.setItem('gameverse_videos', JSON.stringify(state.videos));
-  }
-
-  // تصبح مشرفاً (أول شخص فقط)
-  window.becomeAdmin = function() {
-    if (state.adminExists) {
-      alert('⚠️ المنصة لديها مشرف بالفعل! لا يمكنك أن تصبح مشرفاً.');
-      updateUI();
-      return;
-    }
-    // طلب اسم المستخدم (اختياري)
-    let adminName = prompt('👑 أدخل اسمك (سيظهر كاسم المشرف):', 'المشرف العام');
-    if (!adminName) adminName = 'المشرف العام';
-    localStorage.setItem('gameverse_admin_exists', 'true');
-    sessionStorage.setItem('gameverse_current_admin', 'true');
-    sessionStorage.setItem('gameverse_admin_name', adminName);
-    state.adminExists = true;
-    state.isAdmin = true;
-    updateUI();
-    openPanelAuto();
-    alert(`✅ مرحباً ${adminName}! أصبحت الآن المشرف الوحيد للمنصة. يمكنك إدارة الفيديوهات.`);
-  };
-
-  window.handleSignOut = function() {
-    sessionStorage.removeItem('gameverse_current_admin');
-    state.isAdmin = false;
-    closePanel();
-    updateUI();
-  };
-
-  function getAdminName() {
-    return sessionStorage.getItem('gameverse_admin_name') || 'المشرف العام';
-  }
-
-  // دوال إدارة الفيديوهات
   function extractYouTubeId(url) {
     const regexes = [
       /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
@@ -755,49 +708,22 @@
   }
   function getThumb(id) { return `https://img.youtube.com/vi/${id}/maxresdefault.jpg`; }
 
-  window.handleAddVideo = function(videoData) {
-    const newVideo = {
-      id: Date.now().toString() + Math.random().toString(36),
-      ...videoData,
-      createdAt: Date.now(),
-      _isNew: true
-    };
-    state.videos.unshift(newVideo);
-    saveVideos();
-    renderVideos();
-  };
-
-  window.handleDelete = function(id) {
-    if (!confirm('🗑️ هل أنت متأكد من حذف هذا الفيديو؟')) return;
-    state.videos = state.videos.filter(v => v.id !== id);
-    saveVideos();
-    renderVideos();
-  };
-
-  window.handleToggleLock = function(id) {
-    const video = state.videos.find(v => v.id === id);
-    if (video) {
-      video.locked = !video.locked;
-      saveVideos();
-      renderVideos();
+  function openPanelAuto() {
+    const panel = document.getElementById('side-panel');
+    const overlay = document.getElementById('overlay');
+    if (!panel.classList.contains('open')) {
+      panel.classList.add('open');
+      overlay.style.display = 'block';
     }
-  };
+  }
 
-  window.handleEdit = function(id, updates) {
-    const index = state.videos.findIndex(v => v.id === id);
-    if (index !== -1) {
-      state.videos[index] = { ...state.videos[index], ...updates };
-      saveVideos();
-      renderVideos();
-    }
-  };
-
-  // واجهة المستخدم
   window.updateUI = function() {
+    const { user, isAdmin, adminExists } = state;
+
     const gearBtn = document.getElementById('gear-btn');
     const gearIcon = document.getElementById('gear-icon');
     const gearDot = document.getElementById('gear-dot');
-    if (state.isAdmin) {
+    if (isAdmin) {
       gearBtn.classList.add('active');
       gearIcon.setAttribute('fill','#ff9900');
       gearDot.style.display = 'block';
@@ -808,23 +734,23 @@
     }
 
     const badge = document.getElementById('admin-badge');
-    if (state.isAdmin) {
+    if (isAdmin && user) {
       badge.style.display = 'flex';
-      document.getElementById('admin-avatar').src = `https://ui-avatars.com/api/?background=00ff96&color=000&bold=true&size=44&name=${encodeURIComponent(getAdminName())}`;
-      document.getElementById('admin-name').textContent = '👑 ' + getAdminName();
+      document.getElementById('admin-avatar').src = user.photoURL || '';
+      document.getElementById('admin-name').textContent = '👑 ' + (user.displayName || '').split(' ')[0];
     } else {
       badge.style.display = 'none';
     }
 
-    document.getElementById('add-video-btn').style.display = state.isAdmin ? 'block' : 'none';
+    document.getElementById('add-video-btn').style.display = isAdmin ? 'block' : 'none';
 
-    document.getElementById('state-no-admin').style.display = (!state.adminExists && !state.isAdmin) ? 'block' : 'none';
-    document.getElementById('state-blocked').style.display = (state.adminExists && !state.isAdmin) ? 'block' : 'none';
-    document.getElementById('state-is-admin').style.display = state.isAdmin ? 'block' : 'none';
+    document.getElementById('state-no-admin').style.display = (!adminExists && !isAdmin) ? 'block' : 'none';
+    document.getElementById('state-blocked').style.display = (adminExists && !isAdmin) ? 'block' : 'none';
+    document.getElementById('state-is-admin').style.display = isAdmin ? 'block' : 'none';
 
-    if (state.isAdmin) {
-      document.getElementById('panel-avatar').src = `https://ui-avatars.com/api/?background=00ff96&color=000&bold=true&size=44&name=${encodeURIComponent(getAdminName())}`;
-      document.getElementById('panel-name').textContent = getAdminName();
+    if (isAdmin && user) {
+      document.getElementById('panel-avatar').src = user.photoURL || '';
+      document.getElementById('panel-name').textContent = user.displayName || '';
     }
 
     renderVideos();
@@ -940,14 +866,6 @@
     document.getElementById('side-panel').classList.remove('open');
     document.getElementById('overlay').style.display = 'none';
   };
-  function openPanelAuto() {
-    const panel = document.getElementById('side-panel');
-    const overlay = document.getElementById('overlay');
-    if (!panel.classList.contains('open')) {
-      panel.classList.add('open');
-      overlay.style.display = 'block';
-    }
-  }
 
   window.setFilter = function(f, btn) {
     state.filter = f;
@@ -965,14 +883,14 @@
     clearAddError();
   };
   window.clearAddError = function() { document.getElementById('add-error').style.display = 'none'; };
-  window.submitAddVideo = function() {
+  window.submitAddVideo = async function() {
     const url = document.getElementById('add-url').value;
     const title = document.getElementById('add-title').value.trim();
     const desc = document.getElementById('add-desc').value.trim();
     const id = extractYouTubeId(url);
     if (!id) { showAddError('رابط يوتيوب غير صحيح'); return; }
     if (!title) { showAddError('أدخل عنواناً للفيديو'); return; }
-    handleAddVideo({ youtubeId: id, title, description: desc, locked: false });
+    await handleAddVideo({ youtubeId: id, title, description: desc, locked: false });
     closeAddModal();
   };
   function showAddError(msg) {
@@ -990,17 +908,194 @@
     document.getElementById('edit-modal').style.display = 'none';
     state.editingId = null;
   };
-  window.submitEdit = function() {
+  window.submitEdit = async function() {
     const title = document.getElementById('edit-title').value.trim();
     const desc = document.getElementById('edit-desc').value.trim();
     if (!title) return;
-    handleEdit(state.editingId, { title, description: desc });
+    await handleEdit(state.editingId, { title, description: desc });
     closeEditModal();
   };
 
-  // بدء التطبيق
-  loadData();
-  updateUI();
+  window.handleAdminLogin = async function() {
+    const { fb } = state;
+    if (!fb) {
+      alert("⚠️ لم يتم تحميل Firebase بعد، حاول مرة أخرى.");
+      return;
+    }
+    try {
+      const { auth, db, GoogleAuthProvider, signInWithPopup, signInWithRedirect, collection, getDocs, setDoc, doc, query, where } = fb;
+      // التحقق من وجود مشرف مسبقاً
+      const adminSnap = await getDocs(query(collection(db, 'users'), where('isAdmin','==',true)));
+      if (!adminSnap.empty) {
+        alert('⚠️ المنصة لديها مشرف بالفعل. لا يمكنك تسجيل الدخول كمشرف.');
+        return;
+      }
+
+      const provider = new GoogleAuthProvider();
+      const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+
+      if (isMobile) {
+        await signInWithRedirect(auth, provider);
+        return;
+      }
+
+      let result = null;
+      try {
+        result = await signInWithPopup(auth, provider);
+      } catch(popupErr) {
+        if (popupErr.code === 'auth/popup-blocked' || popupErr.code === 'auth/popup-closed-by-user') {
+          await signInWithRedirect(auth, provider);
+          return;
+        }
+        throw popupErr;
+      }
+
+      if (result && result.user) {
+        const freshSnap = await getDocs(query(collection(db, 'users'), where('isAdmin','==',true)));
+        if (freshSnap.empty) {
+          await saveAdminUser(result.user);
+        } else {
+          alert('⚠️ تم تعيين مشرف بالفعل أثناء عملية الدخول. لن تصبح مشرفاً.');
+          await fb.signOut(auth);
+        }
+      }
+    } catch(e) { console.error('Login error:', e); alert('حدث خطأ في تسجيل الدخول: ' + e.message); }
+  };
+
+  async function saveAdminUser(fbUser) {
+    const { db, doc, setDoc } = state.fb;
+    await setDoc(doc(db, 'users', fbUser.uid), {
+      email: fbUser.email, displayName: fbUser.displayName,
+      photoURL: fbUser.photoURL, isAdmin: true, createdAt: new Date(),
+    });
+    state.user = { uid: fbUser.uid, email: fbUser.email, displayName: fbUser.displayName, photoURL: fbUser.photoURL };
+    state.isAdmin = true; state.adminExists = true;
+    updateUI();
+    openPanelAuto();
+  }
+
+  window.handleSignOut = async function() {
+    const { fb } = state;
+    if (fb) await fb.signOut(fb.auth);
+    state.user = null; state.isAdmin = false;
+    closePanel(); updateUI();
+  };
+
+  window.handleAddVideo = async function(videoData) {
+    const { fb } = state;
+    if (fb) {
+      const ref = await fb.addDoc(fb.collection(fb.db, 'videos'), { ...videoData, createdAt: new Date() });
+      state.videos.unshift({ id: ref.id, ...videoData, createdAt: new Date(), _isNew: true });
+    } else {
+      // وضع تجريبي بدون Firebase (لن يحدث إلا إذا فشل التحميل)
+      state.videos.unshift({ ...videoData, id: Date.now().toString(), createdAt: new Date(), _isNew: true });
+    }
+    renderVideos();
+  };
+
+  window.handleDelete = async function(id) {
+    if (!confirm('🗑️ هل أنت متأكد من حذف هذا الفيديو؟')) return;
+    const { fb } = state;
+    if (fb) await fb.deleteDoc(fb.doc(fb.db, 'videos', id));
+    state.videos = state.videos.filter(v => v.id !== id);
+    renderVideos();
+  };
+
+  window.handleToggleLock = async function(id) {
+    const { fb } = state;
+    const video = state.videos.find(v => v.id === id);
+    const newLocked = !video.locked;
+    if (fb) await fb.updateDoc(fb.doc(fb.db, 'videos', id), { locked: newLocked });
+    state.videos = state.videos.map(v => v.id === id ? { ...v, locked: newLocked } : v);
+    renderVideos();
+  };
+
+  window.handleEdit = async function(id, updates) {
+    const { fb } = state;
+    if (fb) await fb.updateDoc(fb.doc(fb.db, 'videos', id), updates);
+    state.videos = state.videos.map(v => v.id === id ? { ...v, ...updates } : v);
+    renderVideos();
+  };
+
+  async function loadVideos(db, collection, getDocs, query, orderBy) {
+    try {
+      const q = query(collection(db, 'videos'), orderBy('createdAt', 'desc'));
+      const snap = await getDocs(q);
+      state.videos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    } catch {
+      try {
+        const snap = await getDocs(collection(db, 'videos'));
+        state.videos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      } catch { state.videos = []; }
+    }
+    renderVideos();
+  }
+
+  // ===== INIT =====
+  Promise.all([
+    import('https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js'),
+    import('https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js'),
+    import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js'),
+  ]).then(([
+    { initializeApp },
+    { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged },
+    { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, updateDoc, setDoc, getDoc, query, orderBy, where }
+  ]) => {
+    const app = initializeApp(FIREBASE_CONFIG);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    state.fb = { auth, db, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged, collection, getDocs, addDoc, deleteDoc, doc, updateDoc, setDoc, getDoc, query, orderBy, where };
+
+    // معالجة redirect result
+    getRedirectResult(auth).then(async (result) => {
+      if (result && result.user) {
+        const adminSnap = await getDocs(query(collection(db, 'users'), where('isAdmin','==',true)));
+        if (adminSnap.empty) {
+          await saveAdminUser(result.user);
+        } else {
+          await signOut(auth);
+          alert('⚠️ المنصة لها مشرف بالفعل. تم تسجيل خروجك.');
+        }
+      }
+    }).catch(e => console.error('Redirect result error:', e));
+
+    // التحقق من وجود مشرف
+    getDocs(query(collection(db, 'users'), where('isAdmin','==',true)))
+      .then(snap => { state.adminExists = !snap.empty; updateUI(); })
+      .catch(() => { state.adminExists = false; updateUI(); });
+
+    let prevIsAdmin = false;
+    onAuthStateChanged(auth, async (fbUser) => {
+      if (fbUser) {
+        try {
+          const userRef = doc(db, 'users', fbUser.uid);
+          const userSnap = await getDoc(userRef);
+          const userData = userSnap.exists() ? userSnap.data() : null;
+          state.user = { uid: fbUser.uid, email: fbUser.email, displayName: fbUser.displayName, photoURL: fbUser.photoURL };
+          state.isAdmin = userData?.isAdmin === true;
+        } catch { state.user = null; state.isAdmin = false; }
+      } else { state.user = null; state.isAdmin = false; }
+
+      if (state.isAdmin && !prevIsAdmin) {
+        updateUI();
+        openPanelAuto();
+      } else {
+        updateUI();
+      }
+      prevIsAdmin = state.isAdmin;
+
+      loadVideos(db, collection, getDocs, query, orderBy);
+    });
+  }).catch(err => {
+    console.error("Firebase loading error:", err);
+    // وضع تجريبي في حالة فشل تحميل Firebase (لن يحدث في الوضع الطبيعي)
+    state.adminExists = false;
+    state.videos = [
+      { id: 'demo1', youtubeId: 'dQw4w9WgXcQ', title: 'فيديو تجريبي 1', description: 'وصف تجريبي', locked: false },
+      { id: 'demo2', youtubeId: '9bZkp7q19f0', title: 'أفضل لحظات الجيمنج', description: '', locked: false },
+    ];
+    updateUI();
+  });
 </script>
 </body>
 </html>
