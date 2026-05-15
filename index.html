@@ -865,10 +865,7 @@
       closePanel(); updateUI(); return;
     }
     try {
-      const { auth, db, GoogleAuthProvider, signInWithPopup, signInWithRedirect, collection, getDocs, setDoc, doc, query, where } = fb;
-      // تحقق أولاً: هل يوجد مشرف مسجل؟
-      const adminSnap = await getDocs(query(collection(db, 'users'), where('isAdmin','==',true)));
-      if (!adminSnap.empty) { state.adminExists = true; updateUI(); return; }
+      const { auth, db, GoogleAuthProvider, signInWithPopup, signInWithRedirect, collection, getDocs, getDoc, setDoc, doc, query, where } = fb;
 
       const provider = new GoogleAuthProvider();
       let result = null;
@@ -884,15 +881,40 @@
         throw popupErr;
       }
 
-      // Popup نجح — سجّل المشرف مباشرة
+      // Popup نجح — تحقق من صلاحية المستخدم
       if (result && result.user) {
-        const freshSnap = await getDocs(query(collection(db, 'users'), where('isAdmin','==',true)));
-        if (freshSnap.empty) {
-          await saveAdminUser(result.user);
+        const userRef = doc(db, 'users', result.user.uid);
+        const userSnap = await getDoc(userRef);
+
+        if (userSnap.exists() && userSnap.data().isAdmin === true) {
+          // ✅ هو المشرف المسجل — سجّل دخوله
+          await loginExistingAdmin(result.user);
+        } else {
+          // تحقق: هل يوجد مشرف آخر مسجل؟
+          const adminSnap = await getDocs(query(collection(db, 'users'), where('isAdmin','==',true)));
+          if (adminSnap.empty) {
+            // لا يوجد مشرف — سجّله كمشرف أول
+            await saveAdminUser(result.user);
+          } else {
+            // يوجد مشرف آخر — هذا المستخدم محظور
+            state.adminExists = true;
+            state.isAdmin = false;
+            state.user = null;
+            // سجّل خروجه فوراً لأنه ليس المشرف
+            await fb.signOut(auth);
+            updateUI();
+          }
         }
       }
     } catch(e) { console.error('Login error:', e); }
   };
+
+  async function loginExistingAdmin(fbUser) {
+    state.user = { uid: fbUser.uid, email: fbUser.email, displayName: fbUser.displayName, photoURL: fbUser.photoURL };
+    state.isAdmin = true;
+    state.adminExists = true;
+    closePanel(); updateUI();
+  }
 
   async function saveAdminUser(fbUser) {
     const { db, doc, setDoc } = state.fb;
@@ -992,12 +1014,21 @@
       // Handle redirect result (after Google redirect on mobile)
       getRedirectResult(auth).then(async (result) => {
         if (result && result.user) {
-          // تحقق مجدداً: هل لا يزال لا يوجد مشرف؟
-          const adminSnap = await getDocs(query(collection(db, 'users'), where('isAdmin','==',true)));
-          if (adminSnap.empty) {
-            await saveAdminUser(result.user);
+          const userRef = doc(db, 'users', result.user.uid);
+          const userSnap = await getDoc(userRef);
+          if (userSnap.exists() && userSnap.data().isAdmin === true) {
+            // ✅ هو المشرف المسجل
+            await loginExistingAdmin(result.user);
           } else {
-            // المستخدم موجود بالفعل في الـ auth — onAuthStateChanged سيتولى الأمر
+            const adminSnap = await getDocs(query(collection(db, 'users'), where('isAdmin','==',true)));
+            if (adminSnap.empty) {
+              await saveAdminUser(result.user);
+            } else {
+              // ليس المشرف — سجّل خروجه
+              state.adminExists = true; state.isAdmin = false; state.user = null;
+              await signOut(auth);
+              updateUI();
+            }
           }
         }
       }).catch(e => console.error('Redirect result error:', e));
@@ -1007,7 +1038,10 @@
         .then(snap => { state.adminExists = !snap.empty; updateUI(); })
         .catch(() => { state.adminExists = false; updateUI(); });
 
-      // Auth listener
+      // تحميل الفيديوهات للجميع فوراً بدون انتظار تسجيل الدخول
+      loadVideos(db, collection, getDocs, query, orderBy);
+
+      // Auth listener — فقط لتحديد صلاحية المشرف
       onAuthStateChanged(auth, async (fbUser) => {
         if (fbUser) {
           try {
@@ -1019,7 +1053,6 @@
           } catch { state.user = null; state.isAdmin = false; }
         } else { state.user = null; state.isAdmin = false; }
         updateUI();
-        loadVideos(db, collection, getDocs, query, orderBy);
       });
     });
   }
