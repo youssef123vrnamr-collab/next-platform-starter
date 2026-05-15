@@ -41,7 +41,59 @@
     font-size: 14px; font-weight: 600; transition: color 0.2s;
   }
   .nav-links a:hover { color: #00ff96; }
-  .nav-right { display: flex; align-items: center; gap: 12px; }
+  .nav-right { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+
+  /* ===== RESPONSIVE ===== */
+
+  /* Tablet */
+  @media (max-width: 768px) {
+    .nav-links { gap: 16px; }
+    .nav-links a { font-size: 13px; }
+    #hero { height: 360px; }
+    .hero-title { font-size: 48px; }
+    .hero-sub { font-size: 15px; }
+    #video-grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); padding: 16px; gap: 16px; }
+    #filters-bar { padding: 16px 16px 0; }
+  }
+
+  /* Mobile */
+  @media (max-width: 600px) {
+    .nav-links { display: none; }
+    #navbar { padding: 0 12px; height: 56px; }
+    .nav-logo-text { font-size: 16px; letter-spacing: 1px; }
+    .nav-logo-icon { width: 30px; height: 30px; font-size: 15px; }
+    #gear-btn { width: 44px; height: 44px; flex-shrink: 0; }
+    #admin-badge span { display: none; }
+
+    #hero { height: auto; min-height: 300px; padding: 40px 16px; margin-top: 56px; }
+    .hero-tag { font-size: 10px; letter-spacing: 3px; }
+    .hero-title { font-size: 36px; }
+    .hero-sub { font-size: 13px; margin-bottom: 24px; }
+    .hero-btn { padding: 10px 22px; font-size: 13px; }
+
+    #filters-bar { padding: 14px 12px 0; flex-direction: column; align-items: stretch; gap: 10px; }
+    .filter-btns { display: flex; }
+    .filter-btn { flex: 1; padding: 8px 4px; font-size: 12px; text-align: center; }
+    .filter-right { flex-direction: column; gap: 8px; }
+    #search-input { width: 100%; }
+    #add-video-btn { width: 100%; text-align: center; }
+
+    #video-grid { grid-template-columns: 1fr; padding: 12px; gap: 14px; }
+
+    #side-panel { width: 100%; max-width: 100%; }
+
+    .modal-box { padding: 24px 18px; border-radius: 16px; }
+    .modal-title { font-size: 18px; margin-bottom: 18px; }
+    .modal-btns { flex-direction: column-reverse; gap: 8px; }
+    .btn-cancel, .btn-confirm-add, .btn-confirm-edit { width: 100%; text-align: center; padding: 12px; }
+  }
+
+  /* Very small */
+  @media (max-width: 360px) {
+    .hero-title { font-size: 28px; }
+    .filter-btn { font-size: 11px; padding: 7px 3px; }
+    .nav-logo-text { font-size: 14px; }
+  }
 
   #admin-badge {
     display: none; align-items: center; gap: 8px;
