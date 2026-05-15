@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>GAMEVERSE</title>
+<title>GAMEVERSE | منصة الجيمنج</title>
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@700&display=swap" rel="stylesheet" />
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -44,8 +44,6 @@
   .nav-right { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
 
   /* ===== RESPONSIVE ===== */
-
-  /* Tablet */
   @media (max-width: 768px) {
     .nav-links { gap: 16px; }
     .nav-links a { font-size: 13px; }
@@ -55,8 +53,6 @@
     #video-grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); padding: 16px; gap: 16px; }
     #filters-bar { padding: 16px 16px 0; }
   }
-
-  /* Mobile */
   @media (max-width: 600px) {
     .nav-links { display: none; }
     #navbar { padding: 0 12px; height: 56px; }
@@ -64,31 +60,24 @@
     .nav-logo-icon { width: 30px; height: 30px; font-size: 15px; }
     #gear-btn { width: 44px; height: 44px; flex-shrink: 0; }
     #admin-badge span { display: none; }
-
     #hero { height: auto; min-height: 300px; padding: 40px 16px; margin-top: 56px; }
     .hero-tag { font-size: 10px; letter-spacing: 3px; }
     .hero-title { font-size: 36px; }
     .hero-sub { font-size: 13px; margin-bottom: 24px; }
     .hero-btn { padding: 10px 22px; font-size: 13px; }
-
     #filters-bar { padding: 14px 12px 0; flex-direction: column; align-items: stretch; gap: 10px; }
     .filter-btns { display: flex; }
     .filter-btn { flex: 1; padding: 8px 4px; font-size: 12px; text-align: center; }
     .filter-right { flex-direction: column; gap: 8px; }
     #search-input { width: 100%; }
     #add-video-btn { width: 100%; text-align: center; }
-
     #video-grid { grid-template-columns: 1fr; padding: 12px; gap: 14px; }
-
     #side-panel { width: 100%; max-width: 100%; }
-
     .modal-box { padding: 24px 18px; border-radius: 16px; }
     .modal-title { font-size: 18px; margin-bottom: 18px; }
     .modal-btns { flex-direction: column-reverse; gap: 8px; }
     .btn-cancel, .btn-confirm-add, .btn-confirm-edit { width: 100%; text-align: center; padding: 12px; }
   }
-
-  /* Very small */
   @media (max-width: 360px) {
     .hero-title { font-size: 28px; }
     .filter-btn { font-size: 11px; padding: 7px 3px; }
@@ -161,10 +150,8 @@
   }
   .panel-body { padding: 24px 20px; flex: 1; }
 
-  /* Panel states */
   #state-no-admin, #state-blocked, #state-is-admin { display: none; }
 
-  /* No admin card */
   .invite-card {
     background: linear-gradient(135deg, rgba(0,255,150,0.07), rgba(0,180,255,0.04));
     border: 1px solid rgba(0,255,150,0.2);
@@ -183,7 +170,6 @@
     display: flex; align-items: center; justify-content: center; gap: 10px;
   }
 
-  /* Blocked card */
   .blocked-card {
     background: rgba(255,60,60,0.07);
     border: 1px solid rgba(255,60,60,0.18);
@@ -193,7 +179,6 @@
   .blocked-card h3 { color: #ff6060; margin: 0 0 8px; font-size: 16px; }
   .blocked-card p { color: rgba(255,255,255,0.45); font-size: 13px; line-height: 1.7; }
 
-  /* Admin logged in */
   .admin-profile {
     background: rgba(0,255,150,0.05);
     border: 1px solid rgba(0,255,150,0.14);
@@ -336,19 +321,17 @@
     gap: 20px;
   }
 
-  /* VIDEO CARD */
   .video-card {
     background: linear-gradient(145deg, rgba(15,15,35,0.98), rgba(8,8,24,0.98));
     border-radius: 20px; overflow: hidden;
     transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
     position: relative;
-    padding: 2px; /* for gradient border */
+    padding: 2px;
     box-shadow:
       0 4px 24px rgba(0,0,0,0.5),
       0 0 0 1px rgba(255,255,255,0.06),
       inset 0 1px 0 rgba(255,255,255,0.04);
   }
-  /* Gradient border frame using pseudo-element */
   .video-card::before {
     content: '';
     position: absolute; inset: 0;
@@ -380,7 +363,6 @@
     );
     opacity: 0.6; transition: opacity 0.4s;
   }
-  /* Inner content wrapper */
   .video-card > * { position: relative; z-index: 1; }
   .video-card:hover::before { opacity: 1; }
   .video-card:hover::after { opacity: 1; }
@@ -392,7 +374,6 @@
       0 0 80px rgba(0,180,255,0.06),
       0 0 0 1px rgba(0,255,150,0.2);
   }
-  /* New card glow animation */
   @keyframes cardPop {
     0%   { transform: scale(0.92); opacity: 0; }
     60%  { transform: scale(1.03); }
@@ -462,13 +443,11 @@
   .btn-edit { background: rgba(0,180,255,0.1); border: 1px solid rgba(0,180,255,0.3); color: #00b4ff; }
   .btn-del { background: rgba(255,60,60,0.1); border: 1px solid rgba(255,60,60,0.3); color: #ff6060; }
 
-  /* ===== EMPTY STATE ===== */
   #empty-state {
     grid-column: 1/-1; text-align: center; padding: 80px 0;
     color: rgba(255,255,255,0.3); font-size: 16px; display: none;
   }
 
-  /* ===== FOOTER ===== */
   footer {
     text-align: center; padding: 40px 24px;
     border-top: 1px solid rgba(255,255,255,0.05);
@@ -572,8 +551,6 @@
   </div>
 
   <div class="panel-body">
-    <div id="debug-info" style="display:none;color:#ffff00;font-size:11px;margin-bottom:14px;padding:8px;background:rgba(255,255,0,0.05);border-radius:8px;border:1px solid rgba(255,255,0,0.2);font-family:monospace;"></div>
-
     <!-- STATE 1: لا يوجد مشرف -->
     <div id="state-no-admin">
       <div class="invite-card">
@@ -589,7 +566,6 @@
           </svg>
           تسجيل الدخول كمشرف بـ Google
         </button>
-        <p style="margin-top:12px;font-size:11px;color:rgba(255,255,255,0.28);">بعد الدخول ستُفتح لوحة التحكم تلقائياً ✨</p>
       </div>
     </div>
 
@@ -634,7 +610,6 @@
         🚪 تسجيل الخروج
       </button>
     </div>
-
   </div>
 </div>
 
@@ -722,19 +697,17 @@
   </div>
 </div>
 
-<!-- ===== FIREBASE + APP SCRIPT ===== -->
 <script type="module">
   // ===== FIREBASE CONFIG =====
   const FIREBASE_CONFIG = {
     apiKey: "AIzaSyB-TFF6yvJyq21RxMD7KuAgNuVOBlXgNhY",
-    authDomain: "ginang-ca81d.firebaseapp.com", // keep original for Firebase Auth SDK
+    authDomain: "ginang-ca81d.firebaseapp.com",
     projectId: "ginang-ca81d",
     storageBucket: "ginang-ca81d.firebasestorage.app",
     messagingSenderId: "556233466817",
     appId: "1:556233466817:web:f86580ee42b9e7f0f90540",
   };
 
-  // ===== STATE =====
   let state = {
     user: null,
     isAdmin: false,
@@ -745,7 +718,6 @@
     fb: null,
   };
 
-  // ===== HELPERS =====
   function extractYouTubeId(url) {
     const regexes = [
       /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
@@ -756,11 +728,18 @@
   }
   function getThumb(id) { return `https://img.youtube.com/vi/${id}/maxresdefault.jpg`; }
 
-  // ===== UI UPDATERS =====
+  function openPanelAuto() {
+    const panel = document.getElementById('side-panel');
+    const overlay = document.getElementById('overlay');
+    if (!panel.classList.contains('open')) {
+      panel.classList.add('open');
+      overlay.style.display = 'block';
+    }
+  }
+
   window.updateUI = function() {
     const { user, isAdmin, adminExists } = state;
 
-    // Navbar gear style
     const gearBtn = document.getElementById('gear-btn');
     const gearIcon = document.getElementById('gear-icon');
     const gearDot = document.getElementById('gear-dot');
@@ -774,7 +753,6 @@
       gearDot.style.display = 'none';
     }
 
-    // Admin badge in navbar
     const badge = document.getElementById('admin-badge');
     if (isAdmin && user) {
       badge.style.display = 'flex';
@@ -784,14 +762,8 @@
       badge.style.display = 'none';
     }
 
-    // Add video button in filter bar
     document.getElementById('add-video-btn').style.display = isAdmin ? 'block' : 'none';
 
-    // Debug info
-    const dbg = document.getElementById('debug-info');
-    if (dbg) dbg.textContent = 'FB:' + (state.fb ? 'متصل✅' : 'غير متصل❌') + ' | adminExists:' + adminExists + ' | isAdmin:' + isAdmin;
-
-    // Panel states
     document.getElementById('state-no-admin').style.display = (!adminExists && !isAdmin) ? 'block' : 'none';
     document.getElementById('state-blocked').style.display = (adminExists && !isAdmin) ? 'block' : 'none';
     document.getElementById('state-is-admin').style.display = isAdmin ? 'block' : 'none';
@@ -817,7 +789,6 @@
       return true;
     });
 
-    // Clear old cards but keep empty state div
     [...grid.querySelectorAll('.video-card')].forEach(el => el.remove());
     const emptyState = document.getElementById('empty-state');
 
@@ -837,7 +808,7 @@
   function buildCard(v, isAdmin) {
     const card = document.createElement('div');
     card.className = 'video-card' + (v._isNew ? ' new-card' : '');
-    if (v._isNew) { v._isNew = false; } // reset flag
+    if (v._isNew) { v._isNew = false; }
     card.dataset.id = v.id;
 
     const thumbWrap = document.createElement('div');
@@ -904,7 +875,6 @@
     return card;
   }
 
-  // ===== PANEL =====
   window.togglePanel = function() {
     const panel = document.getElementById('side-panel');
     const overlay = document.getElementById('overlay');
@@ -917,7 +887,6 @@
     document.getElementById('overlay').style.display = 'none';
   };
 
-  // ===== FILTER =====
   window.setFilter = function(f, btn) {
     state.filter = f;
     document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -925,7 +894,6 @@
     renderVideos();
   };
 
-  // ===== ADD VIDEO MODAL =====
   window.openAddModal = function() { document.getElementById('add-modal').style.display = 'flex'; };
   window.closeAddModal = function() {
     document.getElementById('add-modal').style.display = 'none';
@@ -950,7 +918,6 @@
     el.textContent = msg; el.style.display = 'block';
   }
 
-  // ===== EDIT MODAL =====
   window.openEditModal = function(v) {
     state.editingId = v.id;
     document.getElementById('edit-title').value = v.title;
@@ -969,24 +936,18 @@
     closeEditModal();
   };
 
-  // ===== FIREBASE ACTIONS =====
   window.handleAdminLogin = async function() {
     const { fb } = state;
     if (!fb) {
+      // Demo mode
       state.adminExists = true; state.isAdmin = true;
       state.user = { displayName: 'مشرف تجريبي', photoURL: '', uid: 'demo', email: 'demo@test.com' };
       updateUI();
-      setTimeout(() => {
-        const panel = document.getElementById('side-panel');
-        const overlay = document.getElementById('overlay');
-        panel.classList.add('open');
-        overlay.style.display = 'block';
-      }, 300);
+      openPanelAuto();
       return;
     }
     try {
       const { auth, db, GoogleAuthProvider, signInWithPopup, signInWithRedirect, collection, getDocs, setDoc, doc, query, where } = fb;
-      // تحقق أولاً: هل يوجد مشرف مسجل؟
       const adminSnap = await getDocs(query(collection(db, 'users'), where('isAdmin','==',true)));
       if (!adminSnap.empty) { state.adminExists = true; updateUI(); return; }
 
@@ -994,12 +955,10 @@
       const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
 
       if (isMobile) {
-        // موبايل: استخدم Redirect دائماً (Popup محظور)
         await signInWithRedirect(auth, provider);
         return;
       }
 
-      // ديسك توب: استخدم Popup
       let result = null;
       try {
         result = await signInWithPopup(auth, provider);
@@ -1029,13 +988,7 @@
     state.user = { uid: fbUser.uid, email: fbUser.email, displayName: fbUser.displayName, photoURL: fbUser.photoURL };
     state.isAdmin = true; state.adminExists = true;
     updateUI();
-    // فتح لوحة التحكم تلقائياً بعد تسجيل الدخول
-    setTimeout(() => {
-      const panel = document.getElementById('side-panel');
-      const overlay = document.getElementById('overlay');
-      panel.classList.add('open');
-      overlay.style.display = 'block';
-    }, 300);
+    openPanelAuto();
   }
 
   window.handleSignOut = async function() {
@@ -1080,7 +1033,6 @@
     renderVideos();
   };
 
-  // ===== LOAD VIDEOS =====
   async function loadVideos(db, collection, getDocs, query, orderBy) {
     try {
       const q = query(collection(db, 'videos'), orderBy('createdAt', 'desc'));
@@ -1122,25 +1074,19 @@
       const db = getFirestore(app);
       state.fb = { auth, db, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged, collection, getDocs, addDoc, deleteDoc, doc, updateDoc, setDoc, getDoc, query, orderBy, where };
 
-      // Handle redirect result (after Google redirect on mobile)
       getRedirectResult(auth).then(async (result) => {
         if (result && result.user) {
-          // تحقق مجدداً: هل لا يزال لا يوجد مشرف؟
           const adminSnap = await getDocs(query(collection(db, 'users'), where('isAdmin','==',true)));
           if (adminSnap.empty) {
             await saveAdminUser(result.user);
-          } else {
-            // المستخدم موجود بالفعل في الـ auth — onAuthStateChanged سيتولى الأمر
           }
         }
       }).catch(e => console.error('Redirect result error:', e));
 
-      // Check if admin exists
       getDocs(query(collection(db, 'users'), where('isAdmin','==',true)))
         .then(snap => { state.adminExists = !snap.empty; updateUI(); })
         .catch(() => { state.adminExists = false; updateUI(); });
 
-      // Auth listener
       let prevIsAdmin = false;
       onAuthStateChanged(auth, async (fbUser) => {
         if (fbUser) {
@@ -1153,15 +1099,9 @@
           } catch { state.user = null; state.isAdmin = false; }
         } else { state.user = null; state.isAdmin = false; }
 
-        // فتح لوحة التحكم تلقائياً إذا سجّل الدخول لأول مرة
         if (state.isAdmin && !prevIsAdmin) {
           updateUI();
-          setTimeout(() => {
-            const panel = document.getElementById('side-panel');
-            const overlay = document.getElementById('overlay');
-            panel.classList.add('open');
-            overlay.style.display = 'block';
-          }, 400);
+          openPanelAuto();
         } else {
           updateUI();
         }
