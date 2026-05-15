@@ -631,6 +631,7 @@
     user: null,
     isAdmin: false,
     adminExists: false,
+    isBlocked: false,
     videos: [],
     filter: "all",
     editingId: null,
@@ -684,8 +685,9 @@
     if (dbg) dbg.textContent = 'FB:' + (state.fb ? 'متصل✅' : 'غير متصل❌') + ' | adminExists:' + adminExists + ' | isAdmin:' + isAdmin;
 
     // Panel states
-    document.getElementById('state-no-admin').style.display = (!adminExists && !isAdmin) ? 'block' : 'none';
-    document.getElementById('state-blocked').style.display = (adminExists && !isAdmin) ? 'block' : 'none';
+    const { isBlocked } = state;
+    document.getElementById('state-no-admin').style.display = (!adminExists && !isAdmin && !isBlocked) ? 'block' : 'none';
+    document.getElementById('state-blocked').style.display = (isBlocked && !isAdmin) ? 'block' : 'none';
     document.getElementById('state-is-admin').style.display = isAdmin ? 'block' : 'none';
 
     if (isAdmin && user) {
@@ -1025,7 +1027,7 @@
               await saveAdminUser(result.user);
             } else {
               // ليس المشرف — سجّل خروجه
-              state.adminExists = true; state.isAdmin = false; state.user = null;
+              state.adminExists = true; state.isAdmin = false; state.user = null; state.isBlocked = true;
               await signOut(auth);
               updateUI();
             }
