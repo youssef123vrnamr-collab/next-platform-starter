@@ -1055,6 +1055,7 @@
 
       // Auth listener — فقط لتحديد صلاحية المشرف
       onAuthStateChanged(auth, async (fbUser) => {
+        const wasAdmin = state.isAdmin;
         if (fbUser) {
           try {
             const userRef = doc(db, 'users', fbUser.uid);
@@ -1062,9 +1063,17 @@
             const userData = userSnap.exists() ? userSnap.data() : null;
             state.user = { uid: fbUser.uid, email: fbUser.email, displayName: fbUser.displayName, photoURL: fbUser.photoURL };
             state.isAdmin = userData?.isAdmin === true;
+            state.adminExists = true;
           } catch { state.user = null; state.isAdmin = false; }
         } else { state.user = null; state.isAdmin = false; }
         updateUI();
+        // لو المشرف سجل دخول للتو (مش كان مسجل قبل) — افتح البانيل تلقائياً
+        if (!wasAdmin && state.isAdmin) {
+          const panel = document.getElementById('side-panel');
+          const overlay = document.getElementById('overlay');
+          panel.classList.add('open');
+          overlay.style.display = 'block';
+        }
       });
     });
   }
