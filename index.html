@@ -619,7 +619,7 @@
   // ===== FIREBASE CONFIG =====
   const FIREBASE_CONFIG = {
     apiKey: "AIzaSyB-TFF6yvJyq21RxMD7KuAgNuVOBlXgNhY",
-    authDomain: "ginang-ca81d.firebaseapp.com",
+    authDomain: "ginang-ca81d.firebaseapp.com", // keep original for Firebase Auth SDK
     projectId: "ginang-ca81d",
     storageBucket: "ginang-ca81d.firebasestorage.app",
     messagingSenderId: "556233466817",
@@ -871,20 +871,26 @@
       if (!adminSnap.empty) { state.adminExists = true; updateUI(); return; }
 
       const provider = new GoogleAuthProvider();
+      const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+
+      if (isMobile) {
+        // موبايل: استخدم Redirect دائماً (Popup محظور)
+        await signInWithRedirect(auth, provider);
+        return;
+      }
+
+      // ديسك توب: استخدم Popup
       let result = null;
       try {
-        // جرب Popup أولاً (أسرع على الديسك توب)
         result = await signInWithPopup(auth, provider);
       } catch(popupErr) {
-        // لو Popup فشل (موبايل أو blocked)، استخدم Redirect
-        if (popupErr.code === 'auth/popup-blocked' || popupErr.code === 'auth/popup-closed-by-user' || popupErr.code === 'auth/cancelled-popup-request') {
+        if (popupErr.code === 'auth/popup-blocked' || popupErr.code === 'auth/popup-closed-by-user') {
           await signInWithRedirect(auth, provider);
-          return; // بيكمل في getRedirectResult
+          return;
         }
         throw popupErr;
       }
 
-      // Popup نجح — سجّل المشرف مباشرة
       if (result && result.user) {
         const freshSnap = await getDocs(query(collection(db, 'users'), where('isAdmin','==',true)));
         if (freshSnap.empty) {
