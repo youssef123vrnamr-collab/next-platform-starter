@@ -238,6 +238,19 @@
     border-radius: 10px; color: #ff6060;
     font-size: 13px; font-weight: 700; cursor: pointer;
     margin-top: 10px;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .btn-signout-google {
+    width: 100%; padding: 11px;
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 10px; color: rgba(255,255,255,0.65);
+    font-size: 13px; font-weight: 700; cursor: pointer;
+    margin-top: 8px;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: all 0.2s;
+  }
+  .btn-signout-google:hover {
+    background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2);
   }
 
   /* ===== HERO ===== */
@@ -325,40 +338,67 @@
 
   /* VIDEO CARD */
   .video-card {
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.06);
-    border-radius: 16px; overflow: hidden; transition: all 0.3s;
+    background: linear-gradient(145deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 18px; overflow: hidden; transition: all 0.35s cubic-bezier(0.4,0,0.2,1);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.05);
+    position: relative;
   }
+  .video-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0,255,150,0.4), transparent);
+    opacity: 0; transition: opacity 0.35s;
+  }
+  .video-card:hover::before { opacity: 1; }
   .video-card:hover {
-    border-color: rgba(0,255,150,0.3); transform: translateY(-4px);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.4), 0 0 20px rgba(0,255,150,0.08);
+    border-color: rgba(0,255,150,0.35); transform: translateY(-6px);
+    box-shadow: 0 24px 48px rgba(0,0,0,0.5), 0 0 30px rgba(0,255,150,0.1), inset 0 1px 0 rgba(255,255,255,0.07);
   }
   .video-thumb-wrap {
     position: relative; padding-bottom: 56.25%; background: #000;
+    border-radius: 0;
+    overflow: hidden;
   }
   .video-thumb {
     position: absolute; inset: 0; background-size: cover; background-position: center;
     cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: transform 0.3s ease;
   }
-  .video-thumb.locked { cursor: not-allowed; }
+  .video-card:hover .video-thumb:not(.locked) { transform: scale(1.03); }
+  .video-thumb.locked { cursor: not-allowed; filter: grayscale(40%) brightness(0.7); }
   .thumb-gradient {
     position: absolute; inset: 0;
-    background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 50%);
+    background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 40%, transparent 100%);
   }
   .play-btn {
-    background: rgba(0,0,0,0.7); border-radius: 50%;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(8px);
+    border-radius: 50%;
     width: 64px; height: 64px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 26px; z-index: 1; border: 3px solid rgba(255,255,255,0.7);
+    font-size: 26px; z-index: 1;
+    border: 2px solid rgba(255,255,255,0.5);
     position: relative;
+    box-shadow: 0 0 30px rgba(0,0,0,0.5);
+    transition: all 0.2s;
+  }
+  .video-card:hover .play-btn {
+    background: rgba(0,255,150,0.2);
+    border-color: #00ff96;
+    box-shadow: 0 0 25px rgba(0,255,150,0.4);
+    transform: scale(1.1);
   }
   .video-iframe {
     position: absolute; inset: 0; width: 100%; height: 100%; border: none;
   }
-  .video-info { padding: 16px; }
+  .video-info { padding: 16px 18px 18px; }
   .video-meta { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
-  .video-title { margin: 0 0 4px; color: #fff; font-size: 15px; font-weight: 700; line-height: 1.4; }
-  .video-desc { margin: 0; color: rgba(255,255,255,0.45); font-size: 12px; line-height: 1.5; }
+  .video-title { margin: 0 0 6px; color: #fff; font-size: 15px; font-weight: 700; line-height: 1.4; }
+  .video-desc {
+    margin: 0; color: rgba(255,255,255,0.45); font-size: 12px; line-height: 1.6;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  }
   .badge-locked {
     background: rgba(255,60,60,0.15); border: 1px solid rgba(255,60,60,0.3);
     border-radius: 6px; padding: 2px 8px; color: #ff6060;
@@ -429,6 +469,18 @@
     border-radius: 10px; padding: 10px 28px; color: #fff;
     font-size: 14px; font-weight: 800; cursor: pointer;
   }
+  .modal-textarea {
+    width: 100%; padding: 11px 14px;
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px; color: #fff; font-size: 13px;
+    font-family: 'Segoe UI', sans-serif; outline: none;
+    box-sizing: border-box; direction: rtl;
+    resize: vertical; min-height: 80px; max-height: 180px;
+    transition: border-color 0.2s;
+    line-height: 1.6;
+  }
+  .modal-textarea:focus { border-color: rgba(0,255,150,0.4); }
+  .modal-input:focus { border-color: rgba(0,255,150,0.4); }
 </style>
 </head>
 <body>
@@ -524,7 +576,9 @@
         <div class="tool-item" style="border-bottom:none"><span>🗑️</span><span>حذف الفيديو</span></div>
       </div>
 
-      <button class="btn-signout" onclick="handleSignOut()">تسجيل الخروج</button>
+      <button class="btn-signout" onclick="handleSignOut()">
+        🚪 تسجيل الخروج
+      </button>
     </div>
 
   </div>
@@ -585,7 +639,7 @@
     </div>
     <div class="modal-field">
       <label class="modal-label">الوصف (اختياري)</label>
-      <input id="add-desc" class="modal-input" placeholder="وصف قصير..." />
+      <textarea id="add-desc" class="modal-textarea" placeholder="وصف قصير عن الفيديو..."></textarea>
     </div>
     <p id="add-error" class="modal-error" style="display:none"></p>
     <div class="modal-btns">
@@ -605,7 +659,7 @@
     </div>
     <div class="modal-field">
       <label class="modal-label">الوصف</label>
-      <input id="edit-desc" class="modal-input" />
+      <textarea id="edit-desc" class="modal-textarea" placeholder="وصف الفيديو..."></textarea>
     </div>
     <div class="modal-btns">
       <button class="btn-cancel" onclick="closeEditModal()">إلغاء</button>
@@ -848,10 +902,14 @@
     document.getElementById('edit-desc').value = v.description || '';
     document.getElementById('edit-modal').style.display = 'flex';
   };
-  window.closeEditModal = function() { document.getElementById('edit-modal').style.display = 'none'; state.editingId = null; };
+  window.closeEditModal = function() {
+    document.getElementById('edit-modal').style.display = 'none';
+    state.editingId = null;
+  };
   window.submitEdit = async function() {
-    const title = document.getElementById('edit-title').value;
-    const desc = document.getElementById('edit-desc').value;
+    const title = document.getElementById('edit-title').value.trim();
+    const desc = document.getElementById('edit-desc').value.trim();
+    if (!title) return;
     await handleEdit(state.editingId, { title, description: desc });
     closeEditModal();
   };
@@ -862,7 +920,14 @@
     if (!fb) {
       state.adminExists = true; state.isAdmin = true;
       state.user = { displayName: 'مشرف تجريبي', photoURL: '', uid: 'demo', email: 'demo@test.com' };
-      closePanel(); updateUI(); return;
+      updateUI();
+      setTimeout(() => {
+        const panel = document.getElementById('side-panel');
+        const overlay = document.getElementById('overlay');
+        panel.classList.add('open');
+        overlay.style.display = 'block';
+      }, 300);
+      return;
     }
     try {
       const { auth, db, GoogleAuthProvider, signInWithPopup, signInWithRedirect, collection, getDocs, setDoc, doc, query, where } = fb;
@@ -908,7 +973,14 @@
     });
     state.user = { uid: fbUser.uid, email: fbUser.email, displayName: fbUser.displayName, photoURL: fbUser.photoURL };
     state.isAdmin = true; state.adminExists = true;
-    closePanel(); updateUI();
+    updateUI();
+    // فتح لوحة التحكم تلقائياً بعد تسجيل الدخول
+    setTimeout(() => {
+      const panel = document.getElementById('side-panel');
+      const overlay = document.getElementById('overlay');
+      panel.classList.add('open');
+      overlay.style.display = 'block';
+    }, 300);
   }
 
   window.handleSignOut = async function() {
@@ -1014,6 +1086,7 @@
         .catch(() => { state.adminExists = false; updateUI(); });
 
       // Auth listener
+      let prevIsAdmin = false;
       onAuthStateChanged(auth, async (fbUser) => {
         if (fbUser) {
           try {
@@ -1024,7 +1097,21 @@
             state.isAdmin = userData?.isAdmin === true;
           } catch { state.user = null; state.isAdmin = false; }
         } else { state.user = null; state.isAdmin = false; }
-        updateUI();
+
+        // فتح لوحة التحكم تلقائياً إذا سجّل الدخول لأول مرة
+        if (state.isAdmin && !prevIsAdmin) {
+          updateUI();
+          setTimeout(() => {
+            const panel = document.getElementById('side-panel');
+            const overlay = document.getElementById('overlay');
+            panel.classList.add('open');
+            overlay.style.display = 'block';
+          }, 400);
+        } else {
+          updateUI();
+        }
+        prevIsAdmin = state.isAdmin;
+
         loadVideos(db, collection, getDocs, query, orderBy);
       });
     });
