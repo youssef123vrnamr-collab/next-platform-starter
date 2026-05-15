@@ -476,7 +476,7 @@
   </div>
 
   <div class="panel-body">
-    <div id="debug-info" style="color:#ffff00;font-size:11px;margin-bottom:14px;padding:8px;background:rgba(255,255,0,0.05);border-radius:8px;border:1px solid rgba(255,255,0,0.2);font-family:monospace;"></div>
+    <div id="debug-info" style="display:none;color:#ffff00;font-size:11px;margin-bottom:14px;padding:8px;background:rgba(255,255,0,0.05);border-radius:8px;border:1px solid rgba(255,255,0,0.2);font-family:monospace;"></div>
 
     <!-- STATE 1: لا يوجد مشرف -->
     <div id="state-no-admin">
@@ -865,12 +865,33 @@
       closePanel(); updateUI(); return;
     }
     try {
-      const { auth, db, GoogleAuthProvider, signInWithPopup, signInWithRedirect, collection, getDocs, query, where } = fb;
+      const { auth, db, GoogleAuthProvider, signInWithPopup, signInWithRedirect, collection, getDocs, setDoc, doc, query, where } = fb;
+      // تحقق أولاً: هل يوجد مشرف مسجل؟
       const adminSnap = await getDocs(query(collection(db, 'users'), where('isAdmin','==',true)));
       if (!adminSnap.empty) { state.adminExists = true; updateUI(); return; }
+
       const provider = new GoogleAuthProvider();
-      await signInWithRedirect(auth, provider);
-    } catch(e) { console.error(e); }
+      let result = null;
+      try {
+        // جرب Popup أولاً (أسرع على الديسك توب)
+        result = await signInWithPopup(auth, provider);
+      } catch(popupErr) {
+        // لو Popup فشل (موبايل أو blocked)، استخدم Redirect
+        if (popupErr.code === 'auth/popup-blocked' || popupErr.code === 'auth/popup-closed-by-user' || popupErr.code === 'auth/cancelled-popup-request') {
+          await signInWithRedirect(auth, provider);
+          return; // بيكمل في getRedirectResult
+        }
+        throw popupErr;
+      }
+
+      // Popup نجح — سجّل المشرف مباشرة
+      if (result && result.user) {
+        const freshSnap = await getDocs(query(collection(db, 'users'), where('isAdmin','==',true)));
+        if (freshSnap.empty) {
+          await saveAdminUser(result.user);
+        }
+      }
+    } catch(e) { console.error('Login error:', e); }
   };
 
   async function saveAdminUser(fbUser) {
@@ -968,15 +989,18 @@
       const db = getFirestore(app);
       state.fb = { auth, db, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged, collection, getDocs, addDoc, deleteDoc, doc, updateDoc, setDoc, getDoc, query, orderBy, where };
 
-      // Handle redirect result (mobile login)
+      // Handle redirect result (after Google redirect on mobile)
       getRedirectResult(auth).then(async (result) => {
         if (result && result.user) {
+          // تحقق مجدداً: هل لا يزال لا يوجد مشرف؟
           const adminSnap = await getDocs(query(collection(db, 'users'), where('isAdmin','==',true)));
           if (adminSnap.empty) {
             await saveAdminUser(result.user);
+          } else {
+            // المستخدم موجود بالفعل في الـ auth — onAuthStateChanged سيتولى الأمر
           }
         }
-      }).catch(e => console.error(e));
+      }).catch(e => console.error('Redirect result error:', e));
 
       // Check if admin exists
       getDocs(query(collection(db, 'users'), where('isAdmin','==',true)))
