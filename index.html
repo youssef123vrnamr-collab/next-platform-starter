@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
 <title>GAMEVERSE</title>
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@700&display=swap" rel="stylesheet" />
 <style>
@@ -12,18 +12,20 @@
   ::-webkit-scrollbar-track { background: #050510; }
   ::-webkit-scrollbar-thumb { background: rgba(0,255,150,0.3); border-radius: 3px; }
   input::placeholder { color: rgba(255,255,255,0.3) !important; }
+  button { font-family: 'Segoe UI', Tahoma, sans-serif; }
 
   /* ===== NAVBAR ===== */
   #navbar {
     position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
-    background: rgba(5,5,15,0.93); backdrop-filter: blur(20px);
+    background: rgba(5,5,15,0.95); backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     border-bottom: 1px solid rgba(0,255,150,0.1);
     height: 64px; display: flex; align-items: center;
     padding: 0 24px; justify-content: space-between;
   }
   .nav-logo { display: flex; align-items: center; gap: 12px; }
   .nav-logo-icon {
-    width: 36px; height: 36px;
+    width: 36px; height: 36px; flex-shrink: 0;
     background: linear-gradient(135deg, #00ff96, #00b4ff);
     border-radius: 8px; display: flex; align-items: center; justify-content: center;
     font-size: 18px; font-weight: 900; color: #000;
@@ -43,73 +45,24 @@
   .nav-links a:hover { color: #00ff96; }
   .nav-right { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
 
-  /* ===== RESPONSIVE ===== */
-
-  /* Tablet */
-  @media (max-width: 768px) {
-    .nav-links { gap: 16px; }
-    .nav-links a { font-size: 13px; }
-    #hero { height: 360px; }
-    .hero-title { font-size: 48px; }
-    .hero-sub { font-size: 15px; }
-    #video-grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); padding: 16px; gap: 16px; }
-    #filters-bar { padding: 16px 16px 0; }
-  }
-
-  /* Mobile */
-  @media (max-width: 600px) {
-    .nav-links { display: none; }
-    #navbar { padding: 0 12px; height: 56px; }
-    .nav-logo-text { font-size: 16px; letter-spacing: 1px; }
-    .nav-logo-icon { width: 30px; height: 30px; font-size: 15px; }
-    #gear-btn { width: 44px; height: 44px; flex-shrink: 0; }
-    #admin-badge span { display: none; }
-
-    #hero { height: auto; min-height: 300px; padding: 40px 16px; margin-top: 56px; }
-    .hero-tag { font-size: 10px; letter-spacing: 3px; }
-    .hero-title { font-size: 36px; }
-    .hero-sub { font-size: 13px; margin-bottom: 24px; }
-    .hero-btn { padding: 10px 22px; font-size: 13px; }
-
-    #filters-bar { padding: 14px 12px 0; flex-direction: column; align-items: stretch; gap: 10px; }
-    .filter-btns { display: flex; }
-    .filter-btn { flex: 1; padding: 8px 4px; font-size: 12px; text-align: center; }
-    .filter-right { flex-direction: column; gap: 8px; }
-    #search-input { width: 100%; }
-    #add-video-btn { width: 100%; text-align: center; }
-
-    #video-grid { grid-template-columns: 1fr; padding: 12px; gap: 14px; }
-
-    #side-panel { width: 100%; max-width: 100%; }
-
-    .modal-box { padding: 24px 18px; border-radius: 16px; }
-    .modal-title { font-size: 18px; margin-bottom: 18px; }
-    .modal-btns { flex-direction: column-reverse; gap: 8px; }
-    .btn-cancel, .btn-confirm-add, .btn-confirm-edit { width: 100%; text-align: center; padding: 12px; }
-  }
-
-  /* Very small */
-  @media (max-width: 360px) {
-    .hero-title { font-size: 28px; }
-    .filter-btn { font-size: 11px; padding: 7px 3px; }
-    .nav-logo-text { font-size: 14px; }
-  }
-
   #admin-badge {
     display: none; align-items: center; gap: 8px;
   }
   #admin-badge img {
-    width: 30px; height: 30px; border-radius: 50%; border: 2px solid #00ff96;
+    width: 30px; height: 30px; border-radius: 50%;
+    border: 2px solid #00ff96; flex-shrink: 0;
+    object-fit: cover;
   }
-  #admin-badge span { color: #00ff96; font-size: 12px; font-weight: 700; }
+  #admin-badge span { color: #00ff96; font-size: 12px; font-weight: 700; white-space: nowrap; }
 
   /* GEAR BUTTON */
   #gear-btn {
     background: rgba(255,255,255,0.04);
     border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 10px; width: 42px; height: 42px;
+    border-radius: 10px; width: 42px; height: 42px; flex-shrink: 0;
     display: flex; align-items: center; justify-content: center;
     cursor: pointer; transition: all 0.2s; position: relative;
+    -webkit-tap-highlight-color: transparent;
   }
   #gear-btn:hover, #gear-btn.active {
     background: rgba(255,107,0,0.18);
@@ -127,7 +80,8 @@
   #overlay {
     position: fixed; inset: 0; z-index: 1998;
     background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
-    display: none;
+    -webkit-backdrop-filter: blur(4px);
+    display: none; touch-action: none;
   }
   #side-panel {
     position: fixed; top: 0; right: 0; bottom: 0;
@@ -138,6 +92,7 @@
     transform: translateX(100%);
     transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
     display: flex; flex-direction: column; overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
   #side-panel.open { transform: translateX(0); }
 
@@ -145,24 +100,37 @@
     padding: 24px 20px 20px;
     border-bottom: 1px solid rgba(0,255,150,0.1);
     display: flex; align-items: center; justify-content: space-between;
+    flex-shrink: 0;
   }
   .panel-header-left { display: flex; align-items: center; gap: 10px; }
   .panel-header-icon {
-    width: 34px; height: 34px;
+    width: 34px; height: 34px; flex-shrink: 0;
     background: linear-gradient(135deg, #ff6b00, #ff9900);
     border-radius: 8px; display: flex; align-items: center; justify-content: center;
   }
   .panel-header-title { color: #fff; font-weight: 700; font-size: 16px; }
   .panel-close {
     background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 8px; width: 34px; height: 34px;
+    border-radius: 8px; width: 34px; height: 34px; flex-shrink: 0;
     color: rgba(255,255,255,0.6); font-size: 18px;
     cursor: pointer; display: flex; align-items: center; justify-content: center;
+    -webkit-tap-highlight-color: transparent;
   }
-  .panel-body { padding: 24px 20px; flex: 1; }
+  .panel-body { padding: 20px; flex: 1; }
 
   /* Panel states */
-  #state-no-admin, #state-blocked, #state-is-admin { display: none; }
+  #state-loading, #state-no-admin, #state-blocked, #state-is-admin { display: none; }
+
+  /* Loading state */
+  .loading-card {
+    text-align: center; padding: 40px 0; color: rgba(255,255,255,0.4); font-size: 14px;
+  }
+  .loading-spinner {
+    width: 32px; height: 32px; border: 3px solid rgba(0,255,150,0.2);
+    border-top-color: #00ff96; border-radius: 50%;
+    animation: spin 0.8s linear infinite; margin: 0 auto 16px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
 
   /* No admin card */
   .invite-card {
@@ -181,7 +149,11 @@
     color: #000; font-size: 14px; font-weight: 800;
     cursor: pointer; box-shadow: 0 0 25px rgba(0,255,150,0.3);
     display: flex; align-items: center; justify-content: center; gap: 10px;
+    -webkit-tap-highlight-color: transparent;
+    transition: opacity 0.2s;
   }
+  .btn-google:active { opacity: 0.85; }
+  .btn-google:disabled { opacity: 0.6; cursor: not-allowed; }
 
   /* Blocked card */
   .blocked-card {
@@ -204,9 +176,10 @@
   .admin-profile img {
     width: 44px; height: 44px; border-radius: 50%;
     border: 2px solid #00ff96; flex-shrink: 0;
+    object-fit: cover;
   }
   .admin-profile .name { color: #fff; font-weight: 700; font-size: 14px; }
-  .admin-profile .role { color: #00ff96; font-size: 11px; font-weight: 700; letter-spacing: 1px; }
+  .admin-profile .role { color: #00ff96; font-size: 11px; font-weight: 700; letter-spacing: 1px; margin-top: 2px; }
 
   .btn-add-video {
     width: 100%; padding: 13px 16px;
@@ -215,7 +188,10 @@
     color: #000; font-size: 14px; font-weight: 800;
     cursor: pointer; margin-bottom: 10px;
     display: flex; align-items: center; justify-content: center; gap: 10px;
+    -webkit-tap-highlight-color: transparent;
+    transition: opacity 0.2s;
   }
+  .btn-add-video:active { opacity: 0.85; }
 
   .tools-box {
     background: rgba(255,255,255,0.03);
@@ -230,6 +206,7 @@
     padding: 9px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
     display: flex; align-items: center; gap: 10px;
   }
+  .tool-item:last-child { border-bottom: none; }
   .tool-item span { color: rgba(255,255,255,0.7); font-size: 13px; }
 
   .btn-signout {
@@ -238,7 +215,10 @@
     border-radius: 10px; color: #ff6060;
     font-size: 13px; font-weight: 700; cursor: pointer;
     margin-top: 10px;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 0.2s;
   }
+  .btn-signout:active { background: rgba(255,60,60,0.15); }
 
   /* ===== HERO ===== */
   #hero {
@@ -255,14 +235,14 @@
   .hero-glow-1 {
     position: absolute; width: 500px; height: 500px;
     background: radial-gradient(circle, rgba(0,180,255,0.12) 0%, transparent 70%);
-    top: -150px; left: -150px;
+    top: -150px; left: -150px; pointer-events: none;
   }
   .hero-glow-2 {
     position: absolute; width: 500px; height: 500px;
     background: radial-gradient(circle, rgba(0,255,150,0.1) 0%, transparent 70%);
-    bottom: -150px; right: -150px;
+    bottom: -150px; right: -150px; pointer-events: none;
   }
-  .hero-content { position: relative; text-align: center; z-index: 1; }
+  .hero-content { position: relative; text-align: center; z-index: 1; padding: 0 16px; }
   .hero-tag {
     font-size: 11px; letter-spacing: 6px; font-weight: 700;
     color: #00ff96; margin-bottom: 16px;
@@ -271,7 +251,9 @@
     font-size: 64px; font-weight: 900; margin: 0 0 16px;
     font-family: 'Rajdhani', sans-serif;
     background: linear-gradient(135deg, #fff 0%, #00ff96 50%, #00b4ff 100%);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1.1;
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.1;
   }
   .hero-sub {
     color: rgba(255,255,255,0.55); font-size: 18px; margin: 0 0 32px;
@@ -282,6 +264,7 @@
     border-radius: 10px; color: #000; font-weight: 800; font-size: 15px;
     display: inline-block; box-shadow: 0 0 30px rgba(0,255,150,0.35);
     cursor: pointer; border: none;
+    -webkit-tap-highlight-color: transparent;
   }
 
   /* ===== FILTERS ===== */
@@ -290,13 +273,15 @@
     display: flex; gap: 12px; align-items: center;
     flex-wrap: wrap; justify-content: space-between;
   }
-  .filter-btns { display: flex; gap: 8px; }
+  .filter-btns { display: flex; gap: 8px; flex-wrap: wrap; }
   .filter-btn {
     background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
     border-radius: 8px; padding: 8px 18px;
     color: rgba(255,255,255,0.6); font-size: 13px; font-weight: 600;
-    cursor: pointer; font-family: 'Segoe UI', sans-serif;
+    cursor: pointer;
     transition: all 0.2s;
+    -webkit-tap-highlight-color: transparent;
+    white-space: nowrap;
   }
   .filter-btn.active {
     background: linear-gradient(135deg, #00ff96, #00b4ff);
@@ -308,12 +293,15 @@
     border: 1px solid rgba(255,255,255,0.1); border-radius: 10px;
     color: #fff; font-size: 13px; width: 200px;
     font-family: 'Segoe UI', sans-serif; outline: none;
+    -webkit-appearance: none;
   }
   #add-video-btn {
     background: linear-gradient(135deg, #00ff96, #00b4ff); border: none;
     border-radius: 10px; padding: 9px 20px; color: #000;
     font-size: 13px; font-weight: 800; cursor: pointer;
     box-shadow: 0 0 20px rgba(0,255,150,0.3); display: none;
+    white-space: nowrap;
+    -webkit-tap-highlight-color: transparent;
   }
 
   /* ===== VIDEO GRID ===== */
@@ -339,6 +327,7 @@
   .video-thumb {
     position: absolute; inset: 0; background-size: cover; background-position: center;
     cursor: pointer; display: flex; align-items: center; justify-content: center;
+    -webkit-tap-highlight-color: transparent;
   }
   .video-thumb.locked { cursor: not-allowed; }
   .thumb-gradient {
@@ -362,7 +351,7 @@
   .badge-locked {
     background: rgba(255,60,60,0.15); border: 1px solid rgba(255,60,60,0.3);
     border-radius: 6px; padding: 2px 8px; color: #ff6060;
-    font-size: 11px; font-weight: 700; white-space: nowrap;
+    font-size: 11px; font-weight: 700; white-space: nowrap; flex-shrink: 0;
   }
   .admin-actions {
     margin-top: 12px; padding-top: 12px;
@@ -370,9 +359,13 @@
     display: flex; gap: 8px; flex-wrap: wrap;
   }
   .act-btn {
-    border-radius: 6px; padding: 5px 10px;
-    font-size: 11px; font-weight: 700; cursor: pointer; font-family: 'Segoe UI', sans-serif;
+    border-radius: 6px; padding: 7px 12px;
+    font-size: 12px; font-weight: 700; cursor: pointer;
+    font-family: 'Segoe UI', sans-serif;
+    -webkit-tap-highlight-color: transparent;
+    transition: opacity 0.2s;
   }
+  .act-btn:active { opacity: 0.75; }
   .btn-lock { background: rgba(255,165,0,0.1); border: 1px solid rgba(255,165,0,0.3); color: #ffa500; }
   .btn-unlock { background: rgba(0,255,150,0.1); border: 1px solid rgba(0,255,150,0.3); color: #00ff96; }
   .btn-edit { background: rgba(0,180,255,0.1); border: 1px solid rgba(0,180,255,0.3); color: #00b4ff; }
@@ -396,38 +389,113 @@
   .modal-overlay {
     position: fixed; inset: 0; z-index: 9999;
     background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     display: flex; align-items: center; justify-content: center;
+    padding: 16px;
   }
   .modal-box {
     background: linear-gradient(135deg, #0d0d2b, #0a1628);
-    border-radius: 20px; padding: 36px; width: 460px; max-width: 95vw;
+    border-radius: 20px; padding: 32px; width: 460px; max-width: 100%;
+    max-height: 90vh; overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
-  .modal-title { color: #fff; margin: 0 0 24px; font-size: 22px; }
+  .modal-title { color: #fff; margin: 0 0 24px; font-size: 20px; }
   .modal-field { margin-bottom: 16px; }
   .modal-label { display: block; color: rgba(255,255,255,0.6); font-size: 13px; margin-bottom: 6px; }
   .modal-input {
     width: 100%; padding: 11px 14px;
     background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 10px; color: #fff; font-size: 13px;
+    border-radius: 10px; color: #fff; font-size: 14px;
     font-family: 'Segoe UI', sans-serif; outline: none;
-    box-sizing: border-box; direction: rtl;
+    direction: rtl; -webkit-appearance: none;
+    transition: border-color 0.2s;
   }
-  .modal-error { color: #ff6060; font-size: 13px; margin: 0 0 16px; }
+  .modal-input:focus { border-color: rgba(0,255,150,0.4); }
+  .modal-error { color: #ff6060; font-size: 13px; margin: 0 0 16px; display: none; }
   .modal-btns { display: flex; gap: 12px; justify-content: flex-end; }
   .btn-cancel {
     background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
     border-radius: 10px; padding: 10px 24px; color: rgba(255,255,255,0.6);
     font-size: 14px; cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
   }
   .btn-confirm-add {
     background: linear-gradient(135deg, #00ff96, #00b4ff); border: none;
     border-radius: 10px; padding: 10px 28px; color: #000;
     font-size: 14px; font-weight: 800; cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
   }
   .btn-confirm-edit {
     background: linear-gradient(135deg, #00b4ff, #0066ff); border: none;
     border-radius: 10px; padding: 10px 28px; color: #fff;
     font-size: 14px; font-weight: 800; cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* ===== TOAST ===== */
+  #toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px);
+    background: rgba(0,255,150,0.15); border: 1px solid rgba(0,255,150,0.3);
+    color: #00ff96; font-size: 13px; font-weight: 700;
+    padding: 10px 20px; border-radius: 10px; z-index: 99999;
+    transition: transform 0.3s ease; white-space: nowrap;
+  }
+  #toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* ===== RESPONSIVE ===== */
+
+  /* Tablet */
+  @media (max-width: 768px) {
+    .nav-links { gap: 16px; }
+    .nav-links a { font-size: 13px; }
+    #hero { height: 360px; }
+    .hero-title { font-size: 48px; }
+    .hero-sub { font-size: 15px; }
+    #video-grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); padding: 16px; gap: 16px; }
+    #filters-bar { padding: 16px 16px 0; }
+  }
+
+  /* Mobile */
+  @media (max-width: 600px) {
+    .nav-links { display: none; }
+    #navbar { padding: 0 12px; height: 56px; }
+    .nav-logo-text { font-size: 16px; letter-spacing: 1px; }
+    .nav-logo-icon { width: 30px; height: 30px; font-size: 15px; }
+    #gear-btn { width: 44px; height: 44px; }
+    #admin-badge span { display: none; }
+    #admin-badge img { width: 28px; height: 28px; }
+
+    #hero { height: auto; min-height: 280px; padding: 48px 16px 40px; margin-top: 56px; }
+    .hero-tag { font-size: 10px; letter-spacing: 3px; }
+    .hero-title { font-size: 38px; }
+    .hero-sub { font-size: 13px; margin-bottom: 24px; }
+    .hero-btn { padding: 10px 22px; font-size: 13px; }
+
+    #filters-bar { padding: 14px 12px 0; flex-direction: column; align-items: stretch; gap: 10px; }
+    .filter-btns { display: flex; gap: 6px; }
+    .filter-btn { flex: 1; padding: 8px 4px; font-size: 12px; text-align: center; }
+    .filter-right { flex-direction: row; gap: 8px; }
+    #search-input { flex: 1; width: auto; min-width: 0; }
+    #add-video-btn { white-space: nowrap; }
+
+    #video-grid { grid-template-columns: 1fr; padding: 12px; gap: 14px; }
+
+    #side-panel { width: 100%; max-width: 100%; }
+
+    .modal-box { padding: 24px 18px; border-radius: 16px; }
+    .modal-title { font-size: 18px; margin-bottom: 18px; }
+    .modal-btns { flex-direction: column-reverse; gap: 8px; }
+    .btn-cancel, .btn-confirm-add, .btn-confirm-edit { width: 100%; text-align: center; padding: 12px; }
+
+    .admin-actions { gap: 6px; }
+    .act-btn { padding: 8px 10px; font-size: 12px; }
+  }
+
+  /* Very small */
+  @media (max-width: 360px) {
+    .hero-title { font-size: 30px; }
+    .filter-btn { font-size: 11px; padding: 7px 3px; }
+    .nav-logo-text { font-size: 14px; }
   }
 </style>
 </head>
@@ -446,10 +514,10 @@
   </div>
   <div class="nav-right">
     <div id="admin-badge">
-      <img id="admin-avatar" src="" alt="" />
+      <img id="admin-avatar" src="" alt="صورة المشرف" />
       <span id="admin-name">👑</span>
     </div>
-    <button id="gear-btn" onclick="togglePanel()" title="لوحة المشرف">
+    <button id="gear-btn" onclick="togglePanel()" title="لوحة المشرف" aria-label="فتح لوحة التحكم">
       <svg width="18" height="18" viewBox="0 0 24 24" id="gear-icon" fill="rgba(255,255,255,0.35)">
         <path d="M19.14 12.94c.04-.3.06-.61.06-.94s-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96a7.02 7.02 0 0 0-1.62-.94l-.36-2.54A.484.484 0 0 0 14 2h-4a.484.484 0 0 0-.48.41l-.36 2.54a7.02 7.02 0 0 0-1.62.94l-2.39-.96a.48.48 0 0 0-.59.22L2.74 8.47a.47.47 0 0 0 .12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.47.47 0 0 0-.12.61l1.92 3.32c.12.22.37.3.59.22l2.39-.96c.5.36 1.04.67 1.62.94l.36 2.54c.05.28.3.48.48.48h4c.28 0 .47-.2.48-.48l.36-2.54a7.02 7.02 0 0 0 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32a.47.47 0 0 0-.12-.61l-2.03-1.58zM12 15.6A3.6 3.6 0 1 1 12 8.4a3.6 3.6 0 0 1 0 7.2z"/>
       </svg>
@@ -462,7 +530,7 @@
 <div id="overlay" onclick="closePanel()"></div>
 
 <!-- ===== SIDE PANEL ===== -->
-<div id="side-panel">
+<div id="side-panel" role="dialog" aria-label="لوحة التحكم">
   <div class="panel-header">
     <div class="panel-header-left">
       <div class="panel-header-icon">
@@ -472,11 +540,18 @@
       </div>
       <span class="panel-header-title">لوحة التحكم</span>
     </div>
-    <button class="panel-close" onclick="closePanel()">✕</button>
+    <button class="panel-close" onclick="closePanel()" aria-label="إغلاق">✕</button>
   </div>
 
   <div class="panel-body">
-    <div id="debug-info" style="display:none;color:#ffff00;font-size:11px;margin-bottom:14px;padding:8px;background:rgba(255,255,0,0.05);border-radius:8px;border:1px solid rgba(255,255,0,0.2);font-family:monospace;"></div>
+
+    <!-- STATE: Loading -->
+    <div id="state-loading">
+      <div class="loading-card">
+        <div class="loading-spinner"></div>
+        <div>جاري التحميل...</div>
+      </div>
+    </div>
 
     <!-- STATE 1: لا يوجد مشرف -->
     <div id="state-no-admin">
@@ -484,7 +559,7 @@
         <div class="crown">👑</div>
         <h3>لا يوجد مشرف بعد!</h3>
         <p>أنت أول شخص هنا.<br />سجّل دخولك لتصبح المشرف الوحيد للمنصة.</p>
-        <button class="btn-google" onclick="handleAdminLogin()">
+        <button class="btn-google" id="login-btn" onclick="handleAdminLogin()">
           <svg width="18" height="18" viewBox="0 0 24 24">
             <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
             <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
@@ -500,7 +575,7 @@
     <div id="state-blocked">
       <div class="blocked-card">
         <div class="lock-icon">🔐</div>
-        <h3>المنصة محمية</h3>
+        <h3>لا توجد صلاحيات كافية</h3>
         <p>هذه المنصة لها مشرف بالفعل.<br />لا يمكن إضافة مشرف آخر.</p>
       </div>
     </div>
@@ -508,7 +583,7 @@
     <!-- STATE 3: المستخدم الحالي هو المشرف -->
     <div id="state-is-admin">
       <div class="admin-profile">
-        <img id="panel-avatar" src="" alt="" />
+        <img id="panel-avatar" src="" alt="صورة المشرف" />
         <div>
           <div class="name" id="panel-name">—</div>
           <div class="role">👑 مشرف المنصة</div>
@@ -521,7 +596,7 @@
         <div class="tools-title">أدوات المشرف على كل فيديو</div>
         <div class="tool-item"><span>🔒</span><span>قفل / فتح الفيديو</span></div>
         <div class="tool-item"><span>✏️</span><span>تعديل العنوان والوصف</span></div>
-        <div class="tool-item" style="border-bottom:none"><span>🗑️</span><span>حذف الفيديو</span></div>
+        <div class="tool-item"><span>🗑️</span><span>حذف الفيديو</span></div>
       </div>
 
       <button class="btn-signout" onclick="handleSignOut()">تسجيل الخروج</button>
@@ -548,9 +623,9 @@
 <!-- ===== FILTERS BAR ===== -->
 <div id="filters-bar">
   <div class="filter-btns">
-    <button class="filter-btn active" data-filter="all" onclick="setFilter('all',this)">الكل</button>
-    <button class="filter-btn" data-filter="unlocked" onclick="setFilter('unlocked',this)">🔓 مفتوح</button>
-    <button class="filter-btn" data-filter="locked" onclick="setFilter('locked',this)">🔒 مقفول</button>
+    <button class="filter-btn active" onclick="setFilter('all',this)">الكل</button>
+    <button class="filter-btn" onclick="setFilter('unlocked',this)">🔓 مفتوح</button>
+    <button class="filter-btn" onclick="setFilter('locked',this)">🔒 مقفول</button>
   </div>
   <div class="filter-right">
     <input id="search-input" placeholder="بحث عن فيديو..." oninput="renderVideos()" />
@@ -572,22 +647,24 @@
 </footer>
 
 <!-- ===== ADD VIDEO MODAL ===== -->
-<div id="add-modal" class="modal-overlay" style="display:none">
-  <div class="modal-box" style="border:1px solid rgba(0,255,150,0.25)">
+<div id="add-modal" class="modal-overlay" style="display:none" onclick="handleModalOutsideClick(event,'add-modal')">
+  <div class="modal-box" style="border:1px solid rgba(0,255,150,0.25)" onclick="event.stopPropagation()">
     <h2 class="modal-title">🎬 إضافة فيديو جديد</h2>
     <div class="modal-field">
       <label class="modal-label">رابط يوتيوب *</label>
-      <input id="add-url" class="modal-input" placeholder="https://www.youtube.com/watch?v=..." oninput="clearAddError()" />
+      <input id="add-url" class="modal-input" type="url" inputmode="url"
+             placeholder="https://www.youtube.com/watch?v=..." oninput="clearAddError()" />
     </div>
     <div class="modal-field">
       <label class="modal-label">عنوان الفيديو *</label>
-      <input id="add-title" class="modal-input" placeholder="اسم الفيديو" oninput="clearAddError()" />
+      <input id="add-title" class="modal-input" type="text"
+             placeholder="اسم الفيديو" oninput="clearAddError()" />
     </div>
     <div class="modal-field">
       <label class="modal-label">الوصف (اختياري)</label>
-      <input id="add-desc" class="modal-input" placeholder="وصف قصير..." />
+      <input id="add-desc" class="modal-input" type="text" placeholder="وصف قصير..." />
     </div>
-    <p id="add-error" class="modal-error" style="display:none"></p>
+    <p id="add-error" class="modal-error"></p>
     <div class="modal-btns">
       <button class="btn-cancel" onclick="closeAddModal()">إلغاء</button>
       <button class="btn-confirm-add" onclick="submitAddVideo()">إضافة ✓</button>
@@ -596,16 +673,16 @@
 </div>
 
 <!-- ===== EDIT VIDEO MODAL ===== -->
-<div id="edit-modal" class="modal-overlay" style="display:none">
-  <div class="modal-box" style="border:1px solid rgba(0,180,255,0.25)">
+<div id="edit-modal" class="modal-overlay" style="display:none" onclick="handleModalOutsideClick(event,'edit-modal')">
+  <div class="modal-box" style="border:1px solid rgba(0,180,255,0.25)" onclick="event.stopPropagation()">
     <h2 class="modal-title">✏ تعديل الفيديو</h2>
     <div class="modal-field">
       <label class="modal-label">العنوان</label>
-      <input id="edit-title" class="modal-input" />
+      <input id="edit-title" class="modal-input" type="text" />
     </div>
     <div class="modal-field">
       <label class="modal-label">الوصف</label>
-      <input id="edit-desc" class="modal-input" />
+      <input id="edit-desc" class="modal-input" type="text" />
     </div>
     <div class="modal-btns">
       <button class="btn-cancel" onclick="closeEditModal()">إلغاء</button>
@@ -613,6 +690,9 @@
     </div>
   </div>
 </div>
+
+<!-- ===== TOAST ===== -->
+<div id="toast"></div>
 
 <!-- ===== FIREBASE + APP SCRIPT ===== -->
 <script type="module">
@@ -637,10 +717,12 @@
     editingId: null,
     fb: null,
     initialized: false,
+    fbLoading: true,
   };
 
   // ===== HELPERS =====
   function extractYouTubeId(url) {
+    if (!url) return null;
     const regexes = [
       /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
       /youtube\.com\/shorts\/([^&\n?#]+)/
@@ -650,9 +732,28 @@
   }
   function getThumb(id) { return `https://img.youtube.com/vi/${id}/maxresdefault.jpg`; }
 
+  // ===== TOAST =====
+  window.showToast = function(msg, color = '#00ff96') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.style.color = color;
+    t.style.borderColor = color + '55';
+    t.style.background = color + '18';
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  };
+
+  // ===== MODAL OUTSIDE CLICK =====
+  window.handleModalOutsideClick = function(e, id) {
+    if (e.target.id === id) {
+      if (id === 'add-modal') closeAddModal();
+      else closeEditModal();
+    }
+  };
+
   // ===== UI UPDATERS =====
   window.updateUI = function() {
-    const { user, isAdmin, adminExists } = state;
+    const { user, isAdmin, adminExists, isBlocked, fbLoading } = state;
 
     // Navbar gear style
     const gearBtn = document.getElementById('gear-btn');
@@ -672,33 +773,29 @@
     const badge = document.getElementById('admin-badge');
     if (isAdmin && user) {
       badge.style.display = 'flex';
-      document.getElementById('admin-avatar').src = user.photoURL || '';
+      const av = document.getElementById('admin-avatar');
+      av.src = user.photoURL || '';
       document.getElementById('admin-name').textContent = '👑 ' + (user.displayName || '').split(' ')[0];
     } else {
       badge.style.display = 'none';
     }
 
-    // Add video button in filter bar
+    // Add video button
     document.getElementById('add-video-btn').style.display = isAdmin ? 'block' : 'none';
 
-    // Debug info
-    const dbg = document.getElementById('debug-info');
-    if (dbg) dbg.textContent = 'FB:' + (state.fb ? 'متصل✅' : 'غير متصل❌') + ' | adminExists:' + adminExists + ' | isAdmin:' + isAdmin;
+    // Panel states
+    const loading = fbLoading && !isAdmin && !isBlocked;
+    const noAdmin  = !fbLoading && !adminExists && !isAdmin && !isBlocked;
+    const showBlocked = !fbLoading && !isAdmin && isBlocked;
 
-    // Panel states — مش بنعرض حاجة غلط لو Firebase لسه بيتحمل
-    const { isBlocked } = state;
-    const noAdmin  = !adminExists && !isAdmin && !isBlocked;
-    const showBlocked = !isAdmin && isBlocked;
-    // لو isAdmin true: اظهر لوحة المشرف
-    // لو مفيش مشرف خالص: اظهر "ادخل كمشرف"
-    // لو فيه مشرف وهو مش هو ومـblocked: اظهر "محمية"
-    // في أي حالة تانية (لسه بيتحمل): ماظهرش حاجة
+    document.getElementById('state-loading').style.display   = loading ? 'block' : 'none';
     document.getElementById('state-no-admin').style.display  = (!isAdmin && noAdmin) ? 'block' : 'none';
-    document.getElementById('state-blocked').style.display   = (!isAdmin && showBlocked) ? 'block' : 'none';
+    document.getElementById('state-blocked').style.display   = showBlocked ? 'block' : 'none';
     document.getElementById('state-is-admin').style.display  = isAdmin ? 'block' : 'none';
 
     if (isAdmin && user) {
-      document.getElementById('panel-avatar').src = user.photoURL || '';
+      const av = document.getElementById('panel-avatar');
+      av.src = user.photoURL || '';
       document.getElementById('panel-name').textContent = user.displayName || '';
     }
 
@@ -707,18 +804,17 @@
 
   window.renderVideos = function() {
     const grid = document.getElementById('video-grid');
-    const search = document.getElementById('search-input').value.toLowerCase();
+    const search = (document.getElementById('search-input').value || '').toLowerCase();
     const filter = state.filter;
     const isAdmin = state.isAdmin;
 
     let filtered = state.videos.filter(v => {
       if (filter === 'locked' && !v.locked) return false;
       if (filter === 'unlocked' && v.locked) return false;
-      if (search && !v.title.toLowerCase().includes(search)) return false;
+      if (search && !(v.title || '').toLowerCase().includes(search) && !(v.description || '').toLowerCase().includes(search)) return false;
       return true;
     });
 
-    // Clear old cards but keep empty state div
     [...grid.querySelectorAll('.video-card')].forEach(el => el.remove());
     const emptyState = document.getElementById('empty-state');
 
@@ -728,7 +824,8 @@
     } else if (filtered.length === 0) {
       emptyState.style.display = 'block';
       document.getElementById('empty-text').textContent =
-        'لا توجد فيديوهات حتى الآن' + (isAdmin ? ' — ابدأ بإضافة فيديو!' : '');
+        search ? 'لا توجد نتائج للبحث' :
+        (isAdmin ? 'لا توجد فيديوهات — ابدأ بإضافة فيديو! 🎬' : 'لا توجد فيديوهات حتى الآن');
     } else {
       emptyState.style.display = 'none';
       filtered.forEach(v => {
@@ -749,6 +846,7 @@
     const thumb = document.createElement('div');
     thumb.className = 'video-thumb' + (v.locked ? ' locked' : '');
     thumb.style.backgroundImage = `url(${getThumb(v.youtubeId)})`;
+
     if (!v.locked) {
       thumb.onclick = () => {
         const iframe = document.createElement('iframe');
@@ -770,7 +868,7 @@
     const info = document.createElement('div'); info.className = 'video-info';
     const meta = document.createElement('div'); meta.className = 'video-meta';
     const textDiv = document.createElement('div'); textDiv.style.flex = '1';
-    const titleEl = document.createElement('h3'); titleEl.className = 'video-title'; titleEl.textContent = v.title;
+    const titleEl = document.createElement('h3'); titleEl.className = 'video-title'; titleEl.textContent = v.title || '—';
     textDiv.appendChild(titleEl);
     if (v.description) {
       const descEl = document.createElement('p'); descEl.className = 'video-desc'; descEl.textContent = v.description;
@@ -812,13 +910,30 @@
     const panel = document.getElementById('side-panel');
     const overlay = document.getElementById('overlay');
     const isOpen = panel.classList.contains('open');
-    if (isOpen) { panel.classList.remove('open'); overlay.style.display = 'none'; }
-    else { panel.classList.add('open'); overlay.style.display = 'block'; }
+    if (isOpen) {
+      panel.classList.remove('open');
+      overlay.style.display = 'none';
+      document.body.style.overflow = '';
+    } else {
+      panel.classList.add('open');
+      overlay.style.display = 'block';
+      document.body.style.overflow = 'hidden';
+    }
   };
   window.closePanel = function() {
     document.getElementById('side-panel').classList.remove('open');
     document.getElementById('overlay').style.display = 'none';
+    document.body.style.overflow = '';
   };
+
+  // Close on Escape
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      closePanel();
+      closeAddModal();
+      closeEditModal();
+    }
+  });
 
   // ===== FILTER =====
   window.setFilter = function(f, btn) {
@@ -829,24 +944,36 @@
   };
 
   // ===== ADD VIDEO MODAL =====
-  window.openAddModal = function() { document.getElementById('add-modal').style.display = 'flex'; };
+  window.openAddModal = function() {
+    document.getElementById('add-modal').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => document.getElementById('add-url').focus(), 100);
+  };
   window.closeAddModal = function() {
     document.getElementById('add-modal').style.display = 'none';
     document.getElementById('add-url').value = '';
     document.getElementById('add-title').value = '';
     document.getElementById('add-desc').value = '';
     clearAddError();
+    document.body.style.overflow = '';
   };
-  window.clearAddError = function() { document.getElementById('add-error').style.display = 'none'; };
+  window.clearAddError = function() {
+    const el = document.getElementById('add-error');
+    el.textContent = ''; el.style.display = 'none';
+  };
   window.submitAddVideo = async function() {
-    const url = document.getElementById('add-url').value;
-    const title = document.getElementById('add-title').value.trim();
-    const desc = document.getElementById('add-desc').value.trim();
+    const url = (document.getElementById('add-url').value || '').trim();
+    const title = (document.getElementById('add-title').value || '').trim();
+    const desc = (document.getElementById('add-desc').value || '').trim();
     const id = extractYouTubeId(url);
-    if (!id) { showAddError('رابط يوتيوب غير صحيح'); return; }
+    if (!id) { showAddError('رابط يوتيوب غير صحيح — تأكد من النسخ الصحيح'); return; }
     if (!title) { showAddError('أدخل عنواناً للفيديو'); return; }
+    const btn = document.querySelector('.btn-confirm-add');
+    btn.disabled = true; btn.textContent = '⏳ جاري الإضافة...';
     await handleAddVideo({ youtubeId: id, title, description: desc, locked: false });
+    btn.disabled = false; btn.textContent = 'إضافة ✓';
     closeAddModal();
+    showToast('✅ تم إضافة الفيديو بنجاح');
   };
   function showAddError(msg) {
     const el = document.getElementById('add-error');
@@ -856,87 +983,117 @@
   // ===== EDIT MODAL =====
   window.openEditModal = function(v) {
     state.editingId = v.id;
-    document.getElementById('edit-title').value = v.title;
+    document.getElementById('edit-title').value = v.title || '';
     document.getElementById('edit-desc').value = v.description || '';
     document.getElementById('edit-modal').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => document.getElementById('edit-title').focus(), 100);
   };
-  window.closeEditModal = function() { document.getElementById('edit-modal').style.display = 'none'; state.editingId = null; };
+  window.closeEditModal = function() {
+    document.getElementById('edit-modal').style.display = 'none';
+    state.editingId = null;
+    document.body.style.overflow = '';
+  };
   window.submitEdit = async function() {
-    const title = document.getElementById('edit-title').value;
-    const desc = document.getElementById('edit-desc').value;
+    const title = (document.getElementById('edit-title').value || '').trim();
+    const desc = (document.getElementById('edit-desc').value || '').trim();
+    if (!title) { alert('العنوان مطلوب'); return; }
+    const btn = document.querySelector('.btn-confirm-edit');
+    btn.disabled = true; btn.textContent = '⏳ حفظ...';
     await handleEdit(state.editingId, { title, description: desc });
+    btn.disabled = false; btn.textContent = 'حفظ ✓';
     closeEditModal();
+    showToast('✅ تم تعديل الفيديو بنجاح');
   };
 
   // ===== FIREBASE ACTIONS =====
   window.handleAdminLogin = async function() {
     const { fb } = state;
     if (!fb) {
+      // Demo mode
       state.adminExists = true; state.isAdmin = true;
       state.user = { displayName: 'مشرف تجريبي', photoURL: '', uid: 'demo', email: 'demo@test.com' };
       closePanel(); updateUI(); return;
     }
+
+    const loginBtn = document.getElementById('login-btn');
+    if (loginBtn) { loginBtn.disabled = true; loginBtn.textContent = '⏳ جاري تسجيل الدخول...'; }
+
     try {
       const { auth, db, GoogleAuthProvider, signInWithPopup, signInWithRedirect, collection, getDocs, getDoc, setDoc, doc, query, where } = fb;
-
       const provider = new GoogleAuthProvider();
       const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
       if (isMobile) {
-        // موبايل: روح على Redirect مباشرة
+        // موبايل: استخدم Redirect
         await signInWithRedirect(auth, provider);
-        return; // بيكمل في getRedirectResult بعد رجوع الصفحة
+        return;
       }
 
-      // ديسك توب: جرب Popup
+      // ديسك توب: Popup
       try {
         const result = await signInWithPopup(auth, provider);
         if (result && result.user) {
-          const userRef = doc(db, 'users', result.user.uid);
-          const userSnap = await getDoc(userRef);
-          if (!userSnap.exists()) {
-            const adminSnap = await getDocs(query(collection(db, 'users'), where('isAdmin','==',true)));
-            if (adminSnap.empty) {
-              await saveAdminUser(result.user);
-            } else {
-              state.adminExists = true; state.isAdmin = false; state.user = null;
-              await fb.signOut(auth);
-              updateUI();
-            }
-          }
-          // لو موجود، onAuthStateChanged هيتعامل معاه
+          await handleLoginResult(result.user, { db, collection, getDocs, getDoc, setDoc, doc, query, where, auth, signInWithPopup, signInWithRedirect });
         }
-      } catch(popupErr) {
+      } catch (popupErr) {
+        if (loginBtn) { loginBtn.disabled = false; loginBtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>ادخل كمشرف بـ Google'; }
         if (popupErr.code === 'auth/popup-blocked' || popupErr.code === 'auth/cancelled-popup-request') {
           await signInWithRedirect(auth, provider);
           return;
         }
-        throw popupErr;
+        if (popupErr.code !== 'auth/popup-closed-by-user') {
+          console.error('Login error:', popupErr);
+          showToast('❌ حدث خطأ في تسجيل الدخول', '#ff6060');
+        }
       }
-    } catch(e) { console.error('Login error:', e); }
+    } catch(e) {
+      console.error('Login error:', e);
+      if (loginBtn) { loginBtn.disabled = false; }
+      showToast('❌ حدث خطأ في تسجيل الدخول', '#ff6060');
+    }
   };
 
-  async function loginExistingAdmin(fbUser) {
-    // onAuthStateChanged هيشتغل تلقائياً ويفتح البانيل — مش محتاجين نعمل حاجة هنا
-    // بس نخلي state جاهز عشان wasAdmin يتحسب صح
-    state.adminExists = true;
+  async function handleLoginResult(fbUser, deps) {
+    const { db, collection, getDocs, getDoc, setDoc, doc, query, where, auth, signInWithRedirect } = deps;
+    try {
+      const userRef = doc(db, 'users', fbUser.uid);
+      const userSnap = await getDoc(userRef);
+      if (!userSnap.exists()) {
+        const adminSnap = await getDocs(query(collection(db, 'users'), where('isAdmin','==',true)));
+        if (adminSnap.empty) {
+          await saveAdminUser(fbUser);
+        } else {
+          state.adminExists = true; state.isAdmin = false; state.user = null; state.isBlocked = true;
+          const { signOut } = state.fb;
+          await signOut(auth);
+          updateUI();
+        }
+      }
+      // لو موجود، onAuthStateChanged هيتعامل معاه
+    } catch(e) {
+      console.error('handleLoginResult error:', e);
+    }
   }
 
   async function saveAdminUser(fbUser) {
     const { db, doc, setDoc } = state.fb;
     await setDoc(doc(db, 'users', fbUser.uid), {
-      email: fbUser.email, displayName: fbUser.displayName,
-      photoURL: fbUser.photoURL, isAdmin: true, createdAt: new Date(),
+      email: fbUser.email,
+      displayName: fbUser.displayName,
+      photoURL: fbUser.photoURL,
+      isAdmin: true,
+      createdAt: new Date(),
     });
-    // onAuthStateChanged هيشتغل تلقائياً بعد الـ setDoc ويكتشف إن الـ user مشرف
     state.adminExists = true;
   }
 
   window.handleSignOut = async function() {
     const { fb } = state;
     if (fb) await fb.signOut(fb.auth);
-    state.user = null; state.isAdmin = false;
+    state.user = null; state.isAdmin = false; state.isBlocked = false;
     closePanel(); updateUI();
+    showToast('👋 تم تسجيل الخروج');
   };
 
   window.handleAddVideo = async function(videoData) {
@@ -956,15 +1113,18 @@
     if (fb) await fb.deleteDoc(fb.doc(fb.db, 'videos', id));
     state.videos = state.videos.filter(v => v.id !== id);
     renderVideos();
+    showToast('🗑 تم حذف الفيديو');
   };
 
   window.handleToggleLock = async function(id) {
     const { fb } = state;
     const video = state.videos.find(v => v.id === id);
+    if (!video) return;
     const newLocked = !video.locked;
     if (fb) await fb.updateDoc(fb.doc(fb.db, 'videos', id), { locked: newLocked });
     state.videos = state.videos.map(v => v.id === id ? { ...v, locked: newLocked } : v);
     renderVideos();
+    showToast(newLocked ? '🔒 تم قفل الفيديو' : '🔓 تم فتح الفيديو');
   };
 
   window.handleEdit = async function(id, updates) {
@@ -994,7 +1154,7 @@
   }
 
   // ===== INIT =====
-  const configured = FIREBASE_CONFIG.apiKey !== 'YOUR_API_KEY';
+  const configured = FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.apiKey !== 'YOUR_API_KEY';
 
   if (!configured) {
     // Demo mode
@@ -1005,8 +1165,13 @@
     ];
     state.adminExists = false;
     state.initialized = true;
+    state.fbLoading = false;
     updateUI();
   } else {
+    // Show loading immediately
+    state.fbLoading = true;
+    updateUI();
+
     Promise.all([
       import('https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js'),
       import('https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js'),
@@ -1019,76 +1184,86 @@
       const app = initializeApp(FIREBASE_CONFIG);
       const auth = getAuth(app);
       const db = getFirestore(app);
-      state.fb = { auth, db, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged, collection, getDocs, addDoc, deleteDoc, doc, updateDoc, setDoc, getDoc, query, orderBy, where };
+      state.fb = {
+        auth, db, GoogleAuthProvider, signInWithPopup, signInWithRedirect,
+        getRedirectResult, signOut, onAuthStateChanged,
+        collection, getDocs, addDoc, deleteDoc, doc, updateDoc, setDoc, getDoc, query, orderBy, where
+      };
 
-      // Handle redirect result (after Google redirect on mobile)
-      getRedirectResult(auth).then(async (result) => {
-        if (result && result.user) {
-          // onAuthStateChanged هيشتغل تلقائياً ويتعامل مع النتيجة
-          // بس لو مفيش document للـ user في Firestore، نسجّله كمشرف
-          const userRef = doc(db, 'users', result.user.uid);
-          const userSnap = await getDoc(userRef);
-          if (!userSnap.exists()) {
-            const adminSnap = await getDocs(query(collection(db, 'users'), where('isAdmin','==',true)));
-            if (adminSnap.empty) {
-              await saveAdminUser(result.user);
-            } else {
-              // يوجد مشرف آخر — سجّل خروجه
-              state.isBlocked = true;
-              await signOut(auth);
-              updateUI();
-            }
-          }
-          // لو userSnap موجود، onAuthStateChanged هيتعامل معاه تلقائياً
-        }
-      }).catch(e => console.error('Redirect result error:', e));
-
-      // Check if admin exists — بس متعملش updateUI لو المشرف مسجل دخول عشان متبوظش state
-      getDocs(query(collection(db, 'users'), where('isAdmin','==',true)))
-        .then(snap => { 
-          state.adminExists = !snap.empty; 
-          if (!state.isAdmin) updateUI(); // متعملش update لو المشرف مسجل دخول بالفعل
-        })
-        .catch(() => { state.adminExists = false; if (!state.isAdmin) updateUI(); });
-
-      // تحميل الفيديوهات للجميع فوراً بدون انتظار تسجيل الدخول
+      // تحميل الفيديوهات للجميع فوراً
       loadVideos(db, collection, getDocs, query, orderBy);
 
-      // Auth listener — فقط لتحديد صلاحية المشرف
-      let authReady = false;
+      // فحص إذا كان يوجد مشرف
+      getDocs(query(collection(db, 'users'), where('isAdmin','==',true)))
+        .then(snap => {
+          state.adminExists = !snap.empty;
+          state.fbLoading = false;
+          if (!state.isAdmin) updateUI();
+        })
+        .catch(() => {
+          state.adminExists = false;
+          state.fbLoading = false;
+          if (!state.isAdmin) updateUI();
+        });
+
+      // Handle redirect result (بعد رجوع الصفحة على الموبايل)
+      getRedirectResult(auth).then(async (result) => {
+        if (result && result.user) {
+          await handleLoginResult(result.user, { db, collection, getDocs, getDoc, setDoc, doc, query, where, auth, signInWithRedirect, signInWithPopup });
+        }
+      }).catch(e => {
+        if (e.code !== 'auth/cancelled-popup-request') {
+          console.error('Redirect result error:', e);
+        }
+      });
+
+      // Auth listener
       onAuthStateChanged(auth, async (fbUser) => {
-        const wasAdmin = state.isAdmin;
         if (fbUser) {
           try {
             const userRef = doc(db, 'users', fbUser.uid);
             const userSnap = await getDoc(userRef);
             const userData = userSnap.exists() ? userSnap.data() : null;
-            state.user = { uid: fbUser.uid, email: fbUser.email, displayName: fbUser.displayName, photoURL: fbUser.photoURL };
+
+            state.user = {
+              uid: fbUser.uid,
+              email: fbUser.email,
+              displayName: fbUser.displayName,
+              photoURL: fbUser.photoURL
+            };
+
             const nowAdmin = userData?.isAdmin === true;
             state.isAdmin = nowAdmin;
             state.adminExists = true;
-            authReady = true;
-            updateUI();
-            // افتح البانيل لو دخل كمشرف للتو أو بعد redirect
+            state.fbLoading = false;
+
             if (nowAdmin) {
+              state.isBlocked = false;
+              // افتح البانيل تلقائياً لما المشرف يدخل
               const panel = document.getElementById('side-panel');
               const overlay = document.getElementById('overlay');
               panel.classList.add('open');
               overlay.style.display = 'block';
+              document.body.style.overflow = 'hidden';
             }
+            updateUI();
           } catch(e) {
             console.error('Auth check error:', e);
             state.user = null; state.isAdmin = false;
-            authReady = true;
+            state.fbLoading = false;
             updateUI();
           }
         } else {
           state.user = null; state.isAdmin = false;
-          // لو authReady = false يعني أول مرة يشتغل ومفيش user — ابدأ بدون مشرف
-          authReady = true;
+          state.fbLoading = false;
           updateUI();
         }
       });
+    }).catch(e => {
+      console.error('Firebase load error:', e);
+      state.fbLoading = false;
+      state.initialized = true;
+      updateUI();
     });
   }
 </script>
