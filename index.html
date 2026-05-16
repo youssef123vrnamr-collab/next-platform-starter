@@ -967,31 +967,14 @@
 
   window.handleAdminLogin = async function() {
     const loginBtn = document.getElementById('login-btn');
-    if (loginBtn) { loginBtn.disabled = true; loginBtn.textContent = '\u23F3 \u062C\u0627\u0631\u064A...'; }
+    if (loginBtn) { loginBtn.disabled = true; loginBtn.textContent = '⏳ جاري...'; }
     try {
       const provider = new GoogleAuthProvider();
-      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-      if (isMobile) {
-        await signInWithRedirect(auth, provider);
-        return;
-      }
-      try {
-        state._openPanelOnNextAdmin = true;
-        const result = await signInWithPopup(auth, provider);
-        if (!result || !result.user) { state._openPanelOnNextAdmin = false; }
-      } catch (popupErr) {
-        state._openPanelOnNextAdmin = false;
-        if (loginBtn) { loginBtn.disabled = false; loginBtn.textContent = '\u0627\u062F\u062E\u0644 \u0643\u0645\u0634\u0631\u0641 \u0628\u0640 Google'; }
-        if (popupErr.code === 'auth/popup-blocked' || popupErr.code === 'auth/cancelled-popup-request') {
-          await signInWithRedirect(auth, provider); return;
-        }
-        if (popupErr.code !== 'auth/popup-closed-by-user') {
-          showToast('\u274C \u062D\u062F\u062B \u062E\u0637\u0623 \u0641\u064A \u062A\u0633\u062C\u064A\u0644 \u0627\u0644\u062F\u062E\u0648\u0644', '#ff6060');
-        }
-      }
+      // Redirect دائماً — أضمن على موبايل وديسكتوب، يتجنب حجب Popup
+      await signInWithRedirect(auth, provider);
     } catch(e) {
-      if (loginBtn) { loginBtn.disabled = false; loginBtn.textContent = '\u0627\u062F\u062E\u0644 \u0643\u0645\u0634\u0631\u0641 \u0628\u0640 Google'; }
-      showToast('\u274C \u062D\u062F\u062B \u062E\u0637\u0623', '#ff6060');
+      if (loginBtn) { loginBtn.disabled = false; loginBtn.textContent = 'ادخل كمشرف بـ Google'; }
+      showToast('❌ حدث خطأ', '#ff6060');
     }
   };
 
