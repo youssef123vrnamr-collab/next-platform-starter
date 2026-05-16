@@ -918,15 +918,9 @@
   };
 
   async function loginExistingAdmin(fbUser) {
-    state.user = { uid: fbUser.uid, email: fbUser.email, displayName: fbUser.displayName, photoURL: fbUser.photoURL };
-    state.isAdmin = true;
+    // onAuthStateChanged هيشتغل تلقائياً ويفتح البانيل — مش محتاجين نعمل حاجة هنا
+    // بس نخلي state جاهز عشان wasAdmin يتحسب صح
     state.adminExists = true;
-    updateUI();
-    // افتح البانيل عشان المشرف يشوف لوحة التحكم
-    const panel = document.getElementById('side-panel');
-    const overlay = document.getElementById('overlay');
-    panel.classList.add('open');
-    overlay.style.display = 'block';
   }
 
   async function saveAdminUser(fbUser) {
@@ -935,14 +929,8 @@
       email: fbUser.email, displayName: fbUser.displayName,
       photoURL: fbUser.photoURL, isAdmin: true, createdAt: new Date(),
     });
-    state.user = { uid: fbUser.uid, email: fbUser.email, displayName: fbUser.displayName, photoURL: fbUser.photoURL };
-    state.isAdmin = true; state.adminExists = true;
-    updateUI();
-    // افتح البانيل عشان المشرف يشوف لوحة التحكم
-    const panel = document.getElementById('side-panel');
-    const overlay = document.getElementById('overlay');
-    panel.classList.add('open');
-    overlay.style.display = 'block';
+    // onAuthStateChanged هيشتغل تلقائياً بعد الـ setDoc ويكتشف إن الـ user مشرف
+    state.adminExists = true;
   }
 
   window.handleSignOut = async function() {
@@ -1073,17 +1061,25 @@
             const userSnap = await getDoc(userRef);
             const userData = userSnap.exists() ? userSnap.data() : null;
             state.user = { uid: fbUser.uid, email: fbUser.email, displayName: fbUser.displayName, photoURL: fbUser.photoURL };
-            state.isAdmin = userData?.isAdmin === true;
+            const nowAdmin = userData?.isAdmin === true;
+            state.isAdmin = nowAdmin;
             state.adminExists = true;
-          } catch { state.user = null; state.isAdmin = false; }
-        } else { state.user = null; state.isAdmin = false; }
-        updateUI();
-        // لو المشرف سجل دخول للتو (مش كان مسجل قبل) — افتح البانيل تلقائياً
-        if (!wasAdmin && state.isAdmin) {
-          const panel = document.getElementById('side-panel');
-          const overlay = document.getElementById('overlay');
-          panel.classList.add('open');
-          overlay.style.display = 'block';
+            updateUI();
+            // افتح البانيل لو دخل كمشرف للتو
+            if (!wasAdmin && nowAdmin) {
+              const panel = document.getElementById('side-panel');
+              const overlay = document.getElementById('overlay');
+              panel.classList.add('open');
+              overlay.style.display = 'block';
+            }
+          } catch(e) {
+            console.error('Auth check error:', e);
+            state.user = null; state.isAdmin = false;
+            updateUI();
+          }
+        } else {
+          state.user = null; state.isAdmin = false;
+          updateUI();
         }
       });
     });
