@@ -876,43 +876,38 @@
       const { auth, db, GoogleAuthProvider, signInWithPopup, signInWithRedirect, collection, getDocs, getDoc, setDoc, doc, query, where } = fb;
 
       const provider = new GoogleAuthProvider();
-      let result = null;
-      try {
-        // جرب Popup أولاً (أسرع على الديسك توب)
-        result = await signInWithPopup(auth, provider);
-      } catch(popupErr) {
-        // لو Popup فشل (موبايل أو blocked)، استخدم Redirect
-        if (popupErr.code === 'auth/popup-blocked' || popupErr.code === 'auth/popup-closed-by-user' || popupErr.code === 'auth/cancelled-popup-request') {
-          await signInWithRedirect(auth, provider);
-          return; // بيكمل في getRedirectResult
-        }
-        throw popupErr;
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+      if (isMobile) {
+        // موبايل: روح على Redirect مباشرة
+        await signInWithRedirect(auth, provider);
+        return; // بيكمل في getRedirectResult بعد رجوع الصفحة
       }
 
-      // Popup نجح — تحقق من صلاحية المستخدم
-      if (result && result.user) {
-        const userRef = doc(db, 'users', result.user.uid);
-        const userSnap = await getDoc(userRef);
-
-        if (userSnap.exists() && userSnap.data().isAdmin === true) {
-          // ✅ هو المشرف المسجل — سجّل دخوله
-          await loginExistingAdmin(result.user);
-        } else {
-          // تحقق: هل يوجد مشرف آخر مسجل؟
-          const adminSnap = await getDocs(query(collection(db, 'users'), where('isAdmin','==',true)));
-          if (adminSnap.empty) {
-            // لا يوجد مشرف — سجّله كمشرف أول
-            await saveAdminUser(result.user);
-          } else {
-            // يوجد مشرف آخر — هذا المستخدم محظور
-            state.adminExists = true;
-            state.isAdmin = false;
-            state.user = null;
-            // سجّل خروجه فوراً لأنه ليس المشرف
-            await fb.signOut(auth);
-            updateUI();
+      // ديسك توب: جرب Popup
+      try {
+        const result = await signInWithPopup(auth, provider);
+        if (result && result.user) {
+          const userRef = doc(db, 'users', result.user.uid);
+          const userSnap = await getDoc(userRef);
+          if (!userSnap.exists()) {
+            const adminSnap = await getDocs(query(collection(db, 'users'), where('isAdmin','==',true)));
+            if (adminSnap.empty) {
+              await saveAdminUser(result.user);
+            } else {
+              state.adminExists = true; state.isAdmin = false; state.user = null;
+              await fb.signOut(auth);
+              updateUI();
+            }
           }
+          // لو موجود، onAuthStateChanged هيتعامل معاه
         }
+      } catch(popupErr) {
+        if (popupErr.code === 'auth/popup-blocked' || popupErr.code === 'auth/cancelled-popup-request') {
+          await signInWithRedirect(auth, provider);
+          return;
+        }
+        throw popupErr;
       }
     } catch(e) { console.error('Login error:', e); }
   };
@@ -1025,22 +1020,22 @@
       // Handle redirect result (after Google redirect on mobile)
       getRedirectResult(auth).then(async (result) => {
         if (result && result.user) {
+          // onAuthStateChanged هيشتغل تلقائياً ويتعامل مع النتيجة
+          // بس لو مفيش document للـ user في Firestore، نسجّله كمشرف
           const userRef = doc(db, 'users', result.user.uid);
           const userSnap = await getDoc(userRef);
-          if (userSnap.exists() && userSnap.data().isAdmin === true) {
-            // ✅ هو المشرف المسجل
-            await loginExistingAdmin(result.user);
-          } else {
+          if (!userSnap.exists()) {
             const adminSnap = await getDocs(query(collection(db, 'users'), where('isAdmin','==',true)));
             if (adminSnap.empty) {
               await saveAdminUser(result.user);
             } else {
-              // ليس المشرف — سجّل خروجه
-              state.adminExists = true; state.isAdmin = false; state.user = null; state.isBlocked = true;
+              // يوجد مشرف آخر — سجّل خروجه
+              state.isBlocked = true;
               await signOut(auth);
               updateUI();
             }
           }
+          // لو userSnap موجود، onAuthStateChanged هيتعامل معاه تلقائياً
         }
       }).catch(e => console.error('Redirect result error:', e));
 
