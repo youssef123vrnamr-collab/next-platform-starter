@@ -1034,6 +1034,7 @@
       try {
         const result = await signInWithPopup(auth, provider);
         if (result && result.user) {
+          state._openPanelOnNextAdmin = true;
           await handleLoginResult(result.user, { db, collection, getDocs, getDoc, setDoc, doc, query, where, auth, signInWithPopup, signInWithRedirect });
         }
       } catch (popupErr) {
@@ -1063,14 +1064,17 @@
         const adminSnap = await getDocs(query(collection(db, 'users'), where('isAdmin','==',true)));
         if (adminSnap.empty) {
           await saveAdminUser(fbUser);
+          state._openPanelOnNextAdmin = true;
         } else {
           state.adminExists = true; state.isAdmin = false; state.user = null; state.isBlocked = true;
           const { signOut } = state.fb;
           await signOut(auth);
           updateUI();
         }
+      } else {
+        // مشرف موجود بالفعل — افتح البانيل بعد onAuthStateChanged
+        state._openPanelOnNextAdmin = true;
       }
-      // لو موجود، onAuthStateChanged هيتعامل معاه
     } catch(e) {
       console.error('handleLoginResult error:', e);
     }
@@ -1207,8 +1211,10 @@
         });
 
       // Handle redirect result (بعد رجوع الصفحة على الموبايل)
+      // لو في redirect جديد، افتح البانيل بعد تسجيل الدخول
       getRedirectResult(auth).then(async (result) => {
         if (result && result.user) {
+          state._openPanelOnNextAdmin = true;
           await handleLoginResult(result.user, { db, collection, getDocs, getDoc, setDoc, doc, query, where, auth, signInWithRedirect, signInWithPopup });
         }
       }).catch(e => {
@@ -1233,20 +1239,31 @@
             };
 
             const nowAdmin = userData?.isAdmin === true;
+            const wasAdmin = state.isAdmin;
             state.isAdmin = nowAdmin;
             state.adminExists = true;
             state.fbLoading = false;
 
             if (nowAdmin) {
               state.isBlocked = false;
-              // افتح البانيل تلقائياً لما المشرف يدخل
-              const panel = document.getElementById('side-panel');
-              const overlay = document.getElementById('overlay');
-              panel.classList.add('open');
-              overlay.style.display = 'block';
-              document.body.style.overflow = 'hidden';
             }
+
             updateUI();
+
+            // افتح البانيل لو كان في تسجيل دخول جديد (redirect أو popup)
+            if (nowAdmin && state._openPanelOnNextAdmin) {
+              state._openPanelOnNextAdmin = false;
+              setTimeout(() => {
+                const panel = document.getElementById('side-panel');
+                const overlay = document.getElementById('overlay');
+                if (!panel.classList.contains('open')) {
+                  panel.classList.add('open');
+                  overlay.style.display = 'block';
+                  document.body.style.overflow = 'hidden';
+                }
+                showToast('👑 مرحباً بك يا مشرف!');
+              }, 350);
+            }
           } catch(e) {
             console.error('Auth check error:', e);
             state.user = null; state.isAdmin = false;
