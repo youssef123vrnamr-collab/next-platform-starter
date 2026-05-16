@@ -1095,6 +1095,9 @@
         if (nowAdmin && state._openPanelOnNextAdmin) {
           state._openPanelOnNextAdmin = false;
           openPanelNow();
+        } else if (nowAdmin) {
+          updateUI();
+          openPanelNow();
         } else {
           updateUI();
         }
