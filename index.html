@@ -875,7 +875,9 @@
     if (panel.classList.contains('open')) {
       panel.classList.remove('open'); overlay.style.display = 'none'; document.body.style.overflow = '';
     } else {
+      updateUI();
       panel.classList.add('open'); overlay.style.display = 'block'; document.body.style.overflow = 'hidden';
+      if (state.isAdmin) showToast('👑 مرحباً بك يا مشرف!');
     }
   };
   window.closePanel = function() {
@@ -1056,6 +1058,8 @@
   getRedirectResult(auth).then(async result => {
     if (result && result.user) {
       state._openPanelOnNextAdmin = true;
+      // موبايل: افتح البانيل بعد ما onAuthStateChanged يكمل
+      setTimeout(() => { if (state.isAdmin) openPanelNow(); }, 1500);
     }
   }).catch(() => {});
 
@@ -1094,9 +1098,6 @@
 
         if (nowAdmin && state._openPanelOnNextAdmin) {
           state._openPanelOnNextAdmin = false;
-          openPanelNow();
-        } else if (nowAdmin) {
-          updateUI();
           openPanelNow();
         } else {
           updateUI();
