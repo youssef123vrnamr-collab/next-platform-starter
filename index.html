@@ -636,6 +636,7 @@
     filter: "all",
     editingId: null,
     fb: null,
+    initialized: false,
   };
 
   // ===== HELPERS =====
@@ -686,8 +687,10 @@
 
     // Panel states
     const { isBlocked } = state;
-    document.getElementById('state-no-admin').style.display = (!adminExists && !isAdmin && !isBlocked) ? 'block' : 'none';
-    document.getElementById('state-blocked').style.display = (isBlocked && !isAdmin) ? 'block' : 'none';
+    const noAdmin = !adminExists && !isAdmin && !isBlocked;
+    const showBlocked = adminExists && !isAdmin && !isBlocked;
+    document.getElementById('state-no-admin').style.display = noAdmin ? 'block' : 'none';
+    document.getElementById('state-blocked').style.display = showBlocked ? 'block' : 'none';
     document.getElementById('state-is-admin').style.display = isAdmin ? 'block' : 'none';
 
     if (isAdmin && user) {
@@ -715,7 +718,10 @@
     [...grid.querySelectorAll('.video-card')].forEach(el => el.remove());
     const emptyState = document.getElementById('empty-state');
 
-    if (filtered.length === 0) {
+    if (!state.initialized && state.fb) {
+      emptyState.style.display = 'block';
+      document.getElementById('empty-text').textContent = 'جاري تحميل الفيديوهات...';
+    } else if (filtered.length === 0) {
       emptyState.style.display = 'block';
       document.getElementById('empty-text').textContent =
         'لا توجد فيديوهات حتى الآن' + (isAdmin ? ' — ابدأ بإضافة فيديو!' : '');
@@ -991,8 +997,12 @@
       try {
         const snap = await getDocs(collection(db, 'videos'));
         state.videos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-      } catch { state.videos = []; }
+      } catch(e) {
+        console.error('Failed to load videos:', e);
+        state.videos = [];
+      }
     }
+    state.initialized = true;
     renderVideos();
   }
 
@@ -1007,6 +1017,7 @@
       { id: 'd3', youtubeId: 'kJQP7kiw5Fk', title: 'فيديو مقفول', description: 'مقفول حالياً', locked: true },
     ];
     state.adminExists = false;
+    state.initialized = true;
     updateUI();
   } else {
     Promise.all([
