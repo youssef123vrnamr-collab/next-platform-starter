@@ -685,13 +685,17 @@
     const dbg = document.getElementById('debug-info');
     if (dbg) dbg.textContent = 'FB:' + (state.fb ? 'متصل✅' : 'غير متصل❌') + ' | adminExists:' + adminExists + ' | isAdmin:' + isAdmin;
 
-    // Panel states
+    // Panel states — مش بنعرض حاجة غلط لو Firebase لسه بيتحمل
     const { isBlocked } = state;
-    const noAdmin = !adminExists && !isAdmin && !isBlocked;
-    const showBlocked = adminExists && !isAdmin && !isBlocked;
-    document.getElementById('state-no-admin').style.display = noAdmin ? 'block' : 'none';
-    document.getElementById('state-blocked').style.display = showBlocked ? 'block' : 'none';
-    document.getElementById('state-is-admin').style.display = isAdmin ? 'block' : 'none';
+    const noAdmin  = !adminExists && !isAdmin && !isBlocked;
+    const showBlocked = !isAdmin && isBlocked;
+    // لو isAdmin true: اظهر لوحة المشرف
+    // لو مفيش مشرف خالص: اظهر "ادخل كمشرف"
+    // لو فيه مشرف وهو مش هو ومـblocked: اظهر "محمية"
+    // في أي حالة تانية (لسه بيتحمل): ماظهرش حاجة
+    document.getElementById('state-no-admin').style.display  = (!isAdmin && noAdmin) ? 'block' : 'none';
+    document.getElementById('state-blocked').style.display   = (!isAdmin && showBlocked) ? 'block' : 'none';
+    document.getElementById('state-is-admin').style.display  = isAdmin ? 'block' : 'none';
 
     if (isAdmin && user) {
       document.getElementById('panel-avatar').src = user.photoURL || '';
@@ -1039,15 +1043,19 @@
         }
       }).catch(e => console.error('Redirect result error:', e));
 
-      // Check if admin exists
+      // Check if admin exists — بس متعملش updateUI لو المشرف مسجل دخول عشان متبوظش state
       getDocs(query(collection(db, 'users'), where('isAdmin','==',true)))
-        .then(snap => { state.adminExists = !snap.empty; updateUI(); })
-        .catch(() => { state.adminExists = false; updateUI(); });
+        .then(snap => { 
+          state.adminExists = !snap.empty; 
+          if (!state.isAdmin) updateUI(); // متعملش update لو المشرف مسجل دخول بالفعل
+        })
+        .catch(() => { state.adminExists = false; if (!state.isAdmin) updateUI(); });
 
       // تحميل الفيديوهات للجميع فوراً بدون انتظار تسجيل الدخول
       loadVideos(db, collection, getDocs, query, orderBy);
 
       // Auth listener — فقط لتحديد صلاحية المشرف
+      let authReady = false;
       onAuthStateChanged(auth, async (fbUser) => {
         const wasAdmin = state.isAdmin;
         if (fbUser) {
@@ -1059,9 +1067,10 @@
             const nowAdmin = userData?.isAdmin === true;
             state.isAdmin = nowAdmin;
             state.adminExists = true;
+            authReady = true;
             updateUI();
-            // افتح البانيل لو دخل كمشرف للتو
-            if (!wasAdmin && nowAdmin) {
+            // افتح البانيل لو دخل كمشرف للتو أو بعد redirect
+            if (nowAdmin) {
               const panel = document.getElementById('side-panel');
               const overlay = document.getElementById('overlay');
               panel.classList.add('open');
@@ -1070,10 +1079,13 @@
           } catch(e) {
             console.error('Auth check error:', e);
             state.user = null; state.isAdmin = false;
+            authReady = true;
             updateUI();
           }
         } else {
           state.user = null; state.isAdmin = false;
+          // لو authReady = false يعني أول مرة يشتغل ومفيش user — ابدأ بدون مشرف
+          authReady = true;
           updateUI();
         }
       });
