@@ -715,7 +715,7 @@ footer strong{color:#00ff96;font-weight:700}
 <!-- ===== FIREBASE + SCRIPT ===== -->
 <script type="module">
 import { initializeApp }       from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, signOut, onAuthStateChanged }
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
                                from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
 import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, updateDoc, setDoc, getDoc, query, orderBy, where }
                                from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
@@ -1065,8 +1065,7 @@ window.handleAdminLogin=async function(){
   if(btn){btn.disabled=true;btn.textContent='⏳ جاري...';}
   const provider=new GoogleAuthProvider();
   provider.setCustomParameters({prompt:'select_account'});
-  // Redirect مباشرة — أضمن على كل المتصفحات
-  try{ await signInWithRedirect(auth,provider); }
+  try{ await signInWithPopup(auth,provider); }
   catch(e){
     if(btn){btn.disabled=false;btn.textContent='ادخل كمشرف بـ Google';}
     showToast('❌ '+(e.message||'حدث خطأ'),'#ff6060');
@@ -1138,17 +1137,22 @@ async function processUser(fbUser, shouldOpenPanel){
 loadVideos();
 
 // ===== AUTH LISTENERS =====
+let _authBusy = false;
+
 onAuthStateChanged(auth, async fbUser=>{
-  if(fbUser){
-    // مستخدم مسجل — اعرفه كمشرف مؤقتاً ريثما يتم التحقق
-    S.fbLoading=true;
-    updateUI();
-    await processUser(fbUser, true);
-  }else{
-    S.user=null;S.isAdmin=false;S.fbLoading=false;
-    S.isBlocked=false;S.adminExists=false;
-    updateUI();
-  }
+  if(_authBusy) return;
+  _authBusy = true;
+  try{
+    if(fbUser){
+      S.fbLoading=true; updateUI();
+      await processUser(fbUser, true);
+    }else{
+      S.user=null; S.isAdmin=false; S.fbLoading=false;
+      S.isBlocked=false; S.adminExists=false;
+      updateUI();
+    }
+  }catch(e){ console.error('Auth error:',e); S.fbLoading=false; updateUI(); }
+  finally{ _authBusy=false; }
 });
 
 // ESC
