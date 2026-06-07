@@ -1129,8 +1129,10 @@ async function processUser(fbUser, shouldOpenPanel){
       S.isAdmin=true;S.adminExists=true;S.isBlocked=false;S.fbLoading=false;
       if(shouldOpenPanel){ openPanelNow(); }else{ updateUI(); }
     }else{
-      S.user=null;S.isAdmin=false;S.adminExists=true;S.isBlocked=true;S.fbLoading=false;
-      await signOut(auth);updateUI();
+      S.user=null;S.isAdmin=false;S.adminExists=true;S.isBlocked=false;S.fbLoading=false;
+      await signOut(auth);
+      _authHandled=false;
+      updateUI();
     }
   }catch(e){
     console.error('processUser error:',e);
@@ -1147,10 +1149,14 @@ getDocs(query(collection(db,'users'),where('isAdmin','==',true)))
   .catch(()=>{S.fbLoading=false;updateUI();});
 
 // ===== AUTH LISTENERS =====
+let _authHandled = false;
 onAuthStateChanged(auth,async fbUser=>{
   if(fbUser){
+    if(_authHandled) return; // منع التكرار
+    _authHandled = true;
     await processUser(fbUser, true);
   }else{
+    _authHandled = false;
     S.user=null;S.isAdmin=false;S.fbLoading=false;S.isBlocked=false;
     updateUI();
   }
