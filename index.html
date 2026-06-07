@@ -1140,10 +1140,13 @@ loadVideos();
 // ===== AUTH LISTENERS =====
 onAuthStateChanged(auth, async fbUser=>{
   if(fbUser){
+    // مستخدم مسجل — اعرفه كمشرف مؤقتاً ريثما يتم التحقق
+    S.fbLoading=true;
+    updateUI();
     await processUser(fbUser, true);
   }else{
-    S.user=null;S.isAdmin=false;S.fbLoading=false;S.isBlocked=false;
-    S.adminExists=false;
+    S.user=null;S.isAdmin=false;S.fbLoading=false;
+    S.isBlocked=false;S.adminExists=false;
     updateUI();
   }
 });
