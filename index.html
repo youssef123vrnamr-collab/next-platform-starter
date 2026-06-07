@@ -715,7 +715,7 @@ footer strong{color:#00ff96;font-weight:700}
 <!-- ===== FIREBASE + SCRIPT ===== -->
 <script type="module">
 import { initializeApp }       from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged }
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged }
                                from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
 import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, updateDoc, setDoc, getDoc, query, orderBy, where }
                                from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
@@ -1060,18 +1060,38 @@ window.handleDelete=async function(id){
 };
 
 // ===== AUTH =====
-// نستخدم Redirect دايماً — الأضمن على كل المتصفحات والموبايل
 window.handleAdminLogin=async function(){
   const btn=document.getElementById('login-btn');
-  if(btn){btn.disabled=true;btn.textContent='⏳ جاري التوجيه...';}
+  if(btn){btn.disabled=true;btn.textContent='⏳ جاري...';}
+  const provider=new GoogleAuthProvider();
+  provider.setCustomParameters({prompt:'select_account'});
+
+  // جرب Popup الأول — لو اتبلك روح Redirect
   try{
-    const provider=new GoogleAuthProvider();
-    provider.setCustomParameters({prompt:'select_account'});
-    await signInWithRedirect(auth,provider);
-    // الصفحة هتتحمل من أول — getRedirectResult هيشتغل
-  }catch(e){
-    if(btn){btn.disabled=false;btn.textContent='ادخل كمشرف بـ Google';}
-    showToast('❌ '+(e.message||'حدث خطأ'),'#ff6060');
+    const result=await signInWithPopup(auth,provider);
+    // نجح Popup — processUser هيشتغل من onAuthStateChanged
+    console.log('Popup login success:', result.user.email);
+  }catch(popupErr){
+    const c=popupErr.code||'';
+    console.warn('Popup failed:', c);
+    if(
+      c==='auth/popup-blocked'||
+      c==='auth/popup-closed-by-user'||
+      c==='auth/cancelled-popup-request'||
+      c==='auth/internal-error'
+    ){
+      // Fallback: Redirect
+      showToast('⏳ جاري التوجيه لـ Google...','#00b4ff');
+      try{
+        await signInWithRedirect(auth,provider);
+      }catch(redirErr){
+        if(btn){btn.disabled=false;btn.textContent='ادخل كمشرف بـ Google';}
+        showToast('❌ فشل تسجيل الدخول','#ff6060');
+      }
+    }else{
+      if(btn){btn.disabled=false;btn.textContent='ادخل كمشرف بـ Google';}
+      showToast('❌ '+(popupErr.message||'حدث خطأ'),'#ff6060');
+    }
   }
 };
 window.handleSignOut=async function(){
@@ -1144,31 +1164,39 @@ getDocs(query(collection(db,'users'),where('isAdmin','==',true)))
   .then(snap=>{S.adminExists=!snap.empty;if(!S.isAdmin){S.fbLoading=false;updateUI();}})
   .catch(()=>{S.fbLoading=false;updateUI();});
 
-// Redirect result — يشتغل بعد رجوع الصفحة من Google
+// ===== AUTH LISTENERS =====
+let _processing=false; // نمنع تكرار processUser
+
+// Redirect result — يشتغل بعد رجوع الصفحة من Google login
 getRedirectResult(auth)
   .then(async result=>{
     if(result && result.user){
-      // جه من redirect — افتح البانيل بعد المعالجة
+      _processing=true;
+      console.log('Redirect result user:', result.user.email);
       await processUser(result.user, true);
     }
   })
   .catch(e=>{
-    console.warn('getRedirectResult error:',e.code, e.message);
+    // auth/no-current-user = عادي لما ما فيش redirect جاري
+    if(e.code!=='auth/no-current-user'){
+      console.warn('getRedirectResult error:',e.code, e.message);
+    }
   });
 
-// onAuthStateChanged — يشتغل عند كل تغيير في حالة المستخدم
-let redirectHandled=false;
+// onAuthStateChanged — الـ listener الرئيسي
 onAuthStateChanged(auth,async fbUser=>{
   if(fbUser){
-    if(redirectHandled)return; // منعنا تكرار processUser لو getRedirectResult اشتغل أول
-    redirectHandled=true;
-    // مستخدم مسجّل بالفعل (session محفوظة) — افتح البانيل
+    if(_processing){
+      // getRedirectResult شتغل قبله — متابع هناك
+      return;
+    }
+    // Session محفوظة من زيارة سابقة أو Popup نجح
+    _processing=true;
     await processUser(fbUser, true);
   }else{
-    redirectHandled=false;
-    S.user=null;S.isAdmin=false;S.fbLoading=false;
-    if(!S.isBlocked)updateUI();
-    S.isBlocked=false;
+    _processing=false;
+    S.user=null;S.isAdmin=false;S.fbLoading=false;S.isBlocked=false;
+    updateUI();
   }
 });
 
