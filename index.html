@@ -715,7 +715,7 @@ footer strong{color:#00ff96;font-weight:700}
 <!-- ===== FIREBASE + SCRIPT ===== -->
 <script type="module">
 import { initializeApp }       from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged }
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, signOut, onAuthStateChanged }
                                from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
 import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, updateDoc, setDoc, getDoc, query, orderBy, where }
                                from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
@@ -1116,7 +1116,7 @@ async function processUser(fbUser, shouldOpenPanel){
       }else{
         // يوجد مشرف بالفعل — ارفض
         S.user=null;S.isAdmin=false;S.adminExists=true;S.isBlocked=true;S.fbLoading=false;
-        await signOut(auth);updateUI();
+        await signOut(auth);_processing=false;updateUI();
         showToast('❌ يوجد مشرف بالفعل','#ff6060');
       }
       return;
@@ -1140,31 +1140,16 @@ getDocs(collection(db,'admins'))
   .catch(()=>{S.fbLoading=false;updateUI();});
 
 // ===== AUTH LISTENERS =====
-// نتعامل مع الـ Redirect result الأول قبل أي حاجة
-let _redirectChecked = false;
+// الـ Auth listener الوحيد — بسيط وموثوق
+let _processing = false;
 
-getRedirectResult(auth).then(async result=>{
-  _redirectChecked = true;
-  if(result && result.user){
-    await processUser(result.user, true);
-  }
-}).catch(e=>{
-  _redirectChecked = true;
-  if(e.code && e.code!=='auth/no-current-user'){
-    console.warn('getRedirectResult error:',e.code);
-  }
-});
-
-onAuthStateChanged(auth,async fbUser=>{
+onAuthStateChanged(auth, async fbUser=>{
   if(fbUser){
-    // انتظر getRedirectResult ينتهي
-    if(!_redirectChecked){
-      await new Promise(r=>{ const t=setInterval(()=>{ if(_redirectChecked){clearInterval(t);r();} },50); });
-    }
-    // لو processUser اشتغل من getRedirectResult متعملوش تاني
-    if(S.isAdmin||S.isBlocked) return;
+    if(_processing) return;
+    _processing = true;
     await processUser(fbUser, true);
   }else{
+    _processing = false;
     S.user=null;S.isAdmin=false;S.fbLoading=false;S.isBlocked=false;
     updateUI();
   }
