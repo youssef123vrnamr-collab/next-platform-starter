@@ -715,7 +715,7 @@ footer strong{color:#00ff96;font-weight:700}
 <!-- ===== FIREBASE + SCRIPT ===== -->
 <script type="module">
 import { initializeApp }       from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged }
                                from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
 import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, updateDoc, setDoc, getDoc, query, orderBy, where }
                                from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
@@ -1065,14 +1065,11 @@ window.handleAdminLogin=async function(){
   if(btn){btn.disabled=true;btn.textContent='⏳ جاري...';}
   const provider=new GoogleAuthProvider();
   provider.setCustomParameters({prompt:'select_account'});
-  try{
-    await signInWithPopup(auth,provider);
-    // onAuthStateChanged هيكمّل من هنا تلقائياً
-  }catch(e){
+  // Redirect مباشرة — أضمن على كل المتصفحات
+  try{ await signInWithRedirect(auth,provider); }
+  catch(e){
     if(btn){btn.disabled=false;btn.textContent='ادخل كمشرف بـ Google';}
-    if(e.code!=='auth/popup-closed-by-user'&&e.code!=='auth/cancelled-popup-request'){
-      showToast('❌ '+(e.message||'حدث خطأ'),'#ff6060');
-    }
+    showToast('❌ '+(e.message||'حدث خطأ'),'#ff6060');
   }
 };
 
@@ -1149,14 +1146,31 @@ getDocs(query(collection(db,'users'),where('isAdmin','==',true)))
   .catch(()=>{S.fbLoading=false;updateUI();});
 
 // ===== AUTH LISTENERS =====
-let _authHandled = false;
+// نتعامل مع الـ Redirect result الأول قبل أي حاجة
+let _redirectChecked = false;
+
+getRedirectResult(auth).then(async result=>{
+  _redirectChecked = true;
+  if(result && result.user){
+    await processUser(result.user, true);
+  }
+}).catch(e=>{
+  _redirectChecked = true;
+  if(e.code && e.code!=='auth/no-current-user'){
+    console.warn('getRedirectResult error:',e.code);
+  }
+});
+
 onAuthStateChanged(auth,async fbUser=>{
   if(fbUser){
-    if(_authHandled) return; // منع التكرار
-    _authHandled = true;
+    // انتظر getRedirectResult ينتهي
+    if(!_redirectChecked){
+      await new Promise(r=>{ const t=setInterval(()=>{ if(_redirectChecked){clearInterval(t);r();} },50); });
+    }
+    // لو processUser اشتغل من getRedirectResult متعملوش تاني
+    if(S.isAdmin||S.isBlocked) return;
     await processUser(fbUser, true);
   }else{
-    _authHandled = false;
     S.user=null;S.isAdmin=false;S.fbLoading=false;S.isBlocked=false;
     updateUI();
   }
