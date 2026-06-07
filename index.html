@@ -1165,36 +1165,35 @@ getDocs(query(collection(db,'users'),where('isAdmin','==',true)))
   .catch(()=>{S.fbLoading=false;updateUI();});
 
 // ===== AUTH LISTENERS =====
-let _processing=false; // نمنع تكرار processUser
-
-// Redirect result — يشتغل بعد رجوع الصفحة من Google login
-getRedirectResult(auth)
+// نحتفظ بـ Promise لـ getRedirectResult حتى onAuthStateChanged ينتظره
+let _redirectResultPromise = getRedirectResult(auth)
   .then(async result=>{
     if(result && result.user){
-      _processing=true;
       console.log('Redirect result user:', result.user.email);
       await processUser(result.user, true);
+      return true; // تمّ المعالجة من هنا
     }
+    return false;
   })
   .catch(e=>{
-    // auth/no-current-user = عادي لما ما فيش redirect جاري
     if(e.code!=='auth/no-current-user'){
       console.warn('getRedirectResult error:',e.code, e.message);
     }
+    return false;
   });
 
 // onAuthStateChanged — الـ listener الرئيسي
 onAuthStateChanged(auth,async fbUser=>{
   if(fbUser){
-    if(_processing){
-      // getRedirectResult شتغل قبله — متابع هناك
+    // انتظر getRedirectResult ينتهي الأول
+    const handledByRedirect = await _redirectResultPromise;
+    if(handledByRedirect){
+      // تمّ المعالجة بالفعل من getRedirectResult
       return;
     }
     // Session محفوظة من زيارة سابقة أو Popup نجح
-    _processing=true;
     await processUser(fbUser, true);
   }else{
-    _processing=false;
     S.user=null;S.isAdmin=false;S.fbLoading=false;S.isBlocked=false;
     updateUI();
   }
