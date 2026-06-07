@@ -715,7 +715,7 @@ footer strong{color:#00ff96;font-weight:700}
 <!-- ===== FIREBASE + SCRIPT ===== -->
 <script type="module">
 import { initializeApp }       from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged }
+import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged }
                                from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
 import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, updateDoc, setDoc, getDoc, query, orderBy, where }
                                from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
@@ -1062,38 +1062,17 @@ window.handleDelete=async function(id){
 // ===== AUTH =====
 window.handleAdminLogin=async function(){
   const btn=document.getElementById('login-btn');
-  if(btn){btn.disabled=true;btn.textContent='⏳ جاري...';}
+  if(btn){btn.disabled=true;btn.textContent='⏳ جاري التوجيه...';}
   const provider=new GoogleAuthProvider();
   provider.setCustomParameters({prompt:'select_account'});
-
-  // جرب Popup الأول — لو اتبلك روح Redirect
-  try{
-    const result=await signInWithPopup(auth,provider);
-    // نجح Popup — processUser هيشتغل من onAuthStateChanged
-    console.log('Popup login success:', result.user.email);
-  }catch(popupErr){
-    const c=popupErr.code||'';
-    console.warn('Popup failed:', c);
-    if(
-      c==='auth/popup-blocked'||
-      c==='auth/popup-closed-by-user'||
-      c==='auth/cancelled-popup-request'||
-      c==='auth/internal-error'
-    ){
-      // Fallback: Redirect
-      showToast('⏳ جاري التوجيه لـ Google...','#00b4ff');
-      try{
-        await signInWithRedirect(auth,provider);
-      }catch(redirErr){
-        if(btn){btn.disabled=false;btn.textContent='ادخل كمشرف بـ Google';}
-        showToast('❌ فشل تسجيل الدخول','#ff6060');
-      }
-    }else{
-      if(btn){btn.disabled=false;btn.textContent='ادخل كمشرف بـ Google';}
-      showToast('❌ '+(popupErr.message||'حدث خطأ'),'#ff6060');
-    }
+  // Redirect فقط — الأموثوق على موبايل وكمبيوتر
+  try{ await signInWithRedirect(auth,provider); }
+  catch(e){
+    if(btn){btn.disabled=false;btn.textContent='ادخل كمشرف بـ Google';}
+    showToast('❌ '+(e.message||'حدث خطأ'),'#ff6060');
   }
 };
+
 window.handleSignOut=async function(){
   await signOut(auth);
   S.user=null;S.isAdmin=false;S.isBlocked=false;
@@ -1191,7 +1170,7 @@ onAuthStateChanged(auth,async fbUser=>{
       // تمّ المعالجة بالفعل من getRedirectResult
       return;
     }
-    // Session محفوظة من زيارة سابقة أو Popup نجح
+    // Session محفوظة من زيارة سابقة
     await processUser(fbUser, true);
   }else{
     S.user=null;S.isAdmin=false;S.fbLoading=false;S.isBlocked=false;
