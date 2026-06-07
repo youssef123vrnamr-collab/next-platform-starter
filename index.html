@@ -1095,36 +1095,39 @@ async function loadVideos(){
 }
 
 // ===== PROCESS FIREBASE USER =====
-// يشتغل سواء من getRedirectResult أو onAuthStateChanged
+// يشتغل من onAuthStateChanged
 async function processUser(fbUser, shouldOpenPanel){
   try{
-    const email = (fbUser.email||'').toLowerCase().trim();
-    // البحث بالإيميل بدل الـ UID
-    const userSnap=await getDoc(doc(db,'admins',email));
+    const email=(fbUser.email||'').toLowerCase().trim();
+    const adminRef=doc(db,'admins',email);
+    const userSnap=await getDoc(adminRef);
     if(!userSnap.exists()){
-      // تحقق من وجود أي مشرف
       const adminSnap=await getDocs(collection(db,'admins'));
       if(adminSnap.empty){
-        // أول مستخدم → يصبح مشرف
-        await setDoc(doc(db,'admins',email),{
+        // أول مشرف في المنصة
+        await setDoc(adminRef,{
           email:email, displayName:fbUser.displayName,
           photoURL:fbUser.photoURL, isAdmin:true, createdAt:new Date(),
         });
         S.user={uid:fbUser.uid,email:email,displayName:fbUser.displayName,photoURL:fbUser.photoURL};
         S.isAdmin=true;S.adminExists=true;S.isBlocked=false;S.fbLoading=false;
-        openPanelNow();
+        updateUI();
+        if(shouldOpenPanel) openPanelNow();
+        return;
       }else{
-        // يوجد مشرف بالفعل — ارفض
+        // يوجد مشرف بالفعل وهذا المستخدم ليس هو
         S.user=null;S.isAdmin=false;S.adminExists=true;S.isBlocked=true;S.fbLoading=false;
-        await signOut(auth);_processing=false;updateUI();
+        updateUI();
+        await signOut(auth);
         showToast('❌ يوجد مشرف بالفعل','#ff6060');
+        return;
       }
-      return;
     }
-    // مشرف موجود — ادخله
+    // مشرف موجود وتم التحقق منه
     S.user={uid:fbUser.uid,email:email,displayName:fbUser.displayName,photoURL:fbUser.photoURL};
     S.isAdmin=true;S.adminExists=true;S.isBlocked=false;S.fbLoading=false;
-    if(shouldOpenPanel){ openPanelNow(); }else{ updateUI(); }
+    updateUI();
+    if(shouldOpenPanel) openPanelNow();
   }catch(e){
     console.error('processUser error:',e);
     S.fbLoading=false;updateUI();
@@ -1144,14 +1147,20 @@ getDocs(collection(db,'admins'))
 let _processing = false;
 
 onAuthStateChanged(auth, async fbUser=>{
-  if(fbUser){
-    if(_processing) return;
-    _processing = true;
-    await processUser(fbUser, true);
-  }else{
-    _processing = false;
-    S.user=null;S.isAdmin=false;S.fbLoading=false;S.isBlocked=false;
-    updateUI();
+  try{
+    if(fbUser){
+      if(_processing) return;
+      _processing = true;
+      await processUser(fbUser, true);
+    }else{
+      _processing = false;
+      S.user=null;S.isAdmin=false;S.fbLoading=false;S.isBlocked=false;
+      updateUI();
+    }
+  }catch(err){
+    console.error('Auth error:',err);
+  }finally{
+    if(fbUser) _processing = false;
   }
 });
 
