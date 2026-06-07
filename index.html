@@ -1101,16 +1101,15 @@ async function loadVideos(){
 
 // ===== PROCESS FIREBASE USER =====
 // يشتغل من onAuthStateChanged
-async function processUser(fbUser, shouldOpenPanel){
+async function processUser(fbUser, shouldOpenPanel, _retry=0){
   try{
+    // انتظر الاتصال أولاً
+    await enableNetwork(db);
     const email=(fbUser.email||'').toLowerCase().trim();
-    showToast('⏳ 1: جاري التحقق من '+email,'#00b4ff');
     const adminRef=doc(db,'admins',email);
     const userSnap=await getDoc(adminRef);
-    showToast('⏳ 2: exists='+userSnap.exists(),'#00b4ff');
     if(!userSnap.exists()){
       const adminSnap=await getDocs(collection(db,'admins'));
-      showToast('⏳ 3: admins count='+adminSnap.size,'#00b4ff');
       if(adminSnap.empty){
         await setDoc(adminRef,{
           email:email, displayName:fbUser.displayName,
@@ -1129,12 +1128,17 @@ async function processUser(fbUser, shouldOpenPanel){
         return;
       }
     }
-    showToast('✅ مشرف موجود — جاري الفتح','#00ff96');
     S.user={uid:fbUser.uid,email:email,displayName:fbUser.displayName,photoURL:fbUser.photoURL};
     S.isAdmin=true;S.adminExists=true;S.isBlocked=false;S.fbLoading=false;
     updateUI();
     if(shouldOpenPanel) openPanelNow();
   }catch(e){
+    // لو offline وعندنا retry متاح — انتظر ثانيتين وحاول تاني
+    if(e.message&&e.message.includes('offline')&&_retry<3){
+      showToast('🔄 إعادة الاتصال... ('+(  _retry+1)+'/3)','#ffaa00');
+      await new Promise(r=>setTimeout(r,2000));
+      return processUser(fbUser, shouldOpenPanel, _retry+1);
+    }
     showToast('❌ خطأ: '+e.message,'#ff6060');
     S.fbLoading=false;updateUI();
   }
