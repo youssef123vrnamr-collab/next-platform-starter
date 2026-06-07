@@ -1065,9 +1065,14 @@ window.handleAdminLogin=async function(){
   if(btn){btn.disabled=true;btn.textContent='⏳ جاري...';}
   const provider=new GoogleAuthProvider();
   provider.setCustomParameters({prompt:'select_account'});
-  try{ await signInWithPopup(auth,provider); }
-  catch(e){
+  try{
+    const result=await signInWithPopup(auth,provider);
+    // نعالج المستخدم مباشرة بدون انتظار onAuthStateChanged
+    S.fbLoading=true; updateUI();
+    await processUser(result.user, true);
+  }catch(e){
     if(btn){btn.disabled=false;btn.textContent='ادخل كمشرف بـ Google';}
+    S.fbLoading=false; updateUI();
     showToast('❌ '+(e.message||'حدث خطأ'),'#ff6060');
   }
 };
@@ -1137,22 +1142,23 @@ async function processUser(fbUser, shouldOpenPanel){
 loadVideos();
 
 // ===== AUTH LISTENERS =====
-let _authBusy = false;
-
+// فقط لمعالجة حالة إعادة التحميل (reload) وهو مسجل دخول
 onAuthStateChanged(auth, async fbUser=>{
-  if(_authBusy) return;
-  _authBusy = true;
-  try{
-    if(fbUser){
-      S.fbLoading=true; updateUI();
-      await processUser(fbUser, true);
-    }else{
-      S.user=null; S.isAdmin=false; S.fbLoading=false;
-      S.isBlocked=false; S.adminExists=false;
-      updateUI();
+  if(fbUser && !S.user){
+    // مستخدم مسجل من session سابقة (reload)
+    S.fbLoading=true; updateUI();
+    try{
+      await processUser(fbUser, false);
+    }catch(e){
+      console.error('Auth error:',e);
+    }finally{
+      S.fbLoading=false; updateUI();
     }
-  }catch(e){ console.error('Auth error:',e); S.fbLoading=false; updateUI(); }
-  finally{ _authBusy=false; }
+  }else if(!fbUser){
+    S.user=null; S.isAdmin=false; S.isBlocked=false;
+    S.adminExists=false; S.fbLoading=false;
+    updateUI();
+  }
 });
 
 // ESC
