@@ -1103,12 +1103,14 @@ async function loadVideos(){
 async function processUser(fbUser, shouldOpenPanel){
   try{
     const email=(fbUser.email||'').toLowerCase().trim();
+    showToast('⏳ 1: جاري التحقق من '+email,'#00b4ff');
     const adminRef=doc(db,'admins',email);
     const userSnap=await getDoc(adminRef);
+    showToast('⏳ 2: exists='+userSnap.exists(),'#00b4ff');
     if(!userSnap.exists()){
       const adminSnap=await getDocs(collection(db,'admins'));
+      showToast('⏳ 3: admins count='+adminSnap.size,'#00b4ff');
       if(adminSnap.empty){
-        // أول مشرف في المنصة
         await setDoc(adminRef,{
           email:email, displayName:fbUser.displayName,
           photoURL:fbUser.photoURL, isAdmin:true, createdAt:new Date(),
@@ -1119,7 +1121,6 @@ async function processUser(fbUser, shouldOpenPanel){
         if(shouldOpenPanel) openPanelNow();
         return;
       }else{
-        // يوجد مشرف بالفعل وهذا المستخدم ليس هو
         S.user=null;S.isAdmin=false;S.adminExists=true;S.isBlocked=true;S.fbLoading=false;
         updateUI();
         await signOut(auth);
@@ -1127,13 +1128,13 @@ async function processUser(fbUser, shouldOpenPanel){
         return;
       }
     }
-    // مشرف موجود وتم التحقق منه
+    showToast('✅ مشرف موجود — جاري الفتح','#00ff96');
     S.user={uid:fbUser.uid,email:email,displayName:fbUser.displayName,photoURL:fbUser.photoURL};
     S.isAdmin=true;S.adminExists=true;S.isBlocked=false;S.fbLoading=false;
     updateUI();
     if(shouldOpenPanel) openPanelNow();
   }catch(e){
-    console.error('processUser error:',e);
+    showToast('❌ خطأ: '+e.message,'#ff6060');
     S.fbLoading=false;updateUI();
   }
 }
