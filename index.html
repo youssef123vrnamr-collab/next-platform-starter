@@ -1137,30 +1137,14 @@ async function processUser(fbUser, shouldOpenPanel){
 // ===== INIT =====
 loadVideos();
 
-// فحص وجود مشرف للعرض الأولي
-getDocs(collection(db,'admins'))
-  .then(snap=>{S.adminExists=!snap.empty;if(!S.isAdmin){S.fbLoading=false;updateUI();}})
-  .catch(()=>{S.fbLoading=false;updateUI();});
-
 // ===== AUTH LISTENERS =====
-// الـ Auth listener الوحيد — بسيط وموثوق
-let _processing = false;
-
 onAuthStateChanged(auth, async fbUser=>{
-  try{
-    if(fbUser){
-      if(_processing) return;
-      _processing = true;
-      await processUser(fbUser, true);
-    }else{
-      _processing = false;
-      S.user=null;S.isAdmin=false;S.fbLoading=false;S.isBlocked=false;
-      updateUI();
-    }
-  }catch(err){
-    console.error('Auth error:',err);
-  }finally{
-    if(fbUser) _processing = false;
+  if(fbUser){
+    await processUser(fbUser, true);
+  }else{
+    S.user=null;S.isAdmin=false;S.fbLoading=false;S.isBlocked=false;
+    S.adminExists=false;
+    updateUI();
   }
 });
 
