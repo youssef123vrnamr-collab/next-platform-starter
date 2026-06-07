@@ -1098,17 +1098,19 @@ async function loadVideos(){
 // يشتغل سواء من getRedirectResult أو onAuthStateChanged
 async function processUser(fbUser, shouldOpenPanel){
   try{
-    const userSnap=await getDoc(doc(db,'users',fbUser.uid));
+    const email = (fbUser.email||'').toLowerCase().trim();
+    // البحث بالإيميل بدل الـ UID
+    const userSnap=await getDoc(doc(db,'admins',email));
     if(!userSnap.exists()){
-      // مستخدم جديد — تحقق من وجود مشرف
-      const adminSnap=await getDocs(query(collection(db,'users'),where('isAdmin','==',true)));
+      // تحقق من وجود أي مشرف
+      const adminSnap=await getDocs(collection(db,'admins'));
       if(adminSnap.empty){
         // أول مستخدم → يصبح مشرف
-        await setDoc(doc(db,'users',fbUser.uid),{
-          email:fbUser.email, displayName:fbUser.displayName,
+        await setDoc(doc(db,'admins',email),{
+          email:email, displayName:fbUser.displayName,
           photoURL:fbUser.photoURL, isAdmin:true, createdAt:new Date(),
         });
-        S.user={uid:fbUser.uid,email:fbUser.email,displayName:fbUser.displayName,photoURL:fbUser.photoURL};
+        S.user={uid:fbUser.uid,email:email,displayName:fbUser.displayName,photoURL:fbUser.photoURL};
         S.isAdmin=true;S.adminExists=true;S.isBlocked=false;S.fbLoading=false;
         openPanelNow();
       }else{
@@ -1119,18 +1121,10 @@ async function processUser(fbUser, shouldOpenPanel){
       }
       return;
     }
-    // مستخدم موجود في Firestore
-    const isAdmin=userSnap.data()?.isAdmin===true;
-    if(isAdmin){
-      S.user={uid:fbUser.uid,email:fbUser.email,displayName:fbUser.displayName,photoURL:fbUser.photoURL};
-      S.isAdmin=true;S.adminExists=true;S.isBlocked=false;S.fbLoading=false;
-      if(shouldOpenPanel){ openPanelNow(); }else{ updateUI(); }
-    }else{
-      S.user=null;S.isAdmin=false;S.adminExists=true;S.isBlocked=false;S.fbLoading=false;
-      await signOut(auth);
-      _authHandled=false;
-      updateUI();
-    }
+    // مشرف موجود — ادخله
+    S.user={uid:fbUser.uid,email:email,displayName:fbUser.displayName,photoURL:fbUser.photoURL};
+    S.isAdmin=true;S.adminExists=true;S.isBlocked=false;S.fbLoading=false;
+    if(shouldOpenPanel){ openPanelNow(); }else{ updateUI(); }
   }catch(e){
     console.error('processUser error:',e);
     S.fbLoading=false;updateUI();
@@ -1141,7 +1135,7 @@ async function processUser(fbUser, shouldOpenPanel){
 loadVideos();
 
 // فحص وجود مشرف للعرض الأولي
-getDocs(query(collection(db,'users'),where('isAdmin','==',true)))
+getDocs(collection(db,'admins'))
   .then(snap=>{S.adminExists=!snap.empty;if(!S.isAdmin){S.fbLoading=false;updateUI();}})
   .catch(()=>{S.fbLoading=false;updateUI();});
 
