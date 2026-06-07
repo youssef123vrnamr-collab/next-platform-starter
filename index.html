@@ -714,25 +714,29 @@ footer strong{color:#00ff96;font-weight:700}
 
 <!-- ===== FIREBASE + SCRIPT ===== -->
 <script type="module">
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
-import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, updateDoc, setDoc, getDoc, query, orderBy, where } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+import { initializeApp }       from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged }
+                               from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, updateDoc, setDoc, getDoc, query, orderBy, where }
+                               from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
-// ===== CONFIG =====
+// ===== FIREBASE CONFIG =====
 const FIREBASE_CONFIG = {
-  apiKey: "AIzaSyB-TFF6yvJyq21RxMD7KuAgNuVOBlXgNhY",
-  authDomain: "ginang-ca81d.firebaseapp.com",
-  projectId: "ginang-ca81d",
-  storageBucket: "ginang-ca81d.firebasestorage.app",
+  apiKey:            "AIzaSyB-TFF6yvJyq21RxMD7KuAgNuVOBlXgNhY",
+  authDomain:        "ginang-ca81d.firebaseapp.com",
+  projectId:         "ginang-ca81d",
+  storageBucket:     "ginang-ca81d.firebasestorage.app",
   messagingSenderId: "556233466817",
-  appId: "1:556233466817:web:f86580ee42b9e7f0f90540",
+  appId:             "1:556233466817:web:f86580ee42b9e7f0f90540",
 };
+const app  = initializeApp(FIREBASE_CONFIG);
+const auth = getAuth(app);
+const db   = getFirestore(app);
 
 // ===== STATE =====
 let S = {
   user:null, isAdmin:false, adminExists:false, isBlocked:false,
-  videos:[], filter:'all', editingId:null, initialized:false,
-  fbLoading:true, openPanelAfterLogin:false, activeTab:'youtube',
+  videos:[], initialized:false, fbLoading:true, editingId:null, activeTab:'youtube',
 };
 
 // ===== HELPERS =====
@@ -747,7 +751,7 @@ function extractYouTubeId(url){
 }
 function extractDriveId(url){
   if(!url)return null;
-  const m=url.match(/\/file\/d\/([^/]+)/)||url.match(/id=([^&]+)/);
+  const m=url.match(/\/file\/d\/([^/?#]+)/)||url.match(/[?&]id=([^&]+)/);
   return m?m[1]:null;
 }
 function ytThumb(id){return`https://img.youtube.com/vi/${id}/maxresdefault.jpg`;}
@@ -760,13 +764,13 @@ function driveEmbed(id){return`https://drive.google.com/file/d/${id}/preview`;}
   let w,h,stars=[];
   function resize(){w=canvas.width=window.innerWidth;h=canvas.height=window.innerHeight;}
   resize();window.addEventListener('resize',resize);
-  for(let i=0;i<120;i++)stars.push({x:Math.random()*2000,y:Math.random()*2000,r:Math.random()*1.5,s:Math.random()*.5+.1});
+  for(let i=0;i<120;i++)stars.push({x:Math.random()*2000,y:Math.random()*2000,r:Math.random()*1.5+.2,s:Math.random()*.4+.1});
   function frame(){
     ctx.clearRect(0,0,w,h);
     stars.forEach(s=>{
       s.y-=s.s;if(s.y<0){s.y=h;s.x=Math.random()*w;}
-      ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
-      ctx.fillStyle=`rgba(255,255,255,${Math.random()*.5+.2})`;ctx.fill();
+      ctx.beginPath();ctx.arc(s.x%w,s.y,s.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(255,255,255,${(Math.random()*.4+.15).toFixed(2)})`;ctx.fill();
     });
     requestAnimationFrame(frame);
   }
@@ -778,23 +782,19 @@ window.showToast=function(msg,color='#00ff96'){
   const t=document.getElementById('toast');
   t.textContent=msg;t.style.color=color;
   t.style.borderColor=color+'44';t.style.background=color+'14';
-  t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);
+  t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3200);
 };
 
 // ===== STATS =====
 function updateStats(){
-  const total=S.videos.length;
-  const free=S.videos.filter(v=>!v.locked).length;
-  const locked=S.videos.filter(v=>v.locked).length;
-  document.getElementById('stat-total').textContent=total;
-  document.getElementById('stat-free').textContent=free;
-  document.getElementById('stat-locked').textContent=locked;
+  document.getElementById('stat-total').textContent=S.videos.length;
+  document.getElementById('stat-free').textContent=S.videos.filter(v=>!v.locked).length;
+  document.getElementById('stat-locked').textContent=S.videos.filter(v=>v.locked).length;
 }
 
-// ===== UI UPDATE =====
+// ===== UI =====
 window.updateUI=function(){
   const{isAdmin,user,adminExists,isBlocked,fbLoading}=S;
-  // Gear
   const gearBtn=document.getElementById('gear-btn');
   const gearIcon=document.getElementById('gear-icon');
   const gearDot=document.getElementById('gear-dot');
@@ -803,23 +803,21 @@ window.updateUI=function(){
   }else{
     gearBtn.classList.remove('active');gearIcon.setAttribute('fill','rgba(255,255,255,0.35)');gearDot.style.display='none';
   }
-  // Badge
   const badge=document.getElementById('admin-badge');
   if(isAdmin&&user){
     badge.style.display='flex';
     document.getElementById('admin-avatar').src=user.photoURL||'';
     document.getElementById('admin-name').textContent='👑 '+(user.displayName||'').split(' ')[0];
   }else{badge.style.display='none';}
-  // Add btn
   document.getElementById('add-video-btn').style.display=isAdmin?'block':'none';
-  // Panel states
-  const loading=fbLoading&&!isAdmin&&!isBlocked;
-  const noAdmin=!fbLoading&&!adminExists&&!isAdmin&&!isBlocked;
-  const blocked=!fbLoading&&!isAdmin&&isBlocked;
-  document.getElementById('state-loading').style.display=loading?'block':'none';
-  document.getElementById('state-no-admin').style.display=noAdmin?'block':'none';
-  document.getElementById('state-blocked').style.display=blocked?'block':'none';
-  document.getElementById('state-is-admin').style.display=isAdmin?'block':'none';
+
+  const loading  = fbLoading&&!isAdmin&&!isBlocked;
+  const noAdmin  = !fbLoading&&!adminExists&&!isAdmin&&!isBlocked;
+  const blocked  = !fbLoading&&!isAdmin&&isBlocked;
+  document.getElementById('state-loading').style.display  = loading  ? 'block':'none';
+  document.getElementById('state-no-admin').style.display = noAdmin  ? 'block':'none';
+  document.getElementById('state-blocked').style.display  = blocked  ? 'block':'none';
+  document.getElementById('state-is-admin').style.display = isAdmin  ? 'block':'none';
   if(isAdmin&&user){
     document.getElementById('panel-avatar').src=user.photoURL||'';
     document.getElementById('panel-name').textContent=user.displayName||'';
@@ -831,43 +829,44 @@ window.updateUI=function(){
 window.renderVideos=function(){
   const search=(document.getElementById('main-search').value||'').toLowerCase().trim();
   const unlocked=S.videos.filter(v=>!v.locked&&matches(v,search));
-  const locked=S.videos.filter(v=>v.locked&&matches(v,search));
-  // Counts
+  const locked  =S.videos.filter(v=> v.locked&&matches(v,search));
   document.getElementById('unlocked-count').textContent=unlocked.length;
-  document.getElementById('locked-count').textContent=locked.length;
+  document.getElementById('locked-count').textContent  =locked.length;
   updateStats();
   renderGrid('grid-unlocked','empty-unlocked',unlocked,false);
-  renderGrid('grid-locked','empty-locked',locked,true);
+  renderGrid('grid-locked'  ,'empty-locked'  ,locked  ,true );
 };
-function matches(v,search){
-  if(!search)return true;
-  return((v.title||'').toLowerCase().includes(search)||
-         (v.description||'').toLowerCase().includes(search));
+function matches(v,q){
+  if(!q)return true;
+  return((v.title||'').toLowerCase().includes(q)||(v.description||'').toLowerCase().includes(q));
 }
 function renderGrid(gridId,emptyId,videos,isLocked){
   const grid=document.getElementById(gridId);
   const empty=document.getElementById(emptyId);
   [...grid.querySelectorAll('.video-card')].forEach(el=>el.remove());
-  if(!S.initialized){empty.style.display='grid';empty.querySelector('p').textContent='جاري التحميل...';return;}
-  if(videos.length===0){empty.style.display='grid';empty.querySelector('p').textContent=isLocked?'لا توجد فيديوهات مقفولة':'لا توجد فيديوهات مفتوحة';}
-  else{empty.style.display='none';videos.forEach(v=>grid.appendChild(buildCard(v)));}
+  if(!S.initialized){
+    empty.style.display='grid';empty.querySelector('p').textContent='جاري التحميل...';return;
+  }
+  if(videos.length===0){
+    empty.style.display='grid';
+    empty.querySelector('p').textContent=isLocked?'لا توجد فيديوهات مقفولة':'لا توجد فيديوهات مفتوحة';
+  }else{
+    empty.style.display='none';videos.forEach(v=>grid.appendChild(buildCard(v)));
+  }
 }
-
 function buildCard(v){
   const card=document.createElement('div');
   card.className='video-card'+(v.locked?' locked-card':'');
   card.dataset.id=v.id;
 
-  // Thumb
   const thumbWrap=document.createElement('div');thumbWrap.className='thumb-wrap';
   const thumbBg=document.createElement('div');thumbBg.className='thumb-bg';
 
   let thumbUrl='';
   if(v.type==='drive'){
     thumbUrl=v.thumbUrl||'';
-    // Drive badge
-    const driveBadge=document.createElement('div');driveBadge.className='drive-badge';driveBadge.textContent='📁 Drive';
-    thumbWrap.appendChild(driveBadge);
+    const db2=document.createElement('div');db2.className='drive-badge';db2.textContent='📁 Drive';
+    thumbWrap.appendChild(db2);
   }else{
     thumbUrl=ytThumb(v.youtubeId);
   }
@@ -896,20 +895,18 @@ function buildCard(v){
       thumbWrap.innerHTML='';thumbWrap.appendChild(iframe);
     };
   }
-
   thumbWrap.appendChild(thumbBg);thumbWrap.appendChild(grad);thumbWrap.appendChild(playWrap);
 
-  // Info
   const info=document.createElement('div');info.className='video-info';
   const meta=document.createElement('div');meta.className='video-meta';
   const textDiv=document.createElement('div');textDiv.style.flex='1';
-  const title=document.createElement('h3');title.className='video-title';title.textContent=v.title||'—';textDiv.appendChild(title);
+  const title=document.createElement('h3');title.className='video-title';title.textContent=v.title||'—';
+  textDiv.appendChild(title);
   if(v.description){const desc=document.createElement('p');desc.className='video-desc';desc.textContent=v.description;textDiv.appendChild(desc);}
   meta.appendChild(textDiv);
   if(v.locked){const b=document.createElement('span');b.className='badge-locked';b.textContent='مقفول';meta.appendChild(b);}
   info.appendChild(meta);
 
-  // Admin actions
   if(S.isAdmin){
     const actions=document.createElement('div');actions.className='admin-actions';
     const lockBtn=document.createElement('button');
@@ -925,15 +922,13 @@ function buildCard(v){
     actions.appendChild(lockBtn);actions.appendChild(editBtn);actions.appendChild(delBtn);
     info.appendChild(actions);
   }
-
   card.appendChild(thumbWrap);card.appendChild(info);
   return card;
 }
 
 // ===== SEARCH =====
 window.onSearch=function(inp){
-  const clearBtn=document.getElementById('search-clear');
-  clearBtn.style.display=inp.value?'block':'none';
+  document.getElementById('search-clear').style.display=inp.value?'block':'none';
   renderVideos();
 };
 window.clearSearch=function(){
@@ -945,11 +940,11 @@ window.clearSearch=function(){
 // ===== PANEL =====
 window.togglePanel=function(){
   const panel=document.getElementById('side-panel');
-  const overlay=document.getElementById('overlay');
+  const ov=document.getElementById('overlay');
   if(panel.classList.contains('open')){
-    panel.classList.remove('open');overlay.style.display='none';document.body.style.overflow='';
+    panel.classList.remove('open');ov.style.display='none';document.body.style.overflow='';
   }else{
-    updateUI();panel.classList.add('open');overlay.style.display='block';document.body.style.overflow='hidden';
+    updateUI();panel.classList.add('open');ov.style.display='block';document.body.style.overflow='hidden';
     if(S.isAdmin)showToast('👑 مرحباً بك يا مشرف!');
   }
 };
@@ -958,6 +953,15 @@ window.closePanel=function(){
   document.getElementById('overlay').style.display='none';
   document.body.style.overflow='';
 };
+function openPanelNow(){
+  updateUI();
+  const panel=document.getElementById('side-panel');
+  const ov=document.getElementById('overlay');
+  if(!panel.classList.contains('open')){
+    panel.classList.add('open');ov.style.display='block';document.body.style.overflow='hidden';
+    setTimeout(()=>showToast('👑 مرحباً بك يا مشرف!'),300);
+  }
+}
 
 // ===== TABS =====
 window.switchTab=function(tab){
@@ -972,8 +976,7 @@ window.switchTab=function(tab){
 // ===== ADD MODAL =====
 window.openAddModal=function(){
   document.getElementById('add-modal').style.display='flex';
-  document.body.style.overflow='hidden';
-  switchTab('youtube');
+  document.body.style.overflow='hidden';switchTab('youtube');
   setTimeout(()=>document.getElementById('add-yt-url').focus(),100);
 };
 window.closeAddModal=function(){
@@ -990,11 +993,9 @@ function showAddError(msg){
 }
 window.submitAddVideo=async function(){
   const title=(document.getElementById('add-title').value||'').trim();
-  const desc=(document.getElementById('add-desc').value||'').trim();
+  const desc =(document.getElementById('add-desc').value ||'').trim();
   if(!title){showAddError('أدخل عنواناً للفيديو');return;}
-
   let videoData={title,description:desc,locked:false,createdAt:new Date()};
-
   if(S.activeTab==='youtube'){
     const url=(document.getElementById('add-yt-url').value||'').trim();
     const id=extractYouTubeId(url);
@@ -1007,14 +1008,13 @@ window.submitAddVideo=async function(){
     const thumb=(document.getElementById('add-drive-thumb').value||'').trim();
     videoData.type='drive';videoData.driveId=id;if(thumb)videoData.thumbUrl=thumb;
   }
-
   const btn=document.getElementById('add-confirm-btn');
   btn.disabled=true;btn.textContent='⏳...';
   try{
     const ref=await addDoc(collection(db,'videos'),videoData);
     S.videos.unshift({id:ref.id,...videoData});
     closeAddModal();showToast('✅ تم إضافة الفيديو');renderVideos();
-  }catch(e){showAddError('خطأ في الحفظ: '+e.message);}
+  }catch(e){showAddError('خطأ: '+e.message);}
   btn.disabled=false;btn.textContent='إضافة ✓';
 };
 
@@ -1033,7 +1033,7 @@ window.closeEditModal=function(){
 };
 window.submitEdit=async function(){
   const title=(document.getElementById('edit-title').value||'').trim();
-  const desc=(document.getElementById('edit-desc').value||'').trim();
+  const desc =(document.getElementById('edit-desc').value ||'').trim();
   if(!title){alert('العنوان مطلوب');return;}
   const btn=document.getElementById('edit-confirm-btn');
   btn.disabled=true;btn.textContent='⏳...';
@@ -1060,15 +1060,18 @@ window.handleDelete=async function(id){
 };
 
 // ===== AUTH =====
+// نستخدم Redirect دايماً — الأضمن على كل المتصفحات والموبايل
 window.handleAdminLogin=async function(){
   const btn=document.getElementById('login-btn');
-  if(btn){btn.disabled=true;btn.textContent='⏳ جاري...';}
+  if(btn){btn.disabled=true;btn.textContent='⏳ جاري التوجيه...';}
   try{
     const provider=new GoogleAuthProvider();
+    provider.setCustomParameters({prompt:'select_account'});
     await signInWithRedirect(auth,provider);
+    // الصفحة هتتحمل من أول — getRedirectResult هيشتغل
   }catch(e){
     if(btn){btn.disabled=false;btn.textContent='ادخل كمشرف بـ Google';}
-    showToast('❌ حدث خطأ','#ff6060');
+    showToast('❌ '+(e.message||'حدث خطأ'),'#ff6060');
   }
 };
 window.handleSignOut=async function(){
@@ -1076,18 +1079,6 @@ window.handleSignOut=async function(){
   S.user=null;S.isAdmin=false;S.isBlocked=false;
   closePanel();updateUI();showToast('👋 تم تسجيل الخروج');
 };
-
-function openPanelNow(){
-  updateUI();
-  setTimeout(()=>{
-    const panel=document.getElementById('side-panel');
-    const overlay=document.getElementById('overlay');
-    if(!panel.classList.contains('open')){
-      panel.classList.add('open');overlay.style.display='block';
-      document.body.style.overflow='hidden';showToast('👑 مرحباً بك يا مشرف!');
-    }
-  },400);
-}
 
 // ===== LOAD VIDEOS =====
 async function loadVideos(){
@@ -1104,62 +1095,84 @@ async function loadVideos(){
   S.initialized=true;renderVideos();
 }
 
-// ===== INIT =====
-const app=initializeApp(FIREBASE_CONFIG);
-const auth=getAuth(app);
-const db=getFirestore(app);
+// ===== PROCESS FIREBASE USER =====
+// يشتغل سواء من getRedirectResult أو onAuthStateChanged
+async function processUser(fbUser, shouldOpenPanel){
+  try{
+    const userSnap=await getDoc(doc(db,'users',fbUser.uid));
+    if(!userSnap.exists()){
+      // مستخدم جديد — تحقق من وجود مشرف
+      const adminSnap=await getDocs(query(collection(db,'users'),where('isAdmin','==',true)));
+      if(adminSnap.empty){
+        // أول مستخدم → يصبح مشرف
+        await setDoc(doc(db,'users',fbUser.uid),{
+          email:fbUser.email, displayName:fbUser.displayName,
+          photoURL:fbUser.photoURL, isAdmin:true, createdAt:new Date(),
+        });
+        S.user={uid:fbUser.uid,email:fbUser.email,displayName:fbUser.displayName,photoURL:fbUser.photoURL};
+        S.isAdmin=true;S.adminExists=true;S.isBlocked=false;S.fbLoading=false;
+        openPanelNow();
+      }else{
+        // يوجد مشرف بالفعل — ارفض
+        S.user=null;S.isAdmin=false;S.adminExists=true;S.isBlocked=true;S.fbLoading=false;
+        await signOut(auth);updateUI();
+        showToast('❌ يوجد مشرف بالفعل','#ff6060');
+      }
+      return;
+    }
+    // مستخدم موجود في Firestore
+    const isAdmin=userSnap.data()?.isAdmin===true;
+    if(isAdmin){
+      S.user={uid:fbUser.uid,email:fbUser.email,displayName:fbUser.displayName,photoURL:fbUser.photoURL};
+      S.isAdmin=true;S.adminExists=true;S.isBlocked=false;S.fbLoading=false;
+      if(shouldOpenPanel){ openPanelNow(); }else{ updateUI(); }
+    }else{
+      S.user=null;S.isAdmin=false;S.adminExists=true;S.isBlocked=true;S.fbLoading=false;
+      await signOut(auth);updateUI();
+    }
+  }catch(e){
+    console.error('processUser error:',e);
+    S.fbLoading=false;updateUI();
+  }
+}
 
+// ===== INIT =====
 loadVideos();
 
-// Check admin exists
+// فحص وجود مشرف للعرض الأولي
 getDocs(query(collection(db,'users'),where('isAdmin','==',true)))
-  .then(snap=>{S.adminExists=!snap.empty;S.fbLoading=false;if(!S.isAdmin)updateUI();})
-  .catch(()=>{S.adminExists=false;S.fbLoading=false;if(!S.isAdmin)updateUI();});
+  .then(snap=>{S.adminExists=!snap.empty;if(!S.isAdmin){S.fbLoading=false;updateUI();}})
+  .catch(()=>{S.fbLoading=false;updateUI();});
 
-// Redirect result
-getRedirectResult(auth).then(async result=>{
-  if(result&&result.user){
-    S.openPanelAfterLogin=true;
-    setTimeout(()=>{if(S.isAdmin)openPanelNow();},1600);
-  }
-}).catch(()=>{});
+// Redirect result — يشتغل بعد رجوع الصفحة من Google
+getRedirectResult(auth)
+  .then(async result=>{
+    if(result && result.user){
+      // جه من redirect — افتح البانيل بعد المعالجة
+      await processUser(result.user, true);
+    }
+  })
+  .catch(e=>{
+    console.warn('getRedirectResult error:',e.code, e.message);
+  });
 
-// Auth state
+// onAuthStateChanged — يشتغل عند كل تغيير في حالة المستخدم
+let redirectHandled=false;
 onAuthStateChanged(auth,async fbUser=>{
   if(fbUser){
-    try{
-      const userSnap=await getDoc(doc(db,'users',fbUser.uid));
-      const userData=userSnap.exists()?userSnap.data():null;
-      const nowAdmin=userData?.isAdmin===true;
-      if(!userSnap.exists()){
-        const adminSnap=await getDocs(query(collection(db,'users'),where('isAdmin','==',true)));
-        if(adminSnap.empty){
-          await setDoc(doc(db,'users',fbUser.uid),{
-            email:fbUser.email,displayName:fbUser.displayName,
-            photoURL:fbUser.photoURL,isAdmin:true,createdAt:new Date(),
-          });
-          S.user={uid:fbUser.uid,email:fbUser.email,displayName:fbUser.displayName,photoURL:fbUser.photoURL};
-          S.isAdmin=true;S.adminExists=true;S.isBlocked=false;S.fbLoading=false;
-          S.openPanelAfterLogin=true;openPanelNow();return;
-        }else{
-          S.user=null;S.isAdmin=false;S.adminExists=true;S.isBlocked=true;S.fbLoading=false;
-          await signOut(auth);updateUI();return;
-        }
-      }
-      S.user={uid:fbUser.uid,email:fbUser.email,displayName:fbUser.displayName,photoURL:fbUser.photoURL};
-      S.isAdmin=nowAdmin;S.adminExists=true;S.fbLoading=false;
-      if(nowAdmin)S.isBlocked=false;
-      if(nowAdmin&&S.openPanelAfterLogin){S.openPanelAfterLogin=false;openPanelNow();}
-      else updateUI();
-    }catch(e){
-      console.error(e);S.user=null;S.isAdmin=false;S.fbLoading=false;updateUI();
-    }
+    if(redirectHandled)return; // منعنا تكرار processUser لو getRedirectResult اشتغل أول
+    redirectHandled=true;
+    // مستخدم مسجّل بالفعل (session محفوظة) — افتح البانيل
+    await processUser(fbUser, true);
   }else{
-    S.user=null;S.isAdmin=false;S.fbLoading=false;updateUI();
+    redirectHandled=false;
+    S.user=null;S.isAdmin=false;S.fbLoading=false;
+    if(!S.isBlocked)updateUI();
+    S.isBlocked=false;
   }
 });
 
-// ESC key
+// ESC
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){closePanel();closeAddModal();closeEditModal();}
 });
