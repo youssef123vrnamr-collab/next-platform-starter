@@ -64,18 +64,34 @@ try{
 }
 
 // فحص إضافي: هل fetch العادي لـ Firestore REST API بينجح؟ (بدون SDK خالص)
-add('4) جاري تجربة Fetch مباشر لـ Firestore REST API...', 'wait');
-const t1 = Date.now();
-fetch('https://firestore.googleapis.com/v1/projects/ginang-ca81d/databases/(default)/documents/admins')
-  .then(r=>r.json())
-  .then(j=>{
+add('4) جاري تجربة Fetch مباشر لـ Firestore REST API على عدة أسماء databases محتملة...', 'wait');
+const candidateIds = ['(default)','default','ginang-ca81d','gameverse'];
+for(const dbId of candidateIds){
+  const t1 = Date.now();
+  try{
+    const r = await fetch('https://firestore.googleapis.com/v1/projects/ginang-ca81d/databases/'+encodeURIComponent(dbId)+'/documents/admins');
+    const j = await r.json();
     const ms = Date.now()-t1;
-    add('✅ Fetch مباشر نجح في '+ms+'ms — الرد: '+JSON.stringify(j).slice(0,200), 'ok');
-  })
-  .catch(e=>{
+    if(j.error){
+      add('❌ database ID = "'+dbId+'" → خطأ ('+ms+'ms): '+j.error.message, 'err');
+    }else{
+      add('✅✅✅ database ID = "'+dbId+'" → نجح! ('+ms+'ms) — الرد: '+JSON.stringify(j).slice(0,150), 'ok');
+    }
+  }catch(e){
     const ms = Date.now()-t1;
-    add('❌ Fetch مباشر فشل بعد '+ms+'ms: '+(e.message||e), 'err');
-  });
+    add('❌ database ID = "'+dbId+'" → فشل الطلب نفسه ('+ms+'ms): '+(e.message||e), 'err');
+  }
+}
+
+// فحص قائمة كل الـ databases المتاحة في المشروع (endpoint مختلف يسرد كل الداتابيز)
+add('5) جاري سرد كل الـ databases المتاحة في المشروع...', 'wait');
+try{
+  const r2 = await fetch('https://firestore.googleapis.com/v1/projects/ginang-ca81d/databases');
+  const j2 = await r2.json();
+  add('📋 نتيجة سرد الداتابيز: '+JSON.stringify(j2).slice(0,500), j2.databases ? 'ok' : 'err');
+}catch(e){
+  add('❌ فشل سرد الداتابيز: '+(e.message||e), 'err');
+}
 </script>
 </body>
 </html>
