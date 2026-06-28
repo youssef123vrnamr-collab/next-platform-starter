@@ -727,7 +727,7 @@ footer strong{
 <!-- ===== FIREBASE + SCRIPT ===== -->
 <script type="module">
 import { initializeApp }       from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged }
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged }
                                from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
 import { initializeFirestore, collection, getDocs, addDoc, deleteDoc, doc, updateDoc, setDoc, getDoc, query, orderBy, where, enableNetwork }
                                from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
@@ -1079,18 +1079,39 @@ window.handleDelete=async function(id){
   S.videos=S.videos.filter(v=>v.id!==id);showToast('🗑 تم حذف الفيديو');renderVideos();
 };
 
-// ===== AUTH (REDIRECT FLOW — يحل مشكلة Cross-Origin-Opener-Policy مع popup) =====
+// ===== AUTH (POPUP أولاً — أكثر استقراراً خصوصاً على الموبايل، مع REDIRECT كحل بديل لو الـ popup محظور) =====
 window.handleAdminLogin=async function(){
   const btn=document.getElementById('login-btn');
-  if(btn){btn.disabled=true;btn.textContent='⏳ جاري التحويل...';}
+  if(btn){btn.disabled=true;btn.textContent='⏳ جاري تسجيل الدخول...';}
   const provider=new GoogleAuthProvider();
   provider.setCustomParameters({prompt:'select_account'});
+
   try{
-    await signInWithRedirect(auth,provider);
-    // الصفحة ستنتقل إلى جوجل، وبعد اختيار الحساب ستعود تلقائياً لهذا الموقع
+    showDebugError('🔄 جاري فتح نافذة تسجيل الدخول بجوجل...');
+    const result=await signInWithPopup(auth,provider);
+    if(result && result.user){
+      showDebugError('✅ signInWithPopup نجح: '+(result.user.email||result.user.uid));
+      S.fbLoading=true; updateUI();
+      await processUser(result.user, true);
+    }
   }catch(e){
+    console.error('signInWithPopup error:', e);
+    // لو الـ popup محظور، مغلق من المستخدم، أو غير مدعوم على هذا المتصفح — نرجع لـ redirect كخطة بديلة
+    const popupFailCodes=['auth/popup-blocked','auth/popup-closed-by-user','auth/cancelled-popup-request','auth/operation-not-supported-in-this-environment'];
+    if(popupFailCodes.includes(e.code)){
+      showDebugError('⚠️ فشل الـ popup ('+e.code+')، جاري المحاولة عبر التحويل (redirect)...');
+      try{
+        await signInWithRedirect(auth,provider);
+        return; // الصفحة ستنتقل إلى جوجل
+      }catch(e2){
+        if(btn){btn.disabled=false;btn.textContent='ادخل كمشرف بـ Google';}
+        showDebugError('❌ فشل أيضاً التحويل: '+(e2.code||'')+' — '+(e2.message||e2));
+        showToast('❌ '+(e2.message||'حدث خطأ'),'#ff7a7a');
+        return;
+      }
+    }
     if(btn){btn.disabled=false;btn.textContent='ادخل كمشرف بـ Google';}
-    showDebugError('خطأ بدء تسجيل الدخول: '+(e.code||'')+' — '+(e.message||e));
+    showDebugError('❌ خطأ تسجيل الدخول: '+(e.code||'')+' — '+(e.message||e));
     showToast('❌ '+(e.message||'حدث خطأ'),'#ff7a7a');
   }
 };
