@@ -727,7 +727,7 @@ footer strong{color:#00ff96;font-weight:700}
 import { initializeApp }       from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
 import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged }
                                from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
-import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, updateDoc, setDoc, getDoc, query, orderBy, where, enableNetwork }
+import { initializeFirestore, collection, getDocs, addDoc, deleteDoc, doc, updateDoc, setDoc, getDoc, query, orderBy, where, enableNetwork }
                                from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
 // ===== FIREBASE CONFIG =====
@@ -741,7 +741,7 @@ const FIREBASE_CONFIG = {
 };
 const app  = initializeApp(FIREBASE_CONFIG);
 const auth = getAuth(app);
-const db   = getFirestore(app);
+const db   = initializeFirestore(app, { experimentalAutoDetectLongPolling: true });
 enableNetwork(db).catch(()=>{});
 
 // ===== STATE =====
