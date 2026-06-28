@@ -421,6 +421,13 @@ input,button,select,textarea{font-family:'Cairo',sans-serif}
 }
 #toast.show{transform:translateX(-50%) translateY(0)}
 
+/* ===== DEBUG ERROR BOX ===== */
+#debug-error-box{
+  position:fixed;bottom:0;left:0;right:0;background:#1a0000;color:#ff8080;
+  font-size:11px;padding:10px;z-index:999999;display:none;direction:ltr;
+  text-align:left;word-break:break-all;border-top:2px solid #ff0000;
+}
+
 /* ===== FOOTER ===== */
 footer{
   text-align:center;padding:36px 24px;border-top:1px solid var(--border);
@@ -712,10 +719,13 @@ footer strong{color:#00ff96;font-weight:700}
 <!-- ===== TOAST ===== -->
 <div id="toast"></div>
 
+<!-- ===== DEBUG ERROR BOX ===== -->
+<div id="debug-error-box"></div>
+
 <!-- ===== FIREBASE + SCRIPT ===== -->
 <script type="module">
 import { initializeApp }       from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
+import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged }
                                from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
 import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, updateDoc, setDoc, getDoc, query, orderBy, where, enableNetwork }
                                from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
@@ -739,6 +749,13 @@ let S = {
   user:null, isAdmin:false, adminExists:false, isBlocked:false,
   videos:[], initialized:false, fbLoading:true, editingId:null, activeTab:'youtube',
 };
+
+// ===== DEBUG ERROR BOX HELPER =====
+function showDebugError(text){
+  const box=document.getElementById('debug-error-box');
+  box.style.display='block';
+  box.textContent='⚠️ '+text;
+}
 
 // ===== HELPERS =====
 function extractYouTubeId(url){
@@ -1060,20 +1077,18 @@ window.handleDelete=async function(id){
   S.videos=S.videos.filter(v=>v.id!==id);showToast('🗑 تم حذف الفيديو');renderVideos();
 };
 
-// ===== AUTH =====
+// ===== AUTH (REDIRECT FLOW — يحل مشكلة Cross-Origin-Opener-Policy مع popup) =====
 window.handleAdminLogin=async function(){
   const btn=document.getElementById('login-btn');
-  if(btn){btn.disabled=true;btn.textContent='⏳ جاري...';}
+  if(btn){btn.disabled=true;btn.textContent='⏳ جاري التحويل...';}
   const provider=new GoogleAuthProvider();
   provider.setCustomParameters({prompt:'select_account'});
   try{
-    const result=await signInWithPopup(auth,provider);
-    // نعالج المستخدم مباشرة بدون انتظار onAuthStateChanged
-    S.fbLoading=true; updateUI();
-    await processUser(result.user, true);
+    await signInWithRedirect(auth,provider);
+    // الصفحة ستنتقل إلى جوجل، وبعد اختيار الحساب ستعود تلقائياً لهذا الموقع
   }catch(e){
     if(btn){btn.disabled=false;btn.textContent='ادخل كمشرف بـ Google';}
-    S.fbLoading=false; updateUI();
+    showDebugError('خطأ بدء تسجيل الدخول: '+(e.code||'')+' — '+(e.message||e));
     showToast('❌ '+(e.message||'حدث خطأ'),'#ff6060');
   }
 };
@@ -1099,53 +1114,83 @@ async function loadVideos(){
   S.initialized=true;renderVideos();
 }
 
-// ===== PROCESS FIREBASE USER =====
-// يشتغل من onAuthStateChanged
+// ===== PROCESS FIREBASE USER (مع timeout يمنع التعليق اللانهائي) =====
 async function processUser(fbUser, shouldOpenPanel, _retry=0){
+  const TIMEOUT_MS = 10000;
+  const timeoutPromise = new Promise((_, reject)=>
+    setTimeout(()=>reject(Object.assign(new Error('TIMEOUT: لم يستجب الخادم خلال 10 ثواني — تحقق من الإنترنت أو عطّل مانع الإعلانات'),{code:'timeout'})), TIMEOUT_MS)
+  );
+
   try{
-    // انتظر الاتصال أولاً
-    await enableNetwork(db);
-    const email=(fbUser.email||'').toLowerCase().trim();
-    const adminRef=doc(db,'admins',email);
-    const userSnap=await getDoc(adminRef);
-    if(!userSnap.exists()){
-      const adminSnap=await getDocs(collection(db,'admins'));
-      if(adminSnap.empty){
-        await setDoc(adminRef,{
-          email:email, displayName:fbUser.displayName,
-          photoURL:fbUser.photoURL, isAdmin:true, createdAt:new Date(),
-        });
-        S.user={uid:fbUser.uid,email:email,displayName:fbUser.displayName,photoURL:fbUser.photoURL};
-        S.isAdmin=true;S.adminExists=true;S.isBlocked=false;S.fbLoading=false;
-        updateUI();
-        if(shouldOpenPanel) openPanelNow();
-        return;
-      }else{
-        S.user=null;S.isAdmin=false;S.adminExists=true;S.isBlocked=true;S.fbLoading=false;
-        updateUI();
-        await signOut(auth);
-        showToast('❌ يوجد مشرف بالفعل','#ff6060');
-        return;
+    await Promise.race([ (async()=>{
+
+      await enableNetwork(db);
+      const email=(fbUser.email||'').toLowerCase().trim();
+      const adminRef=doc(db,'admins',email);
+      const userSnap=await getDoc(adminRef);
+
+      if(!userSnap.exists()){
+        const adminSnap=await getDocs(collection(db,'admins'));
+        if(adminSnap.empty){
+          await setDoc(adminRef,{
+            email:email, displayName:fbUser.displayName,
+            photoURL:fbUser.photoURL, isAdmin:true, createdAt:new Date(),
+          });
+          S.user={uid:fbUser.uid,email:email,displayName:fbUser.displayName,photoURL:fbUser.photoURL};
+          S.isAdmin=true;S.adminExists=true;S.isBlocked=false;S.fbLoading=false;
+          updateUI();
+          if(shouldOpenPanel) openPanelNow();
+          return;
+        }else{
+          S.user=null;S.isAdmin=false;S.adminExists=true;S.isBlocked=true;S.fbLoading=false;
+          updateUI();
+          await signOut(auth);
+          showToast('❌ يوجد مشرف بالفعل','#ff6060');
+          return;
+        }
       }
-    }
-    S.user={uid:fbUser.uid,email:email,displayName:fbUser.displayName,photoURL:fbUser.photoURL};
-    S.isAdmin=true;S.adminExists=true;S.isBlocked=false;S.fbLoading=false;
-    updateUI();
-    if(shouldOpenPanel) openPanelNow();
+
+      S.user={uid:fbUser.uid,email:email,displayName:fbUser.displayName,photoURL:fbUser.photoURL};
+      S.isAdmin=true;S.adminExists=true;S.isBlocked=false;S.fbLoading=false;
+      updateUI();
+      if(shouldOpenPanel) openPanelNow();
+
+    })(), timeoutPromise ]);
+
   }catch(e){
-    // لو offline وعندنا retry متاح — انتظر ثانيتين وحاول تاني
+    // لو offline وعندنا retry متاح — انتظر ثانيتين وحاول تاني (ليس لحالة timeout)
     if(e.message&&e.message.includes('offline')&&_retry<3){
-      showToast('🔄 إعادة الاتصال... ('+(  _retry+1)+'/3)','#ffaa00');
+      showToast('🔄 إعادة الاتصال... ('+(_retry+1)+'/3)','#ffaa00');
       await new Promise(r=>setTimeout(r,2000));
       return processUser(fbUser, shouldOpenPanel, _retry+1);
     }
-    showToast('❌ خطأ: '+e.message,'#ff6060');
-    S.fbLoading=false;updateUI();
+    console.error('processUser error:', e);
+    S.fbLoading=false; updateUI();
+    showDebugError((e.code||'')+' — '+(e.message||e));
+    if(e.code==='timeout'){
+      showToast('⏱ انتهت المهلة — تأكد من الإنترنت أو عطّل مانع الإعلانات','#ff6060');
+    }else if(e.code==='permission-denied'){
+      showToast('🔒 صلاحيات Firestore مرفوضة — راجع Security Rules','#ff6060');
+    }else{
+      showToast('❌ خطأ: '+(e.message||'غير معروف'),'#ff6060');
+    }
   }
 }
 
 // ===== INIT =====
 loadVideos();
+
+// معالجة نتيجة تسجيل الدخول بعد الرجوع من جوجل (Redirect flow)
+getRedirectResult(auth).then(async result=>{
+  if(result && result.user){
+    S.fbLoading=true; updateUI();
+    await processUser(result.user, true);
+  }
+}).catch(e=>{
+  console.error('Redirect result error:', e);
+  showDebugError('خطأ نتيجة التحويل: '+(e.code||'')+' — '+(e.message||e));
+  showToast('❌ خطأ في تسجيل الدخول: '+(e.message||e),'#ff6060');
+});
 
 // ===== AUTH LISTENERS =====
 // فقط لمعالجة حالة إعادة التحميل (reload) وهو مسجل دخول
