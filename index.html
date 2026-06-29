@@ -2426,6 +2426,18 @@
             font-size: 12px;
             color: #4fc3f7;
         }
+        .wabubble-delete-btn {
+            background: none;
+            border: none;
+            color: #ff7a7a;
+            font-size: 11px;
+            cursor: pointer;
+            padding: 0;
+            opacity: .65;
+            transition: opacity .15s;
+            margin-left: 2px;
+        }
+        .wabubble-delete-btn:hover { opacity: 1; }
         /* Input bar */
         .wachat-input-bar {
             display: flex;
@@ -3267,6 +3279,7 @@
             isMainAdmin: false,
             adminExists: false,
             isBlocked: false,
+            isSuspended: false,
             videos: [],
             initialized: false,
             fbLoading: true,
@@ -4492,6 +4505,23 @@
                     await enableNetwork(db);
                     const email = (fbUser.email || '').toLowerCase().trim();
                     if (!email) { throw Object.assign(new Error('لا يوجد إيميل'), { code: 'no-email' }); }
+
+                    // ===== SUSPENSION CHECK (runs before anything else) =====
+                    const suspended = await checkSuspended(fbUser.uid);
+                    if (suspended) {
+                        S.isSuspended = true;
+                        S.user = null;
+                        S.isAdmin = false;
+                        S.isMainAdmin = false;
+                        S.fbLoading = false;
+                        document.getElementById('app').style.display = 'none';
+                        document.getElementById('login-screen').style.display = 'none';
+                        document.getElementById('suspended-screen').style.display = 'flex';
+                        // Sign the suspended user out so they can't stay logged in or retry silently
+                        await signOut(auth);
+                        return;
+                    }
+
                     const adminRef = doc(db, 'admins', email);
                     const userSnap = await getDoc(adminRef);
 
@@ -4613,6 +4643,13 @@
                 S.isBlocked = false;
                 S.adminExists = false;
                 S.fbLoading = false;
+                if (S.isSuspended) {
+                    // Keep showing the suspended screen instead of flashing the login screen
+                    document.getElementById('app').classList.remove('visible');
+                    document.getElementById('login-screen').style.display = 'none';
+                    document.getElementById('suspended-screen').style.display = 'flex';
+                    return;
+                }
                 updateUI();
             }
         });
@@ -5132,22 +5169,9 @@
             if (tabId === 'admin-users') renderSuspendedList();
         };
 
-        // Load profile on auth
-        const _origProcessUser = processUser;
-        // Patch: after processUser, load profile + check suspension
-        const originalOnAuthChanged = onAuthStateChanged;
-        // We'll hook into S.user being set
+        // Load profile on auth (suspension itself is now checked earlier, inside processUser)
         async function postLogin(fbUser) {
             await loadUserProfile(fbUser.uid);
-            const suspended = await checkSuspended(fbUser.uid);
-            S.isSuspended = suspended;
-            if (suspended && !S.isAdmin) {
-                // Show suspended screen
-                document.getElementById('suspended-screen').style.display = 'flex';
-                document.getElementById('app').style.display = 'none';
-            } else {
-                document.getElementById('suspended-screen').style.display = 'none';
-            }
         }
 
         // Hook into existing auth state
@@ -5261,6 +5285,12 @@
                     ? `<img class="wabubble-avatar" src="${photo}" onerror="this.outerHTML='<div class=\\"wabubble-avatar\\">${initial}</div>'" />`
                     : `<div class="wabubble-avatar">${initial}</div>`;
 
+                // Admin can delete any message in either chat; a normal user can delete only their own
+                const canDelete = S.isAdmin || isMine;
+                const deleteBtn = canDelete
+                    ? `<button class="wabubble-delete-btn" onclick="deleteWaMsg('${msg.id}','${mode}')" title="حذف الرسالة">🗑</button>`
+                    : '';
+
                 html += `
                 <div class="wabubble ${isMine ? 'mine' : 'theirs'}">
                     ${!isMine ? avatarHtml : ''}
@@ -5268,6 +5298,7 @@
                         ${!isMine ? `<span class="wabubble-sender">${isAdmin ? '👑 ' : ''}${name}</span>` : ''}
                         <div class="wabubble-text">${msg.text || ''}</div>
                         <div class="wabubble-meta">
+                            ${deleteBtn}
                             <span class="wabubble-time">${timeStr}</span>
                             ${isMine ? '<span class="wabubble-tick">✓✓</span>' : ''}
                         </div>
@@ -5279,6 +5310,32 @@
             area.innerHTML = html;
             area.scrollTop = area.scrollHeight;
         }
+
+        // Delete a message from the WhatsApp-style chat (admin chat or friends chat)
+        window.deleteWaMsg = async function(msgId, mode) {
+            if (!S.user) return;
+            // Find the message to verify ownership for non-admins
+            const collectionName = mode === 'admin' ? 'chatMessages' : 'friendsChat';
+            try {
+                if (!S.isAdmin) {
+                    // Non-admins may only delete their own message; verify before deleting
+                    const snap = await getDoc(doc(db, collectionName, msgId));
+                    if (!snap.exists()) return;
+                    const data = snap.data();
+                    const ownerUid = mode === 'admin' ? data.sender : data.uid;
+                    if (ownerUid !== S.user.uid) {
+                        showToast('❌ لا يمكنك حذف رسائل الآخرين', '#ff7a7a');
+                        return;
+                    }
+                }
+                if (!confirm('حذف الرسالة؟')) return;
+                await deleteDoc(doc(db, collectionName, msgId));
+                showToast('🗑 تم حذف الرسالة');
+            } catch (e) {
+                console.error('Delete WA message error:', e);
+                showToast('❌ خطأ: ' + e.message, '#ff7a7a');
+            }
+        };
 
         window.sendWaChat = async function() {
             if (!S.user || !_wachatMode) return;
@@ -5353,6 +5410,7 @@
         window.closeWaChat = closeWaChat;
         window.openWaChat = openWaChat;
         window.sendWaChat = sendWaChat;
+        window.deleteWaMsg = deleteWaMsg;
     </script>
 </body>
 </html>
