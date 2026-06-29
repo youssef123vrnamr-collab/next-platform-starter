@@ -1826,6 +1826,505 @@
                 display: none;
             }
         }
+
+        /* ===== HAMBURGER MENU BTN ===== */
+        #hamburger-btn {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+            width: 42px;
+            height: 42px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 11px;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+            transition: all .25s;
+            flex-shrink: 0;
+        }
+        #hamburger-btn:hover {
+            background: var(--surface-2);
+            border-color: rgba(255,255,255,0.18);
+        }
+        #hamburger-btn span {
+            display: block;
+            width: 18px;
+            height: 2px;
+            background: rgba(255,255,255,0.7);
+            border-radius: 2px;
+            transition: all .25s;
+        }
+
+        /* ===== HAMBURGER SIDE PANEL ===== */
+        #menu-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 2998;
+            background: rgba(5,3,10,0.7);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            display: none;
+            touch-action: none;
+        }
+        #menu-panel {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 320px;
+            max-width: 90vw;
+            z-index: 2999;
+            background: linear-gradient(180deg, #120e22 0%, #0a0814 100%);
+            border-right: 1px solid rgba(192,38,211,0.18);
+            box-shadow: 24px 0 70px rgba(0,0,0,0.8);
+            transform: translateX(-100%);
+            transition: transform .35s cubic-bezier(.4,0,.2,1);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        #menu-panel.open {
+            transform: translateX(0);
+        }
+        .menu-panel-header {
+            padding: 20px 18px 16px;
+            border-bottom: 1px solid rgba(192,38,211,0.12);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+            position: sticky;
+            top: 0;
+            background: rgba(10,8,20,0.95);
+            backdrop-filter: blur(12px);
+            z-index: 2;
+        }
+        .menu-panel-logo {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 20px;
+            font-weight: 900;
+            background: var(--grad);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 2px;
+        }
+        .menu-panel-close {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            width: 32px;
+            height: 32px;
+            color: var(--text);
+            font-size: 17px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .menu-panel-body {
+            padding: 16px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        /* User info in menu */
+        .menu-user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px;
+            background: rgba(192,38,211,0.07);
+            border: 1px solid rgba(192,38,211,0.18);
+            border-radius: 12px;
+            margin-bottom: 6px;
+            cursor: pointer;
+            transition: background .2s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .menu-user-info:hover {
+            background: rgba(192,38,211,0.12);
+        }
+        .menu-user-info img {
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            border: 2px solid var(--magenta);
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+        .menu-user-info .menu-user-name {
+            color: var(--bright);
+            font-weight: 700;
+            font-size: 14px;
+        }
+        .menu-user-info .menu-user-role {
+            font-size: 11px;
+            color: var(--text-dim);
+            margin-top: 2px;
+        }
+        .menu-user-info .menu-edit-hint {
+            font-size: 10px;
+            color: var(--magenta);
+            margin-top: 3px;
+        }
+        /* Menu section title */
+        .menu-section-title {
+            color: var(--text-dim);
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            padding: 10px 4px 4px;
+        }
+        /* Menu nav items */
+        .menu-nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all .2s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .menu-nav-item:hover {
+            background: var(--surface-2);
+            color: var(--bright);
+            border-color: rgba(192,38,211,0.3);
+        }
+        .menu-nav-item .menu-nav-icon {
+            font-size: 18px;
+            width: 28px;
+            text-align: center;
+        }
+        .menu-nav-item.danger {
+            color: #ff7a7a;
+            border-color: rgba(255,70,70,0.18);
+            background: rgba(255,70,70,0.05);
+        }
+        .menu-nav-item.danger:hover {
+            background: rgba(255,70,70,0.1);
+        }
+        .menu-nav-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 6px 0;
+        }
+        /* Admin badge in menu */
+        .menu-admin-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 3px 10px;
+            background: rgba(255,176,32,0.12);
+            border: 1px solid rgba(255,176,32,0.25);
+            border-radius: 12px;
+            color: #ffc862;
+            font-size: 11px;
+            font-weight: 700;
+            margin-top: 4px;
+        }
+
+        /* ===== PROFILE MODAL ===== */
+        #profile-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: rgba(5,3,10,0.88);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+        .profile-modal-box {
+            background: linear-gradient(135deg,#150f2c,#0d0a1f);
+            border-radius: 20px;
+            padding: 28px 24px;
+            width: 440px;
+            max-width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            border: 1px solid rgba(192,38,211,0.22);
+        }
+        .profile-modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 22px;
+        }
+        .profile-modal-title {
+            color: var(--bright);
+            font-size: 18px;
+            font-weight: 700;
+        }
+        .profile-close-btn {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            width: 32px;
+            height: 32px;
+            color: var(--text);
+            font-size: 17px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        /* Profile avatar section */
+        .profile-avatar-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 24px;
+            padding: 20px;
+            background: rgba(192,38,211,0.05);
+            border: 1px solid rgba(192,38,211,0.15);
+            border-radius: 14px;
+        }
+        .profile-avatar-wrap {
+            position: relative;
+            width: 80px;
+            height: 80px;
+        }
+        .profile-avatar-wrap img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 3px solid var(--magenta);
+            object-fit: cover;
+        }
+        .profile-avatar-initials {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 3px solid var(--magenta);
+            background: var(--grad);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 28px;
+            font-weight: 900;
+            color: #0a0814;
+        }
+        .profile-avatar-url-wrap {
+            width: 100%;
+        }
+        .profile-avatar-url-wrap label {
+            color: var(--text-dim);
+            font-size: 11px;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .profile-avatar-url-input {
+            width: 100%;
+            padding: 9px 12px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 12px;
+            outline: none;
+            direction: ltr;
+            transition: border-color .2s;
+        }
+        .profile-avatar-url-input:focus {
+            border-color: rgba(192,38,211,0.45);
+        }
+        .profile-avatar-url-input::placeholder {
+            color: var(--text-dim);
+        }
+        .profile-field {
+            margin-bottom: 14px;
+        }
+        .profile-label {
+            display: block;
+            color: var(--text);
+            font-size: 12px;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+        .profile-input {
+            width: 100%;
+            padding: 11px 14px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 13px;
+            outline: none;
+            direction: rtl;
+            -webkit-appearance: none;
+            transition: border-color .2s;
+        }
+        .profile-input:focus {
+            border-color: rgba(192,38,211,0.45);
+        }
+        .profile-input::placeholder {
+            color: var(--text-dim);
+        }
+        .profile-select {
+            width: 100%;
+            padding: 11px 14px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 13px;
+            outline: none;
+            direction: rtl;
+            -webkit-appearance: none;
+            transition: border-color .2s;
+        }
+        .profile-select:focus {
+            border-color: rgba(192,38,211,0.45);
+        }
+        .profile-select option {
+            background: #1a1335;
+        }
+        .profile-save-btn {
+            width: 100%;
+            padding: 13px;
+            background: var(--grad);
+            border: none;
+            border-radius: 10px;
+            color: #0a0814;
+            font-size: 14px;
+            font-weight: 900;
+            cursor: pointer;
+            margin-top: 6px;
+            transition: opacity .2s, transform .2s;
+        }
+        .profile-save-btn:hover { transform: translateY(-1px); }
+        .profile-save-btn:active { opacity: .85; }
+        .profile-save-btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+
+        /* ===== ACCOUNT SUSPEND (admin) ===== */
+        .suspend-banner {
+            background: rgba(255,70,70,0.07);
+            border: 1px solid rgba(255,70,70,0.2);
+            border-radius: 10px;
+            padding: 12px 14px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .suspend-banner .sb-text {
+            color: #ff7a7a;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .btn-suspend {
+            padding: 6px 14px;
+            background: rgba(255,70,70,0.12);
+            border: 1px solid rgba(255,70,70,0.35);
+            border-radius: 7px;
+            color: #ff7a7a;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: background .2s;
+        }
+        .btn-suspend:hover { background: rgba(255,70,70,0.2); }
+        .btn-unsuspend {
+            padding: 6px 14px;
+            background: rgba(168,85,247,0.12);
+            border: 1px solid rgba(168,85,247,0.35);
+            border-radius: 7px;
+            color: #d8a8ff;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: background .2s;
+        }
+
+        /* ===== DM REPLY (admin sends direct msg to user) ===== */
+        .dm-reply-panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px;
+            margin-top: 10px;
+        }
+        .dm-reply-panel input {
+            width: 100%;
+            padding: 9px 12px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 13px;
+            outline: none;
+            margin-bottom: 8px;
+        }
+        .dm-reply-panel input:focus {
+            border-color: rgba(192,38,211,0.4);
+        }
+        .dm-reply-send-btn {
+            padding: 8px 18px;
+            background: var(--grad);
+            border: none;
+            border-radius: 8px;
+            color: #0a0814;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        /* ===== COMMENT DELETE BTN ===== */
+        .comment-delete-btn {
+            background: none;
+            border: none;
+            color: #ff7a7a;
+            font-size: 12px;
+            cursor: pointer;
+            padding: 2px 6px;
+            border-radius: 4px;
+            transition: background .2s;
+            margin-top: 2px;
+            display: inline-block;
+        }
+        .comment-delete-btn:hover {
+            background: rgba(255,70,70,0.1);
+        }
+
+        /* ===== SUSPENDED OVERLAY ===== */
+        #suspended-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 99999;
+            background: var(--void);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 24px;
+        }
+        #suspended-screen .sus-icon { font-size: 58px; margin-bottom: 16px; }
+        #suspended-screen h2 { color: #ff7a7a; font-size: 22px; margin-bottom: 12px; }
+        #suspended-screen p { color: var(--text); font-size: 15px; line-height: 1.7; max-width: 380px; }
     </style>
 </head>
 <body>
@@ -1858,11 +2357,16 @@
                 <a href="#section-locked">مقفول</a>
             </div>
             <div class="nav-right">
-                <div id="user-badge">
+                <div id="user-badge" onclick="openMenuPanel()" style="cursor:pointer" title="الملف الشخصي">
                     <img id="user-avatar-nav" src="" alt="" />
                     <span id="user-name-nav">مستخدم</span>
                     <span class="role-tag" id="user-role-nav">عادي</span>
                 </div>
+                <button id="hamburger-btn" onclick="openMenuPanel()" aria-label="القائمة">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
                 <button id="gear-btn" onclick="handleGearClick()" aria-label="لوحة التحكم">
                     <svg width="18" height="18" viewBox="0 0 24 24" id="gear-icon" fill="rgba(255,255,255,0.4)">
                         <path d="M19.14 12.94c.04-.3.06-.61.06-.94s-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96a7.02 7.02 0 0 0-1.62-.94l-.36-2.54A.484.484 0 0 0 14 2h-4a.484.484 0 0 0-.48.41l-.36 2.54a7.02 7.02 0 0 0-1.62.94l-2.39-.96a.48.48 0 0 0-.59.22L2.74 8.47a.47.47 0 0 0 .12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.47.47 0 0 0-.12.61l1.92 3.32c.12.22.37.3.59.22l2.39-.96c.5.36 1.04.67 1.62.94l.36 2.54c.05.28.3.48.48.48h4c.28 0 .47-.2.48-.48l.36-2.54a7.02 7.02 0 0 0 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32a.47.47 0 0 0-.12-.61l-2.03-1.58zM12 15.6A3.6 3.6 0 1 1 12 8.4a3.6 3.6 0 0 1 0 7.2z"/>
@@ -1874,6 +2378,86 @@
 
         <!-- ===== OVERLAY ===== -->
         <div id="overlay" onclick="closePanel()"></div>
+
+        <!-- ===== MENU OVERLAY ===== -->
+        <div id="menu-overlay" onclick="closeMenuPanel()"></div>
+
+        <!-- ===== HAMBURGER MENU PANEL ===== -->
+        <div id="menu-panel">
+            <div class="menu-panel-header">
+                <span class="menu-panel-logo">GAMEVERSE</span>
+                <button class="menu-panel-close" onclick="closeMenuPanel()">✕</button>
+            </div>
+            <div class="menu-panel-body">
+
+                <!-- User info card - click to open profile -->
+                <div class="menu-user-info" id="menu-user-info-card" onclick="openProfileModal()">
+                    <img id="menu-user-avatar" src="" alt="" onerror="this.style.display='none'" />
+                    <div>
+                        <div class="menu-user-name" id="menu-user-name-text">مستخدم</div>
+                        <div class="menu-user-role" id="menu-user-role-text">عادي</div>
+                        <div class="menu-edit-hint">✏ اضغط لتعديل الملف الشخصي</div>
+                    </div>
+                </div>
+
+                <div class="menu-section-title">التنقل</div>
+
+                <a class="menu-nav-item" href="#hero" onclick="closeMenuPanel()">
+                    <span class="menu-nav-icon">🏠</span>
+                    الرئيسية
+                </a>
+                <a class="menu-nav-item" href="#section-unlocked" onclick="closeMenuPanel()">
+                    <span class="menu-nav-icon">🔓</span>
+                    فيديوهات مفتوحة
+                </a>
+                <a class="menu-nav-item" href="#section-locked" onclick="closeMenuPanel()">
+                    <span class="menu-nav-icon">🔒</span>
+                    فيديوهات مقفولة
+                </a>
+
+                <div class="menu-nav-divider"></div>
+                <div class="menu-section-title">التواصل</div>
+
+                <div class="menu-nav-item" onclick="openUserChatFromMenu()">
+                    <span class="menu-nav-icon">💬</span>
+                    تواصل مع المشرفين
+                </div>
+                <div class="menu-nav-item" onclick="openFriendsChatFromMenu()">
+                    <span class="menu-nav-icon">👥</span>
+                    تواصل مع أصدقائك
+                </div>
+
+                <!-- Admin only section -->
+                <div id="menu-admin-section" style="display:none">
+                    <div class="menu-nav-divider"></div>
+                    <div class="menu-section-title">إدارة المنصة</div>
+                    <div class="menu-nav-item" onclick="closeMenuPanel();handleGearClick()">
+                        <span class="menu-nav-icon">⚙️</span>
+                        لوحة التحكم
+                    </div>
+                    <div class="menu-nav-item" id="menu-add-admin-btn" onclick="closeMenuPanel();setTimeout(()=>{handleGearClick();setTimeout(()=>switchPanelTab('admin-admins'),300)},100)">
+                        <span class="menu-nav-icon">➕</span>
+                        إضافة مشرف
+                    </div>
+                    <div class="menu-nav-item" onclick="closeMenuPanel();setTimeout(()=>{handleGearClick();setTimeout(()=>switchPanelTab('admin-comments'),300)},100)">
+                        <span class="menu-nav-icon">💬</span>
+                        تعليقات كل الفيديوهات
+                    </div>
+                    <div class="menu-nav-item" onclick="closeMenuPanel();setTimeout(()=>{handleGearClick();setTimeout(()=>switchPanelTab('admin-chat'),300)},100)">
+                        <span class="menu-nav-icon">📨</span>
+                        رد على المستخدمين
+                    </div>
+                </div>
+
+                <div class="menu-nav-divider"></div>
+
+                <div class="menu-nav-item danger" onclick="handleSignOut()">
+                    <span class="menu-nav-icon">🚪</span>
+                    تسجيل الخروج
+                </div>
+
+            </div>
+        </div>
 
         <!-- ===== SIDE PANEL ===== -->
         <div id="side-panel">
@@ -1937,7 +2521,8 @@
                         <button class="panel-tab" data-tab="admin-admins" onclick="switchPanelTab('admin-admins')">👥 مشرفين</button>
                         <button class="panel-tab" data-tab="admin-ratings" onclick="switchPanelTab('admin-ratings')">⭐ تقييمات</button>
                         <button class="panel-tab" data-tab="admin-comments" onclick="switchPanelTab('admin-comments')">💬 تعليقات</button>
-                        <button class="panel-tab" data-tab="admin-chat" onclick="switchPanelTab('admin-chat')">💬 دردشه</button>
+                        <button class="panel-tab" data-tab="admin-chat" onclick="switchPanelTab('admin-chat')">📨 رسائل</button>
+                        <button class="panel-tab" data-tab="admin-users" onclick="switchPanelTab('admin-users')">🚫 المستخدمين</button>
                     </div>
 
                     <!-- Upload -->
@@ -1983,6 +2568,7 @@
 
                     <!-- Chat -->
                     <div class="panel-tab-content" id="tab-admin-chat">
+                        <p class="panel-section-title">رد على رسائل المستخدمين</p>
                         <div class="chat-container" id="admin-chat-container">
                             <div class="chat-messages" id="admin-chat-messages"></div>
                             <div class="chat-input-wrap">
@@ -1990,6 +2576,25 @@
                                 <button onclick="sendAdminChat()">إرسال</button>
                             </div>
                         </div>
+                        <div class="dm-reply-panel" style="margin-top:10px">
+                            <p class="panel-section-title" style="margin-top:0">رد على مستخدم بالخاص (UID)</p>
+                            <input type="text" id="dm-uid-input" placeholder="أدخل UID المستخدم..." />
+                            <input type="text" id="dm-msg-input" placeholder="الرسالة..." style="margin-bottom:8px" />
+                            <button class="dm-reply-send-btn" onclick="sendDMReply()">📨 إرسال خاص</button>
+                        </div>
+                    </div>
+
+                    <!-- Users Management -->
+                    <div class="panel-tab-content" id="tab-admin-users">
+                        <p class="panel-section-title">إدارة حسابات المستخدمين</p>
+                        <div style="display:flex;gap:8px;margin-bottom:10px">
+                            <input type="text" id="suspend-uid-input" placeholder="UID المستخدم..." style="flex:1;padding:8px 12px;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:#fff;font-size:13px;outline:none"/>
+                        </div>
+                        <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+                            <button class="btn-suspend" onclick="suspendUser()">🚫 توقيف الحساب</button>
+                            <button class="btn-unsuspend" onclick="unsuspendUser()">✅ رفع التوقيف</button>
+                        </div>
+                        <div id="suspended-users-list"></div>
                     </div>
 
                     <button class="btn-signout" onclick="handleSignOut()">🚪 تسجيل الخروج</button>
@@ -1997,16 +2602,18 @@
 
                 <!-- ===== USER VIEW ===== -->
                 <div id="state-user">
-                    <div class="admin-profile" style="border-color:rgba(168,85,247,0.15)">
+                    <div class="admin-profile" style="border-color:rgba(168,85,247,0.15);cursor:pointer" onclick="openProfileModal()">
                         <img id="user-avatar" src="" alt="" />
                         <div>
                             <div class="p-name" id="user-name">—</div>
                             <div class="p-role" style="color:var(--text-dim)">👤 مستخدم</div>
+                            <div style="font-size:10px;color:var(--magenta);margin-top:2px">✏ اضغط لتعديل الملف</div>
                         </div>
                     </div>
 
                     <div class="panel-tabs">
-                        <button class="panel-tab active" data-tab="user-chat" onclick="switchPanelTab('user-chat')">💬 دردشه</button>
+                        <button class="panel-tab active" data-tab="user-chat" onclick="switchPanelTab('user-chat')">💬 مشرفين</button>
+                        <button class="panel-tab" data-tab="user-friends" onclick="switchPanelTab('user-friends')">👥 أصدقاء</button>
                     </div>
 
                     <div class="panel-tab-content active" id="tab-user-chat">
@@ -2015,6 +2622,16 @@
                             <div class="chat-input-wrap">
                                 <input id="user-chat-input" type="text" placeholder="اكتب رسالة للمشرف..." onkeydown="if(event.key==='Enter')sendUserChat()" />
                                 <button onclick="sendUserChat()">إرسال</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel-tab-content" id="tab-user-friends">
+                        <div class="chat-container" id="user-friends-container">
+                            <div class="chat-messages" id="user-friends-messages"></div>
+                            <div class="chat-input-wrap">
+                                <input id="user-friends-input" type="text" placeholder="اكتب رسالة للأصدقاء..." onkeydown="if(event.key==='Enter')sendFriendsChatInPanel()" />
+                                <button onclick="sendFriendsChatInPanel()">إرسال</button>
                             </div>
                         </div>
                     </div>
@@ -2109,6 +2726,82 @@
         </footer>
 
     </div><!-- end #app -->
+
+    <!-- ===== SUSPENDED SCREEN ===== -->
+    <div id="suspended-screen">
+        <div class="sus-icon">🔐</div>
+        <h2>تم تعليق حسابك</h2>
+        <p>تم إيقاف حسابك من قِبل أحد المشرفين.<br/>إذا كنت تعتقد أن هذا خطأ، تواصل مع إدارة المنصة.</p>
+    </div>
+
+    <!-- ===== PROFILE MODAL ===== -->
+    <div id="profile-modal" onclick="if(event.target===this)closeProfileModal()">
+        <div class="profile-modal-box">
+            <div class="profile-modal-header">
+                <h2 class="profile-modal-title">🎮 تعديل الملف الشخصي</h2>
+                <button class="profile-close-btn" onclick="closeProfileModal()">✕</button>
+            </div>
+
+            <!-- Avatar section -->
+            <div class="profile-avatar-section">
+                <div class="profile-avatar-wrap">
+                    <img id="profile-preview-img" src="" alt="" onerror="this.style.display='none';document.getElementById('profile-initials').style.display='flex'" style="display:none"/>
+                    <div class="profile-avatar-initials" id="profile-initials" style="display:flex">G</div>
+                </div>
+                <div class="profile-avatar-url-wrap">
+                    <label>رابط صورة البروفايل (Google Drive)</label>
+                    <input type="url" id="profile-photo-url" class="profile-avatar-url-input"
+                        placeholder="https://drive.google.com/file/d/.../view"
+                        oninput="previewProfilePhoto(this.value)" />
+                </div>
+            </div>
+
+            <!-- Name -->
+            <div class="profile-field">
+                <label class="profile-label">الاسم</label>
+                <input type="text" id="profile-name-input" class="profile-input" placeholder="اسمك..." />
+            </div>
+
+            <!-- Gender -->
+            <div class="profile-field">
+                <label class="profile-label">النوع</label>
+                <select id="profile-gender-select" class="profile-select">
+                    <option value="">-- اختر --</option>
+                    <option value="ذكر">ذكر</option>
+                    <option value="أنثى">أنثى</option>
+                    <option value="أفضل عدم الذكر">أفضل عدم الذكر</option>
+                </select>
+            </div>
+
+            <!-- Nationality -->
+            <div class="profile-field">
+                <label class="profile-label">الجنسية</label>
+                <input type="text" id="profile-nationality-input" class="profile-input" placeholder="مثال: مصري، سعودي..." />
+            </div>
+
+            <p id="profile-save-msg" style="color:#4fc3f7;font-size:13px;display:none;margin-bottom:8px">✅ تم حفظ التغييرات</p>
+            <p id="profile-save-err" style="color:#ff7a7a;font-size:13px;display:none;margin-bottom:8px"></p>
+
+            <button class="profile-save-btn" id="profile-save-btn" onclick="saveProfileChanges()">💾 حفظ التغييرات</button>
+        </div>
+    </div>
+
+    <!-- ===== FRIENDS CHAT MODAL ===== -->
+    <div id="friends-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeFriendsModal()">
+        <div class="modal-box" style="max-width:500px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+                <h2 class="modal-title" style="margin:0">👥 تواصل مع الأصدقاء</h2>
+                <button class="panel-close" onclick="closeFriendsModal()">✕</button>
+            </div>
+            <div class="chat-container" id="friends-chat-container">
+                <div class="chat-messages" id="friends-chat-messages"></div>
+                <div class="chat-input-wrap">
+                    <input id="friends-chat-input" type="text" placeholder="اكتب رسالة..." onkeydown="if(event.key==='Enter')sendFriendsChat()" />
+                    <button onclick="sendFriendsChat()">إرسال</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- ===== ADD VIDEO MODAL ===== -->
     <div id="add-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeAddModal()">
@@ -2595,7 +3288,9 @@
             if (comments.length === 0) {
                 return `<p style="color:var(--text-dim);font-size:12px;padding:4px 0">لا توجد تعليقات</p>`;
             }
-            return comments.map(c => `
+            return comments.map((c, idx) => {
+                const canDelete = S.isAdmin || (S.user && c.uid === S.user.uid);
+                return `
                 <div class="comment-item">
                     <div class="comment-avatar">
                         <img src="${c.photo||''}" onerror="this.style.display='none'" />
@@ -2604,9 +3299,11 @@
                         <div class="comment-name">${c.name||'مستخدم'}</div>
                         <div class="comment-text">${c.text||''}</div>
                         <div class="comment-time">${getTimeAgo(c.timestamp)}</div>
+                        ${canDelete ? `<button class="comment-delete-btn" onclick="deleteCardComment('${v.id}',${idx})">🗑 حذف</button>` : ''}
                     </div>
                 </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
         function toggleComments(videoId) {
@@ -2949,6 +3646,7 @@
         // ===== VIDEO RATING FROM CARD =====
         window.handleVideoRating = async function(videoId, type) {
             if (!S.user) { showToast('🔑 سجّل دخولك أولاً', '#ffb020'); return; }
+            if (S.isSuspended) { showToast('🚫 حسابك موقوف', '#ff7a7a'); return; }
             const v = S.videos.find(v => v.id === videoId);
             if (!v) return;
 
@@ -3053,7 +3751,10 @@
                 list.innerHTML = `<p style="color:var(--text-dim);font-size:13px;padding:8px 0">لا توجد تعليقات</p>`;
                 return;
             }
-            list.innerHTML = v.comments.slice().reverse().map(c => `
+            list.innerHTML = v.comments.slice().reverse().map((c, idx) => {
+                const origIdx = v.comments.length - 1 - idx;
+                const canDelete = S.isAdmin || (S.user && c.uid === S.user.uid);
+                return `
                 <div class="comment-item">
                     <div class="comment-avatar">
                         <img src="${c.photo||''}" onerror="this.style.display='none'" />
@@ -3062,9 +3763,11 @@
                         <div class="comment-name">${c.name||'مستخدم'}</div>
                         <div class="comment-text">${c.text||''}</div>
                         <div class="comment-time">${getTimeAgo(c.timestamp)}</div>
+                        ${canDelete ? `<button class="comment-delete-btn" onclick="deletePlayerComment('${v.id}',${origIdx})">🗑 حذف</button>` : ''}
                     </div>
                 </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
         // ===== FIREBASE ACTIONS =====
@@ -3214,8 +3917,8 @@
                 const allComments = [];
                 S.videos.forEach(v => {
                     if (v.comments) {
-                        v.comments.forEach(c => {
-                            allComments.push({ ...c, videoTitle: v.title, videoId: v.id });
+                        v.comments.forEach((c, idx) => {
+                            allComments.push({ ...c, videoTitle: v.title, videoId: v.id, commentIdx: idx });
                         });
                     }
                 });
@@ -3229,16 +3932,30 @@
                     const tb = b.timestamp?.toDate?.() || new Date(b.timestamp);
                     return tb - ta;
                 });
-                container.innerHTML = allComments.slice(0, 30).map(c => `
-                    <div class="comment-item">
-                        <div class="comment-avatar">
-                            <img src="${c.photo||''}" onerror="this.style.display='none'" />
-                        </div>
-                        <div class="comment-body">
-                            <div class="comment-name">${c.name||'مستخدم'} <span style="color:var(--text-dim);font-size:11px;font-weight:400">على ${c.videoTitle||'فيديو'}</span></div>
-                            <div class="comment-text">${c.text||''}</div>
-                            <div class="comment-time">${getTimeAgo(c.timestamp)}</div>
-                        </div>
+
+                // Group by video
+                const byVideo = {};
+                allComments.forEach(c => {
+                    if (!byVideo[c.videoId]) byVideo[c.videoId] = { title: c.videoTitle, comments: [] };
+                    byVideo[c.videoId].comments.push(c);
+                });
+
+                container.innerHTML = Object.entries(byVideo).map(([vid, group]) => `
+                    <div style="margin-bottom:16px">
+                        <div style="color:#e6a8ff;font-size:12px;font-weight:700;margin-bottom:8px;padding:4px 8px;background:rgba(192,38,211,0.08);border-radius:6px">🎬 ${group.title||vid.slice(0,8)}</div>
+                        ${group.comments.map(c => `
+                            <div class="comment-item" style="padding:8px;background:var(--surface);border-radius:8px;margin-bottom:6px">
+                                <div class="comment-avatar">
+                                    <img src="${c.photo||''}" onerror="this.style.display='none'" />
+                                </div>
+                                <div class="comment-body">
+                                    <div class="comment-name">${c.name||'مستخدم'}</div>
+                                    <div class="comment-text">${c.text||''}</div>
+                                    <div class="comment-time">${getTimeAgo(c.timestamp)}</div>
+                                    <button class="comment-delete-btn" onclick="deleteAdminComment('${c.videoId}',${c.commentIdx})">🗑 حذف</button>
+                                </div>
+                            </div>
+                        `).join('')}
                     </div>
                 `).join('');
             } catch (e) {
@@ -3626,7 +4343,517 @@
         window.handleAdminLogin = handleAdminLogin;
         window.handleGearClick = handleGearClick;
         window.handleSignOut = handleSignOut;
-        window.showToast = showToast;
+        // ===== DELETE COMMENT (card) =====
+        window.deleteCardComment = async function(videoId, commentIdx) {
+            if (!S.user) return;
+            const v = S.videos.find(v => v.id === videoId);
+            if (!v || !v.comments) return;
+            const comment = v.comments[commentIdx];
+            if (!comment) return;
+            const canDelete = S.isAdmin || comment.uid === S.user.uid;
+            if (!canDelete) { showToast('❌ لا يمكنك حذف تعليق شخص آخر', '#ff7a7a'); return; }
+            if (!confirm('حذف التعليق؟')) return;
+            try {
+                await updateDoc(doc(db, 'videos', videoId), {
+                    comments: arrayRemove(comment)
+                });
+                v.comments.splice(commentIdx, 1);
+                const sec = document.getElementById(`comments-${videoId}`);
+                if (sec) sec.innerHTML = buildCommentsHTML(v);
+                renderVideos();
+                showToast('🗑 تم حذف التعليق');
+            } catch (e) { showToast('❌ خطأ: ' + e.message, '#ff7a7a'); }
+        };
+
+        // ===== DELETE COMMENT (player) =====
+        window.deletePlayerComment = async function(videoId, commentIdx) {
+            if (!S.user) return;
+            const v = S.videos.find(v => v.id === videoId);
+            if (!v || !v.comments) return;
+            const comment = v.comments[commentIdx];
+            if (!comment) return;
+            const canDelete = S.isAdmin || comment.uid === S.user.uid;
+            if (!canDelete) { showToast('❌ لا يمكنك حذف تعليق شخص آخر', '#ff7a7a'); return; }
+            if (!confirm('حذف التعليق؟')) return;
+            try {
+                await updateDoc(doc(db, 'videos', videoId), {
+                    comments: arrayRemove(comment)
+                });
+                v.comments.splice(commentIdx, 1);
+                renderPlayerComments(v);
+                renderVideos();
+                showToast('🗑 تم حذف التعليق');
+            } catch (e) { showToast('❌ خطأ: ' + e.message, '#ff7a7a'); }
+        };
+
+        // ===== DELETE COMMENT (admin panel) =====
+        window.deleteAdminComment = async function(videoId, commentIdx) {
+            if (!S.isAdmin) return;
+            const v = S.videos.find(v => v.id === videoId);
+            if (!v || !v.comments) return;
+            const comment = v.comments[commentIdx];
+            if (!comment) return;
+            if (!confirm('حذف التعليق؟')) return;
+            try {
+                await updateDoc(doc(db, 'videos', videoId), {
+                    comments: arrayRemove(comment)
+                });
+                v.comments.splice(commentIdx, 1);
+                renderAdminComments();
+                renderVideos();
+                showToast('🗑 تم حذف التعليق');
+            } catch (e) { showToast('❌ خطأ: ' + e.message, '#ff7a7a'); }
+        };
+
+        // ===== HAMBURGER MENU PANEL =====
+        window.openMenuPanel = function() {
+            const panel = document.getElementById('menu-panel');
+            const ov = document.getElementById('menu-overlay');
+            // Update user info in menu
+            if (S.user) {
+                const img = document.getElementById('menu-user-avatar');
+                img.src = S.userProfile?.photoURL || S.user.photoURL || '';
+                img.style.display = (S.userProfile?.photoURL || S.user.photoURL) ? '' : 'none';
+                document.getElementById('menu-user-name-text').textContent = S.userProfile?.displayName || S.user.displayName || 'مستخدم';
+                document.getElementById('menu-user-role-text').textContent = S.isAdmin ? (S.isMainAdmin ? '👑 مشرف رئيسي' : '🔑 مشرف عادي') : '👤 مستخدم';
+                document.getElementById('menu-admin-section').style.display = S.isAdmin ? 'block' : 'none';
+                document.getElementById('menu-add-admin-btn').style.display = S.isMainAdmin ? '' : 'none';
+            }
+            panel.classList.add('open');
+            ov.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        };
+
+        window.closeMenuPanel = function() {
+            document.getElementById('menu-panel').classList.remove('open');
+            document.getElementById('menu-overlay').style.display = 'none';
+            document.body.style.overflow = '';
+        };
+
+        window.openUserChatFromMenu = function() {
+            closeMenuPanel();
+            if (!S.user) { showToast('🔑 سجّل دخولك أولاً', '#ffb020'); return; }
+            // Open side panel on chat tab
+            const panel = document.getElementById('side-panel');
+            const ov = document.getElementById('overlay');
+            updateUI();
+            loadUserChat();
+            panel.classList.add('open');
+            ov.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+            if (S.isAdmin) {
+                switchPanelTab('admin-chat');
+            } else {
+                switchPanelTab('user-chat');
+            }
+        };
+
+        window.openFriendsChatFromMenu = function() {
+            closeMenuPanel();
+            if (!S.user) { showToast('🔑 سجّل دخولك أولاً', '#ffb020'); return; }
+            document.getElementById('friends-modal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            loadFriendsChat();
+        };
+
+        window.closeFriendsModal = function() {
+            document.getElementById('friends-modal').style.display = 'none';
+            document.body.style.overflow = '';
+            if (S.friendsChatUnsubscribe) {
+                S.friendsChatUnsubscribe();
+                S.friendsChatUnsubscribe = null;
+            }
+        };
+
+        // ===== FRIENDS CHAT =====
+        S.friendsChatUnsubscribe = null;
+
+        async function loadFriendsChat() {
+            if (S.friendsChatUnsubscribe) { S.friendsChatUnsubscribe(); S.friendsChatUnsubscribe = null; }
+            const container = document.getElementById('friends-chat-messages');
+            if (!container) return;
+            try {
+                const q = query(collection(db, 'friendsChat'), orderBy('timestamp', 'asc'));
+                S.friendsChatUnsubscribe = onSnapshot(q, (snap) => {
+                    const msgs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                    renderFriendsMessages(msgs, container);
+                });
+            } catch (e) { console.error('Friends chat error:', e); }
+        }
+
+        function renderFriendsMessages(msgs, container) {
+            if (!container) return;
+            if (msgs.length === 0) {
+                container.innerHTML = `<p style="color:var(--text-dim);font-size:13px;text-align:center;padding:20px 0">لا توجد رسائل</p>`;
+                return;
+            }
+            container.innerHTML = msgs.map(msg => {
+                const isSelf = msg.uid === S.user?.uid;
+                const canDelete = S.isAdmin || isSelf;
+                return `
+                <div class="chat-msg ${isSelf ? 'self' : ''}">
+                    <div class="msg-sender">${msg.senderName||'مستخدم'}</div>
+                    <div class="msg-text">${msg.text||''}</div>
+                    <div class="msg-time">${getTimeAgo(msg.timestamp)}</div>
+                    ${canDelete ? `<button onclick="deleteFriendMsg('${msg.id}')" style="background:none;border:none;color:#ff7a7a;font-size:11px;cursor:pointer;margin-top:2px">🗑 حذف</button>` : ''}
+                </div>
+                `;
+            }).join('');
+            container.scrollTop = container.scrollHeight;
+        }
+
+        window.sendFriendsChat = async function() {
+            if (!S.user) { showToast('🔑 سجّل دخولك أولاً', '#ffb020'); return; }
+            const input = document.getElementById('friends-chat-input');
+            const text = (input?.value || '').trim();
+            if (!text) return;
+            input.value = '';
+            try {
+                await addDoc(collection(db, 'friendsChat'), {
+                    uid: S.user.uid,
+                    senderName: S.userProfile?.displayName || S.user.displayName || 'مستخدم',
+                    senderPhoto: S.userProfile?.photoURL || S.user.photoURL || '',
+                    text,
+                    timestamp: new Date()
+                });
+            } catch (e) { console.error('Friends chat send error:', e); }
+        };
+
+        window.sendFriendsChatInPanel = async function() {
+            if (!S.user) { showToast('🔑 سجّل دخولك أولاً', '#ffb020'); return; }
+            const input = document.getElementById('user-friends-input');
+            const text = (input?.value || '').trim();
+            if (!text) return;
+            input.value = '';
+            try {
+                await addDoc(collection(db, 'friendsChat'), {
+                    uid: S.user.uid,
+                    senderName: S.userProfile?.displayName || S.user.displayName || 'مستخدم',
+                    senderPhoto: S.userProfile?.photoURL || S.user.photoURL || '',
+                    text,
+                    timestamp: new Date()
+                });
+            } catch (e) { console.error('Friends chat send error:', e); }
+        };
+
+        window.deleteFriendMsg = async function(msgId) {
+            const canDelete = S.isAdmin;
+            if (!canDelete) { showToast('❌ لا يمكنك حذف رسائل الآخرين', '#ff7a7a'); return; }
+            if (!confirm('حذف الرسالة؟')) return;
+            try {
+                await deleteDoc(doc(db, 'friendsChat', msgId));
+                showToast('🗑 تم حذف الرسالة');
+            } catch (e) { showToast('❌ خطأ', '#ff7a7a'); }
+        };
+
+        // Friends chat in panel
+        async function loadFriendsChatInPanel() {
+            if (S.friendsChatPanelUnsub) { S.friendsChatPanelUnsub(); S.friendsChatPanelUnsub = null; }
+            const container = document.getElementById('user-friends-messages');
+            if (!container) return;
+            try {
+                const q = query(collection(db, 'friendsChat'), orderBy('timestamp', 'asc'));
+                S.friendsChatPanelUnsub = onSnapshot(q, (snap) => {
+                    const msgs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                    renderFriendsMessages(msgs, container);
+                });
+            } catch (e) { console.error('Friends panel chat error:', e); }
+        }
+
+        // ===== PROFILE MODAL =====
+        S.userProfile = null; // store extra profile data from firestore
+
+        async function loadUserProfile(uid) {
+            try {
+                const snap = await getDoc(doc(db, 'userProfiles', uid));
+                if (snap.exists()) {
+                    S.userProfile = snap.data();
+                } else {
+                    S.userProfile = {};
+                }
+            } catch (e) {
+                S.userProfile = {};
+            }
+        }
+
+        window.openProfileModal = function() {
+            if (!S.user) { showToast('🔑 سجّل دخولك أولاً', '#ffb020'); return; }
+            closeMenuPanel();
+            const modal = document.getElementById('profile-modal');
+            // Prefill fields
+            const profile = S.userProfile || {};
+            const currentName = profile.displayName || S.user.displayName || '';
+            const currentPhoto = profile.photoURL || '';
+            const currentNationality = profile.nationality || '';
+            const currentGender = profile.gender || '';
+
+            document.getElementById('profile-name-input').value = currentName;
+            document.getElementById('profile-photo-url').value = currentPhoto;
+            document.getElementById('profile-nationality-input').value = currentNationality;
+            document.getElementById('profile-gender-select').value = currentGender;
+
+            // Show avatar preview
+            previewProfilePhoto(currentPhoto);
+            const initials = (currentName || 'G').charAt(0).toUpperCase();
+            document.getElementById('profile-initials').textContent = initials;
+
+            document.getElementById('profile-save-msg').style.display = 'none';
+            document.getElementById('profile-save-err').style.display = 'none';
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        };
+
+        window.closeProfileModal = function() {
+            document.getElementById('profile-modal').style.display = 'none';
+            document.body.style.overflow = '';
+        };
+
+        window.previewProfilePhoto = function(url) {
+            const img = document.getElementById('profile-preview-img');
+            const initials = document.getElementById('profile-initials');
+            // Convert Google Drive share URL to direct image
+            const directUrl = convertDriveToDirectImage(url);
+            if (directUrl) {
+                img.src = directUrl;
+                img.style.display = '';
+                initials.style.display = 'none';
+                img.onerror = () => { img.style.display = 'none'; initials.style.display = 'flex'; };
+            } else {
+                img.style.display = 'none';
+                initials.style.display = 'flex';
+            }
+        };
+
+        function convertDriveToDirectImage(url) {
+            if (!url) return '';
+            // Handle Google Drive share link
+            const m = url.match(/\/file\/d\/([^/?#]+)/) || url.match(/[?&]id=([^&]+)/);
+            if (m) return `https://drive.google.com/uc?export=view&id=${m[1]}`;
+            // If already direct or other URL
+            if (url.startsWith('http')) return url;
+            return '';
+        }
+
+        window.saveProfileChanges = async function() {
+            if (!S.user) return;
+            const btn = document.getElementById('profile-save-btn');
+            const saveMsg = document.getElementById('profile-save-msg');
+            const saveErr = document.getElementById('profile-save-err');
+            saveMsg.style.display = 'none';
+            saveErr.style.display = 'none';
+
+            const name = document.getElementById('profile-name-input').value.trim();
+            const rawPhotoUrl = document.getElementById('profile-photo-url').value.trim();
+            const nationality = document.getElementById('profile-nationality-input').value.trim();
+            const gender = document.getElementById('profile-gender-select').value;
+
+            if (!name) { saveErr.textContent = '❌ أدخل اسمك'; saveErr.style.display = 'block'; return; }
+
+            const photoURL = convertDriveToDirectImage(rawPhotoUrl) || rawPhotoUrl;
+
+            btn.disabled = true;
+            btn.textContent = '⏳ جاري الحفظ...';
+
+            try {
+                const profileData = {
+                    uid: S.user.uid,
+                    displayName: name,
+                    photoURL,
+                    nationality,
+                    gender,
+                    updatedAt: new Date()
+                };
+                await setDoc(doc(db, 'userProfiles', S.user.uid), profileData, { merge: true });
+                S.userProfile = { ...S.userProfile, ...profileData };
+
+                // Update navbar
+                document.getElementById('user-name-nav').textContent = name;
+                if (photoURL) {
+                    document.getElementById('user-avatar-nav').src = photoURL;
+                }
+
+                // Update panel
+                if (document.getElementById('user-name')) {
+                    document.getElementById('user-name').textContent = name;
+                }
+                if (document.getElementById('user-avatar') && photoURL) {
+                    document.getElementById('user-avatar').src = photoURL;
+                }
+                // Update admin panel name if admin
+                if (S.isAdmin) {
+                    document.getElementById('panel-name').textContent = name;
+                    if (photoURL) document.getElementById('panel-avatar').src = photoURL;
+                }
+
+                saveMsg.style.display = 'block';
+                showToast('✅ تم حفظ الملف الشخصي');
+            } catch (e) {
+                saveErr.textContent = '❌ خطأ: ' + e.message;
+                saveErr.style.display = 'block';
+            }
+            btn.disabled = false;
+            btn.textContent = '💾 حفظ التغييرات';
+        };
+
+        // ===== ACCOUNT SUSPEND =====
+        window.suspendUser = async function() {
+            if (!S.isAdmin) return;
+            const uid = document.getElementById('suspend-uid-input').value.trim();
+            if (!uid) { showToast('❌ أدخل UID المستخدم', '#ff7a7a'); return; }
+            if (!confirm(`تأكيد توقيف الحساب: ${uid}؟`)) return;
+            try {
+                await setDoc(doc(db, 'suspendedUsers', uid), {
+                    uid,
+                    suspendedAt: new Date(),
+                    suspendedBy: S.user?.uid || 'admin'
+                });
+                document.getElementById('suspend-uid-input').value = '';
+                showToast('🚫 تم توقيف الحساب');
+                renderSuspendedList();
+            } catch (e) { showToast('❌ خطأ: ' + e.message, '#ff7a7a'); }
+        };
+
+        window.unsuspendUser = async function() {
+            if (!S.isAdmin) return;
+            const uid = document.getElementById('suspend-uid-input').value.trim();
+            if (!uid) { showToast('❌ أدخل UID المستخدم', '#ff7a7a'); return; }
+            if (!confirm(`رفع توقيف الحساب: ${uid}؟`)) return;
+            try {
+                await deleteDoc(doc(db, 'suspendedUsers', uid));
+                document.getElementById('suspend-uid-input').value = '';
+                showToast('✅ تم رفع التوقيف');
+                renderSuspendedList();
+            } catch (e) { showToast('❌ خطأ: ' + e.message, '#ff7a7a'); }
+        };
+
+        async function renderSuspendedList() {
+            const container = document.getElementById('suspended-users-list');
+            if (!container) return;
+            try {
+                const snap = await getDocs(collection(db, 'suspendedUsers'));
+                if (snap.empty) {
+                    container.innerHTML = `<p style="color:var(--text-dim);font-size:13px">لا توجد حسابات موقوفة</p>`;
+                    return;
+                }
+                container.innerHTML = `<p class="panel-section-title" style="margin-top:0">الحسابات الموقوفة</p>` + snap.docs.map(d => {
+                    const data = d.data();
+                    return `
+                    <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:12px">
+                        <span style="color:#ff7a7a;font-family:monospace">${data.uid}</span>
+                        <button class="btn-unsuspend" onclick="quickUnsuspend('${data.uid}')">رفع</button>
+                    </div>`;
+                }).join('');
+            } catch (e) {
+                container.innerHTML = `<p style="color:var(--text-dim);font-size:13px">خطأ في التحميل</p>`;
+            }
+        }
+
+        window.quickUnsuspend = async function(uid) {
+            try {
+                await deleteDoc(doc(db, 'suspendedUsers', uid));
+                showToast('✅ تم رفع التوقيف');
+                renderSuspendedList();
+            } catch (e) { showToast('❌ خطأ', '#ff7a7a'); }
+        };
+
+        // Check if current user is suspended
+        async function checkSuspended(uid) {
+            try {
+                const snap = await getDoc(doc(db, 'suspendedUsers', uid));
+                return snap.exists();
+            } catch (e) { return false; }
+        }
+
+        // ===== DM REPLY (admin -> user) =====
+        window.sendDMReply = async function() {
+            if (!S.isAdmin) return;
+            const uidInput = document.getElementById('dm-uid-input');
+            const msgInput = document.getElementById('dm-msg-input');
+            const targetUid = (uidInput?.value || '').trim();
+            const text = (msgInput?.value || '').trim();
+            if (!targetUid || !text) { showToast('❌ أدخل UID والرسالة', '#ff7a7a'); return; }
+            try {
+                await addDoc(collection(db, 'directMessages'), {
+                    fromUid: S.user?.uid || 'admin',
+                    fromName: S.user?.displayName || 'مشرف',
+                    toUid: targetUid,
+                    text,
+                    timestamp: new Date(),
+                    isAdmin: true,
+                    read: false
+                });
+                uidInput.value = '';
+                msgInput.value = '';
+                showToast('✅ تم إرسال الرسالة الخاصة');
+            } catch (e) { showToast('❌ خطأ: ' + e.message, '#ff7a7a'); }
+        };
+
+        // ===== ADD TO processUser: check suspension =====
+        // Will be patched into processUser call below
+        S.isSuspended = false;
+
+        // ===== UPDATE UI: add hamburger always visible =====
+        const _origUpdateUI = window.updateUI;
+        window.updateUI = function() {
+            _origUpdateUI();
+            // hamburger always visible when logged in
+            const hb = document.getElementById('hamburger-btn');
+            if (hb) hb.style.display = S.user ? 'flex' : 'none';
+        };
+
+        // Override switchPanelTab to load friends chat in panel
+        const _origSwitchPanelTab = window.switchPanelTab;
+        window.switchPanelTab = function(tabId) {
+            _origSwitchPanelTab(tabId);
+            if (tabId === 'user-friends') loadFriendsChatInPanel();
+            if (tabId === 'admin-users') renderSuspendedList();
+        };
+
+        // Load profile on auth
+        const _origProcessUser = processUser;
+        // Patch: after processUser, load profile + check suspension
+        const originalOnAuthChanged = onAuthStateChanged;
+        // We'll hook into S.user being set
+        async function postLogin(fbUser) {
+            await loadUserProfile(fbUser.uid);
+            const suspended = await checkSuspended(fbUser.uid);
+            S.isSuspended = suspended;
+            if (suspended && !S.isAdmin) {
+                // Show suspended screen
+                document.getElementById('suspended-screen').style.display = 'flex';
+                document.getElementById('app').style.display = 'none';
+            } else {
+                document.getElementById('suspended-screen').style.display = 'none';
+            }
+        }
+
+        // Hook into existing auth state
+        onAuthStateChanged(auth, async fbUser => {
+            if (fbUser && S.user) {
+                // user is now logged in and processed, run post-login
+                setTimeout(() => postLogin(fbUser), 1500);
+            }
+        });
+
+        window.openMenuPanel = openMenuPanel;
+        window.closeMenuPanel = closeMenuPanel;
+        window.openProfileModal = openProfileModal;
+        window.closeProfileModal = closeProfileModal;
+        window.previewProfilePhoto = previewProfilePhoto;
+        window.saveProfileChanges = saveProfileChanges;
+        window.suspendUser = suspendUser;
+        window.unsuspendUser = unsuspendUser;
+        window.quickUnsuspend = quickUnsuspend;
+        window.sendDMReply = sendDMReply;
+        window.deleteCardComment = deleteCardComment;
+        window.deletePlayerComment = deletePlayerComment;
+        window.deleteAdminComment = deleteAdminComment;
+        window.openUserChatFromMenu = openUserChatFromMenu;
+        window.openFriendsChatFromMenu = openFriendsChatFromMenu;
+        window.closeFriendsModal = closeFriendsModal;
+        window.sendFriendsChat = sendFriendsChat;
+        window.sendFriendsChatInPanel = sendFriendsChatInPanel;
+        window.deleteFriendMsg = deleteFriendMsg;
     </script>
 </body>
 </html>
