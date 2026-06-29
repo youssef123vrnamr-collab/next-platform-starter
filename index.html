@@ -1418,11 +1418,16 @@
             color: var(--text-dim);
             margin: 8px 0;
         }
+        @keyframes wabubble-in {
+            from { opacity: 0; transform: translateY(6px) scale(.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
         .wabubble {
             display: flex;
             align-items: flex-end;
             gap: 8px;
             max-width: 82%;
+            animation: wabubble-in .22s ease both;
         }
         .wabubble.mine { align-self: flex-end; flex-direction: row-reverse; }
         .wabubble.theirs { align-self: flex-start; }
@@ -1442,26 +1447,33 @@
             color: #0a0814;
         }
         .wabubble-content {
-            background: rgba(30,22,52,0.9);
-            border: 1px solid rgba(255,255,255,0.07);
-            border-radius: 16px 16px 16px 4px;
-            padding: 8px 12px 6px;
+            background: linear-gradient(165deg, rgba(36,27,60,0.95), rgba(24,18,40,0.95));
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 17px 17px 17px 4px;
+            padding: 9px 13px 7px;
             position: relative;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.35);
+            min-width: 64px;
+            transition: box-shadow .15s;
         }
         .wabubble.mine .wabubble-content {
-            background: rgba(124,58,237,0.25);
-            border-color: rgba(168,85,247,0.3);
-            border-radius: 16px 16px 4px 16px;
+            background: linear-gradient(165deg, rgba(138,68,237,0.32), rgba(192,38,211,0.18));
+            border-color: rgba(192,138,255,0.28);
+            border-radius: 17px 17px 4px 17px;
+            box-shadow: 0 3px 14px rgba(124,58,237,0.18);
         }
+        .wabubble.pending .wabubble-content { opacity: .65; }
+        .wabubble.failed .wabubble-content { border-color: rgba(255,122,122,0.5); }
         .wabubble-admin-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; color: #ffc862; font-weight: 700; margin-bottom: 3px; }
-        .wabubble-sender { font-size: 11px; font-weight: 700; color: var(--violet); margin-bottom: 3px; display: block; }
+        .wabubble-sender { font-size: 11.5px; font-weight: 700; color: var(--violet); margin-bottom: 3px; display: block; letter-spacing: .2px; }
         .wabubble.mine .wabubble-sender { color: #c4a8ff; }
-        .wabubble-text { font-size: 14px; color: var(--bright); word-break: break-word; line-height: 1.5; }
-        .wabubble-meta { display: flex; align-items: center; justify-content: flex-end; gap: 5px; margin-top: 3px; }
+        .wabubble-text { font-size: 14.5px; color: var(--bright); word-break: break-word; line-height: 1.5; }
+        .wabubble-meta { display: flex; align-items: center; justify-content: flex-end; gap: 6px; margin-top: 4px; }
         .wabubble-time { font-size: 10px; color: var(--text-dim); }
-        .wabubble-tick { font-size: 12px; color: #4fc3f7; }
-        .wabubble-delete-btn { background: none; border: none; color: #ff7a7a; font-size: 11px; cursor: pointer; padding: 0; opacity: .65; transition: opacity .15s; margin-left: 2px; }
+        .wabubble-tick { font-size: 12px; color: #4fc3f7; letter-spacing: -2px; }
+        .wabubble-status { font-size: 10px; color: var(--text-dim); }
+        .wabubble-status.failed { color: #ff7a7a; font-weight: 700; }
+        .wabubble-delete-btn { background: none; border: none; color: #ff7a7a; font-size: 11px; cursor: pointer; padding: 0; opacity: .55; transition: opacity .15s; margin-left: 2px; }
         .wabubble-delete-btn:hover { opacity: 1; }
         .wachat-input-bar {
             display: flex;
@@ -3255,6 +3267,8 @@
         // ===== WHATSAPP CHAT ENGINE =====
         let _wachatUnsub = null;
         let _wachatMode = null;
+        let _wachatPending = [];   // messages sent but not yet confirmed by Firestore snapshot
+        let _wachatLastMsgs = [];  // last known confirmed messages from the server
 
         window.openWaChat = function(mode) {
             if (!S.user) { showToast('🔑 سجّل دخولك أولاً', '#ffb020'); return; }
@@ -3281,10 +3295,14 @@
             document.body.style.overflow = '';
             if (_wachatUnsub) { _wachatUnsub(); _wachatUnsub = null; }
             _wachatMode = null;
+            _wachatPending = [];
+            _wachatLastMsgs = [];
         };
 
         function _subscribeWaChat(collectionName, mode) {
             if (_wachatUnsub) { _wachatUnsub(); _wachatUnsub = null; }
+            _wachatPending = [];
+            _wachatLastMsgs = [];
             const area = document.getElementById('wachat-messages-area');
             const empty = document.getElementById('wachat-empty-state');
             area.innerHTML = '';
@@ -3294,9 +3312,27 @@
                 const q = query(collection(db, collectionName), orderBy('timestamp', 'asc'));
                 _wachatUnsub = onSnapshot(q, snap => {
                     const msgs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-                    _renderWaMsgs(msgs, mode);
+                    _wachatLastMsgs = msgs;
+                    // Drop any pending messages that now exist in the confirmed list
+                    // (same sender + same text, sent within the last 2 minutes)
+                    const myUid = S.user?.uid;
+                    _wachatPending = _wachatPending.filter(p => {
+                        const pUid = mode === 'admin' ? p.sender : p.uid;
+                        const stillPending = !msgs.some(m => {
+                            const mUid = mode === 'admin' ? m.sender : m.uid;
+                            return mUid === pUid && m.text === p.text;
+                        });
+                        return stillPending && (Date.now() - new Date(p.timestamp).getTime() < 120000);
+                    });
+                    _renderWaMsgs(msgs.concat(_wachatPending), mode);
                 }, err => { console.error('WaChat snapshot error:', err); });
             } catch (e) { console.error('WaChat subscribe error:', e); }
+        }
+
+        function _escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str == null ? '' : String(str);
+            return div.innerHTML;
         }
 
         function _renderWaMsgs(msgs, mode) {
@@ -3309,43 +3345,53 @@
                 return;
             }
             empty.style.display = 'none';
+            const wasAtBottom = (area.scrollHeight - area.scrollTop - area.clientHeight) < 80;
             let html = '';
             let lastDate = '';
             msgs.forEach(msg => {
                 const uid = mode === 'admin' ? msg.sender : msg.uid;
                 const isMine = uid === S.user?.uid;
-                const name = mode === 'admin' ? (msg.senderName || 'مستخدم') : (msg.senderName || 'مستخدم');
+                const name = msg.senderName || 'مستخدم';
                 const isAdmin = mode === 'admin' && msg.isAdmin;
                 const ts = msg.timestamp;
                 const d = ts ? (ts.toDate ? ts.toDate() : new Date(ts)) : new Date();
                 const dateStr = d.toLocaleDateString('ar-EG', { day:'numeric', month:'long' });
                 const timeStr = d.toLocaleTimeString('ar-EG', { hour:'2-digit', minute:'2-digit' });
-                const photo = mode === 'admin' ? (msg.senderPhoto || '') : (msg.senderPhoto || '');
+                const photo = msg.senderPhoto || '';
                 const initial = (name || '?').charAt(0).toUpperCase();
                 if (dateStr !== lastDate) {
-                    html += `<div class="wachat-date-badge">${dateStr}</div>`;
+                    html += `<div class="wachat-date-badge">${_escapeHtml(dateStr)}</div>`;
                     lastDate = dateStr;
                 }
-                const avatarHtml = avatarImgHtml(photo, 'wabubble-avatar', initial) || `<div class="wabubble-avatar">${initial}</div>`;
-                const canDelete = S.isAdmin || isMine;
+                const avatarHtml = avatarImgHtml(photo, 'wabubble-avatar', initial) || `<div class="wabubble-avatar">${_escapeHtml(initial)}</div>`;
+                const canDelete = !msg._pending && (S.isAdmin || isMine);
                 const deleteBtn = canDelete ? `<button class="wabubble-delete-btn" onclick="deleteWaMsg('${msg.id}','${mode}')" title="حذف الرسالة">🗑</button>` : '';
+                const safeText = _escapeHtml(msg.text).replace(/\n/g, '<br>');
+                let statusHtml = '';
+                if (msg._failed) {
+                    statusHtml = '<span class="wabubble-status failed" title="فشل الإرسال">⚠️ فشل</span>';
+                } else if (msg._pending) {
+                    statusHtml = '<span class="wabubble-status pending">⏳</span>';
+                } else if (isMine) {
+                    statusHtml = '<span class="wabubble-tick">✓✓</span>';
+                }
                 html += `
-                <div class="wabubble ${isMine ? 'mine' : 'theirs'}">
+                <div class="wabubble ${isMine ? 'mine' : 'theirs'}${msg._pending ? ' pending' : ''}${msg._failed ? ' failed' : ''}">
                     ${!isMine ? avatarHtml : ''}
                     <div class="wabubble-content">
-                        ${!isMine ? `<span class="wabubble-sender">${isAdmin ? '👑 ' : ''}${name}</span>` : ''}
-                        <div class="wabubble-text">${msg.text || ''}</div>
+                        ${!isMine ? `<span class="wabubble-sender">${isAdmin ? '👑 ' : ''}${_escapeHtml(name)}</span>` : ''}
+                        <div class="wabubble-text">${safeText}</div>
                         <div class="wabubble-meta">
                             ${deleteBtn}
                             <span class="wabubble-time">${timeStr}</span>
-                            ${isMine ? '<span class="wabubble-tick">✓✓</span>' : ''}
+                            ${statusHtml}
                         </div>
                     </div>
                     ${isMine ? avatarHtml : ''}
                 </div>`;
             });
             area.innerHTML = html;
-            area.scrollTop = area.scrollHeight;
+            if (wasAtBottom) area.scrollTop = area.scrollHeight;
         }
 
         window.deleteWaMsg = async function(msgId, mode) {
@@ -3379,14 +3425,24 @@
             input.value = '';
             const name = S.userProfile?.displayName || S.user.displayName || 'مستخدم';
             const photo = S.userProfile?.photoURL || S.user.photoURL || '';
+            const mode = _wachatMode;
+
+            // ===== OPTIMISTIC RENDER: show the message instantly, don't wait for the server =====
+            const localId = 'local_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+            const pendingMsg = mode === 'admin'
+                ? { id: localId, sender: S.user.uid, senderName: name, senderPhoto: photo, text, timestamp: new Date(), isAdmin: S.isAdmin, _pending: true }
+                : { id: localId, uid: S.user.uid, senderName: name, senderPhoto: photo, text, timestamp: new Date(), _pending: true };
+            _wachatPending.push(pendingMsg);
+            _renderWaMsgs(_wachatLastMsgs.concat(_wachatPending), mode);
+
             try {
-                if (_wachatMode === 'admin') {
+                if (mode === 'admin') {
                     await addDoc(collection(db, 'chatMessages'), {
                         sender: S.user.uid,
                         senderName: name,
                         senderPhoto: photo,
                         text,
-                        timestamp: new Date(),
+                        timestamp: serverTimestamp(),
                         isAdmin: S.isAdmin
                     });
                 } else {
@@ -3395,12 +3451,19 @@
                         senderName: name,
                         senderPhoto: photo,
                         text,
-                        timestamp: new Date()
+                        timestamp: serverTimestamp()
                     });
                 }
+                // Real snapshot will arrive via onSnapshot and replace the pending bubble.
             } catch (e) {
                 console.error('WaChat send error:', e);
                 showToast('❌ فشل الإرسال', '#ff7a7a');
+                // Mark the pending message as failed instead of silently dropping it
+                const idx = _wachatPending.findIndex(m => m.id === localId);
+                if (idx !== -1) {
+                    _wachatPending[idx]._failed = true;
+                    _renderWaMsgs(_wachatLastMsgs.concat(_wachatPending), mode);
+                }
             }
         };
 
