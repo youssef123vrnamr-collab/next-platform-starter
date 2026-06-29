@@ -261,6 +261,20 @@
             border: 2px solid var(--magenta);
             object-fit: cover;
         }
+        #user-avatar-nav-initials {
+            width: 28px;
+            height: 28px;
+            min-width: 28px;
+            border-radius: 50%;
+            border: 2px solid var(--magenta);
+            background: var(--grad);
+            color: #0a0814;
+            font-weight: 900;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
         #user-badge span {
             color: var(--bright);
             font-size: 12px;
@@ -1622,20 +1636,69 @@
             color: #0a0814;
         }
 
-        /* ===== VIDEO PLAYER MODAL ===== */
+        /* ===== VIDEO PLAYER — FULL SCREEN PAGE ===== */
         #player-modal {
+            position: fixed;
+            inset: 0;
             z-index: 9998;
+            background: var(--void);
+            display: none;
+            flex-direction: column;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
+            padding: 0;
         }
-        #player-modal .modal-box {
-            width: 860px;
-            max-width: 98vw;
-            padding: 20px;
+        .player-fs-header {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 18px;
+            background: rgba(10,8,20,0.96);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-bottom: 1px solid rgba(192,38,211,0.18);
+            flex-shrink: 0;
+        }
+        .player-fs-back {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            width: 38px;
+            height: 38px;
+            color: var(--text);
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .player-fs-title-wrap {
+            flex: 1;
+            min-width: 0;
+        }
+        .player-fs-header-title {
+            color: var(--bright);
+            font-size: 15px;
+            font-weight: 700;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .player-fs-body {
+            flex: 1;
+            padding: 0 0 30px;
         }
         .player-container {
             position: relative;
+            width: 100%;
             padding-bottom: 56.25%;
             background: #000;
-            border-radius: 12px;
             overflow: hidden;
         }
         .player-container iframe {
@@ -1646,7 +1709,9 @@
             border: none;
         }
         .player-info {
-            padding: 16px 4px 0;
+            padding: 16px 18px 0;
+            max-width: 900px;
+            margin: 0 auto;
         }
         .player-info .player-title {
             color: var(--bright);
@@ -1793,9 +1858,6 @@
             }
             .modal-tabs {
                 gap: 6px;
-            }
-            #player-modal .modal-box {
-                padding: 12px;
             }
             .player-info .player-title {
                 font-size: 15px;
@@ -2637,6 +2699,7 @@
             <div class="nav-right">
                 <div id="user-badge" onclick="openProfileModal()" style="cursor:pointer" title="الملف الشخصي">
                     <img id="user-avatar-nav" src="" alt="" />
+                    <span id="user-avatar-nav-initials" style="display:none"></span>
                     <span id="user-name-nav">مستخدم</span>
                     <span class="role-tag" id="user-role-nav">عادي</span>
                 </div>
@@ -3185,9 +3248,17 @@
         </div>
     </div>
 
-    <!-- ===== VIDEO PLAYER MODAL ===== -->
-    <div id="player-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closePlayer()">
-        <div class="modal-box">
+    <!-- ===== VIDEO PLAYER — FULL SCREEN PAGE ===== -->
+    <div id="player-modal" style="display:none">
+        <div class="player-fs-header">
+            <button class="player-fs-back" onclick="closePlayer()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            </button>
+            <div class="player-fs-title-wrap">
+                <span class="player-fs-header-title" id="player-fs-header-title">فيديو</span>
+            </div>
+        </div>
+        <div class="player-fs-body">
             <div class="player-container" id="player-container"></div>
             <div class="player-info" id="player-info">
                 <h3 class="player-title" id="player-title">—</h3>
@@ -3216,6 +3287,7 @@
 
     <!-- ===== TOAST ===== -->
     <div id="toast"></div>
+
 
     <!-- ===== FIREBASE + SCRIPT ===== -->
     <script type="module">
@@ -3328,6 +3400,12 @@
             return `${days} ي`;
         }
 
+        // The user's custom profile photo (Google Drive link) always takes
+        // priority over their raw Google account photo.
+        function currentAvatarUrl() {
+            return (S.userProfile && S.userProfile.photoURL) || (S.user && S.user.photoURL) || '';
+        }
+
         // ===== CANVAS PARTICLES =====
         (function() {
             const canvas = document.getElementById('canvas-bg');
@@ -3393,11 +3471,25 @@
 
             // Navbar user badge
             const avatar = document.getElementById('user-avatar-nav');
+            const avatarInitials = document.getElementById('user-avatar-nav-initials');
             const nameSpan = document.getElementById('user-name-nav');
             const roleSpan = document.getElementById('user-role-nav');
             if (user) {
-                avatar.src = user.photoURL || '';
-                nameSpan.textContent = user.displayName || 'مستخدم';
+                const displayName = (S.userProfile && S.userProfile.displayName) || user.displayName || 'مستخدم';
+                avatarInitials.textContent = displayName.charAt(0).toUpperCase();
+                const url = currentAvatarUrl();
+                if (url) {
+                    avatarInitials.style.display = 'none';
+                    avatar.style.display = '';
+                    setImgWithFallback(avatar, url, () => {
+                        avatar.style.display = 'none';
+                        avatarInitials.style.display = 'flex';
+                    });
+                } else {
+                    avatar.style.display = 'none';
+                    avatarInitials.style.display = 'flex';
+                }
+                nameSpan.textContent = displayName;
                 roleSpan.textContent = isAdmin ? (isMainAdmin ? 'مشرف رئيسي' : 'مشرف عادي') : 'عادي';
                 roleSpan.style.background = isAdmin ? 'rgba(255,176,32,0.15)' : 'rgba(168,85,247,0.1)';
                 roleSpan.style.color = isAdmin ? '#ffc862' : '#d8a8ff';
@@ -3433,13 +3525,13 @@
             document.getElementById('state-user').style.display = isUser ? 'block' : 'none';
 
             if (isAdmin && user) {
-                document.getElementById('panel-avatar').src = user.photoURL || '';
-                document.getElementById('panel-name').textContent = user.displayName || '';
+                setImgWithFallback(document.getElementById('panel-avatar'), currentAvatarUrl(), () => {});
+                document.getElementById('panel-name').textContent = (S.userProfile && S.userProfile.displayName) || user.displayName || '';
                 document.getElementById('panel-role').textContent = isMainAdmin ? '👑 مشرف رئيسي' : '🔑 مشرف عادي';
             }
             if (isUser && user) {
-                document.getElementById('user-avatar').src = user.photoURL || '';
-                document.getElementById('user-name').textContent = user.displayName || 'مستخدم';
+                setImgWithFallback(document.getElementById('user-avatar'), currentAvatarUrl(), () => {});
+                document.getElementById('user-name').textContent = (S.userProfile && S.userProfile.displayName) || user.displayName || 'مستخدم';
             }
 
             // Admin actions visibility on video cards
@@ -3621,7 +3713,7 @@
                 return `
                 <div class="comment-item">
                     <div class="comment-avatar">
-                        <img src="${c.photo||''}" onerror="this.style.display='none'" />
+                        ${avatarImgHtml(c.photo, '')}
                     </div>
                     <div class="comment-body">
                         <div class="comment-name">${c.name||'مستخدم'}</div>
@@ -3839,6 +3931,7 @@
             container.appendChild(iframe);
 
             document.getElementById('player-title').textContent = v.title || '—';
+            document.getElementById('player-fs-header-title').textContent = v.title || 'فيديو';
             document.getElementById('player-desc').textContent = v.description || '';
             document.getElementById('player-like-count').textContent = v.likes || 0;
             document.getElementById('player-dislike-count').textContent = v.dislikes || 0;
@@ -4044,8 +4137,8 @@
             try {
                 const comment = {
                     uid: S.user.uid,
-                    name: S.user.displayName || 'مستخدم',
-                    photo: S.user.photoURL || '',
+                    name: (S.userProfile && S.userProfile.displayName) || S.user.displayName || 'مستخدم',
+                    photo: currentAvatarUrl(),
                     text,
                     timestamp: new Date()
                 };
@@ -4085,7 +4178,7 @@
                 return `
                 <div class="comment-item">
                     <div class="comment-avatar">
-                        <img src="${c.photo||''}" onerror="this.style.display='none'" />
+                        ${avatarImgHtml(c.photo, '')}
                     </div>
                     <div class="comment-body">
                         <div class="comment-name">${c.name||'مستخدم'}</div>
@@ -4274,7 +4367,7 @@
                         ${group.comments.map(c => `
                             <div class="comment-item" style="padding:8px;background:var(--surface);border-radius:8px;margin-bottom:6px">
                                 <div class="comment-avatar">
-                                    <img src="${c.photo||''}" onerror="this.style.display='none'" />
+                                    ${avatarImgHtml(c.photo, '')}
                                 </div>
                                 <div class="comment-body">
                                     <div class="comment-name">${c.name||'مستخدم'}</div>
@@ -4766,8 +4859,12 @@
             // Update user info in menu
             if (S.user) {
                 const img = document.getElementById('menu-user-avatar');
-                img.src = S.userProfile?.photoURL || S.user.photoURL || '';
-                img.style.display = (S.userProfile?.photoURL || S.user.photoURL) ? '' : 'none';
+                const url = currentAvatarUrl();
+                if (url) {
+                    setImgWithFallback(img, url, () => { img.style.display = 'none'; });
+                } else {
+                    img.style.display = 'none';
+                }
                 document.getElementById('menu-user-name-text').textContent = S.userProfile?.displayName || S.user.displayName || 'مستخدم';
                 document.getElementById('menu-user-role-text').textContent = S.isAdmin ? (S.isMainAdmin ? '👑 مشرف رئيسي' : '🔑 مشرف عادي') : '👤 مستخدم';
                 document.getElementById('menu-admin-section').style.display = S.isAdmin ? 'block' : 'none';
@@ -4971,27 +5068,95 @@
         window.previewProfilePhoto = function(url) {
             const img = document.getElementById('profile-preview-img');
             const initials = document.getElementById('profile-initials');
-            // Convert Google Drive share URL to direct image
-            const directUrl = convertDriveToDirectImage(url);
-            if (directUrl) {
-                img.src = directUrl;
-                img.style.display = '';
-                initials.style.display = 'none';
-                img.onerror = () => { img.style.display = 'none'; initials.style.display = 'flex'; };
-            } else {
+            if (!url) {
                 img.style.display = 'none';
                 initials.style.display = 'flex';
+                return;
+            }
+            initials.style.display = 'none';
+            setImgWithFallback(img, url, () => { initials.style.display = 'flex'; });
+        };
+
+        // Build an <img> tag (as an HTML string) for contexts where we render
+        // via innerHTML (comments, chat bubbles). It cycles through Drive URL
+        // candidates on error before finally swapping to an initials div
+        // (or just hiding, if no fallbackInitial is given).
+        function avatarImgHtml(rawUrl, cssClass, fallbackInitial) {
+            const candidates = driveImageCandidates(rawUrl);
+            if (candidates.length === 0) return '';
+            const list = candidates.map(u => u.replace(/"/g, '&quot;')).join('|');
+            const initialAttr = fallbackInitial ? ` data-fallback-initial="${fallbackInitial}"` : '';
+            return `<img class="${cssClass}" src="${candidates[0]}" data-fallbacks="${list}" data-i="0"${initialAttr}
+                onerror="window.__avatarFallback(this)" />`;
+        }
+
+        window.__avatarFallback = function(img) {
+            const list = (img.dataset.fallbacks || '').split('|').filter(Boolean);
+            let i = parseInt(img.dataset.i || '0', 10) + 1;
+            if (i < list.length) {
+                img.dataset.i = String(i);
+                img.src = list[i];
+            } else if (img.dataset.fallbackInitial) {
+                const cls = img.className || '';
+                img.outerHTML = `<div class="${cls}">${img.dataset.fallbackInitial}</div>`;
+            } else {
+                img.onerror = null;
+                img.style.display = 'none';
             }
         };
 
         function convertDriveToDirectImage(url) {
             if (!url) return '';
-            // Handle Google Drive share link
+            // Handle Google Drive share link -> extract the file id
             const m = url.match(/\/file\/d\/([^/?#]+)/) || url.match(/[?&]id=([^&]+)/);
-            if (m) return `https://drive.google.com/uc?export=view&id=${m[1]}`;
+            if (m) return `https://drive.google.com/thumbnail?id=${m[1]}&sz=w1000`;
             // If already direct or other URL
             if (url.startsWith('http')) return url;
             return '';
+        }
+
+        // Extract a Drive file id from any drive URL (share link or already-converted link)
+        function extractDriveFileId(url) {
+            if (!url) return '';
+            const m = url.match(/\/file\/d\/([^/?#]+)/) || url.match(/[?&]id=([^&]+)/);
+            return m ? m[1] : '';
+        }
+
+        // Build a small ordered list of candidate image URLs to try, in order of reliability
+        function driveImageCandidates(rawUrl) {
+            const id = extractDriveFileId(rawUrl);
+            if (id) {
+                return [
+                    `https://drive.google.com/thumbnail?id=${id}&sz=w1000`,
+                    `https://lh3.googleusercontent.com/d/${id}=w1000`,
+                    `https://drive.google.com/uc?export=view&id=${id}`
+                ];
+            }
+            if (rawUrl && rawUrl.startsWith('http')) return [rawUrl];
+            return [];
+        }
+
+        // Attach a chain of onerror fallbacks to an <img>, trying each candidate URL in turn
+        // before finally calling the provided onAllFailed callback.
+        function setImgWithFallback(imgEl, rawUrl, onAllFailed) {
+            const candidates = driveImageCandidates(rawUrl);
+            if (!imgEl || candidates.length === 0) {
+                if (onAllFailed) onAllFailed();
+                return;
+            }
+            let i = 0;
+            imgEl.onerror = function() {
+                i++;
+                if (i < candidates.length) {
+                    imgEl.src = candidates[i];
+                } else {
+                    imgEl.onerror = null;
+                    imgEl.style.display = 'none';
+                    if (onAllFailed) onAllFailed();
+                }
+            };
+            imgEl.style.display = '';
+            imgEl.src = candidates[0];
         }
 
         window.saveProfileChanges = async function() {
@@ -5009,16 +5174,18 @@
 
             if (!name) { saveErr.textContent = '❌ أدخل اسمك'; saveErr.style.display = 'block'; return; }
 
-            const photoURL = convertDriveToDirectImage(rawPhotoUrl) || rawPhotoUrl;
-
             btn.disabled = true;
             btn.textContent = '⏳ جاري الحفظ...';
 
             try {
+                // Store the raw URL the user pasted; conversion to a direct
+                // image URL happens at render time (see currentAvatarUrl +
+                // setImgWithFallback), so we're never locked into one Google
+                // Drive URL format if it changes again later.
                 const profileData = {
                     uid: S.user.uid,
                     displayName: name,
-                    photoURL,
+                    photoURL: rawPhotoUrl,
                     nationality,
                     gender,
                     updatedAt: new Date()
@@ -5026,24 +5193,8 @@
                 await setDoc(doc(db, 'userProfiles', S.user.uid), profileData, { merge: true });
                 S.userProfile = { ...S.userProfile, ...profileData };
 
-                // Update navbar
-                document.getElementById('user-name-nav').textContent = name;
-                if (photoURL) {
-                    document.getElementById('user-avatar-nav').src = photoURL;
-                }
-
-                // Update panel
-                if (document.getElementById('user-name')) {
-                    document.getElementById('user-name').textContent = name;
-                }
-                if (document.getElementById('user-avatar') && photoURL) {
-                    document.getElementById('user-avatar').src = photoURL;
-                }
-                // Update admin panel name if admin
-                if (S.isAdmin) {
-                    document.getElementById('panel-name').textContent = name;
-                    if (photoURL) document.getElementById('panel-avatar').src = photoURL;
-                }
+                // Refresh navbar, side panel, and admin panel avatars/names in one go
+                updateUI();
 
                 saveMsg.style.display = 'block';
                 showToast('✅ تم حفظ الملف الشخصي');
@@ -5281,9 +5432,8 @@
                     lastDate = dateStr;
                 }
 
-                const avatarHtml = photo
-                    ? `<img class="wabubble-avatar" src="${photo}" onerror="this.outerHTML='<div class=\\"wabubble-avatar\\">${initial}</div>'" />`
-                    : `<div class="wabubble-avatar">${initial}</div>`;
+                const avatarImg = avatarImgHtml(photo, 'wabubble-avatar', initial);
+                const avatarHtml = avatarImg || `<div class="wabubble-avatar">${initial}</div>`;
 
                 // Admin can delete any message in either chat; a normal user can delete only their own
                 const canDelete = S.isAdmin || isMine;
