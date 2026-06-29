@@ -2036,94 +2036,138 @@
             margin-top: 4px;
         }
 
-        /* ===== PROFILE MODAL ===== */
+        /* ===== PROFILE MODAL – FULL SCREEN ===== */
         #profile-modal {
             position: fixed;
             inset: 0;
             z-index: 9999;
-            background: rgba(5,3,10,0.88);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            background: var(--void);
             display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 16px;
-        }
-        .profile-modal-box {
-            background: linear-gradient(135deg,#150f2c,#0d0a1f);
-            border-radius: 20px;
-            padding: 28px 24px;
-            width: 440px;
-            max-width: 100%;
-            max-height: 90vh;
+            flex-direction: column;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
-            border: 1px solid rgba(192,38,211,0.22);
+            overscroll-behavior: contain;
         }
-        .profile-modal-header {
+        /* Full-screen top header bar */
+        .profile-fs-header {
+            position: sticky;
+            top: 0;
+            z-index: 2;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            margin-bottom: 22px;
+            gap: 12px;
+            padding: 14px 18px;
+            background: rgba(10,8,20,0.96);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-bottom: 1px solid rgba(192,38,211,0.18);
+            flex-shrink: 0;
         }
-        .profile-modal-title {
-            color: var(--bright);
-            font-size: 18px;
-            font-weight: 700;
-        }
-        .profile-close-btn {
+        .profile-fs-back {
             background: var(--surface);
             border: 1px solid var(--border);
-            border-radius: 8px;
-            width: 32px;
-            height: 32px;
+            border-radius: 10px;
+            width: 38px;
+            height: 38px;
             color: var(--text);
-            font-size: 17px;
+            font-size: 18px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
+            flex-shrink: 0;
+            -webkit-tap-highlight-color: transparent;
         }
-        /* Profile avatar section */
-        .profile-avatar-section {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 14px;
-            margin-bottom: 24px;
-            padding: 20px;
-            background: rgba(192,38,211,0.05);
-            border: 1px solid rgba(192,38,211,0.15);
-            border-radius: 14px;
+        .profile-fs-title {
+            color: var(--bright);
+            font-size: 17px;
+            font-weight: 700;
+            flex: 1;
         }
-        .profile-avatar-wrap {
+        /* Hero cover area */
+        .profile-fs-cover {
             position: relative;
-            width: 80px;
-            height: 80px;
+            height: 180px;
+            background: linear-gradient(135deg,#1a0a30,#200a30,#0d0a1f);
+            overflow: hidden;
+            flex-shrink: 0;
         }
-        .profile-avatar-wrap img {
-            width: 80px;
-            height: 80px;
+        .profile-fs-cover-pattern {
+            position: absolute;
+            inset: 0;
+            background-image: linear-gradient(rgba(192,38,211,0.08) 1px,transparent 1px),
+                linear-gradient(90deg,rgba(192,38,211,0.08) 1px,transparent 1px);
+            background-size: 36px 36px;
+        }
+        .profile-fs-cover-glow {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse 80% 80% at 50% 120%,rgba(168,85,247,0.3) 0%,transparent 65%);
+        }
+        /* Avatar positioned at bottom of cover */
+        .profile-fs-avatar-wrap {
+            position: absolute;
+            bottom: -44px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2;
+        }
+        .profile-fs-avatar-wrap img,
+        .profile-avatar-initials {
+            width: 88px;
+            height: 88px;
             border-radius: 50%;
-            border: 3px solid var(--magenta);
+            border: 4px solid var(--void);
+            box-shadow: 0 0 0 3px var(--magenta), 0 8px 30px rgba(255,45,135,0.4);
             object-fit: cover;
         }
         .profile-avatar-initials {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            border: 3px solid var(--magenta);
             background: var(--grad);
             display: flex;
             align-items: center;
             justify-content: center;
             font-family: 'Rajdhani', sans-serif;
-            font-size: 28px;
+            font-size: 32px;
             font-weight: 900;
             color: #0a0814;
         }
-        .profile-avatar-url-wrap {
+        /* Content area */
+        .profile-fs-body {
+            padding: 60px 20px 30px;
+            max-width: 520px;
+            margin: 0 auto;
             width: 100%;
+            flex: 1;
+        }
+        /* User display name & role centered */
+        .profile-fs-userinfo {
+            text-align: center;
+            margin-bottom: 26px;
+        }
+        .profile-fs-username {
+            color: var(--bright);
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .profile-fs-userrole {
+            font-size: 12px;
+            color: var(--text-dim);
+        }
+        /* Card sections */
+        .profile-fs-card {
+            background: rgba(255,255,255,0.035);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            padding: 18px 16px;
+            margin-bottom: 14px;
+        }
+        .profile-fs-card-title {
+            color: var(--text-dim);
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            margin-bottom: 14px;
         }
         .profile-avatar-url-wrap label {
             color: var(--text-dim);
@@ -2144,15 +2188,9 @@
             direction: ltr;
             transition: border-color .2s;
         }
-        .profile-avatar-url-input:focus {
-            border-color: rgba(192,38,211,0.45);
-        }
-        .profile-avatar-url-input::placeholder {
-            color: var(--text-dim);
-        }
-        .profile-field {
-            margin-bottom: 14px;
-        }
+        .profile-avatar-url-input:focus { border-color: rgba(192,38,211,0.45); }
+        .profile-avatar-url-input::placeholder { color: var(--text-dim); }
+        .profile-field { margin-bottom: 14px; }
         .profile-label {
             display: block;
             color: var(--text);
@@ -2173,12 +2211,8 @@
             -webkit-appearance: none;
             transition: border-color .2s;
         }
-        .profile-input:focus {
-            border-color: rgba(192,38,211,0.45);
-        }
-        .profile-input::placeholder {
-            color: var(--text-dim);
-        }
+        .profile-input:focus { border-color: rgba(192,38,211,0.45); }
+        .profile-input::placeholder { color: var(--text-dim); }
         .profile-select {
             width: 100%;
             padding: 11px 14px;
@@ -2192,28 +2226,260 @@
             -webkit-appearance: none;
             transition: border-color .2s;
         }
-        .profile-select:focus {
-            border-color: rgba(192,38,211,0.45);
-        }
-        .profile-select option {
-            background: #1a1335;
-        }
+        .profile-select:focus { border-color: rgba(192,38,211,0.45); }
+        .profile-select option { background: #1a1335; }
         .profile-save-btn {
             width: 100%;
-            padding: 13px;
+            padding: 14px;
             background: var(--grad);
             border: none;
-            border-radius: 10px;
+            border-radius: 12px;
             color: #0a0814;
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 900;
             cursor: pointer;
             margin-top: 6px;
             transition: opacity .2s, transform .2s;
+            box-shadow: 0 6px 24px rgba(192,38,211,0.3);
         }
-        .profile-save-btn:hover { transform: translateY(-1px); }
+        .profile-save-btn:hover { transform: translateY(-2px); }
         .profile-save-btn:active { opacity: .85; }
         .profile-save-btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+        /* Compat alias */
+        .profile-modal-box { width: 100%; }
+        .profile-modal-header { display: none; }
+        .profile-close-btn { display: none; }
+        .profile-avatar-section { display: none; }
+        .profile-avatar-wrap { display: none; }
+
+        /* ===== WHATSAPP CHAT MODAL ===== */
+        #wachat-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
+            display: none;
+            flex-direction: column;
+            background: var(--void);
+        }
+        #wachat-modal.open { display: flex; }
+
+        .wachat-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            background: rgba(18,14,34,0.98);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-bottom: 1px solid rgba(192,38,211,0.18);
+            flex-shrink: 0;
+            min-height: 62px;
+        }
+        .wachat-back-btn {
+            background: none;
+            border: none;
+            color: var(--text);
+            font-size: 22px;
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            -webkit-tap-highlight-color: transparent;
+            flex-shrink: 0;
+        }
+        .wachat-back-btn:hover { background: var(--surface); }
+        .wachat-header-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(192,38,211,0.4);
+            flex-shrink: 0;
+            background: var(--grad);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+        .wachat-header-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .wachat-header-name {
+            color: var(--bright);
+            font-size: 15px;
+            font-weight: 700;
+            display: block;
+        }
+        .wachat-header-status {
+            color: #4fc3f7;
+            font-size: 11px;
+            display: block;
+            margin-top: 1px;
+        }
+        .wachat-header-icon {
+            font-size: 26px;
+        }
+        /* Messages area with WhatsApp-style bg */
+        .wachat-messages {
+            flex: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 14px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            background:
+                linear-gradient(rgba(10,8,20,0.96),rgba(10,8,20,0.96)),
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Ccircle cx='10' cy='10' r='1.5' fill='rgba(168,85,247,0.07)'/%3E%3Ccircle cx='30' cy='30' r='1.5' fill='rgba(168,85,247,0.07)'/%3E%3Ccircle cx='50' cy='50' r='1.5' fill='rgba(168,85,247,0.07)'/%3E%3C/svg%3E");
+        }
+        /* Date divider */
+        .wachat-date-badge {
+            align-self: center;
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 3px 12px;
+            font-size: 11px;
+            color: var(--text-dim);
+            margin: 8px 0;
+        }
+        /* Message bubble */
+        .wabubble {
+            display: flex;
+            align-items: flex-end;
+            gap: 8px;
+            max-width: 82%;
+        }
+        .wabubble.mine {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+        .wabubble.theirs {
+            align-self: flex-start;
+        }
+        .wabubble-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1.5px solid rgba(255,255,255,0.1);
+            flex-shrink: 0;
+            background: var(--grad);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: #0a0814;
+        }
+        .wabubble-content {
+            background: rgba(30,22,52,0.9);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 16px 16px 16px 4px;
+            padding: 8px 12px 6px;
+            position: relative;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        .wabubble.mine .wabubble-content {
+            background: rgba(124,58,237,0.25);
+            border-color: rgba(168,85,247,0.3);
+            border-radius: 16px 16px 4px 16px;
+        }
+        .wabubble-admin-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 10px;
+            color: #ffc862;
+            font-weight: 700;
+            margin-bottom: 3px;
+        }
+        .wabubble-sender {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--violet);
+            margin-bottom: 3px;
+            display: block;
+        }
+        .wabubble.mine .wabubble-sender { color: #c4a8ff; }
+        .wabubble-text {
+            font-size: 14px;
+            color: var(--bright);
+            word-break: break-word;
+            line-height: 1.5;
+        }
+        .wabubble-meta {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 5px;
+            margin-top: 3px;
+        }
+        .wabubble-time {
+            font-size: 10px;
+            color: var(--text-dim);
+        }
+        .wabubble-tick {
+            font-size: 12px;
+            color: #4fc3f7;
+        }
+        /* Input bar */
+        .wachat-input-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 12px;
+            background: rgba(18,14,34,0.97);
+            border-top: 1px solid rgba(192,38,211,0.12);
+            flex-shrink: 0;
+        }
+        .wachat-input {
+            flex: 1;
+            padding: 11px 14px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 24px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            font-family: 'Cairo', sans-serif;
+            transition: border-color .2s;
+        }
+        .wachat-input:focus { border-color: rgba(192,38,211,0.4); }
+        .wachat-input::placeholder { color: var(--text-dim); }
+        .wachat-send-btn {
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            background: var(--grad);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 4px 16px rgba(192,38,211,0.4);
+            -webkit-tap-highlight-color: transparent;
+            transition: transform .2s, box-shadow .2s;
+        }
+        .wachat-send-btn:active { transform: scale(.92); }
+        .wachat-send-btn svg { width: 20px; height: 20px; fill: #0a0814; }
+        /* Empty state in chat */
+        .wachat-empty {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-dim);
+            gap: 10px;
+            padding: 40px 20px;
+        }
+        .wachat-empty-icon { font-size: 46px; opacity: .6; }
+        .wachat-empty p { font-size: 13px; text-align: center; }
 
         /* ===== ACCOUNT SUSPEND (admin) ===== */
         .suspend-banner {
@@ -2357,7 +2623,7 @@
                 <a href="#section-locked">مقفول</a>
             </div>
             <div class="nav-right">
-                <div id="user-badge" onclick="openMenuPanel()" style="cursor:pointer" title="الملف الشخصي">
+                <div id="user-badge" onclick="openProfileModal()" style="cursor:pointer" title="الملف الشخصي">
                     <img id="user-avatar-nav" src="" alt="" />
                     <span id="user-name-nav">مستخدم</span>
                     <span class="role-tag" id="user-role-nav">عادي</span>
@@ -2418,11 +2684,11 @@
                 <div class="menu-nav-divider"></div>
                 <div class="menu-section-title">التواصل</div>
 
-                <div class="menu-nav-item" onclick="openUserChatFromMenu()">
+                <div class="menu-nav-item" onclick="openWaChat('admin')">
                     <span class="menu-nav-icon">💬</span>
                     تواصل مع المشرفين
                 </div>
-                <div class="menu-nav-item" onclick="openFriendsChatFromMenu()">
+                <div class="menu-nav-item" onclick="openWaChat('friends')">
                     <span class="menu-nav-icon">👥</span>
                     تواصل مع أصدقائك
                 </div>
@@ -2734,20 +3000,35 @@
         <p>تم إيقاف حسابك من قِبل أحد المشرفين.<br/>إذا كنت تعتقد أن هذا خطأ، تواصل مع إدارة المنصة.</p>
     </div>
 
-    <!-- ===== PROFILE MODAL ===== -->
-    <div id="profile-modal" onclick="if(event.target===this)closeProfileModal()">
-        <div class="profile-modal-box">
-            <div class="profile-modal-header">
-                <h2 class="profile-modal-title">🎮 تعديل الملف الشخصي</h2>
-                <button class="profile-close-btn" onclick="closeProfileModal()">✕</button>
+    <!-- ===== PROFILE MODAL – FULL SCREEN ===== -->
+    <div id="profile-modal" onclick="">
+        <!-- Sticky top bar -->
+        <div class="profile-fs-header">
+            <button class="profile-fs-back" onclick="closeProfileModal()">✕</button>
+            <span class="profile-fs-title">🎮 الملف الشخصي</span>
+        </div>
+
+        <!-- Cover + avatar hero -->
+        <div class="profile-fs-cover">
+            <div class="profile-fs-cover-pattern"></div>
+            <div class="profile-fs-cover-glow"></div>
+            <div class="profile-fs-avatar-wrap">
+                <img id="profile-preview-img" src="" alt="" onerror="this.style.display='none';document.getElementById('profile-initials').style.display='flex'" style="display:none"/>
+                <div class="profile-avatar-initials" id="profile-initials" style="display:flex">G</div>
+            </div>
+        </div>
+
+        <!-- Body content -->
+        <div class="profile-fs-body">
+            <!-- User name display -->
+            <div class="profile-fs-userinfo">
+                <div class="profile-fs-username" id="profile-display-name">—</div>
+                <div class="profile-fs-userrole" id="profile-display-role">👤 مستخدم</div>
             </div>
 
-            <!-- Avatar section -->
-            <div class="profile-avatar-section">
-                <div class="profile-avatar-wrap">
-                    <img id="profile-preview-img" src="" alt="" onerror="this.style.display='none';document.getElementById('profile-initials').style.display='flex'" style="display:none"/>
-                    <div class="profile-avatar-initials" id="profile-initials" style="display:flex">G</div>
-                </div>
+            <!-- Avatar URL card -->
+            <div class="profile-fs-card">
+                <div class="profile-fs-card-title">صورة البروفايل</div>
                 <div class="profile-avatar-url-wrap">
                     <label>رابط صورة البروفايل (Google Drive)</label>
                     <input type="url" id="profile-photo-url" class="profile-avatar-url-input"
@@ -2756,33 +3037,63 @@
                 </div>
             </div>
 
-            <!-- Name -->
-            <div class="profile-field">
-                <label class="profile-label">الاسم</label>
-                <input type="text" id="profile-name-input" class="profile-input" placeholder="اسمك..." />
+            <!-- Info card -->
+            <div class="profile-fs-card">
+                <div class="profile-fs-card-title">المعلومات الشخصية</div>
+                <div class="profile-field">
+                    <label class="profile-label">الاسم</label>
+                    <input type="text" id="profile-name-input" class="profile-input" placeholder="اسمك..." />
+                </div>
+                <div class="profile-field">
+                    <label class="profile-label">النوع</label>
+                    <select id="profile-gender-select" class="profile-select">
+                        <option value="">-- اختر --</option>
+                        <option value="ذكر">ذكر</option>
+                        <option value="أنثى">أنثى</option>
+                        <option value="أفضل عدم الذكر">أفضل عدم الذكر</option>
+                    </select>
+                </div>
+                <div class="profile-field">
+                    <label class="profile-label">الجنسية</label>
+                    <input type="text" id="profile-nationality-input" class="profile-input" placeholder="مثال: مصري، سعودي..." />
+                </div>
             </div>
 
-            <!-- Gender -->
-            <div class="profile-field">
-                <label class="profile-label">النوع</label>
-                <select id="profile-gender-select" class="profile-select">
-                    <option value="">-- اختر --</option>
-                    <option value="ذكر">ذكر</option>
-                    <option value="أنثى">أنثى</option>
-                    <option value="أفضل عدم الذكر">أفضل عدم الذكر</option>
-                </select>
-            </div>
-
-            <!-- Nationality -->
-            <div class="profile-field">
-                <label class="profile-label">الجنسية</label>
-                <input type="text" id="profile-nationality-input" class="profile-input" placeholder="مثال: مصري، سعودي..." />
-            </div>
-
-            <p id="profile-save-msg" style="color:#4fc3f7;font-size:13px;display:none;margin-bottom:8px">✅ تم حفظ التغييرات</p>
-            <p id="profile-save-err" style="color:#ff7a7a;font-size:13px;display:none;margin-bottom:8px"></p>
+            <p id="profile-save-msg" style="color:#4fc3f7;font-size:13px;display:none;margin-bottom:8px;text-align:center">✅ تم حفظ التغييرات</p>
+            <p id="profile-save-err" style="color:#ff7a7a;font-size:13px;display:none;margin-bottom:8px;text-align:center"></p>
 
             <button class="profile-save-btn" id="profile-save-btn" onclick="saveProfileChanges()">💾 حفظ التغييرات</button>
+        </div>
+    </div>
+
+    <!-- ===== WHATSAPP CHAT MODAL ===== -->
+    <div id="wachat-modal">
+        <!-- Header -->
+        <div class="wachat-header">
+            <button class="wachat-back-btn" onclick="closeWaChat()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            </button>
+            <div class="wachat-header-avatar" id="wachat-header-avatar">💬</div>
+            <div class="wachat-header-info">
+                <span class="wachat-header-name" id="wachat-header-name">المشرفون</span>
+                <span class="wachat-header-status" id="wachat-header-status">متصل</span>
+            </div>
+        </div>
+
+        <!-- Messages -->
+        <div class="wachat-messages" id="wachat-messages-area">
+            <div class="wachat-empty" id="wachat-empty-state">
+                <div class="wachat-empty-icon">💬</div>
+                <p>لا توجد رسائل بعد<br/>كن أول من يرسل!</p>
+            </div>
+        </div>
+
+        <!-- Input bar -->
+        <div class="wachat-input-bar">
+            <input type="text" class="wachat-input" id="wachat-input" placeholder="اكتب رسالة..." onkeydown="if(event.key==='Enter')sendWaChat()" />
+            <button class="wachat-send-btn" onclick="sendWaChat()">
+                <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            </button>
         </div>
     </div>
 
@@ -2904,7 +3215,9 @@
             signInWithRedirect,
             getRedirectResult,
             signOut,
-            onAuthStateChanged
+            onAuthStateChanged,
+            browserLocalPersistence,
+            setPersistence
         } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
         import {
             initializeFirestore,
@@ -2939,6 +3252,8 @@
         };
         const app = initializeApp(FIREBASE_CONFIG);
         const auth = getAuth(app);
+        // ===== FORCE LOCAL PERSISTENCE =====
+        setPersistence(auth, browserLocalPersistence).catch(()=>{});
         const db = initializeFirestore(app, {
             experimentalForceLongPolling: true,
             useFetchStreams: false,
@@ -4091,7 +4406,7 @@
                 if (result && result.user) {
                     S.fbLoading = true;
                     updateUI();
-                    await processUser(result.user, true);
+                    await processUser(result.user, false); // go to home, no panel
                 }
             } catch (e) {
                 console.error('Main login error:', e);
@@ -4307,7 +4622,9 @@
             if (e.key === 'Escape') { closePanel();
                 closeAddModal();
                 closeEditModal();
-                closePlayer(); }
+                closePlayer();
+                closeWaChat();
+            }
         });
 
         // Expose S to window for inline onclick handlers
@@ -4592,6 +4909,12 @@
             document.getElementById('profile-nationality-input').value = currentNationality;
             document.getElementById('profile-gender-select').value = currentGender;
 
+            // Update display name/role in header
+            const dnEl = document.getElementById('profile-display-name');
+            const drEl = document.getElementById('profile-display-role');
+            if (dnEl) dnEl.textContent = currentName || '—';
+            if (drEl) drEl.textContent = S.isAdmin ? (S.isMainAdmin ? '👑 مشرف رئيسي' : '🔑 مشرف عادي') : '👤 مستخدم';
+
             // Show avatar preview
             previewProfilePhoto(currentPhoto);
             const initials = (currentName || 'G').charAt(0).toUpperCase();
@@ -4854,6 +5177,182 @@
         window.sendFriendsChat = sendFriendsChat;
         window.sendFriendsChatInPanel = sendFriendsChatInPanel;
         window.deleteFriendMsg = deleteFriendMsg;
+
+        // ===== WHATSAPP CHAT ENGINE =====
+        let _wachatUnsub = null;
+        let _wachatMode = null; // 'admin' | 'friends'
+
+        window.openWaChat = function(mode) {
+            if (!S.user) { showToast('🔑 سجّل دخولك أولاً', '#ffb020'); return; }
+            _wachatMode = mode;
+            closeMenuPanel();
+            const modal = document.getElementById('wachat-modal');
+            modal.classList.add('open');
+            document.body.style.overflow = 'hidden';
+            if (mode === 'admin') {
+                document.getElementById('wachat-header-avatar').textContent = '🛡️';
+                document.getElementById('wachat-header-name').textContent = 'المشرفون';
+                document.getElementById('wachat-header-status').textContent = 'قناة الدعم الرسمية';
+                _subscribeWaChat('chatMessages', 'admin');
+            } else {
+                document.getElementById('wachat-header-avatar').textContent = '👥';
+                document.getElementById('wachat-header-name').textContent = 'تواصل مع الأصدقاء';
+                document.getElementById('wachat-header-status').textContent = 'مجتمع GAMEVERSE';
+                _subscribeWaChat('friendsChat', 'friends');
+            }
+        };
+
+        window.closeWaChat = function() {
+            document.getElementById('wachat-modal').classList.remove('open');
+            document.body.style.overflow = '';
+            if (_wachatUnsub) { _wachatUnsub(); _wachatUnsub = null; }
+            _wachatMode = null;
+        };
+
+        function _subscribeWaChat(collectionName, mode) {
+            if (_wachatUnsub) { _wachatUnsub(); _wachatUnsub = null; }
+            const area = document.getElementById('wachat-messages-area');
+            const empty = document.getElementById('wachat-empty-state');
+            area.innerHTML = '';
+            area.appendChild(empty);
+            empty.style.display = 'flex';
+
+            try {
+                const q = query(collection(db, collectionName), orderBy('timestamp', 'asc'));
+                _wachatUnsub = onSnapshot(q, snap => {
+                    const msgs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                    _renderWaMsgs(msgs, mode);
+                }, err => { console.error('WaChat snapshot error:', err); });
+            } catch (e) { console.error('WaChat subscribe error:', e); }
+        }
+
+        function _renderWaMsgs(msgs, mode) {
+            const area = document.getElementById('wachat-messages-area');
+            const empty = document.getElementById('wachat-empty-state');
+            if (msgs.length === 0) {
+                area.innerHTML = '';
+                area.appendChild(empty);
+                empty.style.display = 'flex';
+                return;
+            }
+            empty.style.display = 'none';
+
+            // Build messages
+            let html = '';
+            let lastDate = '';
+            msgs.forEach(msg => {
+                const uid = mode === 'admin' ? msg.sender : msg.uid;
+                const isMine = uid === S.user?.uid;
+                const name = mode === 'admin' ? (msg.senderName || 'مستخدم') : (msg.senderName || 'مستخدم');
+                const isAdmin = mode === 'admin' && msg.isAdmin;
+                const ts = msg.timestamp;
+                const d = ts ? (ts.toDate ? ts.toDate() : new Date(ts)) : new Date();
+                const dateStr = d.toLocaleDateString('ar-EG', { day:'numeric', month:'long' });
+                const timeStr = d.toLocaleTimeString('ar-EG', { hour:'2-digit', minute:'2-digit' });
+                const photo = mode === 'admin' ? (msg.senderPhoto || '') : (msg.senderPhoto || '');
+                const initial = (name || '?').charAt(0).toUpperCase();
+
+                if (dateStr !== lastDate) {
+                    html += `<div class="wachat-date-badge">${dateStr}</div>`;
+                    lastDate = dateStr;
+                }
+
+                const avatarHtml = photo
+                    ? `<img class="wabubble-avatar" src="${photo}" onerror="this.outerHTML='<div class=\\"wabubble-avatar\\">${initial}</div>'" />`
+                    : `<div class="wabubble-avatar">${initial}</div>`;
+
+                html += `
+                <div class="wabubble ${isMine ? 'mine' : 'theirs'}">
+                    ${!isMine ? avatarHtml : ''}
+                    <div class="wabubble-content">
+                        ${!isMine ? `<span class="wabubble-sender">${isAdmin ? '👑 ' : ''}${name}</span>` : ''}
+                        <div class="wabubble-text">${msg.text || ''}</div>
+                        <div class="wabubble-meta">
+                            <span class="wabubble-time">${timeStr}</span>
+                            ${isMine ? '<span class="wabubble-tick">✓✓</span>' : ''}
+                        </div>
+                    </div>
+                    ${isMine ? avatarHtml : ''}
+                </div>`;
+            });
+
+            area.innerHTML = html;
+            area.scrollTop = area.scrollHeight;
+        }
+
+        window.sendWaChat = async function() {
+            if (!S.user || !_wachatMode) return;
+            const input = document.getElementById('wachat-input');
+            const text = (input.value || '').trim();
+            if (!text) return;
+            input.value = '';
+            const name = S.userProfile?.displayName || S.user.displayName || 'مستخدم';
+            const photo = S.userProfile?.photoURL || S.user.photoURL || '';
+            try {
+                if (_wachatMode === 'admin') {
+                    await addDoc(collection(db, 'chatMessages'), {
+                        sender: S.user.uid,
+                        senderName: name,
+                        senderPhoto: photo,
+                        text,
+                        timestamp: new Date(),
+                        isAdmin: S.isAdmin
+                    });
+                } else {
+                    await addDoc(collection(db, 'friendsChat'), {
+                        uid: S.user.uid,
+                        senderName: name,
+                        senderPhoto: photo,
+                        text,
+                        timestamp: new Date()
+                    });
+                }
+            } catch (e) {
+                console.error('WaChat send error:', e);
+                showToast('❌ فشل الإرسال', '#ff7a7a');
+            }
+        };
+
+        // Override old chat open functions to use WaChat
+        window.openUserChatFromMenu = function() { openWaChat('admin'); };
+        window.openFriendsChatFromMenu = function() { openWaChat('friends'); };
+
+        // Update profile modal to show name/role
+        const _origOpenProfile = window.openProfileModal;
+        window.openProfileModal = function() {
+            if (!S.user) { showToast('🔑 سجّل دخولك أولاً', '#ffb020'); return; }
+            closeMenuPanel();
+            const modal = document.getElementById('profile-modal');
+            const profile = S.userProfile || {};
+            const currentName = profile.displayName || S.user.displayName || '';
+            const currentPhoto = profile.photoURL || '';
+            const currentNationality = profile.nationality || '';
+            const currentGender = profile.gender || '';
+
+            document.getElementById('profile-name-input').value = currentName;
+            document.getElementById('profile-photo-url').value = currentPhoto;
+            document.getElementById('profile-nationality-input').value = currentNationality;
+            document.getElementById('profile-gender-select').value = currentGender;
+
+            // Update display name/role
+            const dnEl = document.getElementById('profile-display-name');
+            const drEl = document.getElementById('profile-display-role');
+            if (dnEl) dnEl.textContent = currentName || '—';
+            if (drEl) drEl.textContent = S.isAdmin ? (S.isMainAdmin ? '👑 مشرف رئيسي' : '🔑 مشرف عادي') : '👤 مستخدم';
+
+            previewProfilePhoto(currentPhoto);
+            const initials = (currentName || 'G').charAt(0).toUpperCase();
+            document.getElementById('profile-initials').textContent = initials;
+
+            document.getElementById('profile-save-msg').style.display = 'none';
+            document.getElementById('profile-save-err').style.display = 'none';
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        };
+
+        window.closeWaChat = closeWaChat;
+        window.openWaChat = openWaChat;
+        window.sendWaChat = sendWaChat;
     </script>
 </body>
 </html>
