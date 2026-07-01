@@ -1587,7 +1587,7 @@
         }
         .wabubble {
             display: flex;
-            align-items: flex-end;
+            align-items: flex-start;
             gap: 8px;
             max-width: 82%;
             animation: wabubble-in .22s ease both;
@@ -1922,9 +1922,6 @@
                 <div class="menu-nav-divider"></div>
                 <div class="menu-section-title">التواصل</div>
 
-                <div class="menu-nav-item" onclick="openWaChat()">
-                    <span class="menu-nav-icon">💬</span> تواصل مع المشرفين
-                </div>
                 <div class="menu-nav-item" onclick="openMembersModal()">
                     <span class="menu-nav-icon">👥</span> الأعضاء ومتابعتهم
                 </div>
@@ -2103,16 +2100,7 @@
                         </div>
                     </div>
 
-                    <div class="panel-tab-content active" id="tab-user-chat" style="display:block">
-                        <div class="chat-cta-card" onclick="closePanel();openWaChat()">
-                            <div class="chat-cta-icon">🛡️</div>
-                            <div class="chat-cta-body">
-                                <div class="chat-cta-title">تواصل مع المشرفين</div>
-                                <div class="chat-cta-sub">اسأل أو ابعت مشكلتك وهيردوا عليك فورًا</div>
-                            </div>
-                            <div class="chat-cta-arrow">‹</div>
-                        </div>
-                    </div>
+                    <div class="panel-tab-content active" id="tab-user-chat" style="display:block"></div>
 
                     <button class="btn-signout" onclick="handleSignOut()">🚪 تسجيل الخروج</button>
                 </div>
