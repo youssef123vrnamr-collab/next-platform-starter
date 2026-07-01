@@ -820,16 +820,29 @@
             white-space: nowrap;
         }
         .comment-send-btn:active { opacity: .8; }
-        .comment-item { display: flex; gap: 10px; padding: 8px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.04); }
-        .comment-item:last-child { border-bottom: none; }
-        .comment-avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--surface); border: 1px solid var(--border); flex-shrink: 0; overflow: hidden; }
+        .comment-item { display: flex; gap: 10px; padding: 10px; border-radius: 12px; margin-bottom: 8px; background: rgba(255,255,255,0.035); border: 1px solid rgba(255,255,255,0.05); transition: background .2s, transform .15s; animation: commentFadeIn .25s ease; }
+        .comment-item:hover { background: rgba(255,255,255,0.06); }
+        .comment-item.own { background: rgba(192,38,211,0.06); border-color: rgba(192,38,211,0.12); }
+        @keyframes commentFadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        .comment-avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--surface); border: 1px solid var(--border); flex-shrink: 0; overflow: hidden; }
         .comment-avatar img { width: 100%; height: 100%; object-fit: cover; }
-        .comment-body { flex: 1; }
+        .comment-body { flex: 1; min-width: 0; }
         .comment-name { font-size: 12px; font-weight: 700; color: var(--bright); }
-        .comment-text { font-size: 13px; color: var(--text); margin-top: 2px; word-break: break-word; }
-        .comment-time { font-size: 10px; color: var(--text-dim); margin-top: 2px; }
-        .comment-delete-btn { background: none; border: none; color: #ff7a7a; font-size: 12px; cursor: pointer; padding: 2px 6px; border-radius: 4px; transition: background .2s; margin-top: 2px; display: inline-block; }
-        .comment-delete-btn:hover { background: rgba(255,70,70,0.1); }
+        .comment-text { font-size: 13px; color: var(--text); margin-top: 3px; word-break: break-word; line-height: 1.5; }
+        .comment-time { font-size: 10px; color: var(--text-dim); margin-top: 4px; display: flex; align-items: center; gap: 6px; }
+        .comment-edited-tag { font-style: italic; opacity: .8; }
+        .comment-actions-row { display: flex; align-items: center; gap: 10px; margin-top: 4px; }
+        .comment-delete-btn { background: none; border: none; color: #ff7a7a; font-size: 11.5px; cursor: pointer; padding: 0; opacity: .7; transition: opacity .2s; }
+        .comment-delete-btn:hover { opacity: 1; }
+        .comment-edit-btn { background: none; border: none; color: var(--violet); font-size: 11.5px; cursor: pointer; padding: 0; opacity: .7; transition: opacity .2s; }
+        .comment-edit-btn:hover { opacity: 1; }
+        .comment-reply-preview { display: flex; align-items: center; gap: 8px; padding: 7px 10px; background: rgba(255,255,255,0.05); border-radius: 8px; margin-bottom: 8px; animation: waReplySlideIn .15s ease; }
+        .comment-reply-preview-bar { width: 3px; align-self: stretch; background: var(--violet); border-radius: 2px; flex-shrink: 0; }
+        .comment-reply-preview-text { flex: 1; font-size: 12px; color: var(--text-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .comment-reply-preview-close { background: none; border: none; color: var(--text-dim); font-size: 14px; cursor: pointer; opacity: .7; }
+        .comment-reply-preview-close:hover { opacity: 1; color: #ff7a7a; }
+        #comment-input-wrap.editing input { border-color: #ffc862; }
+        #comment-input-wrap.editing .comment-send-btn { background: linear-gradient(120deg,#ffc862,#ffb020); }
 
         /* ===== ADMIN ACTIONS ===== */
         .admin-actions { padding-top: 11px; border-top: 1px solid var(--border); display: none; gap: 7px; flex-wrap: wrap; margin-top: 11px; }
@@ -1294,10 +1307,10 @@
         .player-actions .rating-group { display: flex; align-items: center; gap: 14px; }
         .player-actions .rating-btn { font-size: 18px; }
         .player-actions .rating-btn .count { font-size: 14px; }
-        .player-comments { margin-top: 14px; border-top: 1px solid var(--border); padding-top: 14px; }
+        .player-comments { margin-top: 14px; border-top: 1px solid var(--border); padding-top: 14px; display: flex; flex-direction: column; }
         .player-comments .comments-title { color: var(--bright); font-size: 14px; font-weight: 700; margin-bottom: 10px; }
-        .player-comments .comment-input-wrap { margin-bottom: 12px; }
-        .player-comments .comment-item { padding: 6px 0; }
+        .player-comments .comment-input-wrap { margin-bottom: 0; margin-top: 2px; }
+        #player-comments-list { max-height: 340px; overflow-y: auto; display: flex; flex-direction: column; padding-left: 2px; scroll-behavior: smooth; }
 
         /* ===== PROFILE MODAL ===== */
         #profile-modal {
@@ -1587,6 +1600,24 @@
         .wabubble-status.failed { color: #ff7a7a; font-weight: 700; }
         .wabubble-delete-btn { background: none; border: none; color: #ff7a7a; font-size: 11px; cursor: pointer; padding: 0; opacity: .55; transition: opacity .15s; margin-left: 2px; }
         .wabubble-delete-btn:hover { opacity: 1; }
+        .wabubble-action-btn { background: none; border: none; color: var(--text-dim); font-size: 11px; cursor: pointer; padding: 0; opacity: .55; transition: opacity .15s, color .15s; margin-left: 2px; }
+        .wabubble-action-btn:hover { opacity: 1; color: var(--violet); }
+        .wabubble-quote { display: flex; flex-direction: column; gap: 1px; background: rgba(255,255,255,0.06); border-right: 3px solid var(--violet); border-radius: 6px; padding: 5px 8px; margin-bottom: 6px; cursor: pointer; }
+        .wabubble.mine .wabubble-quote { border-right: none; border-left: 3px solid #c4a8ff; }
+        .wabubble-quote-name { font-size: 10.5px; font-weight: 700; color: var(--violet); }
+        .wabubble.mine .wabubble-quote-name { color: #c4a8ff; }
+        .wabubble-quote-text { font-size: 12px; color: var(--text-dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 220px; }
+        .wabubble-edited-tag { font-size: 9.5px; color: var(--text-dim); font-style: italic; }
+        .wachat-reply-preview { display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: rgba(255,255,255,0.04); border-top: 1px solid var(--border); animation: waReplySlideIn .15s ease; }
+        @keyframes waReplySlideIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        .wachat-reply-preview-bar { width: 3px; align-self: stretch; background: var(--violet); border-radius: 2px; flex-shrink: 0; }
+        .wachat-reply-preview-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+        .wachat-reply-preview-label { font-size: 11px; font-weight: 700; color: var(--violet); }
+        .wachat-reply-preview-text { font-size: 12px; color: var(--text-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
+        .wachat-reply-preview-close { background: none; border: none; color: var(--text-dim); font-size: 15px; cursor: pointer; opacity: .7; flex-shrink: 0; }
+        .wachat-reply-preview-close:hover { opacity: 1; color: #ff7a7a; }
+        .wachat-input-bar.editing .wachat-input { border-color: #ffc862; }
+        .wachat-input-bar.editing .wachat-send-btn { background: linear-gradient(120deg,#ffc862,#ffb020); }
         .wachat-input-bar {
             display: flex;
             align-items: center;
@@ -1861,17 +1892,17 @@
                 <div id="menu-admin-section" style="display:none">
                     <div class="menu-nav-divider"></div>
                     <div class="menu-section-title">إدارة المنصة</div>
-                    <div class="menu-nav-item" onclick="openAdminPanel()">
-                        <span class="menu-nav-icon">☰</span> لوحة التحكم
-                    </div>
                     <div class="menu-nav-item" id="menu-add-admin-btn" onclick="openAdminPanel('admin-admins')">
                         <span class="menu-nav-icon">➕</span> إضافة / إدارة المشرفين
                     </div>
                     <div class="menu-nav-item" id="menu-accounts-btn" onclick="openAdminPanel('admin-users')">
                         <span class="menu-nav-icon">🚫</span> إدارة الحسابات
                     </div>
+                    <div class="menu-nav-item" onclick="openAdminPanel('admin-ratings')">
+                        <span class="menu-nav-icon">⭐</span> التقييمات
+                    </div>
                     <div class="menu-nav-item" onclick="openAdminPanel('admin-comments')">
-                        <span class="menu-nav-icon">💬</span> تعليقات كل الفيديوهات
+                        <span class="menu-nav-icon">💬</span> التعليقات
                     </div>
                     <div class="menu-nav-item" onclick="closeMenuPanel();openWaChat()">
                         <span class="menu-nav-icon">📨</span> صندوق رسائل المستخدمين
@@ -1944,29 +1975,11 @@
 
                     <!-- Admin Tabs -->
                     <div class="panel-tabs">
-                        <button class="panel-tab active" data-tab="admin-upload" onclick="switchPanelTab('admin-upload')">📤 رفع</button>
-                        <button class="panel-tab" data-tab="admin-videos" onclick="switchPanelTab('admin-videos')">🎬 فيديوهات</button>
                         <button class="panel-tab" data-tab="admin-admins" onclick="switchPanelTab('admin-admins')">👥 مشرفين</button>
-                        <button class="panel-tab" data-tab="admin-ratings" onclick="switchPanelTab('admin-ratings')">⭐ تقييمات</button>
+                        <button class="panel-tab active" data-tab="admin-ratings" onclick="switchPanelTab('admin-ratings')">⭐ تقييمات</button>
                         <button class="panel-tab" data-tab="admin-comments" onclick="switchPanelTab('admin-comments')">💬 تعليقات</button>
                         <button class="panel-tab" data-tab="admin-chat" onclick="switchPanelTab('admin-chat')">📨 رسائل</button>
                         <button class="panel-tab" data-tab="admin-users" onclick="switchPanelTab('admin-users')">🚫 المستخدمين</button>
-                    </div>
-
-                    <!-- Upload -->
-                    <div class="panel-tab-content active" id="tab-admin-upload">
-                        <button class="btn-upload" onclick="openAddModal('youtube');closePanel()">🎬 رفع فيديو يوتيوب</button>
-                        <button class="btn-upload secondary" onclick="openAddModal('drive');closePanel()">📁 رفع فيديو Google Drive</button>
-                        <div class="tool-info" style="margin-top:12px">
-                            <div class="tool-item"><span>🔒</span><span>قفل / فتح الفيديو</span></div>
-                            <div class="tool-item"><span>✏️</span><span>تعديل العنوان والوصف</span></div>
-                            <div class="tool-item"><span>🗑️</span><span>حذف الفيديو</span></div>
-                        </div>
-                    </div>
-
-                    <!-- Videos -->
-                    <div class="panel-tab-content" id="tab-admin-videos">
-                        <div id="admin-video-list" style="max-height:300px;overflow-y:auto"></div>
                     </div>
 
                     <!-- Admins -->
@@ -2227,9 +2240,17 @@
                 <p>لا توجد رسائل بعد<br/>كن أول من يرسل!</p>
             </div>
         </div>
+        <div class="wachat-reply-preview" id="wachat-reply-preview" style="display:none">
+            <div class="wachat-reply-preview-bar"></div>
+            <div class="wachat-reply-preview-body">
+                <span class="wachat-reply-preview-label" id="wachat-reply-preview-label">رد على</span>
+                <span class="wachat-reply-preview-text" id="wachat-reply-preview-text"></span>
+            </div>
+            <button class="wachat-reply-preview-close" onclick="wachatCancelReply()">✕</button>
+        </div>
         <div class="wachat-input-bar">
             <input type="text" class="wachat-input" id="wachat-input" placeholder="اكتب رسالة..." onkeydown="if(event.key==='Enter')sendWaChat()" />
-            <button class="wachat-send-btn" onclick="sendWaChat()">
+            <button class="wachat-send-btn" id="wachat-send-btn" onclick="sendWaChat()">
                 <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
             </button>
         </div>
@@ -2321,11 +2342,16 @@
                 </div>
                 <div class="player-comments" id="player-comments">
                     <div class="comments-title">💬 تعليقات</div>
-                    <div class="comment-input-wrap">
-                        <input id="player-comment-input" type="text" placeholder="اكتب تعليقاً..." onkeydown="if(event.key==='Enter')submitPlayerComment()" />
-                        <button class="comment-send-btn" onclick="submitPlayerComment()">إرسال</button>
-                    </div>
                     <div id="player-comments-list"></div>
+                    <div class="comment-reply-preview" id="comment-reply-preview" style="display:none">
+                        <div class="comment-reply-preview-bar"></div>
+                        <span class="comment-reply-preview-text" id="comment-reply-preview-text"></span>
+                        <button class="comment-reply-preview-close" onclick="cancelPlayerCommentEdit()">✕</button>
+                    </div>
+                    <div class="comment-input-wrap" id="comment-input-wrap">
+                        <input id="player-comment-input" type="text" placeholder="اكتب تعليقاً..." onkeydown="if(event.key==='Enter')submitPlayerComment()" />
+                        <button class="comment-send-btn" id="comment-send-btn" onclick="submitPlayerComment()">إرسال</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -2836,6 +2862,8 @@
         };
 
         // ===== COMMENTS =====
+        let _playerCommentEditIdx = null; // index of comment currently being edited (chat-style, under the video)
+
         window.submitPlayerComment = async function() {
             if (!S.user) { showToast('🔑 سجّل دخولك أولاً', '#ffb020'); return; }
             const input = document.getElementById('player-comment-input');
@@ -2843,6 +2871,25 @@
             if (!text) return;
             const videoId = S.playerVideoId;
             if (!videoId) return;
+            const v = S.videos.find(v => v.id === videoId);
+            if (!v) return;
+
+            // ===== EDIT MODE =====
+            if (_playerCommentEditIdx !== null) {
+                const idx = _playerCommentEditIdx;
+                const comments = (v.comments || []).slice();
+                if (!comments[idx]) { cancelPlayerCommentEdit(); return; }
+                comments[idx] = { ...comments[idx], text, editedAt: new Date() };
+                try {
+                    await updateDoc(doc(db, 'videos', videoId), { comments });
+                    v.comments = comments;
+                    cancelPlayerCommentEdit();
+                    renderPlayerComments(v);
+                    showToast('✅ تم تعديل التعليق');
+                } catch (e) { console.error('Comment edit error:', e); showToast('❌ حدث خطأ', '#ff7a7a'); }
+                return;
+            }
+
             try {
                 const comment = {
                     uid: S.user.uid,
@@ -2853,37 +2900,64 @@
                 };
                 await updateDoc(doc(db, 'videos', videoId), { comments: arrayUnion(comment) });
                 input.value = '';
-                const v = S.videos.find(v => v.id === videoId);
-                if (v) { const comments = v.comments || []; comments.push(comment); v.comments = comments; }
-                renderPlayerComments(S.videos.find(v => v.id === videoId));
+                const comments = v.comments || []; comments.push(comment); v.comments = comments;
+                renderPlayerComments(v);
                 renderVideos();
                 showToast('✅ تم إضافة التعليق');
             } catch (e) { console.error('Comment error:', e); showToast('❌ حدث خطأ', '#ff7a7a'); }
         };
 
+        window.editPlayerComment = function(idx) {
+            const v = S.videos.find(v => v.id === S.playerVideoId);
+            if (!v || !v.comments || !v.comments[idx]) return;
+            _playerCommentEditIdx = idx;
+            document.getElementById('comment-reply-preview-text').textContent = 'بتعدّل تعليقك';
+            document.getElementById('comment-reply-preview').style.display = 'flex';
+            const input = document.getElementById('player-comment-input');
+            input.value = v.comments[idx].text || '';
+            input.focus();
+            document.getElementById('comment-input-wrap').classList.add('editing');
+        };
+
+        window.cancelPlayerCommentEdit = function() {
+            _playerCommentEditIdx = null;
+            document.getElementById('comment-reply-preview').style.display = 'none';
+            document.getElementById('comment-input-wrap').classList.remove('editing');
+            document.getElementById('player-comment-input').value = '';
+        };
+
+        // Renders comments in chronological order (oldest → newest, top → bottom), like a
+        // normal chat, since the input box lives at the bottom — not reversed like YouTube.
         function renderPlayerComments(v) {
             const list = document.getElementById('player-comments-list');
             if (!v || !v.comments || v.comments.length === 0) {
-                list.innerHTML = `<p style="color:var(--text-dim);font-size:13px;padding:8px 0">لا توجد تعليقات</p>`;
+                list.innerHTML = `<p style="color:var(--text-dim);font-size:13px;padding:8px 0">لا توجد تعليقات بعد — كن أول من يعلّق!</p>`;
                 return;
             }
-            list.innerHTML = v.comments.slice().reverse().map((c, idx) => {
-                const origIdx = v.comments.length - 1 - idx;
-                const canDelete = S.isAdmin || (S.user && c.uid === S.user.uid);
+            list.innerHTML = v.comments.map((c, idx) => {
+                const isMine = S.user && c.uid === S.user.uid;
+                const canDelete = S.isAdmin || isMine;
+                const editedTag = c.editedAt ? '<span class="comment-edited-tag">· معدّل</span>' : '';
                 return `
-                <div class="comment-item">
+                <div class="comment-item ${isMine ? 'own' : ''}">
                     <div class="comment-avatar">
                         ${avatarImgHtml(c.photo, '')}
                     </div>
                     <div class="comment-body">
                         <div class="comment-name">${c.name||'مستخدم'}</div>
                         <div class="comment-text">${c.text||''}</div>
-                        <div class="comment-time">${getTimeAgo(c.timestamp)}</div>
-                        ${canDelete ? `<button class="comment-delete-btn" onclick="deletePlayerComment('${v.id}',${origIdx})">🗑 حذف</button>` : ''}
+                        <div class="comment-time">
+                            ${getTimeAgo(c.timestamp)}${editedTag}
+                        </div>
+                        <div class="comment-actions-row">
+                            ${isMine ? `<button class="comment-edit-btn" onclick="editPlayerComment(${idx})">✏️ تعديل</button>` : ''}
+                            ${canDelete ? `<button class="comment-delete-btn" onclick="deletePlayerComment('${v.id}',${idx})">🗑 حذف</button>` : ''}
+                        </div>
                     </div>
                 </div>
                 `;
             }).join('');
+            list.scrollTop = list.scrollHeight;
         }
 
         window.deleteCardComment = async function(videoId, commentIdx) {
@@ -3024,6 +3098,7 @@
         // ===== ADMIN VIDEO LIST =====
         function renderAdminVideoList() {
             const container = document.getElementById('admin-video-list');
+            if (!container) return;
             if (S.videos.length === 0) {
                 container.innerHTML = `<p style="color:var(--text-dim);font-size:13px">لا توجد فيديوهات</p>`;
                 return;
@@ -3312,6 +3387,8 @@
         let _wachatPending = [];   // messages sent but not yet confirmed by Firestore snapshot
         let _wachatLastMsgs = [];  // last known confirmed messages from the server
         let _wachatListenerRetry = 0;
+        let _wachatReplyTo = null;  // { id, senderName, text } of the message being replied to
+        let _wachatEditingId = null; // id of the message currently being edited (in place of sending new)
 
         function _ensureWaChatListener() {
             if (_wachatUnsub || !S.user) return; // already running, or not logged in
@@ -3415,7 +3492,10 @@
                 }
                 const avatarHtml = avatarImgHtml(photo, 'wabubble-avatar', initial) || `<div class="wabubble-avatar">${_escapeHtml(initial)}</div>`;
                 const canDelete = !msg._pending && (S.isAdmin || isMine);
+                const canEdit = !msg._pending && isMine;
                 const deleteBtn = canDelete ? `<button class="wabubble-delete-btn" onclick="deleteWaMsg('${msg.id}')" title="حذف الرسالة">🗑</button>` : '';
+                const editBtn = canEdit ? `<button class="wabubble-action-btn" onclick='wachatEditMsg(${JSON.stringify(msg.id)})' title="تعديل الرسالة">✏️</button>` : '';
+                const replyBtn = (!msg._pending && S.isAdmin) ? `<button class="wabubble-action-btn" onclick='wachatReplyTo(${JSON.stringify(msg.id)},${JSON.stringify(name)},${JSON.stringify(msg.text)})' title="رد على الرسالة">↩️</button>` : '';
                 const safeText = _escapeHtml(msg.text).replace(/\n/g, '<br>');
                 let statusHtml = '';
                 if (msg._failed) {
@@ -3425,15 +3505,27 @@
                 } else if (isMine) {
                     statusHtml = '<span class="wabubble-tick">✓✓</span>';
                 }
+                let quoteHtml = '';
+                if (msg.replyTo && msg.replyTo.text) {
+                    quoteHtml = `<div class="wabubble-quote" onclick="wachatScrollToMsg('${msg.replyTo.id || ''}')">
+                        <span class="wabubble-quote-name">${_escapeHtml(msg.replyTo.senderName || 'مستخدم')}</span>
+                        <span class="wabubble-quote-text">${_escapeHtml(msg.replyTo.text)}</span>
+                    </div>`;
+                }
+                const editedTag = msg.editedAt ? '<span class="wabubble-edited-tag">· معدّلة</span>' : '';
                 html += `
-                <div class="wabubble ${isMine ? 'mine' : 'theirs'}${msg._pending ? ' pending' : ''}${msg._failed ? ' failed' : ''}">
+                <div class="wabubble ${isMine ? 'mine' : 'theirs'}${msg._pending ? ' pending' : ''}${msg._failed ? ' failed' : ''}" id="wamsg-${msg.id}">
                     ${!isMine ? avatarHtml : ''}
                     <div class="wabubble-content">
                         ${!isMine ? `<span class="wabubble-sender">${isAdmin ? '👑 ' : ''}${_escapeHtml(name)}</span>` : ''}
+                        ${quoteHtml}
                         <div class="wabubble-text">${safeText}</div>
                         <div class="wabubble-meta">
+                            ${replyBtn}
+                            ${editBtn}
                             ${deleteBtn}
                             <span class="wabubble-time">${timeStr}</span>
+                            ${editedTag}
                             ${statusHtml}
                         </div>
                     </div>
@@ -3443,6 +3535,48 @@
             area.innerHTML = html;
             if (wasAtBottom) area.scrollTop = area.scrollHeight;
         }
+
+        window.wachatScrollToMsg = function(id) {
+            if (!id) return;
+            const el = document.getElementById('wamsg-' + id);
+            if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.style.outline = '2px solid var(--violet)'; setTimeout(() => el.style.outline = '', 900); }
+        };
+
+        window.wachatReplyTo = function(id, senderName, text) {
+            _wachatEditingId = null;
+            _wachatReplyTo = { id, senderName, text };
+            const bar = document.getElementById('wachat-input-bar') || document.querySelector('.wachat-input-bar');
+            if (bar) bar.classList.remove('editing');
+            document.getElementById('wachat-reply-preview-label').textContent = 'رد على ' + senderName;
+            document.getElementById('wachat-reply-preview-text').textContent = text;
+            document.getElementById('wachat-reply-preview').style.display = 'flex';
+            document.getElementById('wachat-input').focus();
+        };
+
+        window.wachatCancelReply = function() {
+            _wachatReplyTo = null;
+            document.getElementById('wachat-reply-preview').style.display = 'none';
+        };
+
+        window.wachatEditMsg = function(id) {
+            const msg = _wachatLastMsgs.find(m => m.id === id);
+            if (!msg) return;
+            _wachatReplyTo = null;
+            _wachatEditingId = id;
+            document.getElementById('wachat-reply-preview').style.display = 'none';
+            const input = document.getElementById('wachat-input');
+            input.value = msg.text;
+            input.focus();
+            const bar = document.querySelector('.wachat-input-bar');
+            if (bar) bar.classList.add('editing');
+        };
+
+        window.wachatCancelEdit = function() {
+            _wachatEditingId = null;
+            document.getElementById('wachat-input').value = '';
+            const bar = document.querySelector('.wachat-input-bar');
+            if (bar) bar.classList.remove('editing');
+        };
 
         window.deleteWaMsg = async function(msgId) {
             if (!S.user) return;
@@ -3470,29 +3604,54 @@
             const input = document.getElementById('wachat-input');
             const text = (input.value || '').trim();
             if (!text) return;
+
+            // ===== EDIT MODE: saving changes to an existing message =====
+            if (_wachatEditingId) {
+                const msgId = _wachatEditingId;
+                input.value = '';
+                _wachatEditingId = null;
+                const bar = document.querySelector('.wachat-input-bar');
+                if (bar) bar.classList.remove('editing');
+                const cached = _wachatLastMsgs.find(m => m.id === msgId);
+                if (cached) cached.text = text, cached.editedAt = new Date();
+                _renderWaMsgs(_wachatLastMsgs.concat(_wachatPending));
+                try {
+                    await updateDoc(doc(db, 'chatMessages', msgId), { text, editedAt: serverTimestamp() });
+                    showToast('✅ تم تعديل الرسالة');
+                } catch (e) {
+                    console.error('WaChat edit error:', e);
+                    showToast('❌ فشل التعديل: ' + e.message, '#ff7a7a');
+                }
+                return;
+            }
+
             input.value = '';
             const name = S.userProfile?.displayName || S.user.displayName || 'مستخدم';
             const photo = S.userProfile?.photoURL || S.user.photoURL || '';
+            const replyTo = _wachatReplyTo ? { id: _wachatReplyTo.id, senderName: _wachatReplyTo.senderName, text: _wachatReplyTo.text } : null;
+            wachatCancelReply();
 
             // ===== OPTIMISTIC RENDER: show the message instantly, don't wait for the server =====
             const localId = 'local_' + Date.now() + '_' + Math.random().toString(36).slice(2);
-            const pendingMsg = { id: localId, sender: S.user.uid, senderName: name, senderPhoto: photo, text, timestamp: new Date(), isAdmin: S.isAdmin, _pending: true };
+            const pendingMsg = { id: localId, sender: S.user.uid, senderName: name, senderPhoto: photo, text, timestamp: new Date(), isAdmin: S.isAdmin, replyTo, _pending: true };
             _wachatPending.push(pendingMsg);
             _renderWaMsgs(_wachatLastMsgs.concat(_wachatPending));
 
             try {
-                await addDoc(collection(db, 'chatMessages'), {
+                const payload = {
                     sender: S.user.uid,
                     senderName: name,
                     senderPhoto: photo,
                     text,
                     timestamp: serverTimestamp(),
                     isAdmin: S.isAdmin
-                });
+                };
+                if (replyTo) payload.replyTo = replyTo;
+                await addDoc(collection(db, 'chatMessages'), payload);
                 // Real snapshot will arrive via onSnapshot and replace the pending bubble.
             } catch (e) {
                 console.error('WaChat send error:', e);
-                showToast('❌ فشل الإرسال', '#ff7a7a');
+                showToast('❌ فشل الإرسال: ' + (e.message || ''), '#ff7a7a');
                 // Mark the pending message as failed instead of silently dropping it
                 const idx = _wachatPending.findIndex(m => m.id === localId);
                 if (idx !== -1) {
@@ -4080,7 +4239,7 @@
                     // a regular admin can never land on a main-admin-only tab
                     const activeTab = document.querySelector('.panel-tab.active');
                     if (activeTab && (activeTab.dataset.tab === 'admin-admins' || activeTab.dataset.tab === 'admin-users')) {
-                        switchPanelTab('admin-upload');
+                        switchPanelTab('admin-ratings');
                     }
                 }
             }
