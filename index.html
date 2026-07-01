@@ -1130,8 +1130,11 @@
         .dir-btn.follow-btn { background: var(--grad); border-color: transparent; color: #0a0814; }
         .dir-btn.follow-btn.following { background: rgba(255,255,255,0.06); border-color: var(--border); color: var(--text); }
         .dir-btn.follow-btn:hover { filter: brightness(1.1); }
+        .dir-btn.chat-btn { background: rgba(79,195,247,0.12); border-color: rgba(79,195,247,0.3); color: #4fc3f7; padding: 5px 9px; font-size: 13px; }
+        .dir-btn.chat-btn:hover { background: rgba(79,195,247,0.22); }
 
-        #members-modal {
+        #members-modal,
+        #conversations-modal {
             position: fixed;
             inset: 0;
             z-index: 9999;
@@ -1144,6 +1147,16 @@
         }
         .members-fs-body { padding: 18px 18px 30px; max-width: 560px; margin: 0 auto; width: 100%; flex: 1; }
         .members-fs-list { max-height: none; }
+
+        #friend-chat-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
+            display: none;
+            flex-direction: column;
+            background: var(--void);
+        }
+        #friend-chat-modal.open { display: flex; }
 
         .ratings-list .rating-item { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.05); font-size: 13px; }
         .ratings-list .rating-item .likes { color: #4fc3f7; }
@@ -1915,6 +1928,9 @@
                 <div class="menu-nav-item" onclick="openMembersModal()">
                     <span class="menu-nav-icon">👥</span> الأعضاء ومتابعتهم
                 </div>
+                <div class="menu-nav-item" onclick="openConversationsModal()">
+                    <span class="menu-nav-icon">📩</span> محادثاتي مع الأعضاء
+                </div>
 
                 <!-- Admin only section -->
                 <div id="menu-admin-section" style="display:none">
@@ -2261,6 +2277,44 @@
             <input type="text" id="members-search" class="directory-search" placeholder="🔍 دوّر عن عضو بالاسم..." oninput="renderMembersList()" />
             <p class="directory-hint">تابع أعضاء المنصة عشان تفضل قريب من أنشطتهم — يقدر أي عضو يشوف عدد متابعينه في ملفه الشخصي</p>
             <div id="members-list" class="directory-list members-fs-list"></div>
+        </div>
+    </div>
+
+    <!-- ===== CONVERSATIONS LIST MODAL ===== -->
+    <div id="conversations-modal">
+        <div class="profile-fs-header">
+            <button class="profile-fs-back" onclick="closeConversationsModal()">✕</button>
+            <span class="profile-fs-title">📩 محادثاتي</span>
+        </div>
+        <div class="members-fs-body">
+            <p class="directory-hint">كل المحادثات اللي بدأتها مع الأعضاء — دوس على أي حد عشان تكمل الكلام. عايز تبدأ محادثة جديدة؟ روح لصفحة "الأعضاء"</p>
+            <div id="conversations-list" class="directory-list members-fs-list"></div>
+        </div>
+    </div>
+
+    <!-- ===== FRIEND-TO-FRIEND CHAT MODAL ===== -->
+    <div id="friend-chat-modal">
+        <div class="wachat-header">
+            <button class="wachat-back-btn" onclick="closeFriendChat()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            </button>
+            <div class="wachat-header-avatar" id="friend-chat-avatar">💬</div>
+            <div class="wachat-header-info">
+                <span class="wachat-header-name" id="friend-chat-name">عضو</span>
+                <span class="wachat-header-status" id="friend-chat-status">محادثة خاصة</span>
+            </div>
+        </div>
+        <div class="wachat-messages" id="friend-chat-messages-area">
+            <div class="wachat-empty" style="display:flex">
+                <div class="wachat-empty-icon">💬</div>
+                <p>لا توجد رسائل بعد<br/>ابدأ المحادثة!</p>
+            </div>
+        </div>
+        <div class="wachat-input-bar">
+            <input type="text" class="wachat-input" id="friend-chat-input" placeholder="اكتب رسالة..." onkeydown="if(event.key==='Enter')sendFriendMsg()" />
+            <button class="wachat-send-btn" id="friend-chat-send-btn" onclick="sendFriendMsg()">
+                <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            </button>
         </div>
     </div>
 
@@ -3908,11 +3962,206 @@
                         <div class="directory-email">${e.followersCount || 0} متابِع</div>
                     </div>
                     <div class="directory-actions">
+                        <button class="dir-btn chat-btn" onclick="openFriendChat('${e.uid}','${safeName}','${(e.photoURL||'').replace(/'/g,"\\'")}')" title="ابدأ محادثة">💬</button>
                         <button class="dir-btn follow-btn ${following ? 'following' : ''}" onclick="toggleFollow('${e.uid}','${safeName}')">${following ? '✓ متابَع' : '+ متابعة'}</button>
                     </div>
                 </div>`;
             }).join('');
         };
+
+        // ===== FRIEND-TO-FRIEND CHAT (member <-> member DMs) =====
+        // 'friendsChat' collection: each message has { uid (sender), toUid, participants:[uidA,uidB]
+        // sorted, conversationId: same sorted pair joined by '_', senderName/senderPhoto,
+        // toName/toPhoto (denormalized so the conversations list can show the other side even
+        // before they've replied), text, timestamp }.
+        function _convId(a, b) { return [a, b].sort().join('_'); }
+
+        let _friendChatUnsub = null;
+        let _friendChatCid = null;
+        let _friendChatWith = null; // { uid, name, photo }
+
+        function _renderFriendMsgs(msgs) {
+            const area = document.getElementById('friend-chat-messages-area');
+            if (!area) return;
+            if (msgs.length === 0) {
+                area.innerHTML = `<div class="wachat-empty" style="display:flex"><div class="wachat-empty-icon">💬</div><p>لا توجد رسائل بعد<br/>ابدأ المحادثة!</p></div>`;
+                return;
+            }
+            const wasAtBottom = (area.scrollHeight - area.scrollTop - area.clientHeight) < 80;
+            let html = '';
+            let lastDate = '';
+            msgs.forEach(msg => {
+                const isMine = msg.uid === S.user?.uid;
+                const name = isMine ? (S.userProfile?.displayName || S.user.displayName || 'أنت') : (msg.senderName || 'مستخدم');
+                const ts = msg.timestamp;
+                const d = ts ? (ts.toDate ? ts.toDate() : new Date(ts)) : new Date();
+                const dateStr = d.toLocaleDateString('ar-EG', { day: 'numeric', month: 'long' });
+                const timeStr = d.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+                if (dateStr !== lastDate) {
+                    html += `<div class="wachat-date-badge">${_escapeHtml(dateStr)}</div>`;
+                    lastDate = dateStr;
+                }
+                const initial = (msg.senderName || '?').charAt(0).toUpperCase();
+                const avatarHtml = !isMine ? (avatarImgHtml(msg.senderPhoto, 'wabubble-avatar', initial) || `<div class="wabubble-avatar">${_escapeHtml(initial)}</div>`) : '';
+                const safeText = _escapeHtml(msg.text || '').replace(/\n/g, '<br>');
+                const deleteBtn = isMine ? `<button class="wabubble-delete-btn" onclick="deleteFriendMsg('${msg.id}')" title="حذف الرسالة">🗑</button>` : '';
+                const statusHtml = isMine ? '<span class="wabubble-tick">✓✓</span>' : '';
+                html += `
+                <div class="wabubble ${isMine ? 'mine' : 'theirs'}" id="frmsg-${msg.id}">
+                    ${!isMine ? avatarHtml : ''}
+                    <div class="wabubble-content">
+                        ${!isMine ? `<span class="wabubble-sender">${_escapeHtml(name)}</span>` : ''}
+                        <div class="wabubble-text">${safeText}</div>
+                        <div class="wabubble-meta">
+                            ${deleteBtn}
+                            <span class="wabubble-time">${timeStr}</span>
+                            ${statusHtml}
+                        </div>
+                    </div>
+                </div>`;
+            });
+            area.innerHTML = html;
+            if (wasAtBottom) area.scrollTop = area.scrollHeight;
+        }
+
+        function _ensureFriendChatListener(cid) {
+            if (_friendChatUnsub) { _friendChatUnsub(); _friendChatUnsub = null; }
+            const q = query(collection(db, 'friendsChat'), where('conversationId', '==', cid), orderBy('timestamp', 'asc'));
+            _friendChatUnsub = onSnapshot(q, snap => {
+                const msgs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                _renderFriendMsgs(msgs);
+            }, err => {
+                console.error('friend chat listener error:', err);
+                const area = document.getElementById('friend-chat-messages-area');
+                if (area) area.innerHTML = `<p class="directory-empty">⚠️ تعذر تحميل الرسائل — تأكد من صلاحيات Firestore</p>`;
+            });
+        }
+
+        window.openFriendChat = function(uid, name, photo) {
+            if (!S.user) { showToast('🔑 سجّل دخولك أولاً', '#ffb020'); return; }
+            if (uid === S.user.uid) { showToast('❌ ما تقدرش تكلم نفسك 😅', '#ffb020'); return; }
+            closeMembersModal();
+            closeConversationsModal();
+            _friendChatWith = { uid, name: name || 'مستخدم', photo: photo || '' };
+            _friendChatCid = _convId(S.user.uid, uid);
+            document.getElementById('friend-chat-name').textContent = _friendChatWith.name;
+            document.getElementById('friend-chat-status').textContent = 'محادثة خاصة';
+            document.getElementById('friend-chat-avatar').textContent = (_friendChatWith.name || '?').charAt(0).toUpperCase();
+            document.getElementById('friend-chat-messages-area').innerHTML = `<p class="directory-empty">⏳ جاري تحميل الرسائل...</p>`;
+            document.getElementById('friend-chat-modal').classList.add('open');
+            document.body.style.overflow = 'hidden';
+            _ensureFriendChatListener(_friendChatCid);
+        };
+
+        window.closeFriendChat = function() {
+            document.getElementById('friend-chat-modal').classList.remove('open');
+            document.body.style.overflow = '';
+            if (_friendChatUnsub) { _friendChatUnsub(); _friendChatUnsub = null; }
+            _friendChatCid = null;
+            _friendChatWith = null;
+        };
+
+        window.sendFriendMsg = async function() {
+            if (!S.user || !_friendChatWith) return;
+            const input = document.getElementById('friend-chat-input');
+            const text = (input.value || '').trim();
+            if (!text) return;
+            input.value = '';
+            const myName = S.userProfile?.displayName || S.user.displayName || 'مستخدم';
+            const myPhoto = S.userProfile?.photoURL || S.user.photoURL || '';
+            try {
+                await addDoc(collection(db, 'friendsChat'), {
+                    uid: S.user.uid,
+                    toUid: _friendChatWith.uid,
+                    participants: [S.user.uid, _friendChatWith.uid].sort(),
+                    conversationId: _friendChatCid,
+                    senderName: myName,
+                    senderPhoto: myPhoto,
+                    toName: _friendChatWith.name,
+                    toPhoto: _friendChatWith.photo,
+                    text,
+                    timestamp: serverTimestamp()
+                });
+            } catch (e) {
+                console.error('sendFriendMsg error:', e);
+                showToast('❌ فشل الإرسال: ' + e.message, '#ff7a7a');
+                input.value = text;
+            }
+        };
+
+        window.deleteFriendMsg = async function(msgId) {
+            if (!S.user) return;
+            if (!confirm('حذف الرسالة؟')) return;
+            try {
+                await deleteDoc(doc(db, 'friendsChat', msgId));
+            } catch (e) {
+                console.error('deleteFriendMsg error:', e);
+                showToast('❌ خطأ: ' + e.message, '#ff7a7a');
+            }
+        };
+
+        window.openConversationsModal = function() {
+            if (!S.user) { showToast('🔑 سجّل دخولك أولاً', '#ffb020'); return; }
+            closeMenuPanel();
+            document.getElementById('conversations-modal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            loadConversationsList();
+        };
+
+        window.closeConversationsModal = function() {
+            document.getElementById('conversations-modal').style.display = 'none';
+            document.body.style.overflow = '';
+        };
+
+        async function loadConversationsList() {
+            const listEl = document.getElementById('conversations-list');
+            if (!listEl || !S.user) return;
+            listEl.innerHTML = `<p class="directory-empty">⏳ جاري التحميل...</p>`;
+            try {
+                const q = query(collection(db, 'friendsChat'), where('participants', 'array-contains', S.user.uid));
+                const snap = await getDocs(q);
+                const map = new Map();
+                snap.docs.forEach(d => {
+                    const m = d.data();
+                    const otherUid = (m.participants || []).find(p => p !== S.user.uid);
+                    if (!otherUid) return;
+                    const ts = m.timestamp ? (m.timestamp.toDate ? m.timestamp.toDate().getTime() : new Date(m.timestamp).getTime()) : 0;
+                    const existing = map.get(otherUid);
+                    if (!existing || ts > existing.ts) {
+                        const isMine = m.uid === S.user.uid;
+                        map.set(otherUid, {
+                            uid: otherUid,
+                            name: isMine ? (m.toName || 'مستخدم') : (m.senderName || 'مستخدم'),
+                            photo: isMine ? (m.toPhoto || '') : (m.senderPhoto || ''),
+                            lastText: m.text || '',
+                            ts
+                        });
+                    }
+                });
+                const rows = Array.from(map.values()).sort((a, b) => b.ts - a.ts);
+                if (rows.length === 0) {
+                    listEl.innerHTML = `<p class="directory-empty">لسه معملتش أي محادثة — روح "الأعضاء" وابدأ كلام مع حد 👋</p>`;
+                    return;
+                }
+                listEl.innerHTML = rows.map(r => {
+                    const initial = (r.name || '?').charAt(0).toUpperCase();
+                    const avatar = avatarImgHtml(r.photo, 'directory-avatar', initial) || `<div class="directory-avatar">${_escapeHtml(initial)}</div>`;
+                    const safeName = _escapeHtml(r.name).replace(/'/g, "\\'");
+                    const safePhoto = (r.photo || '').replace(/'/g, "\\'");
+                    return `
+                    <div class="directory-item" style="cursor:pointer" onclick="openFriendChat('${r.uid}','${safeName}','${safePhoto}')">
+                        ${avatar}
+                        <div class="directory-info">
+                            <div class="directory-name">${_escapeHtml(r.name)}</div>
+                            <div class="directory-email">${_escapeHtml((r.lastText || '').slice(0, 40))}</div>
+                        </div>
+                    </div>`;
+                }).join('');
+            } catch (e) {
+                console.error('loadConversationsList error:', e);
+                listEl.innerHTML = `<p class="directory-empty">⚠️ تعذر تحميل المحادثات — تأكد من صلاحيات Firestore</p>`;
+            }
+        }
 
         window.openProfileModal = function() {
             if (!S.user) { showToast('🔑 سجّل دخولك أولاً', '#ffb020'); return; }
@@ -4266,6 +4515,7 @@
 
         window.handleSignOut = async function() {
             _teardownWaChat();
+            if (_friendChatUnsub) { _friendChatUnsub(); _friendChatUnsub = null; }
             await signOut(auth);
             S.user = null;
             S.isAdmin = false;
@@ -4273,9 +4523,15 @@
             S.isBlocked = false;
             S.adminExists = false;
             S.isSuspended = false;
+            S.followingSet = new Set();
+            S.followersCount = 0;
+            S.followingCount = 0;
             closePanel();
             closeMenuPanel();
             closeWaChat();
+            closeFriendChat();
+            closeMembersModal();
+            closeConversationsModal();
             updateUI();
             showToast('👋 تم تسجيل الخروج');
         };
@@ -4555,7 +4811,7 @@
 
         // ESC
         document.addEventListener('keydown', e => {
-            if (e.key === 'Escape') { closePanel(); closeAddModal(); closeEditModal(); closePlayer(); closeWaChat(); closeProfileModal(); closeMenuPanel(); closeMembersModal(); }
+            if (e.key === 'Escape') { closePanel(); closeAddModal(); closeEditModal(); closePlayer(); closeWaChat(); closeProfileModal(); closeMenuPanel(); closeMembersModal(); closeConversationsModal(); closeFriendChat(); }
         });
 
         // Expose globals
