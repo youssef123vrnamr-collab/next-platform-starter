@@ -828,14 +828,15 @@
         .comment-avatar img { width: 100%; height: 100%; object-fit: cover; }
         .comment-body { flex: 1; min-width: 0; }
         .comment-name { font-size: 12px; font-weight: 700; color: var(--bright); }
-        .comment-text { font-size: 13px; color: var(--text); margin-top: 3px; word-break: break-word; line-height: 1.5; }
-        .comment-time { font-size: 10px; color: var(--text-dim); margin-top: 4px; display: flex; align-items: center; gap: 6px; }
+        .comment-text { font-size: 15px; color: var(--text); margin-top: 4px; word-break: break-word; line-height: 1.55; }
+        .comment-time { font-size: 10.5px; color: var(--text-dim); margin-top: 6px; display: flex; align-items: center; gap: 6px; }
         .comment-edited-tag { font-style: italic; opacity: .8; }
-        .comment-actions-row { display: flex; align-items: center; gap: 10px; margin-top: 4px; }
-        .comment-delete-btn { background: none; border: none; color: #ff7a7a; font-size: 11.5px; cursor: pointer; padding: 0; opacity: .7; transition: opacity .2s; }
-        .comment-delete-btn:hover { opacity: 1; }
-        .comment-edit-btn { background: none; border: none; color: var(--violet); font-size: 11.5px; cursor: pointer; padding: 0; opacity: .7; transition: opacity .2s; }
-        .comment-edit-btn:hover { opacity: 1; }
+        .comment-actions-row { display: flex; align-items: center; gap: 6px; margin-top: 6px; }
+        .comment-delete-btn, .comment-edit-btn { display: inline-flex; align-items: center; gap: 4px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 4px 10px; font-size: 11.5px; cursor: pointer; opacity: .85; transition: all .2s; }
+        .comment-delete-btn { color: #ff8f8f; }
+        .comment-delete-btn:hover { opacity: 1; background: rgba(255,70,70,0.15); border-color: rgba(255,70,70,0.3); }
+        .comment-edit-btn { color: var(--violet); }
+        .comment-edit-btn:hover { opacity: 1; background: rgba(192,38,211,0.14); border-color: rgba(192,38,211,0.3); }
         .comment-reply-preview { display: flex; align-items: center; gap: 8px; padding: 7px 10px; background: rgba(255,255,255,0.05); border-radius: 8px; margin-bottom: 8px; animation: waReplySlideIn .15s ease; }
         .comment-reply-preview-bar { width: 3px; align-self: stretch; background: var(--violet); border-radius: 2px; flex-shrink: 0; }
         .comment-reply-preview-text { flex: 1; font-size: 12px; color: var(--text-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -1592,16 +1593,16 @@
         .wabubble-admin-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; color: #ffc862; font-weight: 700; margin-bottom: 3px; }
         .wabubble-sender { font-size: 11.5px; font-weight: 700; color: var(--violet); margin-bottom: 3px; display: block; letter-spacing: .2px; }
         .wabubble.mine .wabubble-sender { color: #c4a8ff; }
-        .wabubble-text { font-size: 14.5px; color: var(--bright); word-break: break-word; line-height: 1.5; }
-        .wabubble-meta { display: flex; align-items: center; justify-content: flex-end; gap: 6px; margin-top: 4px; }
-        .wabubble-time { font-size: 10px; color: var(--text-dim); }
+        .wabubble-text { font-size: 16px; color: var(--bright); word-break: break-word; line-height: 1.55; }
+        .wabubble-meta { display: flex; align-items: center; justify-content: flex-end; gap: 4px; margin-top: 6px; }
+        .wabubble-time { font-size: 10.5px; color: var(--text-dim); }
         .wabubble-tick { font-size: 12px; color: #4fc3f7; letter-spacing: -2px; }
-        .wabubble-status { font-size: 10px; color: var(--text-dim); }
+        .wabubble-status { font-size: 10.5px; color: var(--text-dim); }
         .wabubble-status.failed { color: #ff7a7a; font-weight: 700; }
-        .wabubble-delete-btn { background: none; border: none; color: #ff7a7a; font-size: 11px; cursor: pointer; padding: 0; opacity: .55; transition: opacity .15s; margin-left: 2px; }
-        .wabubble-delete-btn:hover { opacity: 1; }
-        .wabubble-action-btn { background: none; border: none; color: var(--text-dim); font-size: 11px; cursor: pointer; padding: 0; opacity: .55; transition: opacity .15s, color .15s; margin-left: 2px; }
-        .wabubble-action-btn:hover { opacity: 1; color: var(--violet); }
+        .wabubble-delete-btn, .wabubble-action-btn { display: inline-flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); width: 23px; height: 23px; border-radius: 50%; font-size: 11.5px; cursor: pointer; padding: 0; opacity: .85; transition: all .15s; margin-left: 2px; color: var(--text-dim); }
+        .wabubble-delete-btn { color: #ff8f8f; }
+        .wabubble-delete-btn:hover { opacity: 1; background: rgba(255,70,70,0.15); border-color: rgba(255,70,70,0.3); transform: scale(1.08); }
+        .wabubble-action-btn:hover { opacity: 1; color: var(--violet); background: rgba(192,38,211,0.14); border-color: rgba(192,38,211,0.3); transform: scale(1.08); }
         .wabubble-quote { display: flex; flex-direction: column; gap: 1px; background: rgba(255,255,255,0.06); border-right: 3px solid var(--violet); border-radius: 6px; padding: 5px 8px; margin-bottom: 6px; cursor: pointer; }
         .wabubble.mine .wabubble-quote { border-right: none; border-left: 3px solid #c4a8ff; }
         .wabubble-quote-name { font-size: 10.5px; font-weight: 700; color: var(--violet); }
@@ -3389,6 +3390,7 @@
         let _wachatListenerRetry = 0;
         let _wachatReplyTo = null;  // { id, senderName, text } of the message being replied to
         let _wachatEditingId = null; // id of the message currently being edited (in place of sending new)
+        let _wachatPollInterval = null; // safety-net poll while the chat modal is open
 
         function _ensureWaChatListener() {
             if (_wachatUnsub || !S.user) return; // already running, or not logged in
@@ -3407,6 +3409,7 @@
                     if (document.getElementById('wachat-modal').classList.contains('open')) {
                         _renderWaMsgs(_wachatLastMsgs.concat(_wachatPending));
                     }
+                    _updateWaParticipantCount();
                 }, err => {
                     console.error('WaChat snapshot error:', err);
                     _wachatUnsub = null;
@@ -3417,18 +3420,65 @@
                             <span style="color:var(--text-dim);font-size:12px">${err.code === 'permission-denied' ? 'صلاحيات Firestore تمنع القراءة — راجع Security Rules في Firebase Console' : (err.message || 'تحقق من اتصال الإنترنت')}</span>
                         </div>`;
                     }
-                    // Auto-retry a few times in case of a transient network drop, so the
-                    // chat recovers on its own instead of staying empty forever.
-                    if (_wachatListenerRetry < 5 && S.user) {
+                    // Auto-retry indefinitely with a capped backoff, so the chat recovers on
+                    // its own instead of staying dead until the whole page gets reloaded.
+                    if (S.user) {
                         _wachatListenerRetry++;
-                        setTimeout(_ensureWaChatListener, 2000 * _wachatListenerRetry);
+                        const delay = Math.min(2000 * _wachatListenerRetry, 20000);
+                        setTimeout(_ensureWaChatListener, delay);
                     }
                 });
             } catch (e) { console.error('WaChat subscribe error:', e); }
         }
 
+        // One-off hard sync straight from the server, bypassing the live listener entirely.
+        // Firestore's realtime WebChannel occasionally goes "zombie" — it stays technically
+        // subscribed (so onSnapshot never fires an error) but stops delivering new events,
+        // especially after the tab is backgrounded or the network blips. That's what caused
+        // messages to send fine but not appear until a full page reload. This hard-refresh
+        // runs every time the chat is opened and whenever the tab/network comes back, so the
+        // view is always correct even if the live connection is silently stuck.
+        async function _wachatHardRefresh() {
+            if (!S.user) return;
+            try {
+                const q = query(collection(db, 'chatMessages'), orderBy('timestamp', 'asc'));
+                const snap = await getDocs(q);
+                const msgs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                _wachatLastMsgs = msgs;
+                _wachatPending = _wachatPending.filter(p => {
+                    const stillPending = !msgs.some(m => m.sender === p.sender && m.text === p.text);
+                    return stillPending && (Date.now() - new Date(p.timestamp).getTime() < 120000);
+                });
+                if (document.getElementById('wachat-modal').classList.contains('open')) {
+                    _renderWaMsgs(_wachatLastMsgs.concat(_wachatPending));
+                }
+                _updateWaParticipantCount();
+            } catch (e) { console.error('WaChat hard refresh error:', e); }
+        }
+
+        // If the realtime connection is stuck (zombie subscription), force it to reconnect.
+        function _wachatForceReconnect() {
+            if (_wachatUnsub) { _wachatUnsub(); _wachatUnsub = null; }
+            _ensureWaChatListener();
+            _wachatHardRefresh();
+        }
+
+        window.addEventListener('online', _wachatForceReconnect);
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible' && S.user) _wachatForceReconnect();
+        });
+
+        function _updateWaParticipantCount() {
+            const el = document.getElementById('wachat-header-status');
+            if (!el) return;
+            const senders = new Set(_wachatLastMsgs.map(m => m.sender).filter(Boolean));
+            const count = senders.size;
+            el.textContent = count > 0 ? `👥 ${count} ${count === 1 ? 'شخص شارك في المحادثة' : 'أشخاص شاركوا في المحادثة'}` : 'قناة الدعم الرسمية';
+        }
+
         function _teardownWaChat() {
             if (_wachatUnsub) { _wachatUnsub(); _wachatUnsub = null; }
+            if (_wachatPollInterval) { clearInterval(_wachatPollInterval); _wachatPollInterval = null; }
             _wachatPending = [];
             _wachatLastMsgs = [];
             _wachatListenerRetry = 0;
@@ -3442,16 +3492,25 @@
             document.body.style.overflow = 'hidden';
             document.getElementById('wachat-header-avatar').textContent = '🛡️';
             document.getElementById('wachat-header-name').textContent = 'المشرفون';
-            document.getElementById('wachat-header-status').textContent = 'قناة الدعم الرسمية';
+            _updateWaParticipantCount();
             _ensureWaChatListener();
             // Render instantly from whatever we already have cached — no reset to a
             // blank/loading state, so previously-loaded messages are always still there.
             _renderWaMsgs(_wachatLastMsgs.concat(_wachatPending));
+            // Then immediately hard-sync with the server in case the live listener had
+            // silently gone stale while the chat was closed.
+            _wachatHardRefresh();
+            // Safety-net poll: every 12s while the chat is open, hard-sync with the server.
+            // This catches a "zombie" realtime connection that doesn't error but also stops
+            // delivering new messages, so a reply never just sits there unseen.
+            if (_wachatPollInterval) clearInterval(_wachatPollInterval);
+            _wachatPollInterval = setInterval(_wachatHardRefresh, 12000);
         };
 
         window.closeWaChat = function() {
             document.getElementById('wachat-modal').classList.remove('open');
             document.body.style.overflow = '';
+            if (_wachatPollInterval) { clearInterval(_wachatPollInterval); _wachatPollInterval = null; }
             // NOTE: intentionally does NOT unsubscribe — the listener keeps running in the
             // background for the whole session so reopening the chat is instant.
         };
