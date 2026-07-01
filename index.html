@@ -1121,6 +1121,30 @@
         .dir-btn.unban { background: rgba(80,220,140,0.12); border-color: rgba(80,220,140,0.35); color: #6bf0a6; }
         .directory-empty { color: var(--text-dim); font-size: 13px; text-align: center; padding: 16px 0; }
 
+        /* ===== FOLLOW SYSTEM ===== */
+        .follow-stats-row { display: flex; justify-content: center; gap: 28px; margin-top: 14px; }
+        .follow-stat-box { text-align: center; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+        .follow-stat-num { color: var(--bright); font-size: 18px; font-weight: 900; font-family: 'Rajdhani', sans-serif; }
+        .follow-stat-label { color: var(--text-dim); font-size: 11px; margin-top: 2px; }
+        .follow-stat-box:hover .follow-stat-num { color: var(--magenta); }
+        .dir-btn.follow-btn { background: var(--grad); border-color: transparent; color: #0a0814; }
+        .dir-btn.follow-btn.following { background: rgba(255,255,255,0.06); border-color: var(--border); color: var(--text); }
+        .dir-btn.follow-btn:hover { filter: brightness(1.1); }
+
+        #members-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: var(--void);
+            display: none;
+            flex-direction: column;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
+        }
+        .members-fs-body { padding: 18px 18px 30px; max-width: 560px; margin: 0 auto; width: 100%; flex: 1; }
+        .members-fs-list { max-height: none; }
+
         .ratings-list .rating-item { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.05); font-size: 13px; }
         .ratings-list .rating-item .likes { color: #4fc3f7; }
         .ratings-list .rating-item .dislikes { color: #ff7a7a; }
@@ -1888,6 +1912,9 @@
                 <div class="menu-nav-item" onclick="openWaChat()">
                     <span class="menu-nav-icon">💬</span> تواصل مع المشرفين
                 </div>
+                <div class="menu-nav-item" onclick="openMembersModal()">
+                    <span class="menu-nav-icon">👥</span> الأعضاء ومتابعتهم
+                </div>
 
                 <!-- Admin only section -->
                 <div id="menu-admin-section" style="display:none">
@@ -2187,6 +2214,7 @@
             <div class="profile-fs-userinfo">
                 <div class="profile-fs-username" id="profile-display-name">—</div>
                 <div class="profile-fs-userrole" id="profile-display-role">👤 مستخدم</div>
+                <div class="follow-stats-row" id="profile-follow-stats"></div>
             </div>
             <div class="profile-fs-card">
                 <div class="profile-fs-card-title">صورة البروفايل</div>
@@ -2220,6 +2248,19 @@
             <p id="profile-save-msg" style="color:#4fc3f7;font-size:13px;display:none;margin-bottom:8px;text-align:center">✅ تم حفظ التغييرات</p>
             <p id="profile-save-err" style="color:#ff7a7a;font-size:13px;display:none;margin-bottom:8px;text-align:center"></p>
             <button class="profile-save-btn" id="profile-save-btn" onclick="saveProfileChanges()">💾 حفظ التغييرات</button>
+        </div>
+    </div>
+
+    <!-- ===== MEMBERS MODAL (Follow system) ===== -->
+    <div id="members-modal">
+        <div class="profile-fs-header">
+            <button class="profile-fs-back" onclick="closeMembersModal()">✕</button>
+            <span class="profile-fs-title">👥 الأعضاء</span>
+        </div>
+        <div class="members-fs-body">
+            <input type="text" id="members-search" class="directory-search" placeholder="🔍 دوّر عن عضو بالاسم..." oninput="renderMembersList()" />
+            <p class="directory-hint">تابع أعضاء المنصة عشان تفضل قريب من أنشطتهم — يقدر أي عضو يشوف عدد متابعينه في ملفه الشخصي</p>
+            <div id="members-list" class="directory-list members-fs-list"></div>
         </div>
     </div>
 
@@ -2430,6 +2471,10 @@
             adminsList: [],
             userProfile: null,
             usersDirectory: [],
+            followingSet: new Set(),
+            followersCount: 0,
+            followingCount: 0,
+            membersDirectory: [],
         };
 
         // ===== HELPERS =====
@@ -3729,6 +3774,146 @@
             } catch (e) { S.userProfile = {}; }
         }
 
+        // ===== FOLLOW SYSTEM =====
+        // 'follows' collection: doc id = `${followerUid}_${followingUid}`, fields { followerUid, followingUid, createdAt }
+        // 'users' collection docs get denormalized followersCount / followingCount counters for fast display.
+        async function loadFollowState(uid) {
+            try {
+                const q = query(collection(db, 'follows'), where('followerUid', '==', uid));
+                const snap = await getDocs(q);
+                S.followingSet = new Set(snap.docs.map(d => d.data().followingUid));
+            } catch (e) { console.error('loadFollowState error:', e); S.followingSet = new Set(); }
+            try {
+                const usnap = await getDoc(doc(db, 'users', uid));
+                const ud = usnap.exists() ? usnap.data() : {};
+                S.followersCount = ud.followersCount || 0;
+                S.followingCount = ud.followingCount || 0;
+            } catch (e) { S.followersCount = 0; S.followingCount = 0; }
+        }
+
+        function renderProfileFollowStats() {
+            const el = document.getElementById('profile-follow-stats');
+            if (!el || !S.user) return;
+            el.innerHTML = `
+                <div class="follow-stat-box" onclick="openMembersModal()">
+                    <div class="follow-stat-num">${S.followersCount || 0}</div>
+                    <div class="follow-stat-label">متابِعين</div>
+                </div>
+                <div class="follow-stat-box" onclick="openMembersModal()">
+                    <div class="follow-stat-num">${S.followingCount || 0}</div>
+                    <div class="follow-stat-label">متابَعين</div>
+                </div>`;
+        }
+
+        window.toggleFollow = async function(targetUid, targetName) {
+            if (!S.user) { showToast('🔑 سجّل دخولك أولاً', '#ffb020'); return; }
+            if (targetUid === S.user.uid) { showToast('❌ ما تقدرش تتابع نفسك', '#ff7a7a'); return; }
+            const followId = `${S.user.uid}_${targetUid}`;
+            const isFollowing = S.followingSet.has(targetUid);
+            try {
+                if (isFollowing) {
+                    S.followingSet.delete(targetUid);
+                    S.followingCount = Math.max(0, (S.followingCount || 0) - 1);
+                    renderMembersList();
+                    renderProfileFollowStats();
+                    await deleteDoc(doc(db, 'follows', followId));
+                    updateDoc(doc(db, 'users', S.user.uid), { followingCount: increment(-1) }).catch(() => {});
+                    updateDoc(doc(db, 'users', targetUid), { followersCount: increment(-1) }).catch(() => {});
+                    showToast(`تم إلغاء متابعة ${targetName || 'المستخدم'}`);
+                } else {
+                    S.followingSet.add(targetUid);
+                    S.followingCount = (S.followingCount || 0) + 1;
+                    renderMembersList();
+                    renderProfileFollowStats();
+                    await setDoc(doc(db, 'follows', followId), {
+                        followerUid: S.user.uid,
+                        followingUid: targetUid,
+                        createdAt: new Date()
+                    });
+                    updateDoc(doc(db, 'users', S.user.uid), { followingCount: increment(1) }).catch(() => {});
+                    updateDoc(doc(db, 'users', targetUid), { followersCount: increment(1) }).catch(() => {});
+                    showToast(`✅ بقيت تتابع ${targetName || 'المستخدم'}`);
+                }
+            } catch (e) {
+                console.error('toggleFollow error:', e);
+                showToast('❌ حصل خطأ، حاول تاني', '#ff7a7a');
+                await loadFollowState(S.user.uid);
+                renderMembersList();
+                renderProfileFollowStats();
+            }
+        };
+
+        window.openMembersModal = function() {
+            if (!S.user) { showToast('🔑 سجّل دخولك أولاً', '#ffb020'); return; }
+            closeMenuPanel();
+            closeProfileModal();
+            document.getElementById('members-modal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            loadMembersList();
+        };
+
+        window.closeMembersModal = function() {
+            document.getElementById('members-modal').style.display = 'none';
+            document.body.style.overflow = '';
+        };
+
+        async function loadMembersList() {
+            const listEl = document.getElementById('members-list');
+            if (!listEl) return;
+            listEl.innerHTML = `<p class="directory-empty">⏳ جاري تحميل الأعضاء...</p>`;
+            try {
+                const snap = await getDocs(collection(db, 'users'));
+                S.membersDirectory = snap.docs
+                    .map(d => {
+                        const u = d.data();
+                        const email = (u.email || '').toLowerCase();
+                        return {
+                            uid: d.id,
+                            email,
+                            displayName: u.displayName || email.split('@')[0] || 'مستخدم',
+                            photoURL: u.photoURL || '',
+                            followersCount: u.followersCount || 0
+                        };
+                    })
+                    .filter(u => u.uid !== S.user?.uid)
+                    .sort((a, b) => (a.displayName || '').localeCompare(b.displayName || '', 'ar'));
+                renderMembersList();
+            } catch (e) {
+                console.error('loadMembersList error:', e);
+                listEl.innerHTML = `<p class="directory-empty">⚠️ تعذر تحميل قائمة الأعضاء — تأكد من صلاحيات Firestore</p>`;
+            }
+        }
+
+        window.renderMembersList = function() {
+            const listEl = document.getElementById('members-list');
+            if (!listEl) return;
+            const term = (document.getElementById('members-search')?.value || '').trim().toLowerCase();
+            const rows = (S.membersDirectory || []).filter(e =>
+                !term || (e.displayName || '').toLowerCase().includes(term) || (e.email || '').toLowerCase().includes(term)
+            );
+            if (rows.length === 0) {
+                listEl.innerHTML = `<p class="directory-empty">لا يوجد أعضاء مطابقين</p>`;
+                return;
+            }
+            listEl.innerHTML = rows.map(e => {
+                const initial = (e.displayName || '?').charAt(0).toUpperCase();
+                const avatar = avatarImgHtml(e.photoURL, 'directory-avatar', initial) || `<div class="directory-avatar">${_escapeHtml(initial)}</div>`;
+                const following = S.followingSet.has(e.uid);
+                const safeName = _escapeHtml(e.displayName).replace(/'/g, "\\'");
+                return `
+                <div class="directory-item">
+                    ${avatar}
+                    <div class="directory-info">
+                        <div class="directory-name">${_escapeHtml(e.displayName)}</div>
+                        <div class="directory-email">${e.followersCount || 0} متابِع</div>
+                    </div>
+                    <div class="directory-actions">
+                        <button class="dir-btn follow-btn ${following ? 'following' : ''}" onclick="toggleFollow('${e.uid}','${safeName}')">${following ? '✓ متابَع' : '+ متابعة'}</button>
+                    </div>
+                </div>`;
+            }).join('');
+        };
+
         window.openProfileModal = function() {
             if (!S.user) { showToast('🔑 سجّل دخولك أولاً', '#ffb020'); return; }
             closeMenuPanel();
@@ -3749,6 +3934,7 @@
             previewProfilePhoto(currentPhoto);
             const initials = (currentName || 'G').charAt(0).toUpperCase();
             document.getElementById('profile-initials').textContent = initials;
+            renderProfileFollowStats();
             document.getElementById('profile-save-msg').style.display = 'none';
             document.getElementById('profile-save-err').style.display = 'none';
             modal.style.display = 'flex';
@@ -4339,6 +4525,7 @@
                 // Load profile after login
                 if (S.user) {
                     await loadUserProfile(fbUser.uid);
+                    await loadFollowState(fbUser.uid);
                     updateUI();
                 }
             } else if (!fbUser) {
@@ -4360,6 +4547,7 @@
                 // Already logged in, ensure profile loaded
                 if (fbUser && S.user) {
                     await loadUserProfile(fbUser.uid);
+                    await loadFollowState(fbUser.uid);
                     updateUI();
                 }
             }
@@ -4367,7 +4555,7 @@
 
         // ESC
         document.addEventListener('keydown', e => {
-            if (e.key === 'Escape') { closePanel(); closeAddModal(); closeEditModal(); closePlayer(); closeWaChat(); closeProfileModal(); closeMenuPanel(); }
+            if (e.key === 'Escape') { closePanel(); closeAddModal(); closeEditModal(); closePlayer(); closeWaChat(); closeProfileModal(); closeMenuPanel(); closeMembersModal(); }
         });
 
         // Expose globals
