@@ -307,37 +307,6 @@
             border: 1px solid rgba(255, 176, 32, 0.2);
             margin-right: 4px;
         }
-        #gear-btn {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 11px;
-            width: 42px;
-            height: 42px;
-            flex-shrink: 0;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all .25s;
-            position: relative;
-            -webkit-tap-highlight-color: transparent;
-        }
-        #gear-btn.visible { display: flex; }
-        #gear-btn:hover { background: var(--surface-2); border-color: rgba(255,255,255,0.18); }
-        #gear-btn.active { background: rgba(255, 176, 32, 0.12); border-color: rgba(255, 176, 32, 0.4); }
-        #gear-dot {
-            position: absolute;
-            top: 7px;
-            right: 7px;
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            background: var(--magenta);
-            box-shadow: 0 0 7px var(--magenta);
-            display: none;
-        }
-        #gear-btn.active #gear-dot { display: block; }
-
         /* ===== HAMBURGER ===== */
         #hamburger-btn {
             display: none;
@@ -1098,6 +1067,46 @@
         .admin-list-item .remove-admin { background: none; border: none; color: #ff7a7a; cursor: pointer; font-size: 14px; padding: 2px 6px; border-radius: 4px; transition: background .2s; }
         .admin-list-item .remove-admin:hover { background: rgba(255, 70, 70, 0.1); }
 
+        /* ===== ACCOUNTS / ADMIN DIRECTORY ===== */
+        .directory-search {
+            width: 100%; padding: 9px 12px; margin-bottom: 8px;
+            background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+            border-radius: 8px; color: #fff; font-size: 13px; outline: none;
+            font-family: inherit;
+        }
+        .directory-search:focus { border-color: rgba(192,38,211,0.4); }
+        .directory-hint { color: var(--text-dim); font-size: 11.5px; line-height: 1.7; margin: 0 0 10px; }
+        .directory-list { max-height: 340px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; margin-bottom: 4px; }
+        .directory-item {
+            display: flex; align-items: center; gap: 10px; padding: 8px 10px;
+            background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+        }
+        .directory-item.is-suspended { border-color: rgba(255,70,70,0.35); background: rgba(255,70,70,0.05); }
+        .directory-avatar {
+            width: 32px; height: 32px; min-width: 32px; border-radius: 50%; object-fit: cover;
+            background: var(--grad); display: flex; align-items: center; justify-content: center;
+            color: #0a0814; font-weight: 900; font-size: 13px; border: 1.5px solid rgba(192,38,211,0.3);
+        }
+        .directory-info { flex: 1; min-width: 0; }
+        .directory-name { color: var(--bright); font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .directory-email { color: var(--text-dim); font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .directory-actions { display: flex; align-items: center; gap: 5px; flex-shrink: 0; flex-wrap: wrap; justify-content: flex-end; }
+        .dir-btn {
+            padding: 5px 10px; border-radius: 7px; font-size: 11px; font-weight: 700;
+            cursor: pointer; white-space: nowrap; border: 1px solid transparent; transition: all .15s;
+            font-family: inherit;
+        }
+        .dir-btn.role-main { background: rgba(255,176,32,0.12); border-color: rgba(255,176,32,0.3); color: #ffc862; }
+        .dir-btn.role-main.active { background: rgba(255,176,32,0.85); color: #0a0814; }
+        .dir-btn.role-normal { background: rgba(168,85,247,0.12); border-color: rgba(168,85,247,0.3); color: #d8a8ff; }
+        .dir-btn.role-normal.active { background: rgba(168,85,247,0.85); color: #0a0814; }
+        .dir-btn.role-none { background: rgba(255,255,255,0.06); border-color: var(--border); color: var(--text-dim); }
+        .dir-btn.role-none.active { background: rgba(255,255,255,0.7); color: #0a0814; }
+        .dir-btn:hover { filter: brightness(1.15); }
+        .dir-btn.ban { background: rgba(255,70,70,0.12); border-color: rgba(255,70,70,0.35); color: #ff7a7a; }
+        .dir-btn.unban { background: rgba(80,220,140,0.12); border-color: rgba(80,220,140,0.35); color: #6bf0a6; }
+        .directory-empty { color: var(--text-dim); font-size: 13px; text-align: center; padding: 16px 0; }
+
         .ratings-list .rating-item { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.05); font-size: 13px; }
         .ratings-list .rating-item .likes { color: #4fc3f7; }
         .ratings-list .rating-item .dislikes { color: #ff7a7a; }
@@ -1802,14 +1811,6 @@
                     <span></span>
                     <span></span>
                 </button>
-                <button id="gear-btn" onclick="handleGearClick()" aria-label="كل أدوات المشرف">
-                    <svg width="18" height="18" viewBox="0 0 24 24" id="gear-icon" fill="rgba(255,255,255,0.4)">
-                        <circle cx="12" cy="5" r="2.1"/>
-                        <circle cx="12" cy="12" r="2.1"/>
-                        <circle cx="12" cy="19" r="2.1"/>
-                    </svg>
-                    <div id="gear-dot"></div>
-                </button>
             </div>
         </nav>
 
@@ -1852,27 +1853,27 @@
                 <div class="menu-nav-divider"></div>
                 <div class="menu-section-title">التواصل</div>
 
-                <div class="menu-nav-item" onclick="openWaChat('admin')">
+                <div class="menu-nav-item" onclick="openWaChat()">
                     <span class="menu-nav-icon">💬</span> تواصل مع المشرفين
-                </div>
-                <div class="menu-nav-item" onclick="openWaChat('friends')">
-                    <span class="menu-nav-icon">👥</span> تواصل مع أصدقائك
                 </div>
 
                 <!-- Admin only section -->
                 <div id="menu-admin-section" style="display:none">
                     <div class="menu-nav-divider"></div>
                     <div class="menu-section-title">إدارة المنصة</div>
-                    <div class="menu-nav-item" onclick="closeMenuPanel();handleGearClick()">
-                        <span class="menu-nav-icon">⚙️</span> لوحة التحكم
+                    <div class="menu-nav-item" onclick="openAdminPanel()">
+                        <span class="menu-nav-icon">☰</span> لوحة التحكم
                     </div>
-                    <div class="menu-nav-item" id="menu-add-admin-btn" onclick="closeMenuPanel();setTimeout(()=>{handleGearClick();setTimeout(()=>switchPanelTab('admin-admins'),300)},100)">
-                        <span class="menu-nav-icon">➕</span> إضافة مشرف
+                    <div class="menu-nav-item" id="menu-add-admin-btn" onclick="openAdminPanel('admin-admins')">
+                        <span class="menu-nav-icon">➕</span> إضافة / إدارة المشرفين
                     </div>
-                    <div class="menu-nav-item" onclick="closeMenuPanel();setTimeout(()=>{handleGearClick();setTimeout(()=>switchPanelTab('admin-comments'),300)},100)">
+                    <div class="menu-nav-item" id="menu-accounts-btn" onclick="openAdminPanel('admin-users')">
+                        <span class="menu-nav-icon">🚫</span> إدارة الحسابات
+                    </div>
+                    <div class="menu-nav-item" onclick="openAdminPanel('admin-comments')">
                         <span class="menu-nav-icon">💬</span> تعليقات كل الفيديوهات
                     </div>
-                    <div class="menu-nav-item" onclick="closeMenuPanel();openWaChat('admin')">
+                    <div class="menu-nav-item" onclick="closeMenuPanel();openWaChat()">
                         <span class="menu-nav-icon">📨</span> صندوق رسائل المستخدمين
                     </div>
                 </div>
@@ -1970,16 +1971,24 @@
 
                     <!-- Admins -->
                     <div class="panel-tab-content" id="tab-admin-admins">
+                        <p class="panel-section-title" style="margin-top:0">المشرفون الحاليون</p>
+                        <div id="admin-list" style="margin-bottom:16px"></div>
+
+                        <p class="panel-section-title">تحديد مشرف من الحسابات</p>
+                        <input type="text" id="directory-admins-search" class="directory-search" placeholder="🔍 دوّر بالاسم أو الإيميل..." oninput="renderUsersDirectory()" />
+                        <p class="directory-hint">اضغط على الرتبة اللي عايزها لأي حساب عشان تخليه مشرف عادي أو رئيسي فورًا</p>
+                        <div id="admin-directory-list" class="directory-list"></div>
+
+                        <p class="panel-section-title">إضافة يدوية (بالإيميل)</p>
                         <div class="admin-mgmt-card">
                             <div class="mgmt-row">
-                                <input id="admin-email-input" type="text" placeholder="البريد الإلكتروني أو UID" />
+                                <input id="admin-email-input" type="text" placeholder="البريد الإلكتروني" />
                                 <select id="admin-role-select">
                                     <option value="main">رئيسي</option>
                                     <option value="normal" selected>عادي</option>
                                 </select>
                             </div>
                             <button class="mgmt-btn" onclick="handleAddAdmin()">➕ إضافة مشرف</button>
-                            <div id="admin-list" style="margin-top:12px"></div>
                         </div>
                     </div>
 
@@ -1996,7 +2005,7 @@
                     <!-- Chat -->
                     <div class="panel-tab-content" id="tab-admin-chat">
                         <p class="panel-section-title">قناة الدعم الجماعية</p>
-                        <div class="chat-cta-card" onclick="closePanel();openWaChat('admin')">
+                        <div class="chat-cta-card" onclick="closePanel();openWaChat()">
                             <div class="chat-cta-icon">💬</div>
                             <div class="chat-cta-body">
                                 <div class="chat-cta-title">فتح صندوق رسائل المستخدمين</div>
@@ -2008,7 +2017,12 @@
 
                     <!-- Users Management -->
                     <div class="panel-tab-content" id="tab-admin-users">
-                        <p class="panel-section-title">إدارة حسابات المستخدمين</p>
+                        <p class="panel-section-title" style="margin-top:0">إدارة كل الحسابات</p>
+                        <p class="directory-hint">قائمة بكل الحسابات اللي دخلت المنصة — اضغط "توقيف" عشان توقف أي حساب فورًا (كراش)، أو "رفع التوقيف" لإرجاعه</p>
+                        <input type="text" id="directory-users-search" class="directory-search" placeholder="🔍 دوّر بالاسم أو الإيميل..." oninput="renderUsersDirectory()" />
+                        <div id="accounts-list" class="directory-list"></div>
+
+                        <p class="panel-section-title">توقيف يدوي (بالـ UID)</p>
                         <div style="display:flex;gap:8px;margin-bottom:10px">
                             <input type="text" id="suspend-uid-input" placeholder="UID المستخدم..." style="flex:1;padding:8px 12px;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:#fff;font-size:13px;outline:none"/>
                         </div>
@@ -2016,7 +2030,6 @@
                             <button class="btn-suspend" onclick="suspendUser()">🚫 توقيف الحساب</button>
                             <button class="btn-unsuspend" onclick="unsuspendUser()">✅ رفع التوقيف</button>
                         </div>
-                        <div id="suspended-users-list"></div>
                     </div>
 
                     <button class="btn-signout" onclick="handleSignOut()">🚪 تسجيل الخروج</button>
@@ -2033,28 +2046,12 @@
                         </div>
                     </div>
 
-                    <div class="panel-tabs">
-                        <button class="panel-tab active" data-tab="user-chat" onclick="switchPanelTab('user-chat')">💬 مشرفين</button>
-                        <button class="panel-tab" data-tab="user-friends" onclick="switchPanelTab('user-friends')">👥 أصدقاء</button>
-                    </div>
-
-                    <div class="panel-tab-content active" id="tab-user-chat">
-                        <div class="chat-cta-card" onclick="closePanel();openWaChat('admin')">
+                    <div class="panel-tab-content active" id="tab-user-chat" style="display:block">
+                        <div class="chat-cta-card" onclick="closePanel();openWaChat()">
                             <div class="chat-cta-icon">🛡️</div>
                             <div class="chat-cta-body">
                                 <div class="chat-cta-title">تواصل مع المشرفين</div>
                                 <div class="chat-cta-sub">اسأل أو ابعت مشكلتك وهيردوا عليك فورًا</div>
-                            </div>
-                            <div class="chat-cta-arrow">‹</div>
-                        </div>
-                    </div>
-
-                    <div class="panel-tab-content" id="tab-user-friends">
-                        <div class="chat-cta-card" onclick="closePanel();openWaChat('friends')">
-                            <div class="chat-cta-icon">👥</div>
-                            <div class="chat-cta-body">
-                                <div class="chat-cta-title">تواصل مع أصدقائك</div>
-                                <div class="chat-cta-sub">ادخل المجتمع وكلم باقي اللاعبين لحظيًا</div>
                             </div>
                             <div class="chat-cta-arrow">‹</div>
                         </div>
@@ -2403,14 +2400,9 @@
             activeTab: 'youtube',
             playerVideoId: null,
             currentUserRating: null,
-            chatUnsubscribe: null,
-            adminChatUnsubscribe: null,
             adminsList: [],
-            chatMessages: [],
-            userChatMessages: [],
             userProfile: null,
-            friendsChatUnsubscribe: null,
-            friendsChatPanelUnsub: null,
+            usersDirectory: [],
         };
 
         // ===== HELPERS =====
@@ -3142,7 +3134,7 @@
                 await setDoc(doc(db, 'suspendedUsers', uid), { uid, suspendedAt: new Date(), suspendedBy: S.user?.uid || 'admin' });
                 document.getElementById('suspend-uid-input').value = '';
                 showToast('🚫 تم توقيف الحساب');
-                renderSuspendedList();
+                renderUsersDirectory();
             } catch (e) { showToast('❌ خطأ: ' + e.message, '#ff7a7a'); }
         };
 
@@ -3155,114 +3147,237 @@
                 await deleteDoc(doc(db, 'suspendedUsers', uid));
                 document.getElementById('suspend-uid-input').value = '';
                 showToast('✅ تم رفع التوقيف');
-                renderSuspendedList();
+                renderUsersDirectory();
             } catch (e) { showToast('❌ خطأ: ' + e.message, '#ff7a7a'); }
         };
 
-        window.quickUnsuspend = async function(uid) {
-            if (!S.isAdmin || !S.isMainAdmin) { showToast('❌ فقط المشرف الرئيسي يقدر يرفع التوقيف', '#ff7a7a'); return; }
+        // Toggle ban ("crash") on/off for a specific account, straight from the accounts list.
+        window.toggleAccountSuspension = async function(uid, name, isCurrentlySuspended) {
+            if (!S.isAdmin || !S.isMainAdmin) { showToast('❌ فقط المشرف الرئيسي يقدر يوقف حسابات', '#ff7a7a'); return; }
+            if (uid === S.user?.uid) { showToast('❌ ما تقدرش توقف حسابك الشخصي', '#ff7a7a'); return; }
+            const verb = isCurrentlySuspended ? 'رفع التوقيف عن' : 'توقيف';
+            if (!confirm(`تأكيد ${verb} حساب ${name}؟`)) return;
             try {
-                await deleteDoc(doc(db, 'suspendedUsers', uid));
-                showToast('✅ تم رفع التوقيف');
-                renderSuspendedList();
-            } catch (e) { showToast('❌ خطأ', '#ff7a7a'); }
+                if (isCurrentlySuspended) {
+                    await deleteDoc(doc(db, 'suspendedUsers', uid));
+                    showToast('✅ تم رفع التوقيف عن ' + name);
+                } else {
+                    await setDoc(doc(db, 'suspendedUsers', uid), { uid, suspendedAt: new Date(), suspendedBy: S.user?.uid || 'admin' });
+                    showToast('🚫 تم توقيف ' + name);
+                }
+                renderUsersDirectory();
+            } catch (e) { showToast('❌ خطأ: ' + e.message, '#ff7a7a'); }
         };
 
-        async function renderSuspendedList() {
-            const container = document.getElementById('suspended-users-list');
-            if (!container) return;
+        // Set (or remove) a user's admin role directly from the accounts list —
+        // only the main admin can promote/demote, and only the main admin can grant
+        // the "main" role itself.
+        window.setUserAdminRole = async function(email, displayName, photoURL, role) {
+            if (!S.isAdmin || !S.isMainAdmin) { showToast('❌ فقط المشرف الرئيسي يقدر يحدد المشرفين', '#ff7a7a'); return; }
+            if (!email) { showToast('❌ لا يوجد بريد إلكتروني لهذا الحساب', '#ff7a7a'); return; }
             try {
-                const snap = await getDocs(collection(db, 'suspendedUsers'));
-                if (snap.empty) {
-                    container.innerHTML = `<p style="color:var(--text-dim);font-size:13px">لا توجد حسابات موقوفة</p>`;
-                    return;
+                if (role === 'none') {
+                    if (email === S.user?.email) { showToast('❌ ما تقدرش تشيل صلاحياتك من نفسك', '#ff7a7a'); return; }
+                    if (!confirm(`إزالة صلاحيات الإشراف عن ${displayName || email}؟`)) return;
+                    await deleteDoc(doc(db, 'admins', email.toLowerCase()));
+                    showToast('✅ تم إزالة صلاحيات الإشراف');
+                } else {
+                    await setDoc(doc(db, 'admins', email.toLowerCase()), {
+                        email: email.toLowerCase(),
+                        displayName: displayName || email.split('@')[0],
+                        photoURL: photoURL || '',
+                        role,
+                        createdAt: new Date(),
+                        addedBy: S.user?.uid || 'unknown'
+                    }, { merge: true });
+                    showToast('✅ تم تحديث الصلاحية: ' + (role === 'main' ? 'مشرف رئيسي' : 'مشرف عادي'));
                 }
-                container.innerHTML = `<p class="panel-section-title" style="margin-top:0">الحسابات الموقوفة</p>` + snap.docs.map(d => {
-                    const data = d.data();
-                    return `
-                    <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:12px">
-                        <span style="color:#ff7a7a;font-family:monospace">${data.uid}</span>
-                        <button class="btn-unsuspend" onclick="quickUnsuspend('${data.uid}')">رفع</button>
-                    </div>`;
-                }).join('');
+                renderAdminList();
+                renderUsersDirectory();
+            } catch (e) { showToast('❌ خطأ: ' + e.message, '#ff7a7a'); }
+        };
+
+        // Builds one combined view of: everyone who's ever logged in (`users`) +
+        // who's currently an admin (`admins`) + who's currently suspended (`suspendedUsers`).
+        // Feeds both the "admins" tab (role picker) and the "accounts" tab (ban toggle).
+        window.renderUsersDirectory = async function() {
+            if (!S.isMainAdmin) return;
+            const adminsList = document.getElementById('admin-directory-list');
+            const accountsList = document.getElementById('accounts-list');
+            if (!adminsList && !accountsList) return;
+            try {
+                const [usersSnap, adminsSnap, suspendedSnap] = await Promise.all([
+                    getDocs(collection(db, 'users')),
+                    getDocs(collection(db, 'admins')),
+                    getDocs(collection(db, 'suspendedUsers'))
+                ]);
+                const adminsByEmail = {};
+                adminsSnap.forEach(d => { adminsByEmail[(d.data().email || d.id || '').toLowerCase()] = d.data(); });
+                const suspendedByUid = {};
+                suspendedSnap.forEach(d => { suspendedByUid[d.id] = true; });
+                const directory = usersSnap.docs.map(d => {
+                    const u = d.data();
+                    const email = (u.email || '').toLowerCase();
+                    return {
+                        uid: d.id,
+                        email,
+                        displayName: u.displayName || email.split('@')[0] || 'مستخدم',
+                        photoURL: u.photoURL || '',
+                        adminRole: adminsByEmail[email]?.role || null,
+                        suspended: !!suspendedByUid[d.id]
+                    };
+                }).sort((a, b) => (a.displayName || '').localeCompare(b.displayName || '', 'ar'));
+                S.usersDirectory = directory;
+                if (adminsList) _renderAdminDirectory(directory);
+                if (accountsList) _renderAccountsDirectory(directory);
             } catch (e) {
-                container.innerHTML = `<p style="color:var(--text-dim);font-size:13px">خطأ في التحميل</p>`;
+                console.error('renderUsersDirectory error:', e);
+                const errHtml = `<p class="directory-empty">⚠️ تعذر تحميل قائمة الحسابات — تأكد من صلاحيات Firestore</p>`;
+                if (adminsList) adminsList.innerHTML = errHtml;
+                if (accountsList) accountsList.innerHTML = errHtml;
             }
+        };
+
+        function _matchesSearch(entry, term) {
+            if (!term) return true;
+            term = term.toLowerCase();
+            return (entry.displayName || '').toLowerCase().includes(term) || (entry.email || '').toLowerCase().includes(term);
         }
 
-        // ===== WHATSAPP CHAT ENGINE =====
+        function _renderAdminDirectory(directory) {
+            const container = document.getElementById('admin-directory-list');
+            if (!container) return;
+            const term = (document.getElementById('directory-admins-search')?.value || '').trim();
+            const rows = directory.filter(e => _matchesSearch(e, term));
+            if (rows.length === 0) {
+                container.innerHTML = `<p class="directory-empty">لا يوجد حسابات مطابقة</p>`;
+                return;
+            }
+            container.innerHTML = rows.map(e => {
+                const initial = (e.displayName || '?').charAt(0).toUpperCase();
+                const avatar = avatarImgHtml(e.photoURL, 'directory-avatar', initial) || `<div class="directory-avatar">${_escapeHtml(initial)}</div>`;
+                const role = e.adminRole || 'none';
+                const isSelf = e.email === S.user?.email;
+                return `
+                <div class="directory-item">
+                    ${avatar}
+                    <div class="directory-info">
+                        <div class="directory-name">${_escapeHtml(e.displayName)}${isSelf ? ' (أنت)' : ''}</div>
+                        <div class="directory-email">${_escapeHtml(e.email)}</div>
+                    </div>
+                    <div class="directory-actions">
+                        <button class="dir-btn role-none ${role==='none'?'active':''}" ${isSelf?'disabled':''} onclick="setUserAdminRole('${e.email}','${_escapeHtml(e.displayName).replace(/'/g,"\\'")}','${e.photoURL}','none')">مستخدم</button>
+                        <button class="dir-btn role-normal ${role==='normal'?'active':''}" onclick="setUserAdminRole('${e.email}','${_escapeHtml(e.displayName).replace(/'/g,"\\'")}','${e.photoURL}','normal')">مشرف عادي</button>
+                        <button class="dir-btn role-main ${role==='main'?'active':''}" onclick="setUserAdminRole('${e.email}','${_escapeHtml(e.displayName).replace(/'/g,"\\'")}','${e.photoURL}','main')">مشرف رئيسي</button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function _renderAccountsDirectory(directory) {
+            const container = document.getElementById('accounts-list');
+            if (!container) return;
+            const term = (document.getElementById('directory-users-search')?.value || '').trim();
+            const rows = directory.filter(e => _matchesSearch(e, term));
+            if (rows.length === 0) {
+                container.innerHTML = `<p class="directory-empty">لا يوجد حسابات مطابقة</p>`;
+                return;
+            }
+            container.innerHTML = rows.map(e => {
+                const initial = (e.displayName || '?').charAt(0).toUpperCase();
+                const avatar = avatarImgHtml(e.photoURL, 'directory-avatar', initial) || `<div class="directory-avatar">${_escapeHtml(initial)}</div>`;
+                const isSelf = e.uid === S.user?.uid;
+                const roleLabel = e.adminRole === 'main' ? '👑 مشرف رئيسي' : e.adminRole === 'normal' ? '🔑 مشرف عادي' : 'مستخدم';
+                return `
+                <div class="directory-item ${e.suspended ? 'is-suspended' : ''}">
+                    ${avatar}
+                    <div class="directory-info">
+                        <div class="directory-name">${_escapeHtml(e.displayName)}${isSelf ? ' (أنت)' : ''} ${e.suspended ? ' — 🚫 موقوف' : ''}</div>
+                        <div class="directory-email">${_escapeHtml(e.email)} · ${roleLabel}</div>
+                    </div>
+                    <div class="directory-actions">
+                        ${isSelf ? '' : `<button class="dir-btn ${e.suspended ? 'unban' : 'ban'}" onclick="toggleAccountSuspension('${e.uid}','${_escapeHtml(e.displayName).replace(/'/g,"\\'")}',${e.suspended})">${e.suspended ? '✅ رفع التوقيف' : '🚫 توقيف'}</button>`}
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        // ===== WHATSAPP-STYLE ADMIN CHAT ENGINE =====
+        // The listener lives for the whole logged-in session (started once, right after
+        // login) instead of being tied to whether the chat modal is open or closed.
+        // This is what fixes messages "disappearing": navigating around the platform
+        // and coming back no longer wipes the local message cache or the subscription —
+        // the data stays live and in memory the entire time you're signed in.
         let _wachatUnsub = null;
-        let _wachatMode = null;
         let _wachatPending = [];   // messages sent but not yet confirmed by Firestore snapshot
         let _wachatLastMsgs = [];  // last known confirmed messages from the server
+        let _wachatListenerRetry = 0;
 
-        window.openWaChat = function(mode) {
-            if (!S.user) { showToast('🔑 سجّل دخولك أولاً', '#ffb020'); return; }
-            _wachatMode = mode;
-            closeMenuPanel();
-            const modal = document.getElementById('wachat-modal');
-            modal.classList.add('open');
-            document.body.style.overflow = 'hidden';
-            if (mode === 'admin') {
-                document.getElementById('wachat-header-avatar').textContent = '🛡️';
-                document.getElementById('wachat-header-name').textContent = 'المشرفون';
-                document.getElementById('wachat-header-status').textContent = 'قناة الدعم الرسمية';
-                _subscribeWaChat('chatMessages', 'admin');
-            } else {
-                document.getElementById('wachat-header-avatar').textContent = '👥';
-                document.getElementById('wachat-header-name').textContent = 'تواصل مع الأصدقاء';
-                document.getElementById('wachat-header-status').textContent = 'مجتمع GAMEVERSE';
-                _subscribeWaChat('friendsChat', 'friends');
-            }
-        };
-
-        window.closeWaChat = function() {
-            document.getElementById('wachat-modal').classList.remove('open');
-            document.body.style.overflow = '';
-            if (_wachatUnsub) { _wachatUnsub(); _wachatUnsub = null; }
-            _wachatMode = null;
-            _wachatPending = [];
-            _wachatLastMsgs = [];
-        };
-
-        function _subscribeWaChat(collectionName, mode) {
-            if (_wachatUnsub) { _wachatUnsub(); _wachatUnsub = null; }
-            _wachatPending = [];
-            _wachatLastMsgs = [];
-            const area = document.getElementById('wachat-messages-area');
-            const empty = document.getElementById('wachat-empty-state');
-            area.innerHTML = '';
-            area.appendChild(empty);
-            empty.style.display = 'flex';
+        function _ensureWaChatListener() {
+            if (_wachatUnsub || !S.user) return; // already running, or not logged in
             try {
-                const q = query(collection(db, collectionName), orderBy('timestamp', 'asc'));
+                const q = query(collection(db, 'chatMessages'), orderBy('timestamp', 'asc'));
                 _wachatUnsub = onSnapshot(q, snap => {
+                    _wachatListenerRetry = 0;
                     const msgs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
                     _wachatLastMsgs = msgs;
                     // Drop any pending messages that now exist in the confirmed list
                     // (same sender + same text, sent within the last 2 minutes)
-                    const myUid = S.user?.uid;
                     _wachatPending = _wachatPending.filter(p => {
-                        const pUid = mode === 'admin' ? p.sender : p.uid;
-                        const stillPending = !msgs.some(m => {
-                            const mUid = mode === 'admin' ? m.sender : m.uid;
-                            return mUid === pUid && m.text === p.text;
-                        });
+                        const stillPending = !msgs.some(m => m.sender === p.sender && m.text === p.text);
                         return stillPending && (Date.now() - new Date(p.timestamp).getTime() < 120000);
                     });
-                    _renderWaMsgs(msgs.concat(_wachatPending), mode);
+                    if (document.getElementById('wachat-modal').classList.contains('open')) {
+                        _renderWaMsgs(_wachatLastMsgs.concat(_wachatPending));
+                    }
                 }, err => {
                     console.error('WaChat snapshot error:', err);
+                    _wachatUnsub = null;
                     const area = document.getElementById('wachat-messages-area');
-                    if (area) {
+                    if (document.getElementById('wachat-modal').classList.contains('open') && area) {
                         area.innerHTML = `<div style="margin:auto;text-align:center;padding:30px;color:#ff7a7a;font-size:13px;line-height:1.8">
                             ⚠️ تعذر تحميل الرسائل<br/>
                             <span style="color:var(--text-dim);font-size:12px">${err.code === 'permission-denied' ? 'صلاحيات Firestore تمنع القراءة — راجع Security Rules في Firebase Console' : (err.message || 'تحقق من اتصال الإنترنت')}</span>
                         </div>`;
                     }
+                    // Auto-retry a few times in case of a transient network drop, so the
+                    // chat recovers on its own instead of staying empty forever.
+                    if (_wachatListenerRetry < 5 && S.user) {
+                        _wachatListenerRetry++;
+                        setTimeout(_ensureWaChatListener, 2000 * _wachatListenerRetry);
+                    }
                 });
             } catch (e) { console.error('WaChat subscribe error:', e); }
         }
+
+        function _teardownWaChat() {
+            if (_wachatUnsub) { _wachatUnsub(); _wachatUnsub = null; }
+            _wachatPending = [];
+            _wachatLastMsgs = [];
+            _wachatListenerRetry = 0;
+        }
+
+        window.openWaChat = function() {
+            if (!S.user) { showToast('🔑 سجّل دخولك أولاً', '#ffb020'); return; }
+            closeMenuPanel();
+            const modal = document.getElementById('wachat-modal');
+            modal.classList.add('open');
+            document.body.style.overflow = 'hidden';
+            document.getElementById('wachat-header-avatar').textContent = '🛡️';
+            document.getElementById('wachat-header-name').textContent = 'المشرفون';
+            document.getElementById('wachat-header-status').textContent = 'قناة الدعم الرسمية';
+            _ensureWaChatListener();
+            // Render instantly from whatever we already have cached — no reset to a
+            // blank/loading state, so previously-loaded messages are always still there.
+            _renderWaMsgs(_wachatLastMsgs.concat(_wachatPending));
+        };
+
+        window.closeWaChat = function() {
+            document.getElementById('wachat-modal').classList.remove('open');
+            document.body.style.overflow = '';
+            // NOTE: intentionally does NOT unsubscribe — the listener keeps running in the
+            // background for the whole session so reopening the chat is instant.
+        };
 
         function _escapeHtml(str) {
             const div = document.createElement('div');
@@ -3270,9 +3385,10 @@
             return div.innerHTML;
         }
 
-        function _renderWaMsgs(msgs, mode) {
+        function _renderWaMsgs(msgs) {
             const area = document.getElementById('wachat-messages-area');
             const empty = document.getElementById('wachat-empty-state');
+            if (!area) return;
             if (msgs.length === 0) {
                 area.innerHTML = '';
                 area.appendChild(empty);
@@ -3284,10 +3400,9 @@
             let html = '';
             let lastDate = '';
             msgs.forEach(msg => {
-                const uid = mode === 'admin' ? msg.sender : msg.uid;
-                const isMine = uid === S.user?.uid;
+                const isMine = msg.sender === S.user?.uid;
                 const name = msg.senderName || 'مستخدم';
-                const isAdmin = mode === 'admin' && msg.isAdmin;
+                const isAdmin = !!msg.isAdmin;
                 const ts = msg.timestamp;
                 const d = ts ? (ts.toDate ? ts.toDate() : new Date(ts)) : new Date();
                 const dateStr = d.toLocaleDateString('ar-EG', { day:'numeric', month:'long' });
@@ -3300,7 +3415,7 @@
                 }
                 const avatarHtml = avatarImgHtml(photo, 'wabubble-avatar', initial) || `<div class="wabubble-avatar">${_escapeHtml(initial)}</div>`;
                 const canDelete = !msg._pending && (S.isAdmin || isMine);
-                const deleteBtn = canDelete ? `<button class="wabubble-delete-btn" onclick="deleteWaMsg('${msg.id}','${mode}')" title="حذف الرسالة">🗑</button>` : '';
+                const deleteBtn = canDelete ? `<button class="wabubble-delete-btn" onclick="deleteWaMsg('${msg.id}')" title="حذف الرسالة">🗑</button>` : '';
                 const safeText = _escapeHtml(msg.text).replace(/\n/g, '<br>');
                 let statusHtml = '';
                 if (msg._failed) {
@@ -3329,22 +3444,20 @@
             if (wasAtBottom) area.scrollTop = area.scrollHeight;
         }
 
-        window.deleteWaMsg = async function(msgId, mode) {
+        window.deleteWaMsg = async function(msgId) {
             if (!S.user) return;
-            const collectionName = mode === 'admin' ? 'chatMessages' : 'friendsChat';
             try {
                 if (!S.isAdmin) {
-                    const snap = await getDoc(doc(db, collectionName, msgId));
+                    const snap = await getDoc(doc(db, 'chatMessages', msgId));
                     if (!snap.exists()) return;
                     const data = snap.data();
-                    const ownerUid = mode === 'admin' ? data.sender : data.uid;
-                    if (ownerUid !== S.user.uid) {
+                    if (data.sender !== S.user.uid) {
                         showToast('❌ لا يمكنك حذف رسائل الآخرين', '#ff7a7a');
                         return;
                     }
                 }
                 if (!confirm('حذف الرسالة؟')) return;
-                await deleteDoc(doc(db, collectionName, msgId));
+                await deleteDoc(doc(db, 'chatMessages', msgId));
                 showToast('🗑 تم حذف الرسالة');
             } catch (e) {
                 console.error('Delete WA message error:', e);
@@ -3353,42 +3466,29 @@
         };
 
         window.sendWaChat = async function() {
-            if (!S.user || !_wachatMode) return;
+            if (!S.user) return;
             const input = document.getElementById('wachat-input');
             const text = (input.value || '').trim();
             if (!text) return;
             input.value = '';
             const name = S.userProfile?.displayName || S.user.displayName || 'مستخدم';
             const photo = S.userProfile?.photoURL || S.user.photoURL || '';
-            const mode = _wachatMode;
 
             // ===== OPTIMISTIC RENDER: show the message instantly, don't wait for the server =====
             const localId = 'local_' + Date.now() + '_' + Math.random().toString(36).slice(2);
-            const pendingMsg = mode === 'admin'
-                ? { id: localId, sender: S.user.uid, senderName: name, senderPhoto: photo, text, timestamp: new Date(), isAdmin: S.isAdmin, _pending: true }
-                : { id: localId, uid: S.user.uid, senderName: name, senderPhoto: photo, text, timestamp: new Date(), _pending: true };
+            const pendingMsg = { id: localId, sender: S.user.uid, senderName: name, senderPhoto: photo, text, timestamp: new Date(), isAdmin: S.isAdmin, _pending: true };
             _wachatPending.push(pendingMsg);
-            _renderWaMsgs(_wachatLastMsgs.concat(_wachatPending), mode);
+            _renderWaMsgs(_wachatLastMsgs.concat(_wachatPending));
 
             try {
-                if (mode === 'admin') {
-                    await addDoc(collection(db, 'chatMessages'), {
-                        sender: S.user.uid,
-                        senderName: name,
-                        senderPhoto: photo,
-                        text,
-                        timestamp: serverTimestamp(),
-                        isAdmin: S.isAdmin
-                    });
-                } else {
-                    await addDoc(collection(db, 'friendsChat'), {
-                        uid: S.user.uid,
-                        senderName: name,
-                        senderPhoto: photo,
-                        text,
-                        timestamp: serverTimestamp()
-                    });
-                }
+                await addDoc(collection(db, 'chatMessages'), {
+                    sender: S.user.uid,
+                    senderName: name,
+                    senderPhoto: photo,
+                    text,
+                    timestamp: serverTimestamp(),
+                    isAdmin: S.isAdmin
+                });
                 // Real snapshot will arrive via onSnapshot and replace the pending bubble.
             } catch (e) {
                 console.error('WaChat send error:', e);
@@ -3397,7 +3497,7 @@
                 const idx = _wachatPending.findIndex(m => m.id === localId);
                 if (idx !== -1) {
                     _wachatPending[idx]._failed = true;
-                    _renderWaMsgs(_wachatLastMsgs.concat(_wachatPending), mode);
+                    _renderWaMsgs(_wachatLastMsgs.concat(_wachatPending));
                 }
             }
         };
@@ -3503,6 +3603,7 @@
                 document.getElementById('menu-user-role-text').textContent = S.isAdmin ? (S.isMainAdmin ? '👑 مشرف رئيسي' : '🔑 مشرف عادي') : '👤 مستخدم';
                 document.getElementById('menu-admin-section').style.display = S.isAdmin ? 'block' : 'none';
                 document.getElementById('menu-add-admin-btn').style.display = S.isMainAdmin ? '' : 'none';
+                document.getElementById('menu-accounts-btn').style.display = S.isMainAdmin ? '' : 'none';
             }
             panel.classList.add('open');
             ov.style.display = 'block';
@@ -3547,9 +3648,9 @@
             document.querySelectorAll('.panel-tab-content').forEach(c => c.classList.toggle('active', c.id === 'tab-' + tabId));
             if (tabId === 'admin-ratings') renderAdminRatings();
             if (tabId === 'admin-comments') renderAdminComments();
-            if (tabId === 'admin-admins') renderAdminList();
+            if (tabId === 'admin-admins') { renderAdminList(); renderUsersDirectory(); }
             if (tabId === 'admin-videos') renderAdminVideoList();
-            if (tabId === 'admin-users') renderSuspendedList();
+            if (tabId === 'admin-users') renderUsersDirectory();
         };
 
         // ===== ADD / EDIT MODALS =====
@@ -3738,21 +3839,29 @@
             }
         };
 
-        window.handleGearClick = function() {
-            if (S.isAdmin) {
-                togglePanel();
-            } else {
-                showToast('🔑 سجّل دخولك كمشرف', '#ffb020');
-                togglePanel();
-            }
+        // Opens the control-panel side drawer (formerly reached via the separate gear
+        // button — now it's reached only from the hamburger (☰) menu). Optionally jumps
+        // straight to a given admin tab.
+        window.openAdminPanel = function(tab) {
+            if (!S.user) { showToast('🔑 سجّل دخولك أولاً', '#ffb020'); return; }
+            closeMenuPanel();
+            if (!S.isAdmin) { showToast('🔑 سجّل دخولك كمشرف', '#ffb020'); return; }
+            updateUI();
+            renderAdminList();
+            renderAdminRatings();
+            renderAdminComments();
+            renderAdminVideoList();
+            renderUsersDirectory();
+            const panel = document.getElementById('side-panel');
+            const ov = document.getElementById('overlay');
+            panel.classList.add('open');
+            ov.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+            if (tab) switchPanelTab(tab);
         };
 
         window.handleSignOut = async function() {
-            if (S.adminChatUnsubscribe) { S.adminChatUnsubscribe(); S.adminChatUnsubscribe = null; }
-            if (S.chatUnsubscribe) { S.chatUnsubscribe(); S.chatUnsubscribe = null; }
-            if (_wachatUnsub) { _wachatUnsub(); _wachatUnsub = null; }
-            if (S.friendsChatUnsubscribe) { S.friendsChatUnsubscribe(); S.friendsChatUnsubscribe = null; }
-            if (S.friendsChatPanelUnsub) { S.friendsChatPanelUnsub(); S.friendsChatPanelUnsub = null; }
+            _teardownWaChat();
             await signOut(auth);
             S.user = null;
             S.isAdmin = false;
@@ -3766,6 +3875,19 @@
             updateUI();
             showToast('👋 تم تسجيل الخروج');
         };
+
+        // ===== USER DIRECTORY (all accounts that have ever logged in) =====
+        async function upsertUserDirectory(fbUser, email) {
+            try {
+                await setDoc(doc(db, 'users', fbUser.uid), {
+                    uid: fbUser.uid,
+                    email,
+                    displayName: fbUser.displayName || email.split('@')[0],
+                    photoURL: fbUser.photoURL || '',
+                    lastLogin: new Date()
+                }, { merge: true });
+            } catch (e) { console.error('user directory upsert error:', e); }
+        }
 
         // ===== PROCESS USER =====
         let _processingUid = null;
@@ -3798,6 +3920,11 @@
                         await signOut(auth);
                         return;
                     }
+                    // Keep a lightweight directory of every account that has ever logged in.
+                    // This is what powers "كل الحسابات" in the admin/accounts management UI —
+                    // without it, the admin panel could only ever see people who happened to
+                    // have saved a profile before.
+                    upsertUserDirectory(fbUser, email);
                     const adminRef = doc(db, 'admins', email);
                     const userSnap = await getDoc(adminRef);
                     if (!userSnap.exists()) {
@@ -3816,6 +3943,7 @@
                             S.adminExists = true;
                             S.isBlocked = false;
                             S.fbLoading = false;
+                            _ensureWaChatListener();
                             updateUI();
                             if (shouldOpenPanel) openPanelNow();
                             return;
@@ -3826,6 +3954,7 @@
                             S.adminExists = true;
                             S.isBlocked = false;
                             S.fbLoading = false;
+                            _ensureWaChatListener();
                             updateUI();
                             if (shouldOpenPanel) openPanelNow();
                             return;
@@ -3838,6 +3967,7 @@
                     S.adminExists = true;
                     S.isBlocked = false;
                     S.fbLoading = false;
+                    _ensureWaChatListener();
                     updateUI();
                     if (shouldOpenPanel) openPanelNow();
                 })(), timeoutPromise]);
@@ -3869,7 +3999,7 @@
                 panel.classList.add('open');
                 ov.style.display = 'block';
                 document.body.style.overflow = 'hidden';
-                if (S.isAdmin) { renderAdminList(); renderAdminRatings(); renderAdminComments(); renderAdminVideoList(); }
+                if (S.isAdmin) { renderAdminList(); renderAdminRatings(); renderAdminComments(); renderAdminVideoList(); if (S.isMainAdmin) renderUsersDirectory(); }
                 setTimeout(() => showToast(S.isAdmin ? '👑 مرحباً بك يا مشرف!' : '👋 مرحباً بك!'), 300);
             }
         }
@@ -3926,16 +4056,6 @@
                 roleSpan.style.color = isAdmin ? '#ffc862' : '#d8a8ff';
                 roleSpan.style.borderColor = isAdmin ? 'rgba(255,176,32,0.2)' : 'rgba(168,85,247,0.2)';
             }
-            const gearBtn = document.getElementById('gear-btn');
-            if (isAdmin) {
-                gearBtn.classList.add('visible');
-                gearBtn.classList.add('active');
-                document.getElementById('gear-icon').setAttribute('fill', '#ffb020');
-            } else {
-                gearBtn.classList.remove('visible');
-                gearBtn.classList.remove('active');
-                document.getElementById('gear-icon').setAttribute('fill', 'rgba(255,255,255,0.4)');
-            }
             document.getElementById('add-video-btn').style.display = isAdmin ? 'block' : 'none';
             // Panel states
             const loading = fbLoading && !isAdmin && !isBlocked;
@@ -3975,6 +4095,7 @@
                 renderAdminRatings();
                 renderAdminComments();
                 renderAdminList();
+                if (isMainAdmin) renderUsersDirectory();
             }
             // Hamburger visibility
             const hb = document.getElementById('hamburger-btn');
@@ -4057,7 +4178,7 @@
         window.switchPanelTab = switchPanelTab;
         window.handleMainLogin = handleMainLogin;
         window.handleAdminLogin = handleAdminLogin;
-        window.handleGearClick = handleGearClick;
+        window.openAdminPanel = openAdminPanel;
         window.handleSignOut = handleSignOut;
         window.openMenuPanel = openMenuPanel;
         window.closeMenuPanel = closeMenuPanel;
@@ -4067,7 +4188,9 @@
         window.saveProfileChanges = saveProfileChanges;
         window.suspendUser = suspendUser;
         window.unsuspendUser = unsuspendUser;
-        window.quickUnsuspend = quickUnsuspend;
+        window.toggleAccountSuspension = toggleAccountSuspension;
+        window.setUserAdminRole = setUserAdminRole;
+        window.renderUsersDirectory = renderUsersDirectory;
         window.deleteCardComment = deleteCardComment;
         window.deletePlayerComment = deletePlayerComment;
         window.deleteAdminComment = deleteAdminComment;
@@ -4076,8 +4199,7 @@
         window.sendWaChat = sendWaChat;
         window.deleteWaMsg = deleteWaMsg;
         // Legacy menu shortcuts now route straight to the unified WaChat engine
-        window.openUserChatFromMenu = function() { openWaChat('admin'); };
-        window.openFriendsChatFromMenu = function() { openWaChat('friends'); };
+        window.openUserChatFromMenu = function() { openWaChat(); };
     </script>
 </body>
 </html>
