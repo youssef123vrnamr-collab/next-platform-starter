@@ -4026,7 +4026,7 @@
 
         function _ensureFriendChatListener(cid) {
             if (_friendChatUnsub) { _friendChatUnsub(); _friendChatUnsub = null; }
-            const q = query(collection(db, 'friendsChat'), where('conversationId', '==', cid), orderBy('timestamp', 'asc'));
+            const q = query(collection(db, 'friendsChat'), where('conversationId', '==', cid), where('participants', 'array-contains', S.user.uid), orderBy('timestamp', 'asc'));
             _friendChatUnsub = onSnapshot(q, snap => {
                 const msgs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
                 _renderFriendMsgs(msgs);
