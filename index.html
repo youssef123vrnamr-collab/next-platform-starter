@@ -1249,6 +1249,60 @@
             padding: 3px 9px; border-radius: 999px; letter-spacing: .5px;
         }
 
+        /* ===== Players count select screen ===== */
+        .players-select-wrap { display: block; }
+        .players-select-wrap.hidden { display: none; }
+        .players-select-title { color: var(--bright); font-size: 19px; font-weight: 900; font-family: 'Rajdhani', sans-serif; margin-bottom: 6px; }
+        .players-select-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 20px; }
+        .player-count-card {
+            position: relative;
+            background: linear-gradient(160deg, rgba(124,58,237,0.14), rgba(255,45,135,0.05));
+            border: 1px solid rgba(192,38,211,0.25);
+            border-radius: 18px;
+            padding: 24px 14px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform .18s, border-color .18s, box-shadow .18s;
+        }
+        .player-count-card:hover { transform: translateY(-3px); border-color: rgba(192,38,211,0.55); box-shadow: 0 14px 34px -14px rgba(192,38,211,0.55); }
+        .player-count-card:active { transform: translateY(0); }
+        .player-count-icon { font-size: 30px; margin-bottom: 10px; filter: drop-shadow(0 4px 10px rgba(192,38,211,0.5)); }
+        .player-count-label { color: var(--bright); font-size: 15px; font-weight: 800; font-family: 'Rajdhani', sans-serif; letter-spacing: .3px; }
+        .games-hub-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 2px; }
+        .games-hub-change-btn {
+            display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+            background: var(--surface); border: 1px solid var(--border); border-radius: 9px;
+            color: var(--text); font-size: 12px; font-weight: 700; padding: 7px 12px; cursor: pointer;
+        }
+        .games-hub-change-btn:hover { border-color: rgba(192,38,211,0.35); color: var(--bright); }
+        .games-hub-empty { display: none; text-align: center; padding: 50px 16px; color: var(--text-dim); font-size: 13.5px; line-height: 1.8; }
+        .games-hub-empty .emoji { font-size: 34px; display: block; margin-bottom: 10px; }
+
+        /* ===== Tug of War (2 players) ===== */
+        .tow-canvas-wrap { display: flex; flex-direction: column; gap: 18px; padding: 22px 16px; }
+        .tow-track-wrap { display: flex; align-items: center; gap: 10px; }
+        .tow-zone { font-size: 12.5px; font-weight: 800; color: var(--bright); white-space: nowrap; }
+        .tow-track { position: relative; flex: 1; height: 46px; border-radius: 999px; background: linear-gradient(90deg, rgba(79,195,247,0.18), rgba(255,255,255,0.03) 50%, rgba(255,45,135,0.18)); border: 1px solid var(--border); overflow: hidden; }
+        .tow-mid-line { position: absolute; left: 50%; top: 0; bottom: 0; width: 2px; background: rgba(255,255,255,0.18); transform: translateX(-50%); }
+        .tow-marker { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 24px; transition: left .12s ease-out; }
+        .tow-buttons { display: flex; gap: 12px; }
+        .tow-btn { flex: 1; min-height: 96px; border: none; border-radius: 18px; font-size: 15px; font-weight: 900; color: #0a0814; cursor: pointer; touch-action: manipulation; user-select: none; -webkit-tap-highlight-color: transparent; }
+        .tow-btn:active { transform: scale(.97); }
+        .tow-btn-p1 { background: linear-gradient(160deg, #4fc3f7, #2196c9); }
+        .tow-btn-p2 { background: linear-gradient(160deg, #ff2d87, #c0176a); }
+
+        /* ===== Tap Race (3/4 players) ===== */
+        .race-track-wrap { display: flex; gap: 10px; height: 280px; padding: 18px 16px; }
+        .race-lane { flex: 1; position: relative; border-radius: 16px; border: 1px solid var(--border); background: rgba(255,255,255,0.03); overflow: hidden; cursor: pointer; touch-action: manipulation; user-select: none; -webkit-tap-highlight-color: transparent; display: flex; flex-direction: column-reverse; }
+        .race-lane:active { border-color: rgba(192,38,211,0.5); }
+        .race-fill { width: 100%; height: 0%; transition: height .1s ease-out; }
+        .race-lane-1 .race-fill { background: linear-gradient(0deg, #7c3aed, #a855f7); }
+        .race-lane-2 .race-fill { background: linear-gradient(0deg, #ff2d87, #ff6fb0); }
+        .race-lane-3 .race-fill { background: linear-gradient(0deg, #4fc3f7, #8fe0ff); }
+        .race-lane-4 .race-fill { background: linear-gradient(0deg, #ffb020, #ffd27a); }
+        .race-lane-label { position: absolute; top: 10px; left: 0; right: 0; text-align: center; font-size: 12px; font-weight: 800; color: var(--bright); z-index: 1; pointer-events: none; }
+        .race-lane-pct { position: absolute; bottom: 10px; left: 0; right: 0; text-align: center; font-size: 15px; font-weight: 900; color: #0a0814; z-index: 1; pointer-events: none; text-shadow: 0 1px 4px rgba(255,255,255,0.3); }
+
         .game-play-wrap { display: none; }
         .game-play-wrap.active { display: block; }
         .game-back-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
@@ -2460,11 +2514,38 @@
         </div>
         <div class="games-fs-body">
 
+            <!-- Player count selection -->
+            <div id="games-player-select" class="players-select-wrap">
+                <div class="players-select-title">عايز تلعب بكام لاعب؟</div>
+                <p class="directory-hint">اختار عدد اللاعبين وهنورّيك الألعاب المتاحة بنفس العدد</p>
+                <div class="players-select-grid">
+                    <div class="player-count-card" onclick="selectGamesPlayerCount(1)">
+                        <div class="player-count-icon">🧍</div>
+                        <div class="player-count-label">لاعب واحد</div>
+                    </div>
+                    <div class="player-count-card" onclick="selectGamesPlayerCount(2)">
+                        <div class="player-count-icon">🧍‍🧍</div>
+                        <div class="player-count-label">لاعبين اتنين</div>
+                    </div>
+                    <div class="player-count-card" onclick="selectGamesPlayerCount(3)">
+                        <div class="player-count-icon">🧍‍🧍‍🧍</div>
+                        <div class="player-count-label">تلات لاعبين</div>
+                    </div>
+                    <div class="player-count-card" onclick="selectGamesPlayerCount(4)">
+                        <div class="player-count-icon">🧑‍🤝‍🧑</div>
+                        <div class="player-count-label">أربع لاعبين</div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Hub -->
-            <div id="games-hub">
-                <p class="directory-hint">ألعاب حصرية على GAMEVERSE — العب لوحدك وحاول تكسر رقمك القياسي</p>
-                <div class="games-hub-grid">
-                    <div class="game-hub-card" onclick="openGame('meteor')">
+            <div id="games-hub" style="display:none">
+                <div class="games-hub-header">
+                    <p class="directory-hint" id="games-hub-hint" style="margin:0">ألعاب حصرية على GAMEVERSE — العب لوحدك وحاول تكسر رقمك القياسي</p>
+                    <button class="games-hub-change-btn" onclick="openGamesPlayerSelect()">🔁 غيّر العدد</button>
+                </div>
+                <div class="games-hub-grid" id="games-hub-grid">
+                    <div class="game-hub-card" data-players="1" onclick="openGame('meteor')">
                         <span class="game-hub-badge">حصري</span>
                         <div class="game-hub-icon">☄️</div>
                         <div class="game-hub-title">صياد النيازك</div>
@@ -2474,7 +2555,7 @@
                             <span class="game-hub-play">العب الآن ›</span>
                         </div>
                     </div>
-                    <div class="game-hub-card" onclick="openGame('simon')">
+                    <div class="game-hub-card" data-players="1" onclick="openGame('simon')">
                         <span class="game-hub-badge">حصري</span>
                         <div class="game-hub-icon">🔮</div>
                         <div class="game-hub-title">متتالية الطاقة</div>
@@ -2484,6 +2565,41 @@
                             <span class="game-hub-play">العب الآن ›</span>
                         </div>
                     </div>
+                    <div class="game-hub-card" data-players="2" onclick="openGame('tow')">
+                        <span class="game-hub-badge">لعب محلي</span>
+                        <div class="game-hub-icon">🪢</div>
+                        <div class="game-hub-title">شد الحبل</div>
+                        <div class="game-hub-desc">كل لاعب على زراره — دوسوا بأسرع ما تقدروا وشدّوا الحبل لجهتكم قبل الوقت ما يخلص</div>
+                        <div class="game-hub-meta">
+                            <span class="game-hub-best">لاعبين على نفس الجهاز</span>
+                            <span class="game-hub-play">العب الآن ›</span>
+                        </div>
+                    </div>
+                    <div class="game-hub-card" data-players="3" onclick="openGame('race3')">
+                        <span class="game-hub-badge">لعب محلي</span>
+                        <div class="game-hub-icon">🏁</div>
+                        <div class="game-hub-title">سباق الضغط</div>
+                        <div class="game-hub-desc">3 حارات، كل واحد يدوس على حارته بسرعة — أول واحد يوصل 100% يكسب السباق</div>
+                        <div class="game-hub-meta">
+                            <span class="game-hub-best">3 لاعبين على نفس الجهاز</span>
+                            <span class="game-hub-play">العب الآن ›</span>
+                        </div>
+                    </div>
+                    <div class="game-hub-card" data-players="4" onclick="openGame('race4')">
+                        <span class="game-hub-badge">لعب محلي</span>
+                        <div class="game-hub-icon">🏆</div>
+                        <div class="game-hub-title">معركة الأزرار</div>
+                        <div class="game-hub-desc">4 حارات، كل واحد يدوس على حارته بسرعة — أول واحد يوصل 100% يكسب المعركة</div>
+                        <div class="game-hub-meta">
+                            <span class="game-hub-best">4 لاعبين على نفس الجهاز</span>
+                            <span class="game-hub-play">العب الآن ›</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="games-hub-empty" id="games-hub-empty">
+                    <span class="emoji">🛠️</span>
+                    ألعاب اللاعبين دي لسه بتتضاف قريباً على GAMEVERSE.<br>
+                    جرّب عدد لاعبين تاني دلوقتي.
                 </div>
             </div>
 
@@ -2537,6 +2653,121 @@
                         <div class="game-overlay-score">وصلت لجولة: <b id="simon-final-score">0</b></div>
                         <div class="game-overlay-best" id="simon-final-best">أفضل نتيجة: 0</div>
                         <button class="game-retry-btn" onclick="startSimonGame()">🔄 العب تاني</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tug of War (2 players) -->
+            <div class="game-play-wrap" id="game-play-tow">
+                <div class="game-back-row">
+                    <button class="game-back-btn" onclick="closeGame()">‹ رجوع للألعاب</button>
+                    <div class="game-hud">
+                        <div class="game-hud-chip">الوقت <b id="tow-timer">12</b></div>
+                    </div>
+                </div>
+                <div class="game-canvas-wrap tow-canvas-wrap">
+                    <div class="tow-track-wrap">
+                        <div class="tow-zone">🔵 لاعب 1</div>
+                        <div class="tow-track">
+                            <div class="tow-mid-line"></div>
+                            <div class="tow-marker" id="tow-marker">🪢</div>
+                        </div>
+                        <div class="tow-zone">🔴 لاعب 2</div>
+                    </div>
+                    <div class="tow-buttons">
+                        <button class="tow-btn tow-btn-p1" onclick="towTap(1)">دوس بسرعة! 🔵</button>
+                        <button class="tow-btn tow-btn-p2" onclick="towTap(2)">دوس بسرعة! 🔴</button>
+                    </div>
+                    <div class="game-overlay active" id="tow-overlay-start">
+                        <div class="game-overlay-title">🪢 شد الحبل</div>
+                        <div class="game-overlay-score">كل لاعب يدوس على زراره بأسرع ما يقدر — اللي يشد الحبل لجهته يكسب!</div>
+                        <button class="game-start-btn" onclick="startTowGame()">ابدأ اللعب</button>
+                    </div>
+                    <div class="game-overlay" id="tow-overlay-end">
+                        <div class="game-overlay-title" id="tow-result-title">🏆 لاعب 1 كسب!</div>
+                        <div class="game-overlay-score" id="tow-result-score"></div>
+                        <button class="game-retry-btn" onclick="startTowGame()">🔄 العب تاني</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tap Race (3 players) -->
+            <div class="game-play-wrap" id="game-play-race3">
+                <div class="game-back-row">
+                    <button class="game-back-btn" onclick="closeGame()">‹ رجوع للألعاب</button>
+                    <div class="game-hud">
+                        <div class="game-hud-chip">دوسوا بسرعة!</div>
+                    </div>
+                </div>
+                <div class="game-canvas-wrap">
+                    <div class="race-track-wrap">
+                        <div class="race-lane race-lane-1" onclick="raceTap(3,1)">
+                            <span class="race-lane-label">🔵 لاعب 1</span>
+                            <div class="race-fill" id="race3-fill-1"></div>
+                            <span class="race-lane-pct" id="race3-pct-1">0%</span>
+                        </div>
+                        <div class="race-lane race-lane-2" onclick="raceTap(3,2)">
+                            <span class="race-lane-label">🔴 لاعب 2</span>
+                            <div class="race-fill" id="race3-fill-2"></div>
+                            <span class="race-lane-pct" id="race3-pct-2">0%</span>
+                        </div>
+                        <div class="race-lane race-lane-3" onclick="raceTap(3,3)">
+                            <span class="race-lane-label">🟦 لاعب 3</span>
+                            <div class="race-fill" id="race3-fill-3"></div>
+                            <span class="race-lane-pct" id="race3-pct-3">0%</span>
+                        </div>
+                    </div>
+                    <div class="game-overlay active" id="race3-overlay-start">
+                        <div class="game-overlay-title">🏁 سباق الضغط</div>
+                        <div class="game-overlay-score">كل لاعب يدوس على حارته بسرعة — أول واحد يوصل 100% يكسب</div>
+                        <button class="game-start-btn" onclick="startRaceGame(3)">ابدأ السباق</button>
+                    </div>
+                    <div class="game-overlay" id="race3-overlay-end">
+                        <div class="game-overlay-title" id="race3-result-title">🏆 لاعب 1 كسب السباق!</div>
+                        <button class="game-retry-btn" onclick="startRaceGame(3)">🔄 العب تاني</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tap Race / Button Battle (4 players) -->
+            <div class="game-play-wrap" id="game-play-race4">
+                <div class="game-back-row">
+                    <button class="game-back-btn" onclick="closeGame()">‹ رجوع للألعاب</button>
+                    <div class="game-hud">
+                        <div class="game-hud-chip">دوسوا بسرعة!</div>
+                    </div>
+                </div>
+                <div class="game-canvas-wrap">
+                    <div class="race-track-wrap">
+                        <div class="race-lane race-lane-1" onclick="raceTap(4,1)">
+                            <span class="race-lane-label">🔵 لاعب 1</span>
+                            <div class="race-fill" id="race4-fill-1"></div>
+                            <span class="race-lane-pct" id="race4-pct-1">0%</span>
+                        </div>
+                        <div class="race-lane race-lane-2" onclick="raceTap(4,2)">
+                            <span class="race-lane-label">🔴 لاعب 2</span>
+                            <div class="race-fill" id="race4-fill-2"></div>
+                            <span class="race-lane-pct" id="race4-pct-2">0%</span>
+                        </div>
+                        <div class="race-lane race-lane-3" onclick="raceTap(4,3)">
+                            <span class="race-lane-label">🟦 لاعب 3</span>
+                            <div class="race-fill" id="race4-fill-3"></div>
+                            <span class="race-lane-pct" id="race4-pct-3">0%</span>
+                        </div>
+                        <div class="race-lane race-lane-4" onclick="raceTap(4,4)">
+                            <span class="race-lane-label">🟠 لاعب 4</span>
+                            <div class="race-fill" id="race4-fill-4"></div>
+                            <span class="race-lane-pct" id="race4-pct-4">0%</span>
+                        </div>
+                    </div>
+                    <div class="game-overlay active" id="race4-overlay-start">
+                        <div class="game-overlay-title">🏆 معركة الأزرار</div>
+                        <div class="game-overlay-score">كل لاعب يدوس على حارته بسرعة — أول واحد يوصل 100% يكسب المعركة</div>
+                        <button class="game-start-btn" onclick="startRaceGame(4)">ابدأ اللعب</button>
+                    </div>
+                    <div class="game-overlay" id="race4-overlay-end">
+                        <div class="game-overlay-title" id="race4-result-title">🏆 لاعب 1 كسب!</div>
+                        <button class="game-retry-btn" onclick="startRaceGame(4)">🔄 العب تاني</button>
                     </div>
                 </div>
             </div>
@@ -2781,6 +3012,7 @@
             followersCount: 0,
             followingCount: 0,
             membersDirectory: [],
+            gamesPlayerCount: null,
         };
 
         // ===== HELPERS =====
@@ -4417,13 +4649,17 @@
             document.getElementById('simon-hub-best').textContent = 'أفضل نتيجة: ' + _gameBest('simon');
         }
 
+        const _playerCountLabels = { 1: 'لاعب واحد', 2: 'لاعبين اتنين', 3: 'تلات لاعبين', 4: 'أربع لاعبين' };
+
         window.openGamesModal = function() {
             closeMenuPanel();
             document.getElementById('games-modal').style.display = 'flex';
             document.body.style.overflow = 'hidden';
-            _updateGameHubBests();
-            document.getElementById('games-hub').style.display = 'block';
             document.querySelectorAll('.game-play-wrap').forEach(w => w.classList.remove('active'));
+            document.getElementById('games-hub').style.display = 'none';
+            // Every time the games section is opened, ask again how many players
+            S.gamesPlayerCount = null;
+            document.getElementById('games-player-select').classList.remove('hidden');
         };
         window.closeGamesModal = function() {
             _stopMeteorGame();
@@ -4431,16 +4667,43 @@
             document.getElementById('games-modal').style.display = 'none';
             document.body.style.overflow = '';
         };
+        window.openGamesPlayerSelect = function() {
+            document.querySelectorAll('.game-play-wrap').forEach(w => w.classList.remove('active'));
+            document.getElementById('games-hub').style.display = 'none';
+            document.getElementById('games-player-select').classList.remove('hidden');
+        };
+        window.selectGamesPlayerCount = function(n) {
+            S.gamesPlayerCount = n;
+            document.getElementById('games-player-select').classList.add('hidden');
+            document.getElementById('games-hub').style.display = 'block';
+            const hint = document.getElementById('games-hub-hint');
+            if (hint) hint.textContent = `بتدور على ألعاب لـ ${_playerCountLabels[n] || n}`;
+            const cards = [...document.querySelectorAll('#games-hub-grid .game-hub-card')];
+            let visibleCount = 0;
+            cards.forEach(card => {
+                const cardPlayers = parseInt(card.dataset.players || '1', 10);
+                const show = cardPlayers === n;
+                card.style.display = show ? '' : 'none';
+                if (show) visibleCount++;
+            });
+            document.getElementById('games-hub-empty').style.display = visibleCount === 0 ? 'block' : 'none';
+            _updateGameHubBests();
+        };
         window.openGame = function(id) {
             document.getElementById('games-hub').style.display = 'none';
             document.querySelectorAll('.game-play-wrap').forEach(w => w.classList.remove('active'));
             document.getElementById('game-play-' + id).classList.add('active');
             if (id === 'meteor') _resetMeteorScreen();
             if (id === 'simon') _resetSimonScreen();
+            if (id === 'tow') _resetTowScreen();
+            if (id === 'race3') _resetRaceScreen(3);
+            if (id === 'race4') _resetRaceScreen(4);
         };
         window.closeGame = function() {
             _stopMeteorGame();
             _stopSimonGame();
+            _stopTowGame();
+            _stopRaceGame();
             document.querySelectorAll('.game-play-wrap').forEach(w => w.classList.remove('active'));
             document.getElementById('games-hub').style.display = 'block';
             _updateGameHubBests();
@@ -4592,6 +4855,94 @@
             document.getElementById('simon-final-score').textContent = finalScore;
             document.getElementById('simon-final-best').textContent = (isNew ? '🏆 رقم قياسي جديد! ' : 'أفضل نتيجة: ') + _gameBest('simon');
             document.getElementById('simon-overlay-end').classList.add('active');
+        }
+
+        // ----- Game 3: شد الحبل (Tug of War, 2 players) -----
+        let _towState = null;
+        function _resetTowScreen() {
+            document.getElementById('tow-overlay-start').classList.add('active');
+            document.getElementById('tow-overlay-end').classList.remove('active');
+            document.getElementById('tow-timer').textContent = '12';
+            document.getElementById('tow-marker').style.left = '50%';
+        }
+        function _stopTowGame() { if (_towState && _towState.interval) clearInterval(_towState.interval); _towState = null; }
+        window.startTowGame = function() {
+            document.getElementById('tow-overlay-start').classList.remove('active');
+            document.getElementById('tow-overlay-end').classList.remove('active');
+            _stopTowGame();
+            const DURATION = 12;
+            _towState = { score1: 0, score2: 0, limit: 20, timeLeft: DURATION, finished: false, interval: null };
+            document.getElementById('tow-marker').style.left = '50%';
+            document.getElementById('tow-timer').textContent = DURATION;
+            _towState.interval = setInterval(() => {
+                if (!_towState || _towState.finished) return;
+                _towState.timeLeft -= 1;
+                document.getElementById('tow-timer').textContent = Math.max(_towState.timeLeft, 0);
+                if (_towState.timeLeft <= 0) {
+                    const winner = _towState.score1 === _towState.score2 ? 0 : (_towState.score1 > _towState.score2 ? 1 : 2);
+                    _finishTow(winner);
+                }
+            }, 1000);
+        };
+        window.towTap = function(player) {
+            if (!_towState || _towState.finished) return;
+            if (player === 1) _towState.score1++; else _towState.score2++;
+            const diff = _towState.score1 - _towState.score2;
+            const pct = Math.max(-1, Math.min(1, diff / _towState.limit));
+            document.getElementById('tow-marker').style.left = (50 + pct * 45) + '%';
+            if (diff >= _towState.limit) _finishTow(1);
+            else if (diff <= -_towState.limit) _finishTow(2);
+        };
+        function _finishTow(winner) {
+            if (!_towState || _towState.finished) return;
+            _towState.finished = true;
+            if (_towState.interval) clearInterval(_towState.interval);
+            const title = document.getElementById('tow-result-title');
+            const scoreEl = document.getElementById('tow-result-score');
+            title.textContent = winner === 0 ? '🤝 تعادل!' : ('🏆 لاعب ' + winner + ' كسب!');
+            scoreEl.textContent = `لاعب 1: ${_towState.score1} ضغطة — لاعب 2: ${_towState.score2} ضغطة`;
+            document.getElementById('tow-overlay-end').classList.add('active');
+        }
+
+        // ----- Game 4/5: سباق الضغط / معركة الأزرار (Tap Race, 3 or 4 players) -----
+        let _raceState = null;
+        function _resetRaceScreen(n) {
+            const prefix = 'race' + n;
+            document.getElementById(prefix + '-overlay-start').classList.add('active');
+            document.getElementById(prefix + '-overlay-end').classList.remove('active');
+            for (let i = 1; i <= n; i++) {
+                const fill = document.getElementById(prefix + '-fill-' + i);
+                const pct = document.getElementById(prefix + '-pct-' + i);
+                if (fill) fill.style.height = '0%';
+                if (pct) pct.textContent = '0%';
+            }
+        }
+        function _stopRaceGame() { _raceState = null; }
+        window.startRaceGame = function(n) {
+            const prefix = 'race' + n;
+            document.getElementById(prefix + '-overlay-start').classList.remove('active');
+            document.getElementById(prefix + '-overlay-end').classList.remove('active');
+            const progress = {};
+            for (let i = 1; i <= n; i++) progress[i] = 0;
+            _raceState = { n, prefix, progress, finished: false };
+            _resetRaceScreen(n);
+        };
+        window.raceTap = function(n, idx) {
+            if (!_raceState || _raceState.n !== n || _raceState.finished) return;
+            const prefix = _raceState.prefix;
+            _raceState.progress[idx] = Math.min(100, _raceState.progress[idx] + 4);
+            const fill = document.getElementById(prefix + '-fill-' + idx);
+            const pct = document.getElementById(prefix + '-pct-' + idx);
+            if (fill) fill.style.height = _raceState.progress[idx] + '%';
+            if (pct) pct.textContent = _raceState.progress[idx] + '%';
+            if (_raceState.progress[idx] >= 100) _finishRace(idx);
+        };
+        function _finishRace(winnerIdx) {
+            if (!_raceState || _raceState.finished) return;
+            _raceState.finished = true;
+            const prefix = _raceState.prefix;
+            document.getElementById(prefix + '-result-title').textContent = '🏆 لاعب ' + winnerIdx + ' كسب!';
+            document.getElementById(prefix + '-overlay-end').classList.add('active');
         }
 
         async function loadConversationsList() {
