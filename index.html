@@ -1124,6 +1124,36 @@
         .directory-search:focus { border-color: rgba(192,38,211,0.4); }
         .directory-hint { color: var(--text-dim); font-size: 11.5px; line-height: 1.7; margin: 0 0 10px; }
         .directory-list { max-height: 340px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; margin-bottom: 4px; }
+        .directory-skel-row { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 10px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); }
+        .directory-skel-avatar { width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0; }
+        .directory-skel-lines { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+        .directory-skel-line { height: 10px; border-radius: 5px; width: 60%; }
+        .directory-skel-line.w2 { width: 35%; }
+        .directory-skel-avatar, .directory-skel-line {
+            background: linear-gradient(100deg, rgba(255,255,255,0.045) 30%, rgba(255,255,255,0.11) 50%, rgba(255,255,255,0.045) 70%);
+            background-size: 200% 100%;
+            animation: shimmer 1.4s ease-in-out infinite;
+        }
+        .directory-retry-box { text-align: center; padding: 22px 10px; }
+        .directory-retry-box p { color: #ff9a9a; font-size: 12.5px; margin-bottom: 12px; line-height: 1.6; }
+        .directory-retry-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: var(--grad);
+            border: none;
+            border-radius: 10px;
+            color: #0a0814;
+            font-size: 12.5px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 6px 20px -6px rgba(192,38,211,0.6);
+            transition: transform .15s;
+        }
+        .directory-retry-btn:hover { transform: translateY(-1px); }
+        .directory-retry-btn:active { transform: translateY(0); }
+        .directory-retrying-box { text-align: center; padding: 18px 10px; color: var(--text-dim); font-size: 12px; }
         .directory-item {
             display: flex; align-items: center; gap: 10px; padding: 8px 10px;
             background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
@@ -3440,14 +3470,39 @@
             } catch (e) { showToast('❌ خطأ: ' + e.message, '#ff7a7a'); }
         };
 
+        function _directorySkeletonHtml() {
+            let html = '';
+            for (let i = 0; i < 4; i++) {
+                html += `<div class="directory-skel-row">
+                    <div class="directory-skel-avatar"></div>
+                    <div class="directory-skel-lines"><div class="directory-skel-line"></div><div class="directory-skel-line w2"></div></div>
+                </div>`;
+            }
+            return html;
+        }
+
         // Builds one combined view of: everyone who's ever logged in (`users`) +
         // who's currently an admin (`admins`) + who's currently suspended (`suspendedUsers`).
         // Feeds both the "admins" tab (role picker) and the "accounts" tab (ban toggle).
-        window.renderUsersDirectory = async function() {
+        // Retries automatically on connection hiccups (Firestore's local cache/network
+        // sometimes takes a moment to settle after opening the admin panel), so the
+        // person doesn't have to close and reopen the panel to get the list to show.
+        window.renderUsersDirectory = async function(_attempt = 1) {
             if (!S.isMainAdmin) return;
             const adminsList = document.getElementById('admin-directory-list');
             const accountsList = document.getElementById('accounts-list');
             if (!adminsList && !accountsList) return;
+
+            if (_attempt === 1) {
+                const skel = _directorySkeletonHtml();
+                if (adminsList) adminsList.innerHTML = skel;
+                if (accountsList) accountsList.innerHTML = skel;
+            } else {
+                const retryingHtml = `<div class="directory-retrying-box"><span class="spinner-ring light"></span> جاري إعادة المحاولة (${_attempt}/4)...</div>`;
+                if (adminsList) adminsList.innerHTML = retryingHtml;
+                if (accountsList) accountsList.innerHTML = retryingHtml;
+            }
+
             try {
                 const [usersSnap, adminsSnap, suspendedSnap] = await Promise.all([
                     getDocs(collection(db, 'users')),
@@ -3474,8 +3529,17 @@
                 if (adminsList) _renderAdminDirectory(directory);
                 if (accountsList) _renderAccountsDirectory(directory);
             } catch (e) {
-                console.error('renderUsersDirectory error:', e);
-                const errHtml = `<p class="directory-empty">⚠️ تعذر تحميل قائمة الحسابات — تأكد من صلاحيات Firestore</p>`;
+                console.error('renderUsersDirectory error (attempt ' + _attempt + '):', e);
+                // Auto-retry up to 3 times with increasing delay (network/cache hiccups
+                // usually resolve within a second or two).
+                if (_attempt < 4) {
+                    setTimeout(() => renderUsersDirectory(_attempt + 1), 1200 * _attempt);
+                    return;
+                }
+                const errHtml = `<div class="directory-retry-box">
+                    <p>⚠️ تعذر الاتصال بالسيرفر لتحميل قائمة الحسابات</p>
+                    <button class="directory-retry-btn" onclick="renderUsersDirectory()">🔄 إعادة المحاولة</button>
+                </div>`;
                 if (adminsList) adminsList.innerHTML = errHtml;
                 if (accountsList) accountsList.innerHTML = errHtml;
             }
