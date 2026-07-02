@@ -1268,7 +1268,7 @@
         .player-count-card:active { transform: translateY(0); }
         .player-count-icon { font-size: 30px; margin-bottom: 10px; filter: drop-shadow(0 4px 10px rgba(192,38,211,0.5)); }
         .player-count-label { color: var(--bright); font-size: 15px; font-weight: 800; font-family: 'Rajdhani', sans-serif; letter-spacing: .3px; }
-        .games-hub-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 2px; flex-wrap: wrap; }
+        .games-hub-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 2px; }
         .games-hub-change-btn {
             display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
             background: var(--surface); border: 1px solid var(--border); border-radius: 9px;
@@ -1496,19 +1496,6 @@
         .btn-confirm { border: none; border-radius: 10px; padding: 10px 26px; font-size: 13px; font-weight: 900; cursor: pointer; -webkit-tap-highlight-color: transparent; }
         .btn-confirm.green { background: var(--grad); color: #0a0814; }
         .btn-confirm.blue { background: linear-gradient(135deg, #ff2d87, #ffb020); color: #0a0814; }
-
-        .modal-textarea { min-height: 150px; resize: vertical; font-family: 'Courier New', monospace; font-size: 12px; line-height: 1.5; direction: ltr; text-align: left; }
-        .modal-players-chips { display: flex; gap: 8px; }
-        .modal-players-chip { flex: 1; padding: 9px 0; text-align: center; border-radius: 9px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 13px; font-weight: 800; cursor: pointer; -webkit-tap-highlight-color: transparent; }
-        .modal-players-chip.active { background: rgba(192, 38, 211, 0.18); border-color: rgba(192, 38, 211, 0.5); color: #e6a8ff; }
-        .modal-file-btn { display: flex; align-items: center; justify-content: center; gap: 6px; background: var(--surface); border: 1px dashed var(--border); border-radius: 10px; padding: 10px 14px; color: var(--text); font-size: 12.5px; cursor: pointer; width: 100%; margin-bottom: 10px; -webkit-tap-highlight-color: transparent; }
-        .modal-file-btn:hover { border-color: rgba(192, 38, 211, 0.4); }
-        .modal-hint { color: var(--text-dim); font-size: 11px; margin-top: 6px; line-height: 1.6; }
-        .add-game-btn {
-            display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
-            background: linear-gradient(120deg, #7c3aed, #c026d3, #ff2d87); border: none; border-radius: 9px;
-            color: #0a0814; font-size: 12.5px; font-weight: 900; padding: 8px 14px; cursor: pointer;
-        }
 
         /* ===== PLAYER ===== */
         #player-modal {
@@ -2556,7 +2543,6 @@
                 <div class="games-hub-header">
                     <p class="directory-hint" id="games-hub-hint" style="margin:0">ألعاب حصرية على GAMEVERSE — العب لوحدك وحاول تكسر رقمك القياسي</p>
                     <button class="games-hub-change-btn" onclick="openGamesPlayerSelect()">🔁 غيّر العدد</button>
-                    <button id="add-game-btn" class="add-game-btn" style="display:none" onclick="openAddGameModal()">➕ إضافة لعبة</button>
                 </div>
                 <div class="games-hub-grid" id="games-hub-grid">
                     <div class="game-hub-card" data-players="1" onclick="openGame('meteor')">
@@ -2786,59 +2772,8 @@
                 </div>
             </div>
 
-            <!-- Custom admin-added game player -->
-            <div class="game-play-wrap" id="game-play-custom">
-                <div class="game-back-row">
-                    <button class="game-back-btn" onclick="closeGame()">‹ رجوع للألعاب</button>
-                    <div class="game-hud">
-                        <button class="games-hub-change-btn admin-only-btn" id="custom-game-delete-btn" style="display:none" onclick="deleteCustomGame()">🗑 حذف</button>
-                    </div>
-                </div>
-                <div class="game-canvas-wrap" style="padding:0; touch-action:auto;">
-                    <iframe id="custom-game-frame" style="width:100%; height:100%; border:0; display:block; background:#0a0814;" sandbox="allow-scripts allow-pointer-lock allow-forms allow-modals" allow="autoplay"></iframe>
-                </div>
-            </div>
-
         </div>
     </div>
-
-    <!-- ===== ADD GAME MODAL ===== -->
-    <div id="add-game-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeAddGameModal()">
-        <div class="modal-box">
-            <h2 class="modal-title">🎮 إضافة لعبة جديدة</h2>
-            <div class="modal-field">
-                <label class="modal-label">اسم اللعبة *</label>
-                <input id="add-game-title" class="modal-input" type="text" placeholder="اسم اللعبة" oninput="clearAddGameError()" />
-            </div>
-            <div class="modal-field">
-                <label class="modal-label">الوصف (اختياري)</label>
-                <input id="add-game-desc" class="modal-input" type="text" placeholder="وصف قصير عن اللعبة..." />
-            </div>
-            <div class="modal-field">
-                <label class="modal-label">عدد اللاعبين *</label>
-                <div class="modal-players-chips" id="add-game-players-chips">
-                    <div class="modal-players-chip" data-val="1" onclick="setAddGamePlayers(1)">1</div>
-                    <div class="modal-players-chip" data-val="2" onclick="setAddGamePlayers(2)">2</div>
-                    <div class="modal-players-chip" data-val="3" onclick="setAddGamePlayers(3)">3</div>
-                    <div class="modal-players-chip" data-val="4" onclick="setAddGamePlayers(4)">4</div>
-                </div>
-            </div>
-            <div class="modal-field">
-                <label class="modal-label">كود اللعبة *</label>
-                <label class="modal-file-btn">📁 اختر ملف اللعبة (HTML)
-                    <input type="file" accept=".html,.htm,text/html" id="add-game-file" style="display:none" onchange="handleGameFileUpload(event)" />
-                </label>
-                <textarea id="add-game-code" class="modal-input modal-textarea" placeholder="الصق هنا كود صفحة الـ HTML بتاع اللعبة، أو اختار ملف من فوق" oninput="clearAddGameError()"></textarea>
-                <p class="modal-hint">لازم يكون ملف HTML كامل وقائم بذاته (فيه كل الـ CSS والـ JS جوه نفس الملف) — هيشتغل جوه المنصة زي أي صفحة لوحدها.</p>
-            </div>
-            <p id="add-game-error" class="modal-error"></p>
-            <div class="modal-btns">
-                <button class="btn-cancel" onclick="closeAddGameModal()">إلغاء</button>
-                <button class="btn-confirm green" id="add-game-confirm-btn" onclick="submitAddGame()">إضافة ✓</button>
-            </div>
-        </div>
-    </div>
-
 
     <!-- ===== FRIEND-TO-FRIEND CHAT MODAL ===== -->
     <div id="friend-chat-modal">
@@ -3078,9 +3013,6 @@
             followingCount: 0,
             membersDirectory: [],
             gamesPlayerCount: null,
-            customGames: [],
-            addGamePlayers: 1,
-            currentCustomGameId: null,
         };
 
         // ===== HELPERS =====
@@ -4732,9 +4664,6 @@
         window.closeGamesModal = function() {
             _stopMeteorGame();
             _stopSimonGame();
-            _stopTowGame();
-            _stopRaceGame();
-            _stopCustomGame();
             document.getElementById('games-modal').style.display = 'none';
             document.body.style.overflow = '';
         };
@@ -4749,7 +4678,6 @@
             document.getElementById('games-hub').style.display = 'block';
             const hint = document.getElementById('games-hub-hint');
             if (hint) hint.textContent = `بتدور على ألعاب لـ ${_playerCountLabels[n] || n}`;
-            renderCustomGameCards();
             const cards = [...document.querySelectorAll('#games-hub-grid .game-hub-card')];
             let visibleCount = 0;
             cards.forEach(card => {
@@ -4776,142 +4704,9 @@
             _stopSimonGame();
             _stopTowGame();
             _stopRaceGame();
-            _stopCustomGame();
             document.querySelectorAll('.game-play-wrap').forEach(w => w.classList.remove('active'));
             document.getElementById('games-hub').style.display = 'block';
             _updateGameHubBests();
-        };
-
-        // ----- Admin-added custom games -----
-        function renderCustomGameCards() {
-            const grid = document.getElementById('games-hub-grid');
-            if (!grid) return;
-            grid.querySelectorAll('.custom-game-card').forEach(el => el.remove());
-            S.customGames.forEach(g => {
-                const card = document.createElement('div');
-                card.className = 'game-hub-card custom-game-card';
-                card.dataset.players = String(g.players || 1);
-                card.onclick = () => openCustomGame(g.id);
-                const label = g.players === 1 ? 'لاعب واحد' : (g.players === 2 ? 'لاعبين اتنين' : (g.players === 3 ? 'تلات لاعبين' : 'أربع لاعبين'));
-                card.innerHTML = `
-                    <span class="game-hub-badge">🛠️ من الأدمن</span>
-                    <div class="game-hub-icon">🎮</div>
-                    <div class="game-hub-title">${_escapeHtml(g.title || 'لعبة')}</div>
-                    <div class="game-hub-desc">${_escapeHtml(g.description || '')}</div>
-                    <div class="game-hub-meta">
-                        <span class="game-hub-best">${label}</span>
-                        <span class="game-hub-play">العب الآن ›</span>
-                    </div>`;
-                grid.appendChild(card);
-            });
-        }
-        window.openCustomGame = function(gameId) {
-            const g = S.customGames.find(g => g.id === gameId);
-            if (!g) return;
-            S.currentCustomGameId = gameId;
-            document.getElementById('games-hub').style.display = 'none';
-            document.querySelectorAll('.game-play-wrap').forEach(w => w.classList.remove('active'));
-            document.getElementById('game-play-custom').classList.add('active');
-            document.getElementById('custom-game-delete-btn').style.display = S.isAdmin ? 'inline-flex' : 'none';
-            const frame = document.getElementById('custom-game-frame');
-            frame.srcdoc = g.code || '';
-        };
-        function _stopCustomGame() {
-            const frame = document.getElementById('custom-game-frame');
-            if (frame) frame.srcdoc = '';
-            S.currentCustomGameId = null;
-        }
-        window.deleteCustomGame = async function() {
-            const gameId = S.currentCustomGameId;
-            if (!gameId || !S.isAdmin) return;
-            if (!confirm('تحذف اللعبة دي نهائياً؟')) return;
-            try {
-                await deleteDoc(doc(db, 'games', gameId));
-                S.customGames = S.customGames.filter(g => g.id !== gameId);
-                closeGame();
-                renderCustomGameCards();
-                showToast('🗑 تم حذف اللعبة');
-            } catch (e) { alert('خطأ: ' + e.message); }
-        };
-
-        async function loadCustomGames() {
-            try {
-                const q = query(collection(db, 'games'), orderBy('createdAt', 'desc'));
-                const snap = await getDocs(q);
-                S.customGames = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-            } catch {
-                try {
-                    const snap = await getDocs(collection(db, 'games'));
-                    S.customGames = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-                } catch { S.customGames = []; }
-            }
-        }
-
-        // ----- Add game modal (admin) -----
-        window.openAddGameModal = function() {
-            document.getElementById('add-game-modal').style.display = 'flex';
-            document.body.style.overflow = 'hidden';
-            document.getElementById('add-game-title').value = '';
-            document.getElementById('add-game-desc').value = '';
-            document.getElementById('add-game-code').value = '';
-            document.getElementById('add-game-file').value = '';
-            setAddGamePlayers(1);
-            clearAddGameError();
-        };
-        window.closeAddGameModal = function() {
-            document.getElementById('add-game-modal').style.display = 'none';
-            document.body.style.overflow = '';
-        };
-        window.clearAddGameError = function() {
-            const el = document.getElementById('add-game-error');
-            el.textContent = '';
-            el.style.display = 'none';
-        };
-        function showAddGameError(msg) {
-            const el = document.getElementById('add-game-error');
-            el.textContent = msg;
-            el.style.display = 'block';
-        }
-        window.setAddGamePlayers = function(n) {
-            S.addGamePlayers = n;
-            document.querySelectorAll('#add-game-players-chips .modal-players-chip').forEach(chip => {
-                chip.classList.toggle('active', parseInt(chip.dataset.val, 10) === n);
-            });
-        };
-        window.handleGameFileUpload = function(event) {
-            const file = event.target.files && event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = () => {
-                document.getElementById('add-game-code').value = reader.result || '';
-                clearAddGameError();
-                const titleEl = document.getElementById('add-game-title');
-                if (!titleEl.value.trim()) titleEl.value = file.name.replace(/\.(html?|htm)$/i, '');
-            };
-            reader.onerror = () => showAddGameError('تعذّرت قراءة الملف');
-            reader.readAsText(file);
-        };
-        window.submitAddGame = async function() {
-            const title = (document.getElementById('add-game-title').value || '').trim();
-            const desc = (document.getElementById('add-game-desc').value || '').trim();
-            const code = (document.getElementById('add-game-code').value || '').trim();
-            const players = S.addGamePlayers || 1;
-            if (!title) { showAddGameError('أدخل اسم اللعبة'); return; }
-            if (!code) { showAddGameError('ارفع ملف اللعبة أو الصق كودها'); return; }
-            const gameData = { title, description: desc, players, code, createdAt: new Date() };
-            const btn = document.getElementById('add-game-confirm-btn');
-            btn.disabled = true;
-            btn.textContent = '⏳...';
-            try {
-                const ref = await addDoc(collection(db, 'games'), gameData);
-                S.customGames.unshift({ id: ref.id, ...gameData });
-                closeAddGameModal();
-                showToast('✅ تم إضافة اللعبة');
-                renderCustomGameCards();
-                if (S.gamesPlayerCount) selectGamesPlayerCount(S.gamesPlayerCount);
-            } catch (e) { showAddGameError('خطأ: ' + e.message); }
-            btn.disabled = false;
-            btn.textContent = 'إضافة ✓';
         };
 
         // ----- Game 1: صياد النيازك (Meteor Hunter) -----
@@ -5771,8 +5566,6 @@
                 roleSpan.style.borderColor = isAdmin ? 'rgba(255,176,32,0.2)' : 'rgba(168,85,247,0.2)';
             }
             document.getElementById('add-video-btn').style.display = isAdmin ? 'block' : 'none';
-            const addGameBtn = document.getElementById('add-game-btn');
-            if (addGameBtn) addGameBtn.style.display = isAdmin ? 'inline-flex' : 'none';
             // Panel states
             const loading = fbLoading && !isAdmin && !isBlocked;
             const noAdmin = !fbLoading && !adminExists && !isAdmin && !isBlocked;
@@ -5820,7 +5613,6 @@
 
         // ===== INIT =====
         loadVideos();
-        loadCustomGames();
 
         getRedirectResult(auth).then(async result => {
             if (result && result.user) {
