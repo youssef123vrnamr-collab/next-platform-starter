@@ -1897,16 +1897,6 @@
             </div>
             <div class="menu-panel-body">
 
-                <!-- User info card -->
-                <div class="menu-user-info" id="menu-user-info-card" onclick="openProfileModal()">
-                    <img id="menu-user-avatar" src="" alt="" onerror="this.style.display='none'" />
-                    <div>
-                        <div class="menu-user-name" id="menu-user-name-text">مستخدم</div>
-                        <div class="menu-user-role" id="menu-user-role-text">عادي</div>
-                        <div class="menu-edit-hint">✏ اضغط لتعديل الملف الشخصي</div>
-                    </div>
-                </div>
-
                 <div class="menu-section-title">التنقل</div>
 
                 <a class="menu-nav-item" href="#hero" onclick="closeMenuPanel()">
@@ -4234,12 +4224,6 @@
             const panel = document.getElementById('menu-panel');
             const ov = document.getElementById('menu-overlay');
             if (S.user) {
-                const img = document.getElementById('menu-user-avatar');
-                const url = currentAvatarUrl();
-                if (url) { setImgWithFallback(img, url, () => { img.style.display = 'none'; }); }
-                else { img.style.display = 'none'; }
-                document.getElementById('menu-user-name-text').textContent = S.userProfile?.displayName || S.user.displayName || 'مستخدم';
-                document.getElementById('menu-user-role-text').textContent = S.isAdmin ? (S.isMainAdmin ? '👑 مشرف رئيسي' : '🔑 مشرف عادي') : '👤 مستخدم';
                 document.getElementById('menu-admin-section').style.display = S.isAdmin ? 'block' : 'none';
                 document.getElementById('menu-add-admin-btn').style.display = S.isMainAdmin ? '' : 'none';
                 document.getElementById('menu-accounts-btn').style.display = S.isMainAdmin ? '' : 'none';
