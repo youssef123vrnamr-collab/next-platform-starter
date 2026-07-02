@@ -1413,9 +1413,9 @@
         }
         .profile-fs-avatar-wrap {
             position: absolute;
-            bottom: -44px;
+            top: 50%;
             left: 50%;
-            transform: translateX(-50%);
+            transform: translate(-50%, -50%);
             z-index: 2;
         }
         .profile-fs-avatar-wrap img, .profile-avatar-initials {
@@ -1436,7 +1436,7 @@
             font-weight: 900;
             color: #0a0814;
         }
-        .profile-fs-body { padding: 60px 20px 30px; max-width: 520px; margin: 0 auto; width: 100%; flex: 1; }
+        .profile-fs-body { padding: 20px 20px 30px; max-width: 520px; margin: 0 auto; width: 100%; flex: 1; }
         .profile-fs-userinfo { text-align: center; margin-bottom: 26px; }
         .profile-fs-username { color: var(--bright); font-size: 20px; font-weight: 700; margin-bottom: 4px; }
         .profile-fs-userrole { font-size: 12px; color: var(--text-dim); }
@@ -1944,9 +1944,6 @@
                     </div>
                     <div class="menu-nav-item" onclick="openAdminPanel('admin-comments')">
                         <span class="menu-nav-icon">💬</span> التعليقات
-                    </div>
-                    <div class="menu-nav-item" onclick="closeMenuPanel();openWaChat()">
-                        <span class="menu-nav-icon">📨</span> صندوق رسائل المستخدمين
                     </div>
                 </div>
 
@@ -3964,6 +3961,7 @@
         // before they've replied), text, timestamp }.
         function _convId(a, b) { return [a, b].sort().join('_'); }
 
+        let _suspensionUnsub = null;
         let _friendChatUnsub = null;
         let _friendChatCid = null;
         let _friendChatWith = null; // { uid, name, photo }
@@ -4504,6 +4502,7 @@
         window.handleSignOut = async function() {
             _teardownWaChat();
             if (_friendChatUnsub) { _friendChatUnsub(); _friendChatUnsub = null; }
+            if (_suspensionUnsub) { _suspensionUnsub(); _suspensionUnsub = null; }
             await signOut(auth);
             S.user = null;
             S.isAdmin = false;
@@ -4568,6 +4567,28 @@
                         await signOut(auth);
                         return;
                     }
+                    // Watch this account's suspension status LIVE. If an admin suspends this
+                    // exact user while they're already using the platform, this fires
+                    // immediately (no refresh/re-login needed) and kicks them out right away.
+                    if (_suspensionUnsub) { _suspensionUnsub(); _suspensionUnsub = null; }
+                    _suspensionUnsub = onSnapshot(doc(db, 'suspendedUsers', fbUser.uid), async (snap) => {
+                        if (snap.exists()) {
+                            S.isSuspended = true;
+                            S.user = null;
+                            S.isAdmin = false;
+                            S.isMainAdmin = false;
+                            document.getElementById('app').style.display = 'none';
+                            document.getElementById('login-screen').style.display = 'none';
+                            document.getElementById('suspended-screen').style.display = 'flex';
+                            closePanel();
+                            closeMenuPanel();
+                            _teardownWaChat();
+                            if (_friendChatUnsub) { _friendChatUnsub(); _friendChatUnsub = null; }
+                            if (_suspensionUnsub) { _suspensionUnsub(); _suspensionUnsub = null; }
+                            await signOut(auth);
+                        }
+                    });
+
                     // Keep a lightweight directory of every account that has ever logged in.
                     // This is what powers "كل الحسابات" in the admin/accounts management UI —
                     // without it, the admin panel could only ever see people who happened to
