@@ -849,6 +849,21 @@
         .comment-reply-preview-close:hover { opacity: 1; color: #ff7a7a; }
         #comment-input-wrap.editing input { border-color: #ffc862; }
         #comment-input-wrap.editing .comment-send-btn { background: linear-gradient(120deg,#ffc862,#ffb020); }
+        .comments-toggle-btn {
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+            width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.09);
+            color: var(--bright); font-weight: 700; font-size: 13.5px; font-family: inherit;
+            padding: 11px 14px; border-radius: 12px; cursor: pointer; transition: background .2s, border-color .2s;
+        }
+        .comments-toggle-btn:hover { background: rgba(255,255,255,0.09); border-color: rgba(192,38,211,0.3); }
+        .comments-toggle-count { color: var(--text-dim); font-weight: 600; }
+        .player-comments-body { margin-top: 10px; animation: commentFadeIn .2s ease; }
+        .comment-reply-quote {
+            display: block; background: rgba(255,255,255,0.05); border-right: 3px solid var(--violet);
+            border-radius: 6px; padding: 5px 9px; margin-bottom: 6px; font-size: 12px; line-height: 1.5;
+        }
+        .comment-reply-quote-name { color: var(--violet); font-weight: 700; margin-left: 5px; }
+        .comment-reply-quote-text { color: var(--text-dim); }
 
         /* ===== ADMIN ACTIONS ===== */
         .admin-actions { padding-top: 11px; border-top: 1px solid var(--border); display: none; gap: 7px; flex-wrap: wrap; margin-top: 11px; }
@@ -2841,16 +2856,20 @@
                     </div>
                 </div>
                 <div class="player-comments" id="player-comments">
-                    <div class="comments-title">💬 تعليقات</div>
-                    <div id="player-comments-list"></div>
-                    <div class="comment-reply-preview" id="comment-reply-preview" style="display:none">
-                        <div class="comment-reply-preview-bar"></div>
-                        <span class="comment-reply-preview-text" id="comment-reply-preview-text"></span>
-                        <button class="comment-reply-preview-close" onclick="cancelPlayerCommentEdit()">✕</button>
-                    </div>
-                    <div class="comment-input-wrap" id="comment-input-wrap">
-                        <input id="player-comment-input" type="text" placeholder="اكتب تعليقاً..." onkeydown="if(event.key==='Enter')submitPlayerComment()" />
-                        <button class="comment-send-btn" id="comment-send-btn" onclick="submitPlayerComment()">إرسال</button>
+                    <button class="comments-toggle-btn" id="comments-toggle-btn" onclick="togglePlayerComments()">
+                        💬 عرض التعليقات <span class="comments-toggle-count" id="comments-toggle-count">(0)</span>
+                    </button>
+                    <div class="player-comments-body" id="player-comments-body" style="display:none">
+                        <div id="player-comments-list"></div>
+                        <div class="comment-reply-preview" id="comment-reply-preview" style="display:none">
+                            <div class="comment-reply-preview-bar"></div>
+                            <span class="comment-reply-preview-text" id="comment-reply-preview-text"></span>
+                            <button class="comment-reply-preview-close" onclick="cancelPlayerCommentEdit()">✕</button>
+                        </div>
+                        <div class="comment-input-wrap" id="comment-input-wrap">
+                            <input id="player-comment-input" type="text" placeholder="اكتب تعليقاً..." onkeydown="if(event.key==='Enter')submitPlayerComment()" />
+                            <button class="comment-send-btn" id="comment-send-btn" onclick="submitPlayerComment()">إرسال</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -3376,6 +3395,9 @@
 
         // ===== COMMENTS =====
         let _playerCommentEditIdx = null; // index of comment currently being edited (chat-style, under the video)
+        let _playerCommentReplyTo = null; // {uid, name, text} of the comment being replied to
+        let _commentLongPressTimer = null;
+        let _playerCommentsUnsub = null; // live listener for real-time comments while the section is open
 
         window.submitPlayerComment = async function() {
             if (!S.user) { showToast('🔑 سجّل دخولك أولاً', '#ffb020'); return; }
@@ -3411,8 +3433,11 @@
                     text,
                     timestamp: new Date()
                 };
+                if (_playerCommentReplyTo) comment.replyTo = _playerCommentReplyTo;
                 await updateDoc(doc(db, 'videos', videoId), { comments: arrayUnion(comment) });
                 input.value = '';
+                _playerCommentReplyTo = null;
+                document.getElementById('comment-reply-preview').style.display = 'none';
                 const comments = v.comments || []; comments.push(comment); v.comments = comments;
                 renderPlayerComments(v);
                 renderVideos();
@@ -3424,6 +3449,7 @@
             const v = S.videos.find(v => v.id === S.playerVideoId);
             if (!v || !v.comments || !v.comments[idx]) return;
             _playerCommentEditIdx = idx;
+            _playerCommentReplyTo = null;
             document.getElementById('comment-reply-preview-text').textContent = 'بتعدّل تعليقك';
             document.getElementById('comment-reply-preview').style.display = 'flex';
             const input = document.getElementById('player-comment-input');
@@ -3434,15 +3460,74 @@
 
         window.cancelPlayerCommentEdit = function() {
             _playerCommentEditIdx = null;
+            _playerCommentReplyTo = null;
             document.getElementById('comment-reply-preview').style.display = 'none';
             document.getElementById('comment-input-wrap').classList.remove('editing');
             document.getElementById('player-comment-input').value = '';
         };
 
+        // ===== Reply-to-comment (long press) =====
+        window.startCommentLongPress = function(idx) {
+            clearTimeout(_commentLongPressTimer);
+            _commentLongPressTimer = setTimeout(() => {
+                startReplyToComment(idx);
+                if (navigator.vibrate) navigator.vibrate(25);
+            }, 500);
+        };
+
+        window.cancelCommentLongPress = function() {
+            clearTimeout(_commentLongPressTimer);
+        };
+
+        function startReplyToComment(idx) {
+            const v = S.videos.find(v => v.id === S.playerVideoId);
+            if (!v || !v.comments || !v.comments[idx]) return;
+            _playerCommentEditIdx = null;
+            document.getElementById('comment-input-wrap').classList.remove('editing');
+            const c = v.comments[idx];
+            const shortText = (c.text || '').length > 100 ? c.text.slice(0, 100) + '…' : (c.text || '');
+            _playerCommentReplyTo = { uid: c.uid || '', name: c.name || 'مستخدم', text: shortText };
+            document.getElementById('comment-reply-preview-text').textContent = `↩️ الرد على ${_playerCommentReplyTo.name}: ${_playerCommentReplyTo.text}`;
+            document.getElementById('comment-reply-preview').style.display = 'flex';
+            document.getElementById('player-comment-input').focus();
+        }
+
+        // ===== Show/hide comments + live (real-time) updates =====
+        window.togglePlayerComments = function() {
+            const body = document.getElementById('player-comments-body');
+            const isOpen = body.style.display !== 'none';
+            const videoId = S.playerVideoId;
+            if (isOpen) {
+                body.style.display = 'none';
+                if (_playerCommentsUnsub) { _playerCommentsUnsub(); _playerCommentsUnsub = null; }
+                return;
+            }
+            body.style.display = 'block';
+            if (!videoId) return;
+            const v = S.videos.find(v => v.id === videoId);
+            if (v) renderPlayerComments(v);
+            if (_playerCommentsUnsub) { _playerCommentsUnsub(); _playerCommentsUnsub = null; }
+            _playerCommentsUnsub = onSnapshot(doc(db, 'videos', videoId), snap => {
+                if (!snap.exists()) return;
+                const data = snap.data();
+                const vv = S.videos.find(v => v.id === videoId);
+                if (!vv) return;
+                vv.comments = data.comments || [];
+                renderPlayerComments(vv);
+                updateCommentsToggleCount(vv);
+            });
+        };
+
+        function updateCommentsToggleCount(v) {
+            const el = document.getElementById('comments-toggle-count');
+            if (el) el.textContent = `(${(v && v.comments ? v.comments.length : 0)})`;
+        }
+
         // Renders comments in chronological order (oldest → newest, top → bottom), like a
         // normal chat, since the input box lives at the bottom — not reversed like YouTube.
         function renderPlayerComments(v) {
             const list = document.getElementById('player-comments-list');
+            updateCommentsToggleCount(v);
             if (!v || !v.comments || v.comments.length === 0) {
                 list.innerHTML = `<p style="color:var(--text-dim);font-size:13px;padding:8px 0">لا توجد تعليقات بعد — كن أول من يعلّق!</p>`;
                 return;
@@ -3451,13 +3536,19 @@
                 const isMine = S.user && c.uid === S.user.uid;
                 const canDelete = S.isAdmin || isMine;
                 const editedTag = c.editedAt ? '<span class="comment-edited-tag">· معدّل</span>' : '';
+                const replyQuoteHtml = c.replyTo ? `
+                        <div class="comment-reply-quote">
+                            <span class="comment-reply-quote-name">${c.replyTo.name || 'مستخدم'}</span>
+                            <span class="comment-reply-quote-text">${c.replyTo.text || ''}</span>
+                        </div>` : '';
                 return `
-                <div class="comment-item ${isMine ? 'own' : ''}">
+                <div class="comment-item ${isMine ? 'own' : ''}" onmousedown="startCommentLongPress(${idx})" onmouseup="cancelCommentLongPress()" onmouseleave="cancelCommentLongPress()" ontouchstart="startCommentLongPress(${idx})" ontouchend="cancelCommentLongPress()" ontouchmove="cancelCommentLongPress()">
                     <div class="comment-avatar">
                         ${avatarImgHtml(c.photo, '')}
                     </div>
                     <div class="comment-body">
                         <div class="comment-name">${c.name||'مستخدم'}</div>
+                        ${replyQuoteHtml}
                         <div class="comment-text">${c.text||''}</div>
                         <div class="comment-time">
                             ${getTimeAgo(c.timestamp)}${editedTag}
@@ -5060,6 +5151,12 @@
             document.getElementById('player-dislike').classList.remove('disliked');
             S.currentUserRating = null;
             if (S.user) checkUserRating(videoId);
+            _playerCommentEditIdx = null;
+            _playerCommentReplyTo = null;
+            document.getElementById('comment-reply-preview').style.display = 'none';
+            document.getElementById('comment-input-wrap').classList.remove('editing');
+            document.getElementById('player-comments-body').style.display = 'none';
+            if (_playerCommentsUnsub) { _playerCommentsUnsub(); _playerCommentsUnsub = null; }
             renderPlayerComments(v);
             document.getElementById('player-modal').style.display = 'flex';
             document.body.style.overflow = 'hidden';
@@ -5071,6 +5168,7 @@
             const container = document.getElementById('player-container');
             container.innerHTML = '';
             S.playerVideoId = null;
+            if (_playerCommentsUnsub) { _playerCommentsUnsub(); _playerCommentsUnsub = null; }
         };
 
         async function checkUserRating(videoId) {
