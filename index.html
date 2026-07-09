@@ -3450,7 +3450,11 @@
                     input.value = '';
                     _playerCommentReplyTo = null;
                     document.getElementById('comment-reply-preview').style.display = 'none';
-                    const comments = v.comments || []; comments.push(comment); v.comments = comments;
+                    // If a live listener is already active (comments panel open), it will pick up
+                    // the new comment on its own — pushing it here too would add it twice locally.
+                    if (!_playerCommentsUnsub) {
+                        const comments = v.comments || []; comments.push(comment); v.comments = comments;
+                    }
                     renderPlayerComments(v);
                     renderVideos();
                     showToast('✅ تم إضافة التعليق');
