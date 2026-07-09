@@ -506,7 +506,11 @@
             pointer-events: none;
             animation: glow-pulse 5s ease-in-out infinite;
             filter: blur(2px);
+            transition: transform .25s ease-out;
+            will-change: transform;
         }
+        .hero-content { transition: transform .25s ease-out; will-change: transform; }
+        .hero-grid { transition: transform .25s ease-out; will-change: transform; }
         .hero-glow-1 {
             width: 560px;
             height: 560px;
@@ -2037,6 +2041,32 @@
             .hero-stats { flex-wrap: wrap; row-gap: 14px; }
             .nav-logo-text { font-size: 17px; }
             #user-badge span { display: none; }
+        }
+        /* ===== LANDSCAPE (phone rotated sideways) =====
+           Targets short-height + wide-ish screens so the mobile layout
+           (not the desktop one) stays active when the phone is tilted,
+           and trims vertical-heavy elements to fit the shorter viewport. */
+        @media(orientation:landscape) and (max-height:500px) {
+            .nav-links { display: none; }
+            #navbar { padding: 0 14px; height: 50px; }
+            #search-section { top: 50px; padding: 8px 14px; }
+            #hero { min-height: 0; padding: 26px 16px 22px; margin-top: 50px; }
+            .hero-title { font-size: clamp(28px, 6vw, 40px); }
+            .hero-sub { font-size: 13px; margin-bottom: 10px; }
+            .hero-stats { gap: 0; margin-top: 10px; }
+            .hero-stat { padding: 0 14px; }
+            .hero-stat-num { font-size: 20px; }
+            .hero-btn { padding: 10px 22px; margin-top: 14px; }
+            .main-content { padding: 0 14px 30px; }
+            .video-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+            #side-panel { width: 62%; max-width: 420px; }
+            #menu-panel { width: 62%; max-width: 420px; }
+            .modal-overlay { align-items: flex-start; padding-top: 16px; }
+            .modal-box { max-height: 92vh; overflow-y: auto; padding: 18px 16px; }
+            .chat-container { height: 180px; }
+            #login-screen .logo { font-size: 28px; margin-bottom: 6px; }
+            .login-card { padding: 18px 24px 16px; max-height: 92vh; overflow-y: auto; }
+            .login-badge { width: 40px; height: 40px; font-size: 18px; }
         }
         /* ===== PROFESSIONAL POLISH LAYER (applies to the app shell only — login screen untouched) ===== */
         #navbar { box-shadow: 0 1px 0 rgba(255,255,255,0.04), 0 12px 30px rgba(0,0,0,0.35); }
@@ -5497,6 +5527,74 @@
         window.deleteWaMsg = deleteWaMsg;
         // Legacy menu shortcuts now route straight to the unified WaChat engine
         window.openUserChatFromMenu = function() { openWaChat(); };
+    </script>
+
+    <script>
+        // ===== HERO TILT / PARALLAX (device orientation) =====
+        (function () {
+            var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            if (reduceMotion) return;
+
+            var hero = document.getElementById('hero');
+            if (!hero) return;
+
+            var glow1 = hero.querySelector('.hero-glow-1');
+            var glow2 = hero.querySelector('.hero-glow-2');
+            var grid = hero.querySelector('.hero-grid');
+            var content = hero.querySelector('.hero-content');
+
+            var enabled = false;
+            var ticking = false;
+            var gammaVal = 0, betaVal = 0;
+
+            function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
+
+            function applyTilt() {
+                ticking = false;
+                // gamma: left/right tilt (-90..90), beta: front/back tilt (-180..180)
+                var gx = clamp(gammaVal, -30, 30) / 30;   // -1..1
+                var gy = clamp(betaVal - 45, -30, 30) / 30; // centered around a natural holding angle
+
+                if (glow1) glow1.style.transform = 'translate(' + (gx * 26) + 'px, ' + (gy * 18) + 'px)';
+                if (glow2) glow2.style.transform = 'translate(' + (gx * -22) + 'px, ' + (gy * -16) + 'px)';
+                if (grid) grid.style.transform = 'translate(' + (gx * 10) + 'px, ' + (gy * 8) + 'px)';
+                if (content) content.style.transform = 'translate(' + (gx * -6) + 'px, ' + (gy * -4) + 'px)';
+            }
+
+            function onOrientation(e) {
+                if (e.gamma === null || e.beta === null) return;
+                gammaVal = e.gamma;
+                betaVal = e.beta;
+                if (!ticking) {
+                    ticking = true;
+                    requestAnimationFrame(applyTilt);
+                }
+            }
+
+            function startListening() {
+                if (enabled) return;
+                enabled = true;
+                window.addEventListener('deviceorientation', onOrientation, true);
+            }
+
+            // iOS 13+ requires an explicit user gesture to grant motion permission
+            var needsPermission = typeof DeviceOrientationEvent !== 'undefined'
+                && typeof DeviceOrientationEvent.requestPermission === 'function';
+
+            if (needsPermission) {
+                var grantOnce = function () {
+                    DeviceOrientationEvent.requestPermission().then(function (state) {
+                        if (state === 'granted') startListening();
+                    }).catch(function () {});
+                    document.removeEventListener('click', grantOnce);
+                    document.removeEventListener('touchend', grantOnce);
+                };
+                document.addEventListener('click', grantOnce, { once: true });
+                document.addEventListener('touchend', grantOnce, { once: true });
+            } else if (typeof DeviceOrientationEvent !== 'undefined') {
+                startListening();
+            }
+        })();
     </script>
 </body>
 </html>
