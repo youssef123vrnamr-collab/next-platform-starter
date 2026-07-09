@@ -3398,9 +3398,15 @@
         let _playerCommentReplyTo = null; // {uid, name, text} of the comment being replied to
         let _commentLongPressTimer = null;
         let _playerCommentsUnsub = null; // live listener for real-time comments while the section is open
+        let _playerCommentSubmitting = false; // guards against double-submit (double-tap / slow network)
+
+        function _genCommentId() {
+            return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+        }
 
         window.submitPlayerComment = async function() {
             if (!S.user) { showToast('🔑 سجّل دخولك أولاً', '#ffb020'); return; }
+            if (_playerCommentSubmitting) return; // ignore extra taps/enters while a send is in flight
             const input = document.getElementById('player-comment-input');
             const text = input.value.trim();
             if (!text) return;
@@ -3409,24 +3415,29 @@
             const v = S.videos.find(v => v.id === videoId);
             if (!v) return;
 
-            // ===== EDIT MODE =====
-            if (_playerCommentEditIdx !== null) {
-                const idx = _playerCommentEditIdx;
-                const comments = (v.comments || []).slice();
-                if (!comments[idx]) { cancelPlayerCommentEdit(); return; }
-                comments[idx] = { ...comments[idx], text, editedAt: new Date() };
-                try {
-                    await updateDoc(doc(db, 'videos', videoId), { comments });
-                    v.comments = comments;
-                    cancelPlayerCommentEdit();
-                    renderPlayerComments(v);
-                    showToast('✅ تم تعديل التعليق');
-                } catch (e) { console.error('Comment edit error:', e); showToast('❌ حدث خطأ', '#ff7a7a'); }
-                return;
-            }
+            _playerCommentSubmitting = true;
+            const sendBtn = document.getElementById('comment-send-btn');
+            if (sendBtn) sendBtn.disabled = true;
 
             try {
+                // ===== EDIT MODE =====
+                if (_playerCommentEditIdx !== null) {
+                    const idx = _playerCommentEditIdx;
+                    const comments = (v.comments || []).slice();
+                    if (!comments[idx]) { cancelPlayerCommentEdit(); return; }
+                    comments[idx] = { ...comments[idx], text, editedAt: new Date() };
+                    try {
+                        await updateDoc(doc(db, 'videos', videoId), { comments });
+                        v.comments = comments;
+                        cancelPlayerCommentEdit();
+                        renderPlayerComments(v);
+                        showToast('✅ تم تعديل التعليق');
+                    } catch (e) { console.error('Comment edit error:', e); showToast('❌ حدث خطأ', '#ff7a7a'); }
+                    return;
+                }
+
                 const comment = {
+                    id: _genCommentId(),
                     uid: S.user.uid,
                     name: (S.userProfile && S.userProfile.displayName) || S.user.displayName || 'مستخدم',
                     photo: currentAvatarUrl(),
@@ -3434,15 +3445,20 @@
                     timestamp: new Date()
                 };
                 if (_playerCommentReplyTo) comment.replyTo = _playerCommentReplyTo;
-                await updateDoc(doc(db, 'videos', videoId), { comments: arrayUnion(comment) });
-                input.value = '';
-                _playerCommentReplyTo = null;
-                document.getElementById('comment-reply-preview').style.display = 'none';
-                const comments = v.comments || []; comments.push(comment); v.comments = comments;
-                renderPlayerComments(v);
-                renderVideos();
-                showToast('✅ تم إضافة التعليق');
-            } catch (e) { console.error('Comment error:', e); showToast('❌ حدث خطأ', '#ff7a7a'); }
+                try {
+                    await updateDoc(doc(db, 'videos', videoId), { comments: arrayUnion(comment) });
+                    input.value = '';
+                    _playerCommentReplyTo = null;
+                    document.getElementById('comment-reply-preview').style.display = 'none';
+                    const comments = v.comments || []; comments.push(comment); v.comments = comments;
+                    renderPlayerComments(v);
+                    renderVideos();
+                    showToast('✅ تم إضافة التعليق');
+                } catch (e) { console.error('Comment error:', e); showToast('❌ حدث خطأ', '#ff7a7a'); }
+            } finally {
+                _playerCommentSubmitting = false;
+                if (sendBtn) sendBtn.disabled = false;
+            }
         };
 
         window.editPlayerComment = function(idx) {
@@ -3574,8 +3590,11 @@
             if (!canDelete) { showToast('❌ لا يمكنك حذف تعليق شخص آخر', '#ff7a7a'); return; }
             if (!confirm('حذف التعليق؟')) return;
             try {
-                await updateDoc(doc(db, 'videos', videoId), { comments: arrayRemove(comment) });
-                v.comments.splice(commentIdx, 1);
+                const newComments = comment.id
+                    ? v.comments.filter(c => c.id !== comment.id)
+                    : v.comments.filter((c, i) => i !== commentIdx);
+                await updateDoc(doc(db, 'videos', videoId), { comments: newComments });
+                v.comments = newComments;
                 const sec = document.getElementById(`comments-${videoId}`);
                 if (sec) sec.innerHTML = buildCommentsHTML(v);
                 renderVideos();
@@ -3593,8 +3612,11 @@
             if (!canDelete) { showToast('❌ لا يمكنك حذف تعليق شخص آخر', '#ff7a7a'); return; }
             if (!confirm('حذف التعليق؟')) return;
             try {
-                await updateDoc(doc(db, 'videos', videoId), { comments: arrayRemove(comment) });
-                v.comments.splice(commentIdx, 1);
+                const newComments = comment.id
+                    ? v.comments.filter(c => c.id !== comment.id)
+                    : v.comments.filter((c, i) => i !== commentIdx);
+                await updateDoc(doc(db, 'videos', videoId), { comments: newComments });
+                v.comments = newComments;
                 renderPlayerComments(v);
                 renderVideos();
                 showToast('🗑 تم حذف التعليق');
@@ -3609,8 +3631,11 @@
             if (!comment) return;
             if (!confirm('حذف التعليق؟')) return;
             try {
-                await updateDoc(doc(db, 'videos', videoId), { comments: arrayRemove(comment) });
-                v.comments.splice(commentIdx, 1);
+                const newComments = comment.id
+                    ? v.comments.filter(c => c.id !== comment.id)
+                    : v.comments.filter((c, i) => i !== commentIdx);
+                await updateDoc(doc(db, 'videos', videoId), { comments: newComments });
+                v.comments = newComments;
                 renderAdminComments();
                 renderVideos();
                 showToast('🗑 تم حذف التعليق');
