@@ -1332,6 +1332,23 @@
         .game-play-wrap { display: none; }
         .game-play-wrap.active { display: block; }
         .game-back-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+        /* Custom (admin-added) games open truly full-screen instead of a small boxed area */
+        #game-play-custom.active {
+            position: fixed; inset: 0; z-index: 10000;
+            display: flex; flex-direction: column;
+            background: #0a0814;
+            margin: 0; padding: 0;
+        }
+        #game-play-custom .game-back-row {
+            margin-bottom: 0; padding: 12px 14px;
+            background: rgba(10,8,20,0.75); backdrop-filter: blur(6px);
+            border-bottom: 1px solid rgba(192,38,211,0.2);
+            flex-shrink: 0;
+        }
+        #game-play-custom .game-canvas-wrap {
+            flex: 1; width: 100%; aspect-ratio: unset; max-height: none;
+            border-radius: 0; border: none;
+        }
         .game-back-btn {
             display: inline-flex; align-items: center; gap: 6px;
             background: var(--surface); border: 1px solid var(--border); border-radius: 9px;
