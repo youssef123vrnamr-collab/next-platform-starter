@@ -4780,12 +4780,14 @@
             renderGamesHub();
         };
 
-        // Converts a Google Drive share link (file/d/ID/view, open?id=ID, uc?id=ID...) into
-        // a direct-viewable image URL. Any other URL is returned as-is.
+        // Converts a Google Drive share link (file/d/ID/view, open?id=ID, uc?id=ID, thumbnail?id=ID...) into
+        // a direct-viewable image URL. Uses the /thumbnail endpoint, which is the most reliable one
+        // for hotlinking (uc?export=view often fails or shows a warning page instead of the image).
+        // Any other URL is returned as-is.
         function _normalizeImageUrl(url) {
             if (!url) return url;
-            const m = url.match(/drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?(?:export=[^&]*&)?id=)([a-zA-Z0-9_-]+)/);
-            if (m && m[1]) return `https://drive.google.com/uc?export=view&id=${m[1]}`;
+            const m = url.match(/drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?(?:export=[^&]*&)?id=|thumbnail\?id=)([a-zA-Z0-9_-]+)/);
+            if (m && m[1]) return `https://drive.google.com/thumbnail?id=${m[1]}&sz=w1000`;
             return url;
         }
 
