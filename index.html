@@ -1260,7 +1260,7 @@
         .game-hub-icon { font-size: 34px; margin-bottom: 10px; filter: drop-shadow(0 4px 10px rgba(192,38,211,0.5)); }
         .game-hub-thumb {
             width: 100%; height: 110px; border-radius: 12px; margin-bottom: 12px;
-            background-size: cover; background-position: center;
+            background-size: contain; background-repeat: no-repeat; background-position: center;
             background-color: rgba(255,255,255,0.04);
             border: 1px solid rgba(192,38,211,0.2);
         }
@@ -2774,8 +2774,8 @@
                 <input id="add-game-icon" class="modal-input" type="text" placeholder="🎮" maxlength="4" />
             </div>
             <div class="modal-field">
-                <label class="modal-label">صورة مصغرة (URL اختياري — لو موجودة بتظهر بدل الأيقونة)</label>
-                <input id="add-game-image" class="modal-input" type="url" inputmode="url" placeholder="https://example.com/thumb.jpg" />
+                <label class="modal-label">صورة مصغرة (رابط عادي أو رابط جوجل درايف — اختياري)</label>
+                <input id="add-game-image" class="modal-input" type="url" inputmode="url" placeholder="https://drive.google.com/file/d/.../view" />
             </div>
             <div class="modal-field">
                 <label class="modal-label">شارة (اختياري، مثال: حصري)</label>
@@ -2819,8 +2819,8 @@
                 <input id="edit-game-icon" class="modal-input" type="text" maxlength="4" />
             </div>
             <div class="modal-field">
-                <label class="modal-label">صورة مصغرة (URL اختياري)</label>
-                <input id="edit-game-image" class="modal-input" type="url" inputmode="url" placeholder="https://example.com/thumb.jpg" />
+                <label class="modal-label">صورة مصغرة (رابط عادي أو رابط جوجل درايف — اختياري)</label>
+                <input id="edit-game-image" class="modal-input" type="url" inputmode="url" placeholder="https://drive.google.com/file/d/.../view" />
             </div>
             <div class="modal-field">
                 <label class="modal-label">شارة</label>
@@ -4780,6 +4780,15 @@
             renderGamesHub();
         };
 
+        // Converts a Google Drive share link (file/d/ID/view, open?id=ID, uc?id=ID...) into
+        // a direct-viewable image URL. Any other URL is returned as-is.
+        function _normalizeImageUrl(url) {
+            if (!url) return url;
+            const m = url.match(/drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?(?:export=[^&]*&)?id=)([a-zA-Z0-9_-]+)/);
+            if (m && m[1]) return `https://drive.google.com/uc?export=view&id=${m[1]}`;
+            return url;
+        }
+
         // ===== ADMIN: ADD / EDIT / DELETE GAMES =====
         window.openAddGameModal = function() {
             if (!S.isAdmin) return;
@@ -4802,7 +4811,7 @@
             const title = (document.getElementById('add-game-title').value || '').trim();
             const desc = (document.getElementById('add-game-desc').value || '').trim();
             const icon = (document.getElementById('add-game-icon').value || '').trim();
-            const image = (document.getElementById('add-game-image').value || '').trim();
+            const image = _normalizeImageUrl((document.getElementById('add-game-image').value || '').trim());
             const badge = (document.getElementById('add-game-badge').value || '').trim();
             const players = parseInt(document.getElementById('add-game-players').value, 10) || 1;
             const code = document.getElementById('add-game-code').value || '';
@@ -4848,7 +4857,7 @@
             const title = (document.getElementById('edit-game-title').value || '').trim();
             const desc = (document.getElementById('edit-game-desc').value || '').trim();
             const icon = (document.getElementById('edit-game-icon').value || '').trim();
-            const image = (document.getElementById('edit-game-image').value || '').trim();
+            const image = _normalizeImageUrl((document.getElementById('edit-game-image').value || '').trim());
             const badge = (document.getElementById('edit-game-badge').value || '').trim();
             const players = parseInt(document.getElementById('edit-game-players').value, 10) || 1;
             const code = document.getElementById('edit-game-code').value || '';
