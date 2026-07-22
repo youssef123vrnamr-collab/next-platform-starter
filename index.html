@@ -5404,27 +5404,12 @@
         }
 
         // ===== AUTH =====
-        // Popup-based Google sign-in silently fails or hangs on a lot of mobile
-        // browsers/WebViews (popups blocked, or the popup opens in a way the app
-        // can never receive a result from) — that's what left the button stuck on
-        // "⏳ جاري..." forever with no way forward except manually reloading the page.
-        // Redirect-based sign-in doesn't have that failure mode: the browser
-        // navigates away and back, and getRedirectResult() below picks up the
-        // result automatically once the page reloads.
-        const _isMobileUA = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
-        const POPUP_FALLBACK_CODES = ['auth/popup-blocked', 'auth/popup-closed-by-user', 'auth/cancelled-popup-request', 'auth/operation-not-supported-in-this-environment'];
-
         window.handleMainLogin = async function() {
             const btn = document.getElementById('login-main-btn');
             btn.disabled = true;
             btn.textContent = '⏳ جاري...';
             const provider = new GoogleAuthProvider();
             provider.setCustomParameters({ prompt: 'select_account' });
-            if (_isMobileUA) {
-                sessionStorage.setItem('pendingLoginType', 'main');
-                signInWithRedirect(auth, provider);
-                return; // page will navigate away; result handled by getRedirectResult on return
-            }
             try {
                 const result = await signInWithPopup(auth, provider);
                 if (result && result.user) {
@@ -5434,11 +5419,6 @@
                 }
             } catch (e) {
                 console.error('Main login error:', e);
-                if (POPUP_FALLBACK_CODES.includes(e.code)) {
-                    sessionStorage.setItem('pendingLoginType', 'main');
-                    signInWithRedirect(auth, provider);
-                    return;
-                }
                 const errEl = document.getElementById('login-error');
                 errEl.textContent = '❌ ' + (e.message || 'حدث خطأ أثناء تسجيل الدخول');
                 errEl.style.display = 'block';
@@ -5452,11 +5432,6 @@
             if (btn) { btn.disabled = true; btn.textContent = '⏳ جاري...'; }
             const provider = new GoogleAuthProvider();
             provider.setCustomParameters({ prompt: 'select_account' });
-            if (_isMobileUA) {
-                sessionStorage.setItem('pendingLoginType', 'admin');
-                signInWithRedirect(auth, provider);
-                return;
-            }
             try {
                 const result = await signInWithPopup(auth, provider);
                 if (result && result.user) {
@@ -5466,11 +5441,6 @@
                 }
             } catch (e) {
                 console.error('Admin login error:', e);
-                if (POPUP_FALLBACK_CODES.includes(e.code)) {
-                    sessionStorage.setItem('pendingLoginType', 'admin');
-                    signInWithRedirect(auth, provider);
-                    return;
-                }
                 showToast('❌ ' + (e.message || 'حدث خطأ'), '#ff7a7a');
                 if (btn) { btn.disabled = false; btn.textContent = 'ادخل كمشرف بـ Google'; }
             }
@@ -5778,17 +5748,11 @@
 
         getRedirectResult(auth).then(async result => {
             if (result && result.user) {
-                const pendingType = sessionStorage.getItem('pendingLoginType');
-                sessionStorage.removeItem('pendingLoginType');
                 S.fbLoading = true;
                 updateUI();
-                await processUser(result.user, pendingType !== 'main');
+                await processUser(result.user, true);
             }
-        }).catch(e => {
-            console.error('Redirect result error:', e);
-            sessionStorage.removeItem('pendingLoginType');
-            showToast('❌ ' + (e.message || 'فشل تسجيل الدخول'), '#ff7a7a');
-        });
+        }).catch(e => { console.error('Redirect result error:', e); });
 
         onAuthStateChanged(auth, async fbUser => {
             if (fbUser && !S.user) {
