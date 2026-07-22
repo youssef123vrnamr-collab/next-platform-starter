@@ -1213,7 +1213,7 @@
             background: rgba(255,255,255,0.035);
             border: 1px solid rgba(255,255,255,0.09);
             border-radius: 13px;
-            padding: 9px 22px;
+            padding: 9px 16px;
             transition: border-color .2s, background .2s, transform .15s;
         }
         .follow-stat-box:hover { border-color: rgba(192,38,211,0.4); background: rgba(192,38,211,0.06); transform: translateY(-1px); }
@@ -4461,6 +4461,14 @@
             } catch (e) { S.followersCount = 0; S.followingCount = 0; }
         }
 
+        // Counts how many videos a given member has uploaded. Only videos added
+        // after the uploader-tracking update carry a uploaderUid, so members who
+        // only ever uploaded before that will correctly show 0 rather than crash.
+        function getVideoCountForUid(uid) {
+            if (!uid || !Array.isArray(S.videos)) return 0;
+            return S.videos.filter(v => v.uploaderUid === uid).length;
+        }
+
         function renderProfileFollowStats() {
             const el = document.getElementById('profile-follow-stats');
             if (!el || !S.user) return;
@@ -4472,6 +4480,10 @@
                 <div class="follow-stat-box" onclick="openMembersModal()">
                     <div class="follow-stat-num">${S.followingCount || 0}</div>
                     <div class="follow-stat-label">متابَعين</div>
+                </div>
+                <div class="follow-stat-box">
+                    <div class="follow-stat-num">${getVideoCountForUid(S.user.uid)}</div>
+                    <div class="follow-stat-label">فيديوهات</div>
                 </div>`;
         }
 
@@ -4650,6 +4662,10 @@
                 <div class="follow-stat-box">
                     <div class="follow-stat-num">${entry.followingCount || 0}</div>
                     <div class="follow-stat-label">متابَعين</div>
+                </div>
+                <div class="follow-stat-box">
+                    <div class="follow-stat-num">${getVideoCountForUid(entry.uid)}</div>
+                    <div class="follow-stat-label">فيديوهات</div>
                 </div>`;
             const following = S.followingSet.has(entry.uid);
             const followBtn = document.getElementById('member-profile-follow-btn');
@@ -5266,7 +5282,7 @@
             const title = (document.getElementById('add-title').value || '').trim();
             const desc = (document.getElementById('add-desc').value || '').trim();
             if (!title) { showAddError('أدخل عنواناً للفيديو'); return; }
-            let videoData = { title, description: desc, locked: false, createdAt: new Date(), likes: 0, dislikes: 0, comments: [] };
+            let videoData = { title, description: desc, locked: false, createdAt: new Date(), likes: 0, dislikes: 0, comments: [], uploaderUid: S.user?.uid || '', uploaderName: S.userProfile?.displayName || S.user?.displayName || '' };
             if (S.activeTab === 'youtube') {
                 const url = (document.getElementById('add-yt-url').value || '').trim();
                 const id = extractYouTubeId(url);
