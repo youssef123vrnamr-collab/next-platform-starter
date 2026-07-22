@@ -1599,7 +1599,7 @@
         #player-comments-list { max-height: 340px; overflow-y: auto; display: flex; flex-direction: column; padding-left: 2px; scroll-behavior: smooth; }
 
         /* ===== PROFILE MODAL ===== */
-        #profile-modal {
+        #profile-modal, #member-profile-modal {
             position: fixed;
             inset: 0;
             z-index: 9999;
@@ -1617,7 +1617,7 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 14px 18px;
+            padding: calc(14px + env(safe-area-inset-top, 0px)) 18px 14px;
             background: rgba(10,8,20,0.96);
             backdrop-filter: blur(14px);
             -webkit-backdrop-filter: blur(14px);
@@ -2515,6 +2515,14 @@
                 <div class="follow-stats-row" id="profile-follow-stats"></div>
             </div>
             <div class="profile-fs-card">
+                <div class="profile-fs-card-title">صورة الغلاف (الخلفية)</div>
+                <div class="profile-avatar-url-wrap">
+                    <label>رابط صورة الغلاف اللي تظهر ورا الشعار (Google Drive)</label>
+                    <input type="url" id="profile-cover-url" class="profile-avatar-url-input"
+                        placeholder="https://drive.google.com/..." oninput="previewProfileCover(this.value)" />
+                </div>
+            </div>
+            <div class="profile-fs-card">
                 <div class="profile-fs-card-title">صورة البروفايل</div>
                 <div class="profile-avatar-url-wrap">
                     <label>رابط صورة البروفايل (Google Drive)</label>
@@ -2546,6 +2554,31 @@
             <p id="profile-save-msg" style="color:#4fc3f7;font-size:13px;display:none;margin-bottom:8px;text-align:center">✅ تم حفظ التغييرات</p>
             <p id="profile-save-err" style="color:#ff7a7a;font-size:13px;display:none;margin-bottom:8px;text-align:center"></p>
             <button class="profile-save-btn" id="profile-save-btn" onclick="saveProfileChanges()">💾 حفظ التغييرات</button>
+        </div>
+    </div>
+
+    <!-- ===== MEMBER PROFILE MODAL (read-only view of another member) ===== -->
+    <div id="member-profile-modal">
+        <div class="profile-fs-header">
+            <button class="profile-fs-back" onclick="closeMemberProfile()">✕</button>
+            <span class="profile-fs-title">👤 ملف العضو</span>
+        </div>
+        <div class="profile-fs-cover" id="member-profile-cover">
+            <div class="profile-fs-cover-pattern"></div>
+            <div class="profile-fs-cover-glow"></div>
+            <div class="profile-fs-avatar-wrap">
+                <img id="member-profile-img" src="" alt="" onerror="this.style.display='none';document.getElementById('member-profile-initials').style.display='flex'" style="display:none"/>
+                <div class="profile-avatar-initials" id="member-profile-initials" style="display:flex">?</div>
+            </div>
+        </div>
+        <div class="profile-fs-body">
+            <div class="profile-fs-userinfo">
+                <div class="profile-fs-username" id="member-profile-name">—</div>
+                <div class="profile-fs-userrole" id="member-profile-role">👤 مستخدم</div>
+                <div class="follow-stats-row" id="member-profile-stats"></div>
+            </div>
+            <button class="profile-save-btn" id="member-profile-follow-btn" onclick="toggleFollow(window._viewedMemberUid, window._viewedMemberName)">+ متابعة</button>
+            <button class="profile-save-btn" style="margin-top:10px;background:var(--surface);color:var(--text);box-shadow:none" onclick="openFriendChat(window._viewedMemberUid, window._viewedMemberName, window._viewedMemberPhoto)">💬 ابدأ محادثة</button>
         </div>
     </div>
 
@@ -4499,7 +4532,12 @@
             if (!listEl) return;
             listEl.innerHTML = `<p class="directory-empty">⏳ جاري تحميل الأعضاء...</p>`;
             try {
-                const snap = await getDocs(collection(db, 'users'));
+                const [snap, adminsSnap] = await Promise.all([
+                    getDocs(collection(db, 'users')),
+                    getDocs(collection(db, 'admins'))
+                ]);
+                const adminsByEmail = {};
+                adminsSnap.forEach(d => { adminsByEmail[(d.data().email || d.id || '').toLowerCase()] = d.data(); });
                 S.membersDirectory = snap.docs
                     .map(d => {
                         const u = d.data();
@@ -4509,7 +4547,9 @@
                             email,
                             displayName: u.displayName || email.split('@')[0] || 'مستخدم',
                             photoURL: u.photoURL || '',
-                            followersCount: u.followersCount || 0
+                            followersCount: u.followersCount || 0,
+                            followingCount: u.followingCount || 0,
+                            adminRole: adminsByEmail[email]?.role || null
                         };
                     })
                     .filter(u => u.uid !== S.user?.uid)
@@ -4539,10 +4579,12 @@
                 const safeName = _escapeHtml(e.displayName).replace(/'/g, "\\'");
                 return `
                 <div class="directory-item">
-                    ${avatar}
-                    <div class="directory-info">
-                        <div class="directory-name">${_escapeHtml(e.displayName)}</div>
-                        <div class="directory-email">${e.followersCount || 0} متابِع</div>
+                    <div class="directory-clickable" onclick="openMemberProfile('${e.uid}')" style="display:flex;align-items:center;gap:12px;flex:1;min-width:0;cursor:pointer">
+                        ${avatar}
+                        <div class="directory-info">
+                            <div class="directory-name">${_escapeHtml(e.displayName)}${e.adminRole ? (e.adminRole === 'main' ? ' 👑' : ' 🔑') : ''}</div>
+                            <div class="directory-email">${e.followersCount || 0} متابِع</div>
+                        </div>
                     </div>
                     <div class="directory-actions">
                         <button class="dir-btn chat-btn" onclick="openFriendChat('${e.uid}','${safeName}','${(e.photoURL||'').replace(/'/g,"\\'")}')" title="ابدأ محادثة">💬</button>
@@ -4550,6 +4592,76 @@
                     </div>
                 </div>`;
             }).join('');
+        };
+
+        // ===== VIEW ANOTHER MEMBER'S PROFILE (read-only) =====
+        window.openMemberProfile = async function(uid) {
+            if (!S.user) { showToast('🔑 سجّل دخولك أولاً', '#ffb020'); return; }
+            let entry = (S.membersDirectory || []).find(m => m.uid === uid);
+            // Fall back to a live fetch if the member isn't in the currently loaded list
+            // (e.g. opened from somewhere other than the members directory).
+            if (!entry) {
+                try {
+                    const [uSnap, pSnap] = await Promise.all([
+                        getDoc(doc(db, 'users', uid)),
+                        getDoc(doc(db, 'userProfiles', uid))
+                    ]);
+                    const u = uSnap.exists() ? uSnap.data() : {};
+                    const p = pSnap.exists() ? pSnap.data() : {};
+                    const email = (u.email || '').toLowerCase();
+                    let adminRole = null;
+                    if (email) {
+                        const aSnap = await getDoc(doc(db, 'admins', email));
+                        if (aSnap.exists()) adminRole = aSnap.data().role || 'normal';
+                    }
+                    entry = {
+                        uid,
+                        email,
+                        displayName: p.displayName || u.displayName || email.split('@')[0] || 'مستخدم',
+                        photoURL: p.photoURL || u.photoURL || '',
+                        coverURL: p.coverURL || '',
+                        followersCount: u.followersCount || 0,
+                        followingCount: u.followingCount || 0,
+                        adminRole
+                    };
+                } catch (e) {
+                    console.error('openMemberProfile fetch error:', e);
+                    showToast('❌ تعذر تحميل ملف العضو', '#ff7a7a');
+                    return;
+                }
+            }
+            window._viewedMemberUid = entry.uid;
+            window._viewedMemberName = entry.displayName;
+            window._viewedMemberPhoto = entry.photoURL || '';
+            document.getElementById('member-profile-name').textContent = entry.displayName || '—';
+            const roleEl = document.getElementById('member-profile-role');
+            roleEl.textContent = entry.adminRole === 'main' ? '👑 مشرف رئيسي' : entry.adminRole === 'normal' ? '🔑 مشرف عادي' : '👤 مستخدم';
+            const img = document.getElementById('member-profile-img');
+            const initials = document.getElementById('member-profile-initials');
+            initials.textContent = (entry.displayName || '?').charAt(0).toUpperCase();
+            if (entry.photoURL) { initials.style.display = 'none'; setImgWithFallback(img, entry.photoURL, () => { initials.style.display = 'flex'; }); }
+            else { img.style.display = 'none'; initials.style.display = 'flex'; }
+            previewProfileCover(entry.coverURL || '', document.getElementById('member-profile-cover'));
+            document.getElementById('member-profile-stats').innerHTML = `
+                <div class="follow-stat-box">
+                    <div class="follow-stat-num">${entry.followersCount || 0}</div>
+                    <div class="follow-stat-label">متابِعين</div>
+                </div>
+                <div class="follow-stat-box">
+                    <div class="follow-stat-num">${entry.followingCount || 0}</div>
+                    <div class="follow-stat-label">متابَعين</div>
+                </div>`;
+            const following = S.followingSet.has(entry.uid);
+            const followBtn = document.getElementById('member-profile-follow-btn');
+            followBtn.textContent = following ? '✓ متابَع' : '+ متابعة';
+            followBtn.onclick = async () => { await toggleFollow(entry.uid, entry.displayName); followBtn.textContent = S.followingSet.has(entry.uid) ? '✓ متابَع' : '+ متابعة'; };
+            document.getElementById('member-profile-modal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        };
+
+        window.closeMemberProfile = function() {
+            document.getElementById('member-profile-modal').style.display = 'none';
+            document.body.style.overflow = '';
         };
 
         // ===== FRIEND-TO-FRIEND CHAT (member <-> member DMs) =====
@@ -4961,10 +5073,12 @@
             const profile = S.userProfile || {};
             const currentName = profile.displayName || S.user.displayName || '';
             const currentPhoto = profile.photoURL || '';
+            const currentCover = profile.coverURL || '';
             const currentNationality = profile.nationality || '';
             const currentGender = profile.gender || '';
             document.getElementById('profile-name-input').value = currentName;
             document.getElementById('profile-photo-url').value = currentPhoto;
+            document.getElementById('profile-cover-url').value = currentCover;
             document.getElementById('profile-nationality-input').value = currentNationality;
             document.getElementById('profile-gender-select').value = currentGender;
             const dnEl = document.getElementById('profile-display-name');
@@ -4972,6 +5086,7 @@
             if (dnEl) dnEl.textContent = currentName || '—';
             if (drEl) drEl.textContent = S.isAdmin ? (S.isMainAdmin ? '👑 مشرف رئيسي' : '🔑 مشرف عادي') : '👤 مستخدم';
             previewProfilePhoto(currentPhoto);
+            previewProfileCover(currentCover);
             const initials = (currentName || 'G').charAt(0).toUpperCase();
             document.getElementById('profile-initials').textContent = initials;
             renderProfileFollowStats();
@@ -4984,6 +5099,18 @@
         window.closeProfileModal = function() {
             document.getElementById('profile-modal').style.display = 'none';
             document.body.style.overflow = '';
+        };
+
+        window.previewProfileCover = function(url, coverEl) {
+            const cover = coverEl || document.querySelector('#profile-modal .profile-fs-cover');
+            if (!cover) return;
+            if (url) {
+                cover.style.backgroundImage = `url('${url}')`;
+                cover.style.backgroundSize = 'cover';
+                cover.style.backgroundPosition = 'center';
+            } else {
+                cover.style.backgroundImage = '';
+            }
         };
 
         window.previewProfilePhoto = function(url) {
@@ -5007,6 +5134,7 @@
             saveErr.style.display = 'none';
             const name = document.getElementById('profile-name-input').value.trim();
             const rawPhotoUrl = document.getElementById('profile-photo-url').value.trim();
+            const rawCoverUrl = document.getElementById('profile-cover-url').value.trim();
             const nationality = document.getElementById('profile-nationality-input').value.trim();
             const gender = document.getElementById('profile-gender-select').value;
             if (!name) { saveErr.textContent = '❌ أدخل اسمك'; saveErr.style.display = 'block'; return; }
@@ -5017,13 +5145,31 @@
                     uid: S.user.uid,
                     displayName: name,
                     photoURL: rawPhotoUrl,
+                    coverURL: rawCoverUrl,
                     nationality,
                     gender,
                     updatedAt: new Date()
                 };
                 await setDoc(doc(db, 'userProfiles', S.user.uid), profileData, { merge: true });
+                // Keep the public "users" directory doc in sync too — this is the doc
+                // that powers the members list, admin/accounts panels, chat bubbles, etc.
+                // Without this, a changed profile photo/name only ever showed up on the
+                // person's own profile screen and nowhere else in the app.
+                await setDoc(doc(db, 'users', S.user.uid), {
+                    displayName: name,
+                    photoURL: rawPhotoUrl
+                }, { merge: true }).catch(e => console.error('users directory sync error:', e));
                 S.userProfile = { ...S.userProfile, ...profileData };
+                S.user = { ...S.user, displayName: name, photoURL: rawPhotoUrl };
                 updateUI();
+                // Refresh any open lists/panels so the new photo/name shows up immediately
+                // without needing to close and reopen them.
+                if (S.membersDirectory) {
+                    const me = S.membersDirectory.find(m => m.uid === S.user.uid);
+                    if (me) { me.displayName = name; me.photoURL = rawPhotoUrl; }
+                    renderMembersList();
+                }
+                if (typeof renderUsersDirectory === 'function') renderUsersDirectory();
                 saveMsg.style.display = 'block';
                 showToast('✅ تم حفظ الملف الشخصي');
             } catch (e) {
@@ -5242,12 +5388,27 @@
         }
 
         // ===== AUTH =====
+        // Popup-based Google sign-in silently fails or hangs on a lot of mobile
+        // browsers/WebViews (popups blocked, or the popup opens in a way the app
+        // can never receive a result from) — that's what left the button stuck on
+        // "⏳ جاري..." forever with no way forward except manually reloading the page.
+        // Redirect-based sign-in doesn't have that failure mode: the browser
+        // navigates away and back, and getRedirectResult() below picks up the
+        // result automatically once the page reloads.
+        const _isMobileUA = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+        const POPUP_FALLBACK_CODES = ['auth/popup-blocked', 'auth/popup-closed-by-user', 'auth/cancelled-popup-request', 'auth/operation-not-supported-in-this-environment'];
+
         window.handleMainLogin = async function() {
             const btn = document.getElementById('login-main-btn');
             btn.disabled = true;
             btn.textContent = '⏳ جاري...';
             const provider = new GoogleAuthProvider();
             provider.setCustomParameters({ prompt: 'select_account' });
+            if (_isMobileUA) {
+                sessionStorage.setItem('pendingLoginType', 'main');
+                signInWithRedirect(auth, provider);
+                return; // page will navigate away; result handled by getRedirectResult on return
+            }
             try {
                 const result = await signInWithPopup(auth, provider);
                 if (result && result.user) {
@@ -5257,6 +5418,11 @@
                 }
             } catch (e) {
                 console.error('Main login error:', e);
+                if (POPUP_FALLBACK_CODES.includes(e.code)) {
+                    sessionStorage.setItem('pendingLoginType', 'main');
+                    signInWithRedirect(auth, provider);
+                    return;
+                }
                 const errEl = document.getElementById('login-error');
                 errEl.textContent = '❌ ' + (e.message || 'حدث خطأ أثناء تسجيل الدخول');
                 errEl.style.display = 'block';
@@ -5270,6 +5436,11 @@
             if (btn) { btn.disabled = true; btn.textContent = '⏳ جاري...'; }
             const provider = new GoogleAuthProvider();
             provider.setCustomParameters({ prompt: 'select_account' });
+            if (_isMobileUA) {
+                sessionStorage.setItem('pendingLoginType', 'admin');
+                signInWithRedirect(auth, provider);
+                return;
+            }
             try {
                 const result = await signInWithPopup(auth, provider);
                 if (result && result.user) {
@@ -5279,6 +5450,11 @@
                 }
             } catch (e) {
                 console.error('Admin login error:', e);
+                if (POPUP_FALLBACK_CODES.includes(e.code)) {
+                    sessionStorage.setItem('pendingLoginType', 'admin');
+                    signInWithRedirect(auth, provider);
+                    return;
+                }
                 showToast('❌ ' + (e.message || 'حدث خطأ'), '#ff7a7a');
                 if (btn) { btn.disabled = false; btn.textContent = 'ادخل كمشرف بـ Google'; }
             }
@@ -5586,11 +5762,17 @@
 
         getRedirectResult(auth).then(async result => {
             if (result && result.user) {
+                const pendingType = sessionStorage.getItem('pendingLoginType');
+                sessionStorage.removeItem('pendingLoginType');
                 S.fbLoading = true;
                 updateUI();
-                await processUser(result.user, true);
+                await processUser(result.user, pendingType !== 'main');
             }
-        }).catch(e => { console.error('Redirect result error:', e); });
+        }).catch(e => {
+            console.error('Redirect result error:', e);
+            sessionStorage.removeItem('pendingLoginType');
+            showToast('❌ ' + (e.message || 'فشل تسجيل الدخول'), '#ff7a7a');
+        });
 
         onAuthStateChanged(auth, async fbUser => {
             if (fbUser && !S.user) {
