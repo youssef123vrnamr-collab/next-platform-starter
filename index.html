@@ -1174,6 +1174,29 @@
         .directory-retry-btn:hover { transform: translateY(-1px); }
         .directory-retry-btn:active { transform: translateY(0); }
         .directory-retrying-box { text-align: center; padding: 18px 10px; color: var(--text-dim); font-size: 12px; }
+        /* ===== GLOBAL POLISH: avatar glow rings + realistic button press feel ===== */
+        @keyframes avatarGlowPulse {
+            0%, 100% { box-shadow: 0 0 0 2px rgba(192,38,211,0.55), 0 0 12px 2px rgba(192,38,211,0.35); }
+            50% { box-shadow: 0 0 0 2px rgba(255,45,135,0.8), 0 0 18px 5px rgba(255,45,135,0.5); }
+        }
+        .directory-avatar,
+        #user-badge img, #user-avatar-nav-initials,
+        .admin-profile img {
+            animation: avatarGlowPulse 2.6s ease-in-out infinite;
+        }
+        /* Gives every clickable button a real, tactile press — a slight squash on
+           tap. Sits early in the stylesheet so any button-specific rule further
+           down (same or higher specificity) still wins and looks intentional. */
+        button, .dir-btn, .btn-google, .btn-google-large, .profile-save-btn,
+        .follow-stat-box, .modal-tab, .panel-tab, .directory-retry-btn {
+            transition: transform .15s cubic-bezier(.34,1.56,.64,1), filter .15s ease;
+        }
+        button:active, .dir-btn:active, .btn-google:active, .btn-google-large:active,
+        .follow-stat-box:active, .modal-tab:active, .panel-tab:active {
+            transform: scale(0.94);
+            filter: brightness(0.92);
+        }
+
         .directory-item {
             display: flex; align-items: center; gap: 10px; padding: 8px 10px;
             background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
@@ -1686,6 +1709,7 @@
             border: 4px solid var(--void);
             box-shadow: 0 0 0 3px var(--magenta), 0 8px 30px rgba(255,45,135,0.4);
             object-fit: cover;
+            animation: avatarGlowPulse 2.6s ease-in-out infinite;
         }
         .profile-avatar-initials {
             background: var(--grad);
