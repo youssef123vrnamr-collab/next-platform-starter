@@ -16,7 +16,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700;900&family=Cairo:wght@400;500;600;700;900&display=swap" rel="stylesheet" />
     <style>
         /* ===== RESET & ROOT ===== */
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; }
+        button, a, input, select, textarea, [onclick] { -webkit-tap-highlight-color: transparent; }
         :root {
             --void: #0a0814;
             --void-2: #120e22;
@@ -2569,6 +2570,16 @@
                 </div>
             </div>
             <div class="profile-fs-card">
+                <div class="profile-fs-card-title">لون الدائرة حول صورتك</div>
+                <div class="profile-avatar-url-wrap" style="display:flex;align-items:center;gap:10px;">
+                    <input type="color" id="profile-ring-color" value="#c026d3"
+                        style="width:46px;height:36px;border:1px solid var(--border);border-radius:8px;background:transparent;cursor:pointer;padding:2px;"
+                        oninput="this.dataset.cleared='';previewProfileRingColor(this.value)" />
+                    <span style="font-size:12px;color:var(--text-dim);flex:1">اختار أي لون يعجبك للدائرة المضيئة حوالين صورتك</span>
+                    <button type="button" onclick="resetProfileRingColor()" style="background:var(--surface);border:1px solid var(--border);color:var(--text-dim);border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer">افتراضي</button>
+                </div>
+            </div>
+            <div class="profile-fs-card">
                 <div class="profile-fs-card-title">المعلومات الشخصية</div>
                 <div class="profile-field">
                     <label class="profile-label">الاسم</label>
@@ -3126,13 +3137,37 @@
             }
         };
 
-        function avatarImgHtml(rawUrl, cssClass, fallbackInitial) {
+        function avatarImgHtml(rawUrl, cssClass, fallbackInitial, ringColor) {
             const candidates = driveImageCandidates(rawUrl);
             if (candidates.length === 0) return '';
             const list = candidates.map(u => u.replace(/"/g, '&quot;')).join('|');
             const initialAttr = fallbackInitial ? ` data-fallback-initial="${fallbackInitial}"` : '';
-            return `<img class="${cssClass}" src="${candidates[0]}" data-fallbacks="${list}" data-i="0"${initialAttr}
+            const ringStyle = ringColorStyleAttr(ringColor);
+            return `<img class="${cssClass}" src="${candidates[0]}" data-fallbacks="${list}" data-i="0"${initialAttr}${ringStyle}
                 onerror="window.__avatarFallback(this)" />`;
+        }
+
+        // Builds an inline style attribute that overrides the default pulsing
+        // glow ring with a solid ring in the user's chosen color. Returns ''
+        // when no custom color is set, so the element keeps the default
+        // animated purple/pink ring from the stylesheet.
+        function ringColorStyleAttr(ringColor) {
+            if (!ringColor || !/^#[0-9a-fA-F]{6}$/.test(ringColor)) return '';
+            return ` style="animation:none;box-shadow:0 0 0 2px ${ringColor}99, 0 0 14px 3px ${ringColor}55;"`;
+        }
+
+        // Applies (or clears) a custom ring color directly onto a DOM element,
+        // used for the nav avatar / own-profile avatar / viewed-member avatar
+        // which are static <img> elements rather than ones built by avatarImgHtml.
+        function applyRingColorToEl(el, ringColor) {
+            if (!el) return;
+            if (ringColor && /^#[0-9a-fA-F]{6}$/.test(ringColor)) {
+                el.style.animation = 'none';
+                el.style.boxShadow = `0 0 0 2px ${ringColor}99, 0 0 14px 3px ${ringColor}55`;
+            } else {
+                el.style.animation = '';
+                el.style.boxShadow = '';
+            }
         }
 
         function currentAvatarUrl() {
@@ -4042,6 +4077,7 @@
                         email,
                         displayName: u.displayName || email.split('@')[0] || 'مستخدم',
                         photoURL: u.photoURL || '',
+                        ringColor: u.ringColor || '',
                         adminRole: adminsByEmail[email]?.role || null,
                         suspended: !!suspendedByUid[d.id]
                     };
@@ -4083,7 +4119,7 @@
             }
             container.innerHTML = rows.map(e => {
                 const initial = (e.displayName || '?').charAt(0).toUpperCase();
-                const avatar = avatarImgHtml(e.photoURL, 'directory-avatar', initial) || `<div class="directory-avatar">${_escapeHtml(initial)}</div>`;
+                const avatar = avatarImgHtml(e.photoURL, 'directory-avatar', initial, e.ringColor) || `<div class="directory-avatar">${_escapeHtml(initial)}</div>`;
                 const role = e.adminRole || 'none';
                 const isSelf = e.email === S.user?.email;
                 return `
@@ -4113,7 +4149,7 @@
             }
             container.innerHTML = rows.map(e => {
                 const initial = (e.displayName || '?').charAt(0).toUpperCase();
-                const avatar = avatarImgHtml(e.photoURL, 'directory-avatar', initial) || `<div class="directory-avatar">${_escapeHtml(initial)}</div>`;
+                const avatar = avatarImgHtml(e.photoURL, 'directory-avatar', initial, e.ringColor) || `<div class="directory-avatar">${_escapeHtml(initial)}</div>`;
                 const isSelf = e.uid === S.user?.uid;
                 const roleLabel = e.adminRole === 'main' ? '👑 مشرف رئيسي' : e.adminRole === 'normal' ? '🔑 مشرف عادي' : 'مستخدم';
                 return `
@@ -4596,6 +4632,7 @@
                             email,
                             displayName: u.displayName || email.split('@')[0] || 'مستخدم',
                             photoURL: u.photoURL || '',
+                            ringColor: u.ringColor || '',
                             followersCount: u.followersCount || 0,
                             followingCount: u.followingCount || 0,
                             adminRole: adminsByEmail[email]?.role || null
@@ -4623,7 +4660,7 @@
             }
             listEl.innerHTML = rows.map(e => {
                 const initial = (e.displayName || '?').charAt(0).toUpperCase();
-                const avatar = avatarImgHtml(e.photoURL, 'directory-avatar', initial) || `<div class="directory-avatar">${_escapeHtml(initial)}</div>`;
+                const avatar = avatarImgHtml(e.photoURL, 'directory-avatar', initial, e.ringColor) || `<div class="directory-avatar">${_escapeHtml(initial)}</div>`;
                 return `
                 <div class="directory-item" onclick="openMemberProfile('${e.uid}')" style="cursor:pointer">
                     ${avatar}
@@ -4661,6 +4698,7 @@
                         displayName: p.displayName || u.displayName || email.split('@')[0] || 'مستخدم',
                         photoURL: p.photoURL || u.photoURL || '',
                         coverURL: p.coverURL || '',
+                        ringColor: p.ringColor || u.ringColor || '',
                         followersCount: u.followersCount || 0,
                         followingCount: u.followingCount || 0,
                         adminRole
@@ -4682,6 +4720,8 @@
             initials.textContent = (entry.displayName || '?').charAt(0).toUpperCase();
             if (entry.photoURL) { initials.style.display = 'none'; setImgWithFallback(img, entry.photoURL, () => { initials.style.display = 'flex'; }); }
             else { img.style.display = 'none'; initials.style.display = 'flex'; }
+            applyRingColorToEl(img, entry.ringColor);
+            applyRingColorToEl(initials, entry.ringColor);
             previewProfileCover(entry.coverURL || '', document.getElementById('member-profile-cover'));
             document.getElementById('member-profile-stats').innerHTML = `
                 <div class="follow-stat-box">
@@ -5124,11 +5164,16 @@
             const currentCover = profile.coverURL || '';
             const currentNationality = profile.nationality || '';
             const currentGender = profile.gender || '';
+            const currentRingColor = profile.ringColor || '';
             document.getElementById('profile-name-input').value = currentName;
             document.getElementById('profile-photo-url').value = currentPhoto;
             document.getElementById('profile-cover-url').value = currentCover;
             document.getElementById('profile-nationality-input').value = currentNationality;
             document.getElementById('profile-gender-select').value = currentGender;
+            const ringColorInput = document.getElementById('profile-ring-color');
+            ringColorInput.value = currentRingColor || '#c026d3';
+            ringColorInput.dataset.cleared = currentRingColor ? '' : '1';
+            previewProfileRingColor(currentRingColor);
             const dnEl = document.getElementById('profile-display-name');
             const drEl = document.getElementById('profile-display-role');
             if (dnEl) dnEl.textContent = currentName || '—';
@@ -5173,6 +5218,18 @@
             setImgWithFallback(img, url, () => { initials.style.display = 'flex'; });
         };
 
+        window.previewProfileRingColor = function(color) {
+            applyRingColorToEl(document.getElementById('profile-preview-img'), color);
+            applyRingColorToEl(document.getElementById('profile-initials'), color);
+        };
+
+        window.resetProfileRingColor = function() {
+            const input = document.getElementById('profile-ring-color');
+            input.value = '#c026d3';
+            input.dataset.cleared = '1';
+            previewProfileRingColor('');
+        };
+
         window.saveProfileChanges = async function() {
             if (!S.user) return;
             const btn = document.getElementById('profile-save-btn');
@@ -5185,6 +5242,8 @@
             const rawCoverUrl = document.getElementById('profile-cover-url').value.trim();
             const nationality = document.getElementById('profile-nationality-input').value.trim();
             const gender = document.getElementById('profile-gender-select').value;
+            const ringColorInput = document.getElementById('profile-ring-color');
+            const ringColor = ringColorInput.dataset.cleared === '1' ? '' : ringColorInput.value;
             if (!name) { saveErr.textContent = '❌ أدخل اسمك'; saveErr.style.display = 'block'; return; }
             btn.disabled = true;
             btn.innerHTML = 'جاري الحفظ <span class="spinner-ring"></span>';
@@ -5196,6 +5255,7 @@
                     coverURL: rawCoverUrl,
                     nationality,
                     gender,
+                    ringColor,
                     updatedAt: new Date()
                 };
                 await setDoc(doc(db, 'userProfiles', S.user.uid), profileData, { merge: true });
@@ -5205,7 +5265,8 @@
                 // person's own profile screen and nowhere else in the app.
                 await setDoc(doc(db, 'users', S.user.uid), {
                     displayName: name,
-                    photoURL: rawPhotoUrl
+                    photoURL: rawPhotoUrl,
+                    ringColor
                 }, { merge: true }).catch(e => console.error('users directory sync error:', e));
                 S.userProfile = { ...S.userProfile, ...profileData };
                 S.user = { ...S.user, displayName: name, photoURL: rawPhotoUrl };
@@ -5719,6 +5780,9 @@
                     avatar.style.display = 'none';
                     avatarInitials.style.display = 'flex';
                 }
+                const navRingColor = (S.userProfile && S.userProfile.ringColor) || '';
+                applyRingColorToEl(avatar, navRingColor);
+                applyRingColorToEl(avatarInitials, navRingColor);
                 nameSpan.textContent = displayName;
                 roleSpan.textContent = isAdmin ? (isMainAdmin ? 'مشرف رئيسي' : 'مشرف عادي') : 'عادي';
                 roleSpan.style.background = isAdmin ? 'rgba(255,176,32,0.15)' : 'rgba(168,85,247,0.1)';
