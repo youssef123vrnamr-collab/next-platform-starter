@@ -1599,10 +1599,23 @@
         #player-comments-list { max-height: 340px; overflow-y: auto; display: flex; flex-direction: column; padding-left: 2px; scroll-behavior: smooth; }
 
         /* ===== PROFILE MODAL ===== */
-        #profile-modal, #member-profile-modal {
+        #profile-modal {
             position: fixed;
             inset: 0;
             z-index: 9999;
+            background: var(--void);
+            display: none;
+            flex-direction: column;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
+        }
+        /* Higher than #members-modal (9999) so tapping a member's photo always opens
+           this on top, regardless of DOM order — no need to close the members list first. */
+        #member-profile-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
             background: var(--void);
             display: none;
             flex-direction: column;
@@ -4587,20 +4600,12 @@
             listEl.innerHTML = rows.map(e => {
                 const initial = (e.displayName || '?').charAt(0).toUpperCase();
                 const avatar = avatarImgHtml(e.photoURL, 'directory-avatar', initial) || `<div class="directory-avatar">${_escapeHtml(initial)}</div>`;
-                const following = S.followingSet.has(e.uid);
-                const safeName = _escapeHtml(e.displayName).replace(/'/g, "\\'");
                 return `
-                <div class="directory-item">
-                    <div class="directory-clickable" onclick="openMemberProfile('${e.uid}')" style="display:flex;align-items:center;gap:12px;flex:1;min-width:0;cursor:pointer">
-                        ${avatar}
-                        <div class="directory-info">
-                            <div class="directory-name">${_escapeHtml(e.displayName)}${e.adminRole ? (e.adminRole === 'main' ? ' 👑' : ' 🔑') : ''}</div>
-                            <div class="directory-email">${e.followersCount || 0} متابِع</div>
-                        </div>
-                    </div>
-                    <div class="directory-actions">
-                        <button class="dir-btn chat-btn" onclick="openFriendChat('${e.uid}','${safeName}','${(e.photoURL||'').replace(/'/g,"\\'")}')" title="ابدأ محادثة">💬</button>
-                        <button class="dir-btn follow-btn ${following ? 'following' : ''}" onclick="toggleFollow('${e.uid}','${safeName}')">${following ? '✓ متابَع' : '+ متابعة'}</button>
+                <div class="directory-item" onclick="openMemberProfile('${e.uid}')" style="cursor:pointer">
+                    ${avatar}
+                    <div class="directory-info">
+                        <div class="directory-name">${_escapeHtml(e.displayName)}${e.adminRole ? (e.adminRole === 'main' ? ' 👑' : ' 🔑') : ''}</div>
+                        <div class="directory-email">${e.followersCount || 0} متابِع</div>
                     </div>
                 </div>`;
             }).join('');
@@ -4677,7 +4682,10 @@
 
         window.closeMemberProfile = function() {
             document.getElementById('member-profile-modal').style.display = 'none';
-            document.body.style.overflow = '';
+            // Only unlock body scroll if no other full-screen modal is still open underneath.
+            const stillOpen = ['members-modal', 'profile-modal', 'conversations-modal', 'games-modal']
+                .some(id => document.getElementById(id)?.style.display === 'flex');
+            if (!stillOpen) document.body.style.overflow = '';
         };
 
         // ===== FRIEND-TO-FRIEND CHAT (member <-> member DMs) =====
