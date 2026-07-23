@@ -1533,7 +1533,15 @@
             width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0; overflow: hidden;
             background: #2a1a3a; display: flex; align-items: center; justify-content: center;
             color: #fff; font-weight: 800; font-size: 15px; border: 2px solid var(--magenta);
+            position: relative;
         }
+        #call-mini-widget .cmw-avatar-fallback { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; }
+        #call-mini-widget .cmw-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        #cmw-remote-video {
+            position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+            display: none; background: #14101f;
+        }
+        #cmw-remote-video.show { display: block; }
         #call-mini-widget .cmw-info { min-width: 0; flex: 1; }
         #call-mini-widget .cmw-name {
             color: var(--bright); font-size: 12px; font-weight: 700; white-space: nowrap;
@@ -2950,7 +2958,10 @@
          out of the way while playing, and use the buttons to mute/cam/hangup
          without leaving whatever you're doing on the platform. -->
     <div id="call-mini-widget">
-        <div class="cmw-avatar" id="cmw-avatar">?</div>
+        <div class="cmw-avatar" id="cmw-avatar">
+            <span class="cmw-avatar-fallback" id="cmw-avatar-fallback">?</span>
+            <video id="cmw-remote-video" autoplay playsinline muted></video>
+        </div>
         <div class="cmw-info">
             <div class="cmw-name" id="cmw-name">مستخدم</div>
             <div class="cmw-timer" id="cmw-timer">00:00</div>
@@ -5443,6 +5454,7 @@
             pc.ontrack = e => {
                 const remoteVideo = document.getElementById('call-remote-video');
                 if (remoteVideo.srcObject !== e.streams[0]) remoteVideo.srcObject = e.streams[0];
+                _syncMiniWidgetRemoteVideo();
             };
             pc.onnegotiationneeded = async () => {
                 if (!_call || !_call.initialNegotiationDone) return;
@@ -5472,8 +5484,30 @@
 
         function _updatePeerCamUI(d) {
             const peerCamOn = _call.role === 'caller' ? d.calleeCamOn : d.callerCamOn;
+            _call.peerCamOn = peerCamOn;
             const placeholder = document.getElementById('call-remote-placeholder');
             placeholder.style.display = peerCamOn ? 'none' : 'flex';
+            _syncMiniWidgetRemoteVideo();
+        }
+
+        // Shows the other person's live camera feed inside the floating mini widget's
+        // avatar circle (in place of their photo/initials) whenever their camera is on —
+        // so the little bubble mirrors what you'd see on the full call screen.
+        function _syncMiniWidgetRemoteVideo() {
+            const cmwVideo = document.getElementById('cmw-remote-video');
+            const cmwFallback = document.getElementById('cmw-avatar-fallback');
+            if (!cmwVideo || !cmwFallback) return;
+            const remoteVideo = document.getElementById('call-remote-video');
+            const peerCamOn = !!(_call && _call.peerCamOn && remoteVideo && remoteVideo.srcObject);
+            if (peerCamOn) {
+                if (cmwVideo.srcObject !== remoteVideo.srcObject) cmwVideo.srcObject = remoteVideo.srcObject;
+                cmwVideo.classList.add('show');
+                cmwFallback.style.display = 'none';
+            } else {
+                cmwVideo.classList.remove('show');
+                cmwVideo.srcObject = null;
+                cmwFallback.style.display = '';
+            }
         }
 
         function _listenCallDoc() {
@@ -5539,6 +5573,10 @@
             document.getElementById('call-mini-widget').classList.remove('show');
             const cmwMic = document.getElementById('cmw-mic-btn'); if (cmwMic) { cmwMic.innerHTML = CALL_ICONS.micOn; cmwMic.classList.remove('active'); }
             const cmwCam = document.getElementById('cmw-cam-btn'); if (cmwCam) { cmwCam.innerHTML = CALL_ICONS.camOn; cmwCam.classList.remove('active'); }
+            const cmwVideo = document.getElementById('cmw-remote-video');
+            if (cmwVideo) { cmwVideo.classList.remove('show'); cmwVideo.srcObject = null; }
+            const cmwFallback = document.getElementById('cmw-avatar-fallback');
+            if (cmwFallback) cmwFallback.style.display = '';
         }
 
         function _onCallConnected() {
@@ -5720,6 +5758,10 @@
             document.getElementById('call-remote-video').srcObject = null;
             document.getElementById('call-local-video').srcObject = null;
             document.getElementById('call-mini-widget').classList.remove('show');
+            const cmwVideo = document.getElementById('cmw-remote-video');
+            if (cmwVideo) { cmwVideo.classList.remove('show'); cmwVideo.srcObject = null; }
+            const cmwFallback = document.getElementById('cmw-avatar-fallback');
+            if (cmwFallback) cmwFallback.style.display = '';
             document.body.style.overflow = '';
         }
 
@@ -5734,7 +5776,7 @@
             document.body.style.overflow = '';
             const widget = document.getElementById('call-mini-widget');
             const initial = (_call.peerName || '?').charAt(0).toUpperCase();
-            const avatarEl = document.getElementById('cmw-avatar');
+            const avatarEl = document.getElementById('cmw-avatar-fallback');
             const av = avatarImgHtml(_call.peerPhoto, 'cp-avatar-img', initial);
             avatarEl.innerHTML = av || initial;
             document.getElementById('cmw-name').textContent = _call.peerName || 'مستخدم';
@@ -5744,6 +5786,7 @@
             const cmwCam = document.getElementById('cmw-cam-btn');
             if (micBtn && cmwMic) { cmwMic.innerHTML = micBtn.innerHTML; cmwMic.classList.toggle('active', micBtn.classList.contains('active')); }
             if (camBtn && cmwCam) { cmwCam.innerHTML = camBtn.innerHTML; cmwCam.classList.toggle('active', camBtn.classList.contains('active')); }
+            _syncMiniWidgetRemoteVideo();
             widget.classList.add('show');
             _attachMiniWidgetHandlers();
         };
