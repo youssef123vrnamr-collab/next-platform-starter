@@ -1512,6 +1512,55 @@
         .call-ctrl-btn.hangup { background: #ef4444; box-shadow: 0 0 18px rgba(239,68,68,0.55); }
         .ic-avatar-img, .cp-avatar-img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
 
+        /* ===== FLOATING (MINIMIZED) CALL WIDGET ===== */
+        /* Lets the user shrink an active call into a small draggable pill so they
+           can keep browsing/playing on the platform while still talking, muting,
+           or toggling their camera. */
+        #call-mini-widget {
+            position: fixed; z-index: 18500; display: none; align-items: center; gap: 9px;
+            bottom: 90px; left: 14px; padding: 7px 9px 7px 7px; border-radius: 30px;
+            background: rgba(20, 12, 32, 0.94); backdrop-filter: blur(14px);
+            border: 1px solid rgba(192,38,211,0.4); box-shadow: 0 10px 28px rgba(0,0,0,0.55);
+            touch-action: none; cursor: grab; max-width: 250px; user-select: none;
+        }
+        #call-mini-widget.show { display: flex; }
+        #call-mini-widget:active { cursor: grabbing; }
+        #call-mini-widget .cmw-avatar {
+            width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0; overflow: hidden;
+            background: #2a1a3a; display: flex; align-items: center; justify-content: center;
+            color: #fff; font-weight: 800; font-size: 15px; border: 2px solid var(--magenta);
+        }
+        #call-mini-widget .cmw-info { min-width: 0; flex: 1; }
+        #call-mini-widget .cmw-name {
+            color: var(--bright); font-size: 12px; font-weight: 700; white-space: nowrap;
+            overflow: hidden; text-overflow: ellipsis; max-width: 88px;
+        }
+        #call-mini-widget .cmw-timer { color: #22c55e; font-size: 10.5px; font-weight: 700; }
+        #call-mini-widget .cmw-actions { display: flex; gap: 5px; flex-shrink: 0; }
+        #call-mini-widget .cmw-btn {
+            width: 29px; height: 29px; border-radius: 50%; border: none; cursor: pointer; font-size: 12.5px;
+            display: flex; align-items: center; justify-content: center; color: #fff;
+            background: rgba(255,255,255,0.14); flex-shrink: 0;
+        }
+        #call-mini-widget .cmw-btn.active { background: #fff; color: #171021; }
+        #call-mini-widget .cmw-hangup { background: #ef4444; }
+
+        /* ===== RINGTONE PICKER (profile settings) ===== */
+        .ringtone-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .ringtone-opt {
+            display: flex; align-items: center; justify-content: space-between; gap: 6px;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 10px;
+            padding: 9px 10px; cursor: pointer; color: var(--text-dim); font-size: 12.5px; font-weight: 600;
+            transition: border-color .15s, background .15s, color .15s;
+        }
+        .ringtone-opt.active { border-color: var(--magenta); background: rgba(192,38,211,0.14); color: var(--bright); }
+        .ringtone-opt .ro-name { pointer-events: none; }
+        .ringtone-opt .ro-play {
+            width: 24px; height: 24px; border-radius: 50%; background: rgba(255,255,255,0.1);
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 11px; color: #fff;
+        }
+        .ringtone-opt.active .ro-play { background: var(--magenta); }
+
         .ratings-list .rating-item { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.05); font-size: 13px; }
         .ratings-list .rating-item .likes { color: #4fc3f7; }
         .ratings-list .rating-item .dislikes { color: #ff7a7a; }
@@ -2673,6 +2722,11 @@
                 </div>
             </div>
             <div class="profile-fs-card">
+                <div class="profile-fs-card-title">نغمة رنين المكالمات</div>
+                <p style="font-size:12px;color:var(--text-dim);margin:0 0 10px">اختار النغمة اللي هتسمعها وقت ما حد يتصل بيك — كل شخص يقدر يختار نغمته الخاصة</p>
+                <div class="ringtone-grid" id="profile-ringtone-grid" data-selected="classic"></div>
+            </div>
+            <div class="profile-fs-card">
                 <div class="profile-fs-card-title">المعلومات الشخصية</div>
                 <div class="profile-field">
                     <label class="profile-label">الاسم</label>
@@ -2874,9 +2928,27 @@
         <div class="call-controls">
             <button class="call-ctrl-btn" id="call-mic-btn" onclick="toggleCallMic()" title="كتم الصوت">🎤</button>
             <button class="call-ctrl-btn" id="call-cam-btn" onclick="toggleCallCam()" title="الكاميرا">📷</button>
+            <button class="call-ctrl-btn" id="call-min-btn" onclick="minimizeCall()" title="تصغير المكالمة وكمّل تلعب">🔽</button>
             <button class="call-ctrl-btn hangup" onclick="hangUpCall()" title="إنهاء المكالمة">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style="transform:rotate(135deg)"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1C10.61 21 3 13.39 3 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.25 1.01l-2.2 2.2z"/></svg>
             </button>
+        </div>
+    </div>
+
+    <!-- ===== FLOATING MINI CALL WIDGET (shown after minimizing an active call) ===== -->
+    <!-- Draggable pill: tap it to re-open the full call screen, drag it anywhere
+         out of the way while playing, and use the buttons to mute/cam/hangup
+         without leaving whatever you're doing on the platform. -->
+    <div id="call-mini-widget">
+        <div class="cmw-avatar" id="cmw-avatar">?</div>
+        <div class="cmw-info">
+            <div class="cmw-name" id="cmw-name">مستخدم</div>
+            <div class="cmw-timer" id="cmw-timer">00:00</div>
+        </div>
+        <div class="cmw-actions">
+            <button class="cmw-btn" id="cmw-mic-btn" title="كتم الصوت">🎤</button>
+            <button class="cmw-btn" id="cmw-cam-btn" title="الكاميرا">📷</button>
+            <button class="cmw-btn cmw-hangup" id="cmw-hangup-btn" title="إنهاء المكالمة">✕</button>
         </div>
     </div>
 
@@ -5197,26 +5269,83 @@
 
         function _callDocRef(id) { return doc(db, 'calls', id); }
 
+        // ===== RINGTONES =====
+        // Every user can pick their own incoming-call ringtone from the profile
+        // screen. Each preset is just a wave-shape + a little note sequence, so no
+        // audio files are needed — it's all synthesized live with the Web Audio API.
+        const RINGTONES = {
+            classic: { label: '🔔 كلاسيكي', wave: 'sine', notes: [[620, 500]], cycle: 1400 },
+            chime: { label: '🎐 جرس', wave: 'triangle', notes: [[523, 160], [659, 160], [784, 260]], cycle: 1700 },
+            digital: { label: '📱 رقمي', wave: 'square', notes: [[700, 90], [0, 60], [700, 90], [0, 60], [700, 90]], cycle: 1250 },
+            marimba: { label: '🎵 ماريمبا', wave: 'sine', notes: [[784, 140], [659, 140], [523, 220]], cycle: 1600 },
+            gentle: { label: '🌙 هادئة', wave: 'sine', notes: [[440, 700]], cycle: 1900 },
+            retro: { label: '👾 ريترو', wave: 'sawtooth', notes: [[320, 90], [520, 90], [720, 90], [520, 90]], cycle: 1500 }
+        };
+
+        function _scheduleRingPattern(ctx, tone, pitchScale) {
+            let t = ctx.currentTime;
+            tone.notes.forEach(([freq, dur]) => {
+                if (freq > 0) {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = tone.wave || 'sine';
+                    osc.frequency.value = freq * pitchScale;
+                    gain.gain.setValueAtTime(0.0001, t);
+                    gain.gain.exponentialRampToValueAtTime(0.18, t + 0.04);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, t + dur / 1000);
+                    osc.connect(gain).connect(ctx.destination);
+                    osc.start(t); osc.stop(t + dur / 1000 + 0.03);
+                }
+                t += dur / 1000;
+            });
+        }
+
         function _playRingtone(isOutgoing) {
             _stopRingtone();
             try {
                 _ringAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                const beep = () => {
-                    if (!_ringAudioCtx) return;
-                    const osc = _ringAudioCtx.createOscillator();
-                    const gain = _ringAudioCtx.createGain();
-                    osc.frequency.value = isOutgoing ? 480 : 620;
-                    gain.gain.setValueAtTime(0.0001, _ringAudioCtx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.18, _ringAudioCtx.currentTime + 0.05);
-                    gain.gain.exponentialRampToValueAtTime(0.0001, _ringAudioCtx.currentTime + 0.5);
-                    osc.connect(gain).connect(_ringAudioCtx.destination);
-                    osc.start(); osc.stop(_ringAudioCtx.currentTime + 0.55);
-                };
-                beep();
-                _ringInterval = setInterval(beep, 1400);
+                // Incoming calls ring with *my own* chosen ringtone; outgoing calls
+                // just play a softer/lower version of the classic tone as a dial-back cue.
+                const key = (!isOutgoing && S.userProfile && S.userProfile.ringtone) ? S.userProfile.ringtone : 'classic';
+                const tone = RINGTONES[key] || RINGTONES.classic;
+                const pitchScale = isOutgoing ? 0.78 : 1;
+                const play = () => { if (_ringAudioCtx) _scheduleRingPattern(_ringAudioCtx, tone, pitchScale); };
+                play();
+                _ringInterval = setInterval(play, tone.cycle);
                 if (navigator.vibrate && !isOutgoing) navigator.vibrate([500, 400, 500, 400, 500]);
             } catch (e) { /* ignore audio errors */ }
         }
+
+        window.previewRingtone = function(key) {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const tone = RINGTONES[key] || RINGTONES.classic;
+                _scheduleRingPattern(ctx, tone, 1);
+                setTimeout(() => { try { ctx.close(); } catch (e) {} }, 2200);
+            } catch (e) { /* ignore audio errors */ }
+        };
+
+        window._renderRingtoneOptions = function(selected) {
+            const grid = document.getElementById('profile-ringtone-grid');
+            if (!grid) return;
+            const key = RINGTONES[selected] ? selected : 'classic';
+            grid.dataset.selected = key;
+            grid.innerHTML = Object.keys(RINGTONES).map(k => {
+                const t = RINGTONES[k];
+                return `<button type="button" class="ringtone-opt${k === key ? ' active' : ''}" data-key="${k}" onclick="selectProfileRingtone('${k}')">
+                    <span class="ro-name">${t.label}</span>
+                    <span class="ro-play" onclick="event.stopPropagation();previewRingtone('${k}')">▶</span>
+                </button>`;
+            }).join('');
+        };
+
+        window.selectProfileRingtone = function(key) {
+            const grid = document.getElementById('profile-ringtone-grid');
+            if (!grid) return;
+            grid.dataset.selected = key;
+            grid.querySelectorAll('.ringtone-opt').forEach(b => b.classList.toggle('active', b.dataset.key === key));
+            previewRingtone(key);
+        };
         function _stopRingtone() {
             if (_ringInterval) { clearInterval(_ringInterval); _ringInterval = null; }
             if (_ringAudioCtx) { try { _ringAudioCtx.close(); } catch (e) {} _ringAudioCtx = null; }
@@ -5387,6 +5516,10 @@
             document.getElementById('call-timer-text').textContent = '📞 ' + _call.peerName;
             modal.classList.add('open');
             document.body.style.overflow = 'hidden';
+            // Reset the floating widget too, in case a previous call left it in a stale state.
+            document.getElementById('call-mini-widget').classList.remove('show');
+            const cmwMic = document.getElementById('cmw-mic-btn'); if (cmwMic) { cmwMic.textContent = '🎤'; cmwMic.classList.remove('active'); }
+            const cmwCam = document.getElementById('cmw-cam-btn'); if (cmwCam) { cmwCam.textContent = '📷'; cmwCam.classList.remove('active'); }
         }
 
         function _onCallConnected() {
@@ -5400,6 +5533,8 @@
                 const m = String(Math.floor(secs / 60)).padStart(2, '0');
                 const s = String(secs % 60).padStart(2, '0');
                 document.getElementById('call-timer-text').textContent = `📞 ${_call.peerName} • ${m}:${s}`;
+                const cmwTimer = document.getElementById('cmw-timer');
+                if (cmwTimer) cmwTimer.textContent = `${m}:${s}`;
             }, 1000);
         }
 
@@ -5503,9 +5638,13 @@
             if (!_call || !_call.localAudioTrack) return;
             _call.micOn = !_call.micOn;
             _call.localAudioTrack.enabled = _call.micOn;
-            const btn = document.getElementById('call-mic-btn');
-            btn.textContent = _call.micOn ? '🎤' : '🔇';
-            btn.classList.toggle('active', !_call.micOn);
+            const icon = _call.micOn ? '🎤' : '🔇';
+            ['call-mic-btn', 'cmw-mic-btn'].forEach(id => {
+                const btn = document.getElementById(id);
+                if (!btn) return;
+                btn.textContent = icon;
+                btn.classList.toggle('active', !_call.micOn);
+            });
         };
 
         window.toggleCallCam = async function() {
@@ -5532,6 +5671,11 @@
             }
             btn.textContent = _call.camOn ? '📷' : '🚫';
             btn.classList.toggle('active', _call.camOn);
+            const cmwCamBtn = document.getElementById('cmw-cam-btn');
+            if (cmwCamBtn) {
+                cmwCamBtn.textContent = _call.camOn ? '📷' : '🚫';
+                cmwCamBtn.classList.toggle('active', _call.camOn);
+            }
             const field = _call.role === 'caller' ? 'callerCamOn' : 'calleeCamOn';
             updateDoc(_callDocRef(_call.id), { [field]: _call.camOn }).catch(() => {});
         };
@@ -5556,7 +5700,77 @@
             document.getElementById('call-modal').classList.remove('open');
             document.getElementById('call-remote-video').srcObject = null;
             document.getElementById('call-local-video').srcObject = null;
+            document.getElementById('call-mini-widget').classList.remove('show');
             document.body.style.overflow = '';
+        }
+
+        // ===== MINIMIZE / EXPAND ACTIVE CALL =====
+        // Shrinks the full-screen call UI into a small floating, draggable pill so
+        // the person can keep browsing or playing a game while still on the call.
+        // The WebRTC connection, mic and camera keep running exactly as before —
+        // only the call screen's visibility changes.
+        window.minimizeCall = function() {
+            if (!_call) return;
+            document.getElementById('call-modal').classList.remove('open');
+            document.body.style.overflow = '';
+            const widget = document.getElementById('call-mini-widget');
+            const initial = (_call.peerName || '?').charAt(0).toUpperCase();
+            const avatarEl = document.getElementById('cmw-avatar');
+            const av = avatarImgHtml(_call.peerPhoto, 'cp-avatar-img', initial);
+            avatarEl.innerHTML = av || initial;
+            document.getElementById('cmw-name').textContent = _call.peerName || 'مستخدم';
+            const micBtn = document.getElementById('call-mic-btn');
+            const camBtn = document.getElementById('call-cam-btn');
+            const cmwMic = document.getElementById('cmw-mic-btn');
+            const cmwCam = document.getElementById('cmw-cam-btn');
+            if (micBtn && cmwMic) { cmwMic.textContent = micBtn.textContent; cmwMic.classList.toggle('active', micBtn.classList.contains('active')); }
+            if (camBtn && cmwCam) { cmwCam.textContent = camBtn.textContent; cmwCam.classList.toggle('active', camBtn.classList.contains('active')); }
+            widget.classList.add('show');
+            _attachMiniWidgetHandlers();
+        };
+
+        window.expandCall = function() {
+            if (!_call) return;
+            document.getElementById('call-mini-widget').classList.remove('show');
+            document.getElementById('call-modal').classList.add('open');
+            document.body.style.overflow = 'hidden';
+        };
+
+        function _attachMiniWidgetHandlers() {
+            const widget = document.getElementById('call-mini-widget');
+            if (widget._handlersAttached) return;
+            widget._handlersAttached = true;
+            document.getElementById('cmw-mic-btn').addEventListener('click', e => { e.stopPropagation(); toggleCallMic(); });
+            document.getElementById('cmw-cam-btn').addEventListener('click', e => { e.stopPropagation(); toggleCallCam(); });
+            document.getElementById('cmw-hangup-btn').addEventListener('click', e => { e.stopPropagation(); hangUpCall(); });
+            // Drag anywhere on the pill (but not its buttons) to reposition it;
+            // a tap that didn't move re-opens the full call screen.
+            let ox = 0, oy = 0, dragging = false, moved = false;
+            widget.addEventListener('pointerdown', e => {
+                if (e.target.closest('.cmw-btn')) return;
+                dragging = true; moved = false;
+                const rect = widget.getBoundingClientRect();
+                ox = e.clientX - rect.left; oy = e.clientY - rect.top;
+                try { widget.setPointerCapture(e.pointerId); } catch (err) {}
+            });
+            widget.addEventListener('pointermove', e => {
+                if (!dragging) return;
+                moved = true;
+                let x = e.clientX - ox, y = e.clientY - oy;
+                const maxX = window.innerWidth - widget.offsetWidth - 4;
+                const maxY = window.innerHeight - widget.offsetHeight - 4;
+                x = Math.max(4, Math.min(x, maxX));
+                y = Math.max(4, Math.min(y, maxY));
+                widget.style.left = x + 'px'; widget.style.top = y + 'px';
+                widget.style.right = 'auto'; widget.style.bottom = 'auto';
+            });
+            const endDrag = e => {
+                if (!dragging) return;
+                dragging = false;
+                if (!moved && !e.target.closest('.cmw-btn')) expandCall();
+            };
+            widget.addEventListener('pointerup', endDrag);
+            widget.addEventListener('pointercancel', endDrag);
         }
 
         window.deleteFriendMsg = async function(msgId) {
@@ -5851,6 +6065,7 @@
             const currentNationality = profile.nationality || '';
             const currentGender = profile.gender || '';
             const currentRingColor = profile.ringColor || '';
+            const currentRingtone = profile.ringtone || 'classic';
             document.getElementById('profile-name-input').value = currentName;
             document.getElementById('profile-photo-url').value = currentPhoto;
             document.getElementById('profile-cover-url').value = currentCover;
@@ -5860,6 +6075,7 @@
             ringColorInput.value = currentRingColor || '#c026d3';
             ringColorInput.dataset.cleared = currentRingColor ? '' : '1';
             previewProfileRingColor(currentRingColor);
+            _renderRingtoneOptions(currentRingtone);
             const dnEl = document.getElementById('profile-display-name');
             const drEl = document.getElementById('profile-display-role');
             if (dnEl) dnEl.textContent = currentName || '—';
@@ -5930,6 +6146,8 @@
             const gender = document.getElementById('profile-gender-select').value;
             const ringColorInput = document.getElementById('profile-ring-color');
             const ringColor = ringColorInput.dataset.cleared === '1' ? '' : ringColorInput.value;
+            const ringtoneGrid = document.getElementById('profile-ringtone-grid');
+            const ringtone = (ringtoneGrid && RINGTONES[ringtoneGrid.dataset.selected]) ? ringtoneGrid.dataset.selected : 'classic';
             if (!name) { saveErr.textContent = '❌ أدخل اسمك'; saveErr.style.display = 'block'; return; }
             btn.disabled = true;
             btn.innerHTML = 'جاري الحفظ <span class="spinner-ring"></span>';
@@ -5942,6 +6160,7 @@
                     nationality,
                     gender,
                     ringColor,
+                    ringtone,
                     updatedAt: new Date()
                 };
                 await setDoc(doc(db, 'userProfiles', S.user.uid), profileData, { merge: true });
