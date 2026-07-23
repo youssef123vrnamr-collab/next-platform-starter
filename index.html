@@ -22,6 +22,7 @@
         .btn-ic { width: 15px; height: 15px; vertical-align: -3px; margin-inline-end: 5px; flex-shrink: 0; display: inline-block; }
         .menu-nav-icon .btn-ic, .crown .btn-ic, .lock-icon .btn-ic { margin-inline-end: 0; width: 18px; height: 18px; vertical-align: -4px; }
         .search-icon .btn-ic, .section-icon .btn-ic, .empty-icon .btn-ic, .sus-icon .btn-ic, .emoji .btn-ic, .wachat-empty-icon .btn-ic { margin-inline-end: 0; width: 1em; height: 1em; vertical-align: -0.15em; }
+        .menu-panel-close .btn-ic, .panel-close .btn-ic, .search-clear .btn-ic, .profile-fs-back .btn-ic, .ic-btn .btn-ic, .comment-reply-preview-close .btn-ic, .wachat-reply-preview-close .btn-ic, .remove-admin .btn-ic, .wabubble-delete-btn .btn-ic, .wabubble-action-btn .btn-ic { margin-inline-end: 0; vertical-align: middle; }
         :root {
             --void: #0a0814;
             --void-2: #120e22;
@@ -3606,15 +3607,17 @@
             actions.className = 'admin-actions' + (S.isAdmin ? ' visible' : '');
             const lockBtn = document.createElement('button');
             lockBtn.className = 'act-btn ' + (v.locked ? 'btn-unlock' : 'btn-lock');
-            lockBtn.textContent = v.locked ? '🔓 فتح' : '🔒 قفل';
+            lockBtn.innerHTML = v.locked
+                ? '<svg class="btn-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg> فتح'
+                : '<svg class="btn-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> قفل';
             lockBtn.onclick = () => handleToggleLock(v.id);
             const editBtn = document.createElement('button');
             editBtn.className = 'act-btn btn-edit';
-            editBtn.textContent = '✏ تعديل';
+            editBtn.innerHTML = '<svg class="btn-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4z"/></svg> تعديل';
             editBtn.onclick = () => openEditModal(v);
             const delBtn = document.createElement('button');
             delBtn.className = 'act-btn btn-del';
-            delBtn.textContent = '🗑 حذف';
+            delBtn.innerHTML = '<svg class="btn-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg> حذف';
             delBtn.onclick = () => handleDelete(v.id);
             actions.appendChild(lockBtn);
             actions.appendChild(editBtn);
