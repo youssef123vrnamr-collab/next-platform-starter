@@ -5283,6 +5283,7 @@
                 pc: null, localStream: null, localAudioTrack: null, localVideoTrack: null,
                 micOn: true, camOn: false,
                 initialNegotiationDone: role === 'caller',
+                lastNegotiatedSenderCount: 0,
                 myLastOfferRound: 0, lastAppliedOfferRound: 0, lastAppliedAnswerRound: 0,
                 docUnsub: null, candUnsub: null, ringTimeout: null, startedAt: null
             };
@@ -5458,6 +5459,13 @@
             };
             pc.onnegotiationneeded = async () => {
                 if (!_call || !_call.initialNegotiationDone) return;
+                // Guard against a spurious/duplicate negotiationneeded event: on the callee
+                // side, adding the local mic track happens before the initial answer is
+                // sent, so the browser can still fire this event right after — with no
+                // real change in tracks. Only renegotiate when the sender count actually changed.
+                const senderCount = pc.getSenders().filter(s => s.track).length;
+                if (senderCount === _call.lastNegotiatedSenderCount) return;
+                _call.lastNegotiatedSenderCount = senderCount;
                 try {
                     const offer = await pc.createOffer();
                     await pc.setLocalDescription(offer);
@@ -5674,6 +5682,7 @@
                     answer: { type: answer.type, sdp: answer.sdp },
                     answerRound: data.offerRound || 1, answerFrom: S.user.uid, status: 'accepted'
                 });
+                _call.lastNegotiatedSenderCount = _call.pc.getSenders().filter(s => s.track).length;
                 _call.initialNegotiationDone = true;
             } catch (e) {
                 console.error('accept call error:', e);
