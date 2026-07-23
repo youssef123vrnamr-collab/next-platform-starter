@@ -2369,6 +2369,9 @@
                     <div class="menu-nav-item" onclick="openAdminPanel('admin-comments')">
                         <span class="menu-nav-icon">💬</span> التعليقات
                     </div>
+                    <div class="menu-nav-item" id="menu-issues-btn" onclick="openAdminPanel('admin-issues')">
+                        <span class="menu-nav-icon">⚠️</span> أعطال المنصة <span id="menu-issues-badge" style="display:none;background:#ff4646;color:#fff;font-size:10px;border-radius:10px;padding:1px 6px;margin-right:6px">0</span>
+                    </div>
                 </div>
 
                 <div class="menu-nav-divider"></div>
@@ -2440,6 +2443,7 @@
                         <button class="panel-tab" data-tab="admin-admins" onclick="switchPanelTab('admin-admins')">👥 مشرفين</button>
                         <button class="panel-tab active" data-tab="admin-ratings" onclick="switchPanelTab('admin-ratings')">⭐ تقييمات</button>
                         <button class="panel-tab" data-tab="admin-comments" onclick="switchPanelTab('admin-comments')">💬 تعليقات</button>
+                        <button class="panel-tab" data-tab="admin-issues" onclick="switchPanelTab('admin-issues')">⚠️ أعطال</button>
                         <button class="panel-tab" data-tab="admin-users" onclick="switchPanelTab('admin-users')">🚫 المستخدمين</button>
                     </div>
 
@@ -2474,6 +2478,13 @@
                     <!-- Comments -->
                     <div class="panel-tab-content" id="tab-admin-comments">
                         <div id="admin-comments-list"></div>
+                    </div>
+
+                    <div class="panel-tab-content" id="tab-admin-issues">
+                        <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
+                            <button class="comment-delete-btn" onclick="clearAllAdminIssues()">🗑 مسح الكل</button>
+                        </div>
+                        <div id="admin-issues-list"></div>
                     </div>
 
                     <!-- Users Management -->
@@ -3121,6 +3132,7 @@
             query,
             orderBy,
             where,
+            limit,
             enableNetwork,
             onSnapshot,
             serverTimestamp,
@@ -4066,6 +4078,104 @@
                 container.innerHTML = `<p style="color:var(--text-dim);font-size:13px">خطأ في تحميل التعليقات</p>`;
             }
         }
+
+        // ===== ADMIN ISSUES (PLATFORM ERROR LOG) =====
+        async function renderAdminIssues() {
+            const container = document.getElementById('admin-issues-list');
+            if (!container) return;
+            container.innerHTML = `<p style="color:var(--text-dim);font-size:13px">جارِ التحميل...</p>`;
+            try {
+                const q = query(collection(db, 'platformIssues'), orderBy('timestamp', 'desc'), limit(100));
+                const snap = await getDocs(q);
+                if (snap.empty) {
+                    container.innerHTML = `<p style="color:var(--text-dim);font-size:13px">لا توجد أعطال مسجلة 👍</p>`;
+                    updateIssuesBadge(0);
+                    return;
+                }
+                const docs = snap.docs;
+                updateIssuesBadge(docs.length);
+                container.innerHTML = docs.map(d => {
+                    const iss = d.data();
+                    const msg = (iss.message || 'خطأ غير معروف').toString().slice(0, 400);
+                    const stack = (iss.stack || '').toString().slice(0, 600);
+                    return `
+                        <div class="comment-item" style="padding:10px;background:var(--surface);border-radius:8px;margin-bottom:8px;border-right:3px solid #ff4646">
+                            <div class="comment-body" style="width:100%">
+                                <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+                                    <div class="comment-name" style="color:#ff9a9a">⚠️ ${msg}</div>
+                                    <button class="comment-delete-btn" onclick="deleteAdminIssue('${d.id}')">🗑</button>
+                                </div>
+                                ${iss.url ? `<div style="color:var(--text-dim);font-size:11px;margin-top:4px">📍 ${iss.url}</div>` : ''}
+                                ${stack ? `<pre style="color:var(--text-dim);font-size:10px;white-space:pre-wrap;background:rgba(0,0,0,0.25);padding:6px;border-radius:6px;margin-top:6px;max-height:120px;overflow:auto">${stack}</pre>` : ''}
+                                <div class="comment-time">${getTimeAgo(iss.timestamp)} ${iss.userEmail ? '· ' + iss.userEmail : ''}</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (e) {
+                container.innerHTML = `<p style="color:var(--text-dim);font-size:13px">خطأ في تحميل الأعطال</p>`;
+            }
+        }
+
+        window.deleteAdminIssue = async function(id) {
+            try {
+                await deleteDoc(doc(db, 'platformIssues', id));
+                renderAdminIssues();
+            } catch (e) {
+                showToast('❌ تعذر حذف السجل');
+            }
+        };
+
+        window.clearAllAdminIssues = async function() {
+            if (!confirm('هل أنت متأكد من مسح كل سجلات الأعطال؟')) return;
+            try {
+                const snap = await getDocs(collection(db, 'platformIssues'));
+                await Promise.all(snap.docs.map(d => deleteDoc(doc(db, 'platformIssues', d.id))));
+                renderAdminIssues();
+                showToast('✅ تم مسح سجل الأعطال');
+            } catch (e) {
+                showToast('❌ تعذر مسح السجل');
+            }
+        };
+
+        function updateIssuesBadge(count) {
+            const badge = document.getElementById('menu-issues-badge');
+            if (!badge) return;
+            if (count > 0) {
+                badge.style.display = 'inline-block';
+                badge.textContent = count > 99 ? '99+' : count;
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
+        // ===== AUTOMATIC ERROR CAPTURE =====
+        const _reportedIssueKeys = new Set();
+        async function reportPlatformIssue(message, extra = {}) {
+            try {
+                const key = (message || '').toString().slice(0, 200);
+                if (_reportedIssueKeys.has(key)) return; // avoid duplicate spam in same session
+                if (_reportedIssueKeys.size > 30) return; // hard cap per session
+                _reportedIssueKeys.add(key);
+                await addDoc(collection(db, 'platformIssues'), {
+                    message: key,
+                    stack: (extra.stack || '').toString().slice(0, 2000),
+                    url: location.href,
+                    userAgent: navigator.userAgent,
+                    userEmail: S.user?.email || null,
+                    timestamp: serverTimestamp()
+                });
+            } catch (e) {
+                // Swallow errors from the error-reporter itself to avoid loops
+            }
+        }
+        window.addEventListener('error', (e) => {
+            reportPlatformIssue(e.message, { stack: e.error?.stack });
+        });
+        window.addEventListener('unhandledrejection', (e) => {
+            const reason = e.reason;
+            reportPlatformIssue(reason?.message || String(reason), { stack: reason?.stack });
+        });
 
         // ===== SUSPEND =====
         async function checkSuspended(uid) {
@@ -5847,6 +5957,7 @@
             document.querySelectorAll('.panel-tab-content').forEach(c => c.classList.toggle('active', c.id === 'tab-' + tabId));
             if (tabId === 'admin-ratings') renderAdminRatings();
             if (tabId === 'admin-comments') renderAdminComments();
+            if (tabId === 'admin-issues') renderAdminIssues();
             if (tabId === 'admin-admins') { renderAdminList(); renderUsersDirectory(); }
             if (tabId === 'admin-videos') renderAdminVideoList();
             if (tabId === 'admin-users') renderUsersDirectory();
