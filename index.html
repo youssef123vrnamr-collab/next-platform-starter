@@ -699,6 +699,9 @@
             border-radius: 16px;
             overflow: hidden;
             position: relative;
+            contain: content;
+            content-visibility: auto;
+            contain-intrinsic-size: 300px 360px;
             transition: transform .3s, box-shadow .3s, border-color .3s;
         }
         .video-card::before {
@@ -725,7 +728,7 @@
         }
         .video-card:active { transform: scale(.99); }
         .thumb-wrap { position: relative; padding-bottom: 56.25%; background: #000; overflow: hidden; cursor: pointer; }
-        .thumb-bg { position: absolute; inset: 0; background-size: cover; background-position: center; transition: transform .45s ease; }
+        .thumb-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; background: linear-gradient(135deg,#150f2c,#1a1335); transition: transform .45s ease; }
         .thumb-gradient { position: absolute; inset: 0; background: linear-gradient(to top, rgba(8, 6, 16, 0.82) 0%, transparent 55%); }
         .play-btn {
             position: absolute;
@@ -3534,8 +3537,12 @@
 
             const thumbWrap = document.createElement('div');
             thumbWrap.className = 'thumb-wrap';
-            const thumbBg = document.createElement('div');
+            const thumbBg = document.createElement('img');
             thumbBg.className = 'thumb-bg';
+            thumbBg.loading = 'lazy';
+            thumbBg.decoding = 'async';
+            thumbBg.alt = v.title || '';
+            thumbBg.onerror = () => { thumbBg.removeAttribute('src'); };
 
             let thumbUrl = '';
             if (v.type === 'drive') {
@@ -3547,8 +3554,7 @@
             } else {
                 thumbUrl = ytThumb(v.youtubeId);
             }
-            if (thumbUrl) thumbBg.style.backgroundImage = `url(${thumbUrl})`;
-            else thumbBg.style.background = 'linear-gradient(135deg,#150f2c,#1a1335)';
+            if (thumbUrl) thumbBg.src = thumbUrl;
 
             const grad = document.createElement('div');
             grad.className = 'thumb-gradient';
