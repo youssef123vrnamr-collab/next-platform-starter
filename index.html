@@ -1208,6 +1208,13 @@
             background: var(--grad); display: flex; align-items: center; justify-content: center;
             color: #0a0814; font-weight: 900; font-size: 13px; border: 1.5px solid rgba(192,38,211,0.3);
         }
+        .directory-avatar-wrap { position: relative; width: 32px; height: 32px; min-width: 32px; flex-shrink: 0; }
+        .presence-dot {
+            position: absolute; bottom: -1px; right: -1px; width: 10px; height: 10px;
+            border-radius: 50%; border: 2px solid #0f0a1a; box-shadow: 0 0 4px 0 rgba(0,0,0,0.5);
+        }
+        .presence-dot.online { background: #3ddc84; box-shadow: 0 0 6px 1px rgba(61,220,132,0.7); }
+        .presence-dot.offline { background: #ff4d4d; box-shadow: 0 0 6px 1px rgba(255,77,77,0.5); }
         .directory-info { flex: 1; min-width: 0; }
         .directory-name { color: var(--bright); font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .directory-email { color: var(--text-dim); font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -2713,7 +2720,7 @@
             </div>
             <button class="profile-save-btn" id="member-profile-follow-btn" onclick="toggleFollow(window._viewedMemberUid, window._viewedMemberName)">+ متابعة</button>
             <button class="profile-save-btn" style="margin-top:10px;background:var(--surface);color:var(--text);box-shadow:none" onclick="openFriendChat(window._viewedMemberUid, window._viewedMemberName, window._viewedMemberPhoto)">💬 ابدأ محادثة</button>
-            <button class="call-btn-profile" onclick="startCall(window._viewedMemberUid, window._viewedMemberName, window._viewedMemberPhoto)">
+            <button class="call-btn-profile" id="member-profile-call-btn" onclick="startCall(window._viewedMemberUid, window._viewedMemberName, window._viewedMemberPhoto)">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1C10.61 21 3 13.39 3 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.25 1.01l-2.2 2.2z"/></svg>
                 اتصال
             </button>
@@ -3141,6 +3148,14 @@
             arrayRemove,
             increment
         } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+        import {
+            getDatabase,
+            ref as rtdbRef,
+            onValue as rtdbOnValue,
+            set as rtdbSet,
+            onDisconnect as rtdbOnDisconnect,
+            serverTimestamp as rtdbServerTimestamp
+        } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
 
         // ===== CONFIG =====
         const FIREBASE_CONFIG = {
@@ -3156,6 +3171,7 @@
         setPersistence(auth, browserLocalPersistence).catch(()=>{});
         const db = initializeFirestore(app, { experimentalForceLongPolling: true, useFetchStreams: false }, 'default');
         enableNetwork(db).catch(() => {});
+        const rtdb = getDatabase(app);
 
         // ===== STATE =====
         const S = {
@@ -3182,6 +3198,7 @@
             gamesPlayerCount: null,
             games: [],
             editingGameId: null,
+            onlineUsers: new Set(),
         };
 
         // ===== HELPERS =====
@@ -4828,6 +4845,47 @@
             }
         };
 
+        // ===== PRESENCE SYSTEM (online / offline via Realtime Database) =====
+        let _presenceOnlineUnsub = null;
+        let _myStatusRef = null;
+
+        function setUpPresence(uid) {
+            if (!uid) return;
+            _myStatusRef = rtdbRef(rtdb, 'status/' + uid);
+            const connectedRef = rtdbRef(rtdb, '.info/connected');
+            rtdbOnValue(connectedRef, (snap) => {
+                if (snap.val() === false) return;
+                // When this client disconnects (tab closed, app killed, network lost),
+                // the database will automatically flip the status to offline.
+                rtdbOnDisconnect(_myStatusRef).set({ state: 'offline', last_changed: rtdbServerTimestamp() })
+                    .then(() => {
+                        rtdbSet(_myStatusRef, { state: 'online', last_changed: rtdbServerTimestamp() });
+                    });
+            });
+            // Listen to everyone's status to keep the members list live.
+            const statusRootRef = rtdbRef(rtdb, 'status');
+            if (_presenceOnlineUnsub) _presenceOnlineUnsub();
+            _presenceOnlineUnsub = rtdbOnValue(statusRootRef, (snap) => {
+                const val = snap.val() || {};
+                S.onlineUsers = new Set(
+                    Object.keys(val).filter(k => val[k] && val[k].state === 'online')
+                );
+                renderMembersList();
+            });
+        }
+
+        function tearDownPresence() {
+            if (_presenceOnlineUnsub) { _presenceOnlineUnsub(); _presenceOnlineUnsub = null; }
+            if (_myStatusRef) {
+                rtdbSet(_myStatusRef, { state: 'offline', last_changed: rtdbServerTimestamp() }).catch(() => {});
+                _myStatusRef = null;
+            }
+        }
+
+        window.isUserOnline = function(uid) {
+            return !!(uid && S.onlineUsers && S.onlineUsers.has(uid));
+        };
+
         window.openMembersModal = function() {
             if (!S.user) { showToast('🔑 سجّل دخولك أولاً', '#ffb020'); return; }
             closeMenuPanel();
@@ -4891,12 +4949,16 @@
             listEl.innerHTML = rows.map(e => {
                 const initial = (e.displayName || '?').charAt(0).toUpperCase();
                 const avatar = avatarImgHtml(e.photoURL, 'directory-avatar', initial, e.ringColor) || `<div class="directory-avatar">${_escapeHtml(initial)}</div>`;
+                const online = isUserOnline(e.uid);
                 return `
                 <div class="directory-item" onclick="openMemberProfile('${e.uid}')" style="cursor:pointer">
-                    ${avatar}
+                    <div class="directory-avatar-wrap">
+                        ${avatar}
+                        <span class="presence-dot ${online ? 'online' : 'offline'}" title="${online ? 'متصل الآن' : 'غير متصل'}"></span>
+                    </div>
                     <div class="directory-info">
                         <div class="directory-name">${_escapeHtml(e.displayName)}${e.adminRole ? (e.adminRole === 'main' ? ' 👑' : ' 🔑') : ''}</div>
-                        <div class="directory-email">${e.followersCount || 0} متابِع</div>
+                        <div class="directory-email">${e.followersCount || 0} متابِع${online ? ' • <span style="color:#3ddc84">متصل الآن</span>' : ''}</div>
                     </div>
                 </div>`;
             }).join('');
@@ -4944,7 +5006,11 @@
             window._viewedMemberPhoto = entry.photoURL || '';
             document.getElementById('member-profile-name').textContent = entry.displayName || '—';
             const roleEl = document.getElementById('member-profile-role');
-            roleEl.textContent = entry.adminRole === 'main' ? '👑 مشرف رئيسي' : entry.adminRole === 'normal' ? '🔑 مشرف عادي' : '👤 مستخدم';
+            const roleLabel = entry.adminRole === 'main' ? '👑 مشرف رئيسي' : entry.adminRole === 'normal' ? '🔑 مشرف عادي' : '👤 مستخدم';
+            const online = isUserOnline(entry.uid);
+            roleEl.innerHTML = `${_escapeHtml(roleLabel)} <span style="display:inline-flex;align-items:center;gap:4px;margin-inline-start:6px;font-size:11px;color:${online ? '#3ddc84' : '#ff7a7a'}"><span style="width:8px;height:8px;border-radius:50%;display:inline-block;background:${online ? '#3ddc84' : '#ff7a7a'}"></span>${online ? 'متصل الآن' : 'غير متصل'}</span>`;
+            const callBtn = document.getElementById('member-profile-call-btn');
+            if (callBtn) { callBtn.style.opacity = online ? '1' : '0.45'; callBtn.style.filter = online ? 'none' : 'grayscale(1)'; }
             const img = document.getElementById('member-profile-img');
             const initials = document.getElementById('member-profile-initials');
             initials.textContent = (entry.displayName || '?').charAt(0).toUpperCase();
@@ -5341,6 +5407,7 @@
             if (!peerUid) { showToast('❌ تعذر تحديد المستخدم', '#ff7a7a'); return; }
             if (peerUid === S.user.uid) { showToast('❌ ما تقدرش تتصل بنفسك 😅', '#ffb020'); return; }
             if (_call) { showToast('📞 عندك مكالمة شغالة بالفعل', '#ffb020'); return; }
+            if (!isUserOnline(peerUid)) { showToast('⚠️ الشخص ده مش موجود على المنصة دلوقتي', '#ff7a7a'); return; }
             let stream;
             try {
                 stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
@@ -6482,8 +6549,10 @@
                     await loadFollowState(fbUser.uid);
                     updateUI();
                     setUpGlobalCallListener();
+                    setUpPresence(fbUser.uid);
                 }
             } else if (!fbUser) {
+                tearDownPresence();
                 S.user = null;
                 S.isAdmin = false;
                 S.isMainAdmin = false;
@@ -6506,8 +6575,15 @@
                     await loadFollowState(fbUser.uid);
                     updateUI();
                     setUpGlobalCallListener();
+                    setUpPresence(fbUser.uid);
                 }
             }
+        });
+
+        // Mark offline as soon as the tab/app is actually closing (onDisconnect
+        // covers crashes/network loss, this covers a clean close a bit faster).
+        window.addEventListener('beforeunload', () => {
+            if (_myStatusRef) { try { rtdbSet(_myStatusRef, { state: 'offline', last_changed: rtdbServerTimestamp() }); } catch (e) {} }
         });
 
         // ESC
