@@ -218,6 +218,10 @@
             backdrop-filter: blur(22px);
             -webkit-backdrop-filter: blur(22px);
             border-bottom: 1px solid rgba(192, 38, 211, 0.14);
+            transform: translateZ(0);
+            -webkit-transform: translateZ(0);
+            isolation: isolate;
+            will-change: transform;
         }
         .nav-logo { display: flex; align-items: center; gap: 13px; text-decoration: none; cursor: default; }
         .nav-logo-icon {
@@ -613,6 +617,10 @@
             backdrop-filter: blur(18px);
             -webkit-backdrop-filter: blur(18px);
             border-bottom: 1px solid var(--border);
+            transform: translateZ(0);
+            -webkit-transform: translateZ(0);
+            isolation: isolate;
+            will-change: transform;
         }
         .search-wrap { max-width: 720px; margin: 0 auto; position: relative; }
         .search-icon {
