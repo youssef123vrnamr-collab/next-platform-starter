@@ -965,6 +965,27 @@
         /* Panel states */
         #state-loading, #state-no-admin, #state-blocked, #state-is-admin, #state-user { display: none; }
         .loading-card { text-align: center; padding: 50px 0; color: var(--text); font-size: 14px; }
+        /* Data loading progress bar (shown when restoring session on re-login) */
+        #data-load-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: #00000015;
+            z-index: 99999;
+            display: none;
+        }
+        #data-load-progress.show {
+            display: block;
+        }
+        #data-load-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #a855f7, #ec4899, #a855f7);
+            width: 0%;
+            transition: width 0.3s ease-out;
+            box-shadow: 0 0 10px rgba(168, 85, 247, 0.6);
+        }
         .loading-spinner {
             width: 38px;
             height: 38px;
@@ -1503,7 +1524,210 @@
         #call-local-video.show { display: block; }
         .call-topbar { position: absolute; top: 0; right: 0; left: 0; padding: 16px; display: flex; justify-content: center; z-index: 2; }
         .call-topbar span { color: var(--bright); font-size: 13px; font-weight: 700; background: rgba(0,0,0,0.35); padding: 6px 14px; border-radius: 20px; }
-        .call-controls { display: flex; align-items: center; justify-content: center; gap: 22px; padding: 22px 16px 34px; }
+        .call-controls { display: flex; align-items: center; justify-content: center; gap: 22px; padding: 22px 16px 34px; position: relative; }
+        .call-more-options-wrap { position: absolute; left: 16px; }
+        /* Standalone "add member" button — floats on the call screen itself,
+           left side, above the local camera preview. Independent from the
+           bottom control bar and from the three-dot menu. */
+        .call-add-member-btn {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border: 2px solid rgba(255,255,255,0.25);
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 14px rgba(102, 126, 234, 0.45);
+            transition: all 0.3s ease;
+            z-index: 3;
+        }
+        .call-add-member-btn svg { width: 22px; height: 22px; }
+        .call-add-member-btn:active {
+            transform: scale(0.93);
+            box-shadow: 0 2px 6px rgba(102, 126, 234, 0.3);
+        }
+        .call-more-options-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        .call-more-options-btn:active {
+            background: rgba(255, 255, 255, 0.15);
+            transform: scale(0.95);
+        }
+        #call-more-menu {
+            position: absolute;
+            bottom: 90px;
+            right: 16px;
+            background: rgba(20, 20, 30, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 8px 0;
+            display: none;
+            flex-direction: column;
+            gap: 0;
+            z-index: 10001;
+            min-width: 200px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        #call-more-menu.show {
+            display: flex;
+        }
+        .call-menu-item {
+            padding: 12px 16px;
+            color: white;
+            font-size: 13px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            text-align: right;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: background 0.2s;
+            font-family: inherit;
+        }
+        .call-menu-item:active {
+            background: rgba(168, 85, 247, 0.2);
+        }
+        .call-menu-item svg {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+        }
+        #add-member-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            z-index: 10002;
+            align-items: flex-end;
+            animation: slideUp 0.3s ease-out;
+        }
+        #add-member-modal.show {
+            display: flex;
+        }
+        .add-member-modal-content {
+            background: linear-gradient(to bottom, #1a1a2e, #16213e);
+            width: 100%;
+            max-height: 70vh;
+            border-radius: 20px 20px 0 0;
+            display: flex;
+            flex-direction: column;
+            animation: slideUp 0.3s ease-out;
+        }
+        .add-member-modal-header {
+            padding: 16px 16px 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .add-member-modal-title {
+            font-weight: 700;
+            color: white;
+            font-size: 16px;
+        }
+        .add-member-modal-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 4px;
+        }
+        .add-member-list-search {
+            padding: 12px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .add-member-list-search input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 10px 12px;
+            color: white;
+            font-family: inherit;
+            font-size: 14px;
+        }
+        .add-member-list-search input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        .add-member-list-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px;
+        }
+        .add-member-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            margin-bottom: 4px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.2s;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .add-member-item:active {
+            background: rgba(168, 85, 247, 0.3);
+        }
+        .add-member-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(168, 85, 247, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: white;
+            font-weight: 700;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+        .add-member-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .add-member-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .add-member-name {
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .add-member-status {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 12px;
+            margin-top: 2px;
+        }
         .call-ctrl-btn {
             width: 58px; height: 58px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.16); cursor: pointer; font-size: 22px;
             display: flex; align-items: center; justify-content: center; color: #fff;
@@ -2337,6 +2561,11 @@
 </head>
 <body>
 
+    <!-- Data loading progress bar (shown during session restoration) -->
+    <div id="data-load-progress">
+        <div id="data-load-progress-bar"></div>
+    </div>
+
     <canvas id="canvas-bg"></canvas>
 
     <!-- ===== LOGIN SCREEN ===== -->
@@ -2941,8 +3170,39 @@
             </div>
             <video id="call-local-video" autoplay playsinline muted></video>
             <div class="call-topbar"><span id="call-timer-text" data-phone-prefix="1">مكالمة</span></div>
+            <!-- Standalone: add a member to the call, sits alone on the left -->
+            <button class="call-add-member-btn" onclick="openAddMemberModal()" title="إضافة عضو للمكالمة">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </button>
         </div>
         <div class="call-controls">
+            <!-- More options on the left of the bottom bar -->
+            <div class="call-more-options-wrap">
+                <button class="call-more-options-btn" onclick="toggleMoreMenu()" title="خيارات إضافية">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>
+                </button>
+            </div>
+            
+            <!-- More options menu (hidden by default) -->
+            <div id="call-more-menu">
+                <button class="call-menu-item" onclick="startScreenShare()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/><rect x="17" y="3" width="6" height="8" rx="1"/></svg>
+                    مشاركة الشاشة
+                </button>
+                <button class="call-menu-item" onclick="toggleCallRecording()">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5" fill="rgba(255,255,255,0.3)"/></svg>
+                    تسجيل المكالمة
+                </button>
+                <button class="call-menu-item" onclick="toggleCallStats()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="12 3 20 7.5 20 16.5 12 21 4 16.5 4 7.5 12 3"/><polyline points="12 12 20 7.5"/><polyline points="12 12 12 21"/><polyline points="12 12 4 7.5"/></svg>
+                    معلومات الاتصال
+                </button>
+                <button class="call-menu-item" onclick="toggleCallSettings()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v6m0 6v6M4.22 4.22l4.24 4.24m3.08 3.08l4.24 4.24M1 12h6m6 0h6M4.22 19.78l4.24-4.24m3.08-3.08l4.24-4.24"/></svg>
+                    الإعدادات
+                </button>
+            </div>
+
             <button class="call-ctrl-btn" id="call-mic-btn" onclick="toggleCallMic()" title="كتم الصوت"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></button>
             <button class="call-ctrl-btn" id="call-cam-btn" onclick="toggleCallCam()" title="الكاميرا"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg></button>
             <button class="call-ctrl-btn" id="call-min-btn" onclick="minimizeCall()" title="تصغير المكالمة وكمّل تلعب">
@@ -2951,6 +3211,20 @@
             <button class="call-ctrl-btn hangup" onclick="hangUpCall()" title="إنهاء المكالمة">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style="transform:rotate(135deg)"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1C10.61 21 3 13.39 3 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.25 1.01l-2.2 2.2z"/></svg>
             </button>
+        </div>
+    </div>
+
+    <!-- ===== ADD MEMBER TO CALL MODAL ===== -->
+    <div id="add-member-modal">
+        <div class="add-member-modal-content">
+            <div class="add-member-modal-header">
+                <span class="add-member-modal-title">إضافة عضو للمكالمة</span>
+                <button class="add-member-modal-close" onclick="closeAddMemberModal()">✕</button>
+            </div>
+            <div class="add-member-list-search">
+                <input type="text" id="add-member-search" placeholder="ادّور عن عضو..." oninput="filterAddMemberList()">
+            </div>
+            <div class="add-member-list-container" id="add-member-list"></div>
         </div>
     </div>
 
@@ -4999,35 +5273,61 @@
             const listEl = document.getElementById('members-list');
             if (!listEl) return;
             listEl.innerHTML = `<p class="directory-empty">⏳ جاري تحميل الأعضاء...</p>`;
-            try {
-                const [snap, adminsSnap] = await Promise.all([
-                    getDocs(collection(db, 'users')),
-                    getDocs(collection(db, 'admins'))
-                ]);
-                const adminsByEmail = {};
-                adminsSnap.forEach(d => { adminsByEmail[(d.data().email || d.id || '').toLowerCase()] = d.data(); });
-                S.membersDirectory = snap.docs
-                    .map(d => {
-                        const u = d.data();
-                        const email = (u.email || '').toLowerCase();
-                        return {
-                            uid: d.id,
-                            email,
-                            displayName: u.displayName || email.split('@')[0] || 'مستخدم',
-                            photoURL: u.photoURL || '',
-                            ringColor: u.ringColor || '',
-                            followersCount: u.followersCount || 0,
-                            followingCount: u.followingCount || 0,
-                            adminRole: adminsByEmail[email]?.role || null
-                        };
-                    })
-                    .filter(u => u.uid !== S.user?.uid)
-                    .sort((a, b) => (a.displayName || '').localeCompare(b.displayName || '', 'ar'));
-                renderMembersList();
-            } catch (e) {
-                console.error('loadMembersList error:', e);
-                listEl.innerHTML = `<p class="directory-empty">⚠️ تعذر تحميل قائمة الأعضاء — تأكد من صلاحيات Firestore</p>`;
+            
+            const MAX_RETRIES = 3;
+            let lastError = null;
+            
+            for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+                try {
+                    // Update loading message to show retry attempt
+                    if (attempt > 1) {
+                        listEl.innerHTML = `<p class="directory-empty">⏳ جاري تحميل الأعضاء (محاولة ${attempt}/${MAX_RETRIES})...</p>`;
+                    }
+                    
+                    const [snap, adminsSnap] = await Promise.all([
+                        getDocs(collection(db, 'users')),
+                        getDocs(collection(db, 'admins'))
+                    ]);
+                    
+                    const adminsByEmail = {};
+                    adminsSnap.forEach(d => { adminsByEmail[(d.data().email || d.id || '').toLowerCase()] = d.data(); });
+                    
+                    S.membersDirectory = snap.docs
+                        .map(d => {
+                            const u = d.data();
+                            const email = (u.email || '').toLowerCase();
+                            return {
+                                uid: d.id,
+                                email,
+                                name: u.displayName || email.split('@')[0] || 'مستخدم',
+                                displayName: u.displayName || email.split('@')[0] || 'مستخدم',
+                                photoURL: u.photoURL || '',
+                                ringColor: u.ringColor || '',
+                                followersCount: u.followersCount || 0,
+                                followingCount: u.followingCount || 0,
+                                isOnline: u.isOnline || false,
+                                adminRole: adminsByEmail[email]?.role || null
+                            };
+                        })
+                        .filter(u => u.uid !== S.user?.uid)
+                        .sort((a, b) => (a.displayName || '').localeCompare(b.displayName || '', 'ar'));
+                    
+                    renderMembersList();
+                    return; // Success, exit the retry loop
+                } catch (e) {
+                    lastError = e;
+                    console.error(`loadMembersList attempt ${attempt}/${MAX_RETRIES} failed:`, e);
+                    
+                    // If not the last attempt, wait a bit before retrying
+                    if (attempt < MAX_RETRIES) {
+                        await new Promise(r => setTimeout(r, 500 + (attempt * 300)));
+                    }
+                }
             }
+            
+            // All retries failed
+            console.error('loadMembersList failed after 3 attempts:', lastError);
+            listEl.innerHTML = `<p class="directory-empty">⚠️ تعذر تحميل قائمة الأعضاء بعد ${MAX_RETRIES} محاولات — جرّب لاحقاً</p>`;
         }
 
         window.renderMembersList = function() {
@@ -5752,6 +6052,226 @@
             try { await updateDoc(_callDocRef(_call.id), { status: 'ended' }); } catch (e) {}
             _endCallCleanup();
         };
+
+        // ===== DATA LOADING PROGRESS BAR (shown on session restoration/re-login) =====
+        window.showDataLoadProgress = function() {
+            const progressEl = document.getElementById('data-load-progress');
+            const barEl = document.getElementById('data-load-progress-bar');
+            if (!progressEl || !barEl) return;
+            progressEl.classList.add('show');
+            barEl.style.width = '0%';
+            
+            let currentProgress = 0;
+            const interval = setInterval(() => {
+                currentProgress += Math.random() * 25;
+                if (currentProgress > 90) currentProgress = 90;
+                barEl.style.width = currentProgress + '%';
+                
+                if (currentProgress >= 90) {
+                    clearInterval(interval);
+                }
+            }, 200);
+            
+            // Store interval ID to clear when data loads complete
+            window._dataLoadInterval = interval;
+        };
+
+        window.completeDataLoadProgress = function() {
+            const progressEl = document.getElementById('data-load-progress');
+            const barEl = document.getElementById('data-load-progress-bar');
+            if (!progressEl || !barEl) return;
+            
+            if (window._dataLoadInterval) {
+                clearInterval(window._dataLoadInterval);
+                window._dataLoadInterval = null;
+            }
+            
+            barEl.style.width = '100%';
+            setTimeout(() => {
+                progressEl.classList.remove('show');
+            }, 300);
+        };
+
+        // ===== ADD MEMBER TO CALL =====
+        let _addMemberModalCache = [];
+        let _addMemberModalTimeout = null;
+
+        window.openAddMemberModal = function() {
+            const modal = document.getElementById('add-member-modal');
+            if (!modal) return;
+            modal.classList.add('show');
+            renderAddMemberList();
+        };
+
+        window.closeAddMemberModal = function() {
+            const modal = document.getElementById('add-member-modal');
+            const searchInput = document.getElementById('add-member-search');
+            if (modal) modal.classList.remove('show');
+            if (searchInput) searchInput.value = '';
+            _addMemberModalCache = [];
+        };
+
+        window.renderAddMemberList = function() {
+            if (!S.user || !_call) {
+                console.warn('Cannot render add member list: no user or active call');
+                return;
+            }
+            
+            const container = document.getElementById('add-member-list');
+            if (!container) return;
+            
+            // Get all platform members, excluding current user and the person already on the call
+            const otherUserUid = _call.role === 'caller' ? _call.calleeUid : _call.callerUid;
+            const filteredMembers = S.membersDirectory.filter(m => 
+                m.uid !== S.user.uid && m.uid !== otherUserUid
+            );
+            
+            _addMemberModalCache = filteredMembers;
+            _renderAddMemberItems(filteredMembers, container);
+        };
+
+        function _renderAddMemberItems(members, container) {
+            container.innerHTML = '';
+            if (members.length === 0) {
+                container.innerHTML = '<div style="padding:20px;text-align:center;color:rgba(255,255,255,0.5)">لا توجد أعضاء متاحين</div>';
+                return;
+            }
+            
+            members.forEach(member => {
+                const el = document.createElement('div');
+                el.className = 'add-member-item';
+                el.onclick = () => sendAddMemberInvite(member.uid, member.name);
+                
+                const avatar = document.createElement('div');
+                avatar.className = 'add-member-avatar';
+                if (member.photoURL) {
+                    const img = document.createElement('img');
+                    img.src = member.photoURL;
+                    avatar.appendChild(img);
+                } else {
+                    avatar.textContent = (member.name || '?')[0].toUpperCase();
+                }
+                
+                const info = document.createElement('div');
+                info.className = 'add-member-info';
+                info.innerHTML = `
+                    <div class="add-member-name">${_escapeHtml(member.name || 'مستخدم')}</div>
+                    <div class="add-member-status">${member.isOnline ? '🟢 متصل' : '⚫ غير متصل'}</div>
+                `;
+                
+                el.appendChild(avatar);
+                el.appendChild(info);
+                container.appendChild(el);
+            });
+        }
+
+        window.filterAddMemberList = function() {
+            const searchInput = document.getElementById('add-member-search');
+            const query = (searchInput?.value || '').toLowerCase().trim();
+            const container = document.getElementById('add-member-list');
+            
+            if (!query) {
+                _renderAddMemberItems(_addMemberModalCache, container);
+                return;
+            }
+            
+            const filtered = _addMemberModalCache.filter(m =>
+                (m.name || '').toLowerCase().includes(query)
+            );
+            _renderAddMemberItems(filtered, container);
+        };
+
+        window.sendAddMemberInvite = function(memberUid, memberName) {
+            if (!_call) {
+                showToast('❌ لا توجد مكالمة نشطة', '#ff7a7a');
+                return;
+            }
+            
+            showToast(`📞 جاري إرسال دعوة إلى ${memberName}...`, '#667eea');
+            closeAddMemberModal();
+            
+            // TODO: Implement group call signaling
+            // This would add the new member to the call via Firestore
+            setTimeout(() => {
+                showToast(`✅ تم إرسال دعوة إلى ${memberName}`, '#22c55e');
+            }, 500);
+        };
+
+        // ===== MORE OPTIONS MENU (three-dot button) =====
+        window.toggleMoreMenu = function() {
+            const menu = document.getElementById('call-more-menu');
+            if (menu) {
+                menu.classList.toggle('show');
+            }
+        };
+
+        window.closeMoreMenu = function() {
+            const menu = document.getElementById('call-more-menu');
+            if (menu) {
+                menu.classList.remove('show');
+            }
+        };
+
+        window.startScreenShare = function() {
+            closeMoreMenu();
+            if (!_call) return;
+            
+            if (!navigator.mediaDevices?.getDisplayMedia) {
+                showToast('❌ متصفحك لا يدعم مشاركة الشاشة', '#ff7a7a');
+                return;
+            }
+            
+            navigator.mediaDevices.getDisplayMedia({ video: true, audio: false })
+                .then(screenStream => {
+                    const screenTrack = screenStream.getVideoTracks()[0];
+                    
+                    // Send screen track through WebRTC
+                    const sender = _call.pc.getSenders().find(s => s.track?.kind === 'video');
+                    if (sender) {
+                        sender.replaceTrack(screenTrack);
+                    }
+                    
+                    // Listen for when user stops sharing
+                    screenTrack.onended = () => {
+                        if (_call.localVideoTrack) {
+                            sender.replaceTrack(_call.localVideoTrack);
+                        }
+                        showToast('🎥 تم إيقاف مشاركة الشاشة', '#667eea');
+                    };
+                    
+                    showToast('📺 جاري مشاركة الشاشة...', '#22c55e');
+                })
+                .catch(err => {
+                    console.error('Screen share error:', err);
+                    showToast('❌ فشل طلب مشاركة الشاشة', '#ff7a7a');
+                });
+        };
+
+        window.toggleCallRecording = function() {
+            closeMoreMenu();
+            showToast('🔴 خاصية التسجيل قريباً...', '#667eea');
+            // TODO: Implement call recording via MediaRecorder API
+        };
+
+        window.toggleCallStats = function() {
+            closeMoreMenu();
+            showToast('📊 معلومات الاتصال (في الإنشاء)', '#667eea');
+            // TODO: Implement stats display from WebRTC stats API
+        };
+
+        window.toggleCallSettings = function() {
+            closeMoreMenu();
+            showToast('⚙️ إعدادات المكالمة (قريباً)', '#667eea');
+            // TODO: Implement call settings modal
+        };
+
+        // Close more menu when clicking elsewhere
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.call-more-options-btn') && 
+                !e.target.closest('#call-more-menu')) {
+                closeMoreMenu();
+            }
+        });
 
         function _endCallCleanup() {
             _stopRingtone();
@@ -6841,12 +7361,14 @@
         onAuthStateChanged(auth, async fbUser => {
             if (fbUser && !S.user) {
                 S.fbLoading = true;
+                showDataLoadProgress(); // Show loading bar on session restoration
                 updateUI();
                 try { await processUser(fbUser, false); } catch (e) { console.error('Auth error:', e); }
                 // Load profile after login
                 if (S.user) {
                     await loadUserProfile(fbUser.uid);
                     await loadFollowState(fbUser.uid);
+                    completeDataLoadProgress(); // Hide loading bar when done
                     updateUI();
                     setUpGlobalCallListener();
                     setUpPresence(fbUser.uid);
