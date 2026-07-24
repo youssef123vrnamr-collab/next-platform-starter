@@ -3448,12 +3448,18 @@
             const canvas = document.getElementById('canvas-bg');
             const ctx = canvas.getContext('2d');
             let w, h, stars = [];
+            let isScrolling = false, scrollEndTimer = null;
             function resize() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
             resize();
             window.addEventListener('resize', resize);
             for (let i = 0; i < 120; i++) stars.push({ x: Math.random() * 2000, y: Math.random() * 2000, r: Math.random() * 1.5 + .2, s: Math.random() * .4 + .1, hue: Math.random() > 0.5 ? '168,85,247' : '255,45,135' });
+            window.addEventListener('scroll', () => {
+                if (!isScrolling) { isScrolling = true; canvas.style.visibility = 'hidden'; }
+                clearTimeout(scrollEndTimer);
+                scrollEndTimer = setTimeout(() => { isScrolling = false; canvas.style.visibility = 'visible'; }, 200);
+            }, { passive: true });
             function frame() {
-                if (document.hidden) { requestAnimationFrame(frame); return; }
+                if (document.hidden || isScrolling) { requestAnimationFrame(frame); return; }
                 ctx.clearRect(0, 0, w, h);
                 stars.forEach(s => {
                     s.y -= s.s;
