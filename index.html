@@ -1322,7 +1322,8 @@
         }
         .player-count-card:hover { transform: translateY(-3px); border-color: rgba(192,38,211,0.55); box-shadow: 0 14px 34px -14px rgba(192,38,211,0.55); }
         .player-count-card:active { transform: translateY(0); }
-        .player-count-icon { font-size: 30px; margin-bottom: 10px; filter: drop-shadow(0 4px 10px rgba(192,38,211,0.5)); }
+        .player-count-icon { margin-bottom: 10px; filter: drop-shadow(0 4px 10px rgba(192,38,211,0.5)); display: flex; justify-content: center; }
+        .player-count-icon svg { height: 34px; width: auto; }
         .player-count-label { color: var(--bright); font-size: 15px; font-weight: 800; font-family: 'Rajdhani', sans-serif; letter-spacing: .3px; }
         .games-hub-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 2px; }
         .games-hub-change-btn {
@@ -2509,7 +2510,7 @@
                         <img id="panel-avatar" src="" alt="" />
                         <div>
                             <div class="p-name" id="panel-name">—</div>
-                            <div class="p-role" id="panel-role">👑 مشرف رئيسي</div>
+                            <div class="p-role" id="panel-role"><svg class="btn-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18h16M4 18l-1.4-9 5.4 3 4-6 4 6 5.4-3-1.4 9"/></svg> مشرف رئيسي</div>
                         </div>
                     </div>
 
@@ -2588,7 +2589,7 @@
                         <img id="user-avatar" src="" alt="" />
                         <div>
                             <div class="p-name" id="user-name">—</div>
-                            <div class="p-role" style="color:var(--text-dim)">👤 مستخدم</div>
+                            <div class="p-role" style="color:var(--text-dim)"><svg class="btn-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> مستخدم</div>
                             <div style="font-size:10px;color:var(--magenta);margin-top:2px">✏ اضغط لتعديل الملف</div>
                         </div>
                     </div>
@@ -2697,7 +2698,7 @@
     <div id="profile-modal">
         <div class="profile-fs-header">
             <button class="profile-fs-back" onclick="closeProfileModal()"><svg class="btn-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-            <span class="profile-fs-title">🎮 الملف الشخصي</span>
+            <span class="profile-fs-title"><svg class="btn-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="6"/><line x1="6" y1="12" x2="10" y2="12"/><line x1="8" y1="10" x2="8" y2="14"/><circle cx="15" cy="10.5" r="1"/><circle cx="18" cy="13.5" r="1"/></svg> الملف الشخصي</span>
         </div>
         <div class="profile-fs-cover">
             <div class="profile-fs-cover-pattern"></div>
@@ -2710,7 +2711,7 @@
         <div class="profile-fs-body">
             <div class="profile-fs-userinfo">
                 <div class="profile-fs-username" id="profile-display-name">—</div>
-                <div class="profile-fs-userrole" id="profile-display-role">👤 مستخدم</div>
+                <div class="profile-fs-userrole" id="profile-display-role"><svg class="btn-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> مستخدم</div>
                 <div class="follow-stats-row" id="profile-follow-stats"></div>
             </div>
             <div class="profile-fs-card">
@@ -2775,7 +2776,7 @@
     <div id="member-profile-modal">
         <div class="profile-fs-header">
             <button class="profile-fs-back" onclick="closeMemberProfile()"><svg class="btn-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-            <span class="profile-fs-title">👤 ملف العضو</span>
+            <span class="profile-fs-title"><svg class="btn-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> ملف العضو</span>
         </div>
         <div class="profile-fs-cover" id="member-profile-cover">
             <div class="profile-fs-cover-pattern"></div>
@@ -2788,7 +2789,7 @@
         <div class="profile-fs-body">
             <div class="profile-fs-userinfo">
                 <div class="profile-fs-username" id="member-profile-name">—</div>
-                <div class="profile-fs-userrole" id="member-profile-role">👤 مستخدم</div>
+                <div class="profile-fs-userrole" id="member-profile-role"><svg class="btn-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> مستخدم</div>
                 <div class="follow-stats-row" id="member-profile-stats"></div>
             </div>
             <button class="profile-save-btn" id="member-profile-follow-btn" onclick="toggleFollow(window._viewedMemberUid, window._viewedMemberName)">+ متابعة</button>
@@ -2829,7 +2830,7 @@
     <div id="games-modal">
         <div class="profile-fs-header">
             <button class="profile-fs-back" id="games-header-back" onclick="closeGamesModal()"><svg class="btn-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-            <span class="profile-fs-title">🎮 ألعاب أونلاين</span>
+            <span class="profile-fs-title"><svg class="btn-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="6"/><line x1="6" y1="12" x2="10" y2="12"/><line x1="8" y1="10" x2="8" y2="14"/><circle cx="15" cy="10.5" r="1"/><circle cx="18" cy="13.5" r="1"/></svg> ألعاب أونلاين</span>
         </div>
         <div class="games-fs-body">
 
@@ -2839,19 +2840,19 @@
                 <p class="directory-hint">اختار عدد اللاعبين وهنورّيك الألعاب المتاحة بنفس العدد</p>
                 <div class="players-select-grid">
                     <div class="player-count-card" onclick="selectGamesPlayerCount(1)">
-                        <div class="player-count-icon">🧍</div>
+                        <div class="player-count-icon"><svg viewBox="0 0 16 16" fill="var(--bright)"><g transform="translate(0,0)"><path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm0 1c-3.3 0-6 2-6 4.5V15h12v-1.5C14 11 10.3 10 8 10z"/></g></svg></div>
                         <div class="player-count-label">لاعب واحد</div>
                     </div>
                     <div class="player-count-card" onclick="selectGamesPlayerCount(2)">
-                        <div class="player-count-icon">🧍‍🧍</div>
+                        <div class="player-count-icon"><svg viewBox="0 0 29 16" fill="var(--bright)"><g transform="translate(0,0)"><path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm0 1c-3.3 0-6 2-6 4.5V15h12v-1.5C14 11 10.3 10 8 10z"/></g><g transform="translate(13,0)"><path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm0 1c-3.3 0-6 2-6 4.5V15h12v-1.5C14 11 10.3 10 8 10z"/></g></svg></div>
                         <div class="player-count-label">لاعبين اتنين</div>
                     </div>
                     <div class="player-count-card" onclick="selectGamesPlayerCount(3)">
-                        <div class="player-count-icon">🧍‍🧍‍🧍</div>
+                        <div class="player-count-icon"><svg viewBox="0 0 42 16" fill="var(--bright)"><g transform="translate(0,0)"><path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm0 1c-3.3 0-6 2-6 4.5V15h12v-1.5C14 11 10.3 10 8 10z"/></g><g transform="translate(13,0)"><path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm0 1c-3.3 0-6 2-6 4.5V15h12v-1.5C14 11 10.3 10 8 10z"/></g><g transform="translate(26,0)"><path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm0 1c-3.3 0-6 2-6 4.5V15h12v-1.5C14 11 10.3 10 8 10z"/></g></svg></div>
                         <div class="player-count-label">تلات لاعبين</div>
                     </div>
                     <div class="player-count-card" onclick="selectGamesPlayerCount(4)">
-                        <div class="player-count-icon">🧑‍🤝‍🧑</div>
+                        <div class="player-count-icon"><svg viewBox="0 0 55 16" fill="var(--bright)"><g transform="translate(0,0)"><path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm0 1c-3.3 0-6 2-6 4.5V15h12v-1.5C14 11 10.3 10 8 10z"/></g><g transform="translate(13,0)"><path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm0 1c-3.3 0-6 2-6 4.5V15h12v-1.5C14 11 10.3 10 8 10z"/></g><g transform="translate(26,0)"><path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm0 1c-3.3 0-6 2-6 4.5V15h12v-1.5C14 11 10.3 10 8 10z"/></g><g transform="translate(39,0)"><path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm0 1c-3.3 0-6 2-6 4.5V15h12v-1.5C14 11 10.3 10 8 10z"/></g></svg></div>
                         <div class="player-count-label">أربع لاعبين</div>
                     </div>
                 </div>
@@ -3072,7 +3073,7 @@
     <!-- ===== ADD GAME MODAL (admin only) ===== -->
     <div id="add-game-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeAddGameModal()">
         <div class="modal-box">
-            <h2 class="modal-title">🎮 إضافة لعبة جديدة</h2>
+            <h2 class="modal-title"><svg class="btn-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="6"/><line x1="6" y1="12" x2="10" y2="12"/><line x1="8" y1="10" x2="8" y2="14"/><circle cx="15" cy="10.5" r="1"/><circle cx="18" cy="13.5" r="1"/></svg> إضافة لعبة جديدة</h2>
             <div class="modal-field">
                 <label class="modal-label">عنوان اللعبة *</label>
                 <input id="add-game-title" class="modal-input" type="text" placeholder="اسم اللعبة" oninput="clearAddGameError()" />
@@ -4495,7 +4496,7 @@
                 const initial = (e.displayName || '?').charAt(0).toUpperCase();
                 const avatar = avatarImgHtml(e.photoURL, 'directory-avatar', initial, e.ringColor) || `<div class="directory-avatar">${_escapeHtml(initial)}</div>`;
                 const isSelf = e.uid === S.user?.uid;
-                const roleLabel = e.adminRole === 'main' ? '👑 مشرف رئيسي' : e.adminRole === 'normal' ? '🔑 مشرف عادي' : 'مستخدم';
+                const roleLabel = e.adminRole === 'main' ? `${UI_ICONS.crown} مشرف رئيسي` : e.adminRole === 'normal' ? `${UI_ICONS.key} مشرف عادي` : 'مستخدم';
                 return `
                 <div class="directory-item ${e.suspended ? 'is-suspended' : ''}">
                     ${avatar}
@@ -4504,7 +4505,7 @@
                         <div class="directory-email">${_escapeHtml(e.email)} · ${roleLabel}</div>
                     </div>
                     <div class="directory-actions">
-                        ${isSelf ? '' : `<button class="dir-btn ${e.suspended ? 'unban' : 'ban'}" onclick="toggleAccountSuspension('${e.uid}','${_escapeHtml(e.displayName).replace(/'/g,"\\'")}',${e.suspended})">${e.suspended ? '${UI_ICONS.check} رفع التوقيف' : '${UI_ICONS.slash} توقيف'}</button>`}
+                        ${isSelf ? '' : `<button class="dir-btn ${e.suspended ? 'unban' : 'ban'}" onclick="toggleAccountSuspension('${e.uid}','${_escapeHtml(e.displayName).replace(/'/g,"\\'")}',${e.suspended})">${e.suspended ? `${UI_ICONS.check} رفع التوقيف` : `${UI_ICONS.slash} توقيف`}</button>`}
                     </div>
                 </div>`;
             }).join('');
@@ -4708,7 +4709,7 @@
                 <div class="wabubble ${isMine ? 'mine' : 'theirs'}${msg._pending ? ' pending' : ''}${msg._failed ? ' failed' : ''}" id="wamsg-${msg.id}">
                     ${!isMine ? avatarHtml : ''}
                     <div class="wabubble-content">
-                        ${!isMine ? `<span class="wabubble-sender">${isAdmin ? '👑 ' : ''}${_escapeHtml(name)}</span>` : ''}
+                        ${!isMine ? `<span class="wabubble-sender">${isAdmin ? UI_ICONS.crown + ' ' : ''}${_escapeHtml(name)}</span>` : ''}
                         ${quoteHtml}
                         <div class="wabubble-text">${safeText}</div>
                         <div class="wabubble-meta">
@@ -5054,7 +5055,7 @@
                         <span class="presence-dot ${online ? 'online' : 'offline'}" title="${online ? 'متصل الآن' : 'غير متصل'}"></span>
                     </div>
                     <div class="directory-info">
-                        <div class="directory-name">${_escapeHtml(e.displayName)}${e.adminRole ? (e.adminRole === 'main' ? ' 👑' : ' 🔑') : ''}</div>
+                        <div class="directory-name">${_escapeHtml(e.displayName)}${e.adminRole ? (e.adminRole === 'main' ? ' ' + UI_ICONS.crown : ' ' + UI_ICONS.key) : ''}</div>
                         <div class="directory-email">${e.followersCount || 0} متابِع${online ? ' • <span style="color:#3ddc84">متصل الآن</span>' : ''}</div>
                     </div>
                 </div>`;
@@ -5103,7 +5104,7 @@
             window._viewedMemberPhoto = entry.photoURL || '';
             document.getElementById('member-profile-name').textContent = entry.displayName || '—';
             const roleEl = document.getElementById('member-profile-role');
-            const roleLabel = entry.adminRole === 'main' ? '👑 مشرف رئيسي' : entry.adminRole === 'normal' ? '🔑 مشرف عادي' : '👤 مستخدم';
+            const roleLabel = entry.adminRole === 'main' ? `${UI_ICONS.crown} مشرف رئيسي` : entry.adminRole === 'normal' ? `${UI_ICONS.key} مشرف عادي` : `${UI_ICONS.user} مستخدم`;
             const online = isUserOnline(entry.uid);
             roleEl.innerHTML = `${_escapeHtml(roleLabel)} <span style="display:inline-flex;align-items:center;gap:4px;margin-inline-start:6px;font-size:11px;color:${online ? '#3ddc84' : '#ff7a7a'}"><span style="width:8px;height:8px;border-radius:50%;display:inline-block;background:${online ? '#3ddc84' : '#ff7a7a'}"></span>${online ? 'متصل الآن' : 'غير متصل'}</span>`;
             const callBtn = document.getElementById('member-profile-call-btn');
@@ -5299,12 +5300,12 @@
         // screen. Each preset is just a wave-shape + a little note sequence, so no
         // audio files are needed — it's all synthesized live with the Web Audio API.
         const RINGTONES = {
-            classic: { label: '🔔 كلاسيكي', wave: 'sine', notes: [[620, 500]], cycle: 1400 },
-            chime: { label: '🎐 جرس', wave: 'triangle', notes: [[523, 160], [659, 160], [784, 260]], cycle: 1700 },
-            digital: { label: '📱 رقمي', wave: 'square', notes: [[700, 90], [0, 60], [700, 90], [0, 60], [700, 90]], cycle: 1250 },
-            marimba: { label: '🎵 ماريمبا', wave: 'sine', notes: [[784, 140], [659, 140], [523, 220]], cycle: 1600 },
-            gentle: { label: '🌙 هادئة', wave: 'sine', notes: [[440, 700]], cycle: 1900 },
-            retro: { label: '👾 ريترو', wave: 'sawtooth', notes: [[320, 90], [520, 90], [720, 90], [520, 90]], cycle: 1500 }
+            classic: { label: 'كلاسيكي', wave: 'sine', notes: [[620, 500]], cycle: 1400 },
+            chime: { label: 'جرس', wave: 'triangle', notes: [[523, 160], [659, 160], [784, 260]], cycle: 1700 },
+            digital: { label: 'رقمي', wave: 'square', notes: [[700, 90], [0, 60], [700, 90], [0, 60], [700, 90]], cycle: 1250 },
+            marimba: { label: 'ماريمبا', wave: 'sine', notes: [[784, 140], [659, 140], [523, 220]], cycle: 1600 },
+            gentle: { label: 'هادئة', wave: 'sine', notes: [[440, 700]], cycle: 1900 },
+            retro: { label: 'ريترو', wave: 'sawtooth', notes: [[320, 90], [520, 90], [720, 90], [520, 90]], cycle: 1500 }
         };
 
         function _scheduleRingPattern(ctx, tone, pitchScale) {
@@ -5355,10 +5356,11 @@
             if (!grid) return;
             const key = RINGTONES[selected] ? selected : 'classic';
             grid.dataset.selected = key;
+            const RINGTONE_ICONS = { classic: UI_ICONS.bell, chime: UI_ICONS.chime, digital: UI_ICONS.smartphone, marimba: UI_ICONS.music, gentle: UI_ICONS.moon, retro: UI_ICONS.gamepad };
             grid.innerHTML = Object.keys(RINGTONES).map(k => {
                 const t = RINGTONES[k];
                 return `<button type="button" class="ringtone-opt${k === key ? ' active' : ''}" data-key="${k}" onclick="selectProfileRingtone('${k}')">
-                    <span class="ro-name">${t.label}</span>
+                    <span class="ro-name">${RINGTONE_ICONS[k] || ''} ${t.label}</span>
                     <span class="ro-play" onclick="event.stopPropagation();previewRingtone('${k}')">▶</span>
                 </button>`;
             }).join('');
@@ -5577,7 +5579,16 @@
             unlock: '<svg class="btn-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>',
             lock: '<svg class="btn-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>',
             edit: '<svg class="btn-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>',
-            slash: '<svg class="btn-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>'
+            slash: '<svg class="btn-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>',
+            reply: '<svg class="btn-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg>',
+            crown: '<svg class="btn-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18h16M4 18l-1.4-9 5.4 3 4-6 4 6 5.4-3-1.4 9"/></svg>',
+            key: '<svg class="btn-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="15" r="4"/><path d="M9.5 12.3L19 2.8m-3.7 3.7l2 2m-5.7-.3l2 2"/></svg>',
+            user: '<svg class="btn-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
+            bell: '<svg class="btn-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>',
+            chime: '<svg class="btn-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M8 6l.8 6M16 6l-.8 6M6 12h12l-1.6 9H7.6z"/></svg>',
+            smartphone: '<svg class="btn-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>',
+            music: '<svg class="btn-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>',
+            moon: '<svg class="btn-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>'
         };
 
         const CALL_ICONS = {
@@ -6183,7 +6194,7 @@
             const dnEl = document.getElementById('profile-display-name');
             const drEl = document.getElementById('profile-display-role');
             if (dnEl) dnEl.textContent = currentName || '—';
-            if (drEl) drEl.textContent = S.isAdmin ? (S.isMainAdmin ? '👑 مشرف رئيسي' : '🔑 مشرف عادي') : '👤 مستخدم';
+            if (drEl) drEl.innerHTML = S.isAdmin ? (S.isMainAdmin ? `${UI_ICONS.crown} مشرف رئيسي` : `${UI_ICONS.key} مشرف عادي`) : `${UI_ICONS.user} مستخدم`;
             previewProfilePhoto(currentPhoto);
             previewProfileCover(currentCover);
             const initials = (currentName || 'G').charAt(0).toUpperCase();
@@ -6820,7 +6831,7 @@
             if (isAdmin && user) {
                 setImgWithFallback(document.getElementById('panel-avatar'), currentAvatarUrl(), () => {});
                 document.getElementById('panel-name').textContent = (S.userProfile && S.userProfile.displayName) || user.displayName || '';
-                document.getElementById('panel-role').textContent = isMainAdmin ? '👑 مشرف رئيسي' : '🔑 مشرف عادي';
+                document.getElementById('panel-role').innerHTML = isMainAdmin ? `${UI_ICONS.crown} مشرف رئيسي` : `${UI_ICONS.key} مشرف عادي`;
                 const adminsTabBtn = document.querySelector('.panel-tab[data-tab="admin-admins"]');
                 const usersTabBtn = document.querySelector('.panel-tab[data-tab="admin-users"]');
                 if (adminsTabBtn) adminsTabBtn.style.display = isMainAdmin ? '' : 'none';
