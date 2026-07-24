@@ -3174,16 +3174,16 @@
                 <div class="player-actions" id="player-actions">
                     <div class="rating-group">
                         <button class="rating-btn" id="player-like" onclick="handlePlayerRating('like')">
-                            👍 <span class="count" id="player-like-count">0</span>
+                            <svg class="emoji-icon" viewBox="0 0 24 24" width="1em" height="1em" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M14 9V5a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h4l4 6v-7h3a2 2 0 0 0 2-2v-5a2 2 0 0 0-2-2h-3z" transform="scaleX(-1)" transform-origin="center"/></svg> <span class="count" id="player-like-count">0</span>
                         </button>
                         <button class="rating-btn" id="player-dislike" onclick="handlePlayerRating('dislike')">
-                            👎 <span class="count" id="player-dislike-count">0</span>
+                            <svg class="emoji-icon" viewBox="0 0 24 24" width="1em" height="1em" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M10 15v5a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h4l-4-6v7H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h3z" transform="scaleX(-1)" transform-origin="center"/></svg> <span class="count" id="player-dislike-count">0</span>
                         </button>
                     </div>
                 </div>
                 <div class="player-comments" id="player-comments">
                     <button class="comments-toggle-btn" id="comments-toggle-btn" onclick="togglePlayerComments()">
-                        💬 عرض التعليقات <span class="comments-toggle-count" id="comments-toggle-count">(0)</span>
+                        <svg class="emoji-icon" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" xmlns="http://www.w3.org/2000/svg"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> عرض التعليقات <span class="comments-toggle-count" id="comments-toggle-count">(0)</span>
                     </button>
                     <div class="player-comments-body" id="player-comments-body" style="display:none">
                         <div id="player-comments-list"></div>
@@ -3576,18 +3576,18 @@
             ratingsDiv.className = 'video-ratings';
             const likeBtn = document.createElement('button');
             likeBtn.className = 'rating-btn';
-            likeBtn.innerHTML = `👍 <span class="count">${v.likes||0}</span>`;
+            likeBtn.innerHTML = `<svg class="emoji-icon" viewBox="0 0 24 24" width="1em" height="1em" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M14 9V5a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h4l4 6v-7h3a2 2 0 0 0 2-2v-5a2 2 0 0 0-2-2h-3z" transform="scaleX(-1)" transform-origin="center"/></svg> <span class="count">${v.likes||0}</span>`;
             likeBtn.onclick = (e) => { e.stopPropagation(); handleVideoRating(v.id, 'like'); };
             const dislikeBtn = document.createElement('button');
             dislikeBtn.className = 'rating-btn';
-            dislikeBtn.innerHTML = `👎 <span class="count">${v.dislikes||0}</span>`;
+            dislikeBtn.innerHTML = `<svg class="emoji-icon" viewBox="0 0 24 24" width="1em" height="1em" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M10 15v5a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h4l-4-6v7H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h3z" transform="scaleX(-1)" transform-origin="center"/></svg> <span class="count">${v.dislikes||0}</span>`;
             dislikeBtn.onclick = (e) => { e.stopPropagation(); handleVideoRating(v.id, 'dislike'); };
             ratingsDiv.appendChild(likeBtn);
             ratingsDiv.appendChild(dislikeBtn);
 
             const commentToggle = document.createElement('button');
             commentToggle.className = 'comment-toggle';
-            commentToggle.textContent = `💬 ${(v.comments||[]).length}`;
+            commentToggle.innerHTML = `<svg class="emoji-icon" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" xmlns="http://www.w3.org/2000/svg"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> ${(v.comments||[]).length}`;
             commentToggle.onclick = (e) => { e.stopPropagation(); toggleComments(v.id); };
             ratingsDiv.appendChild(commentToggle);
             info.appendChild(ratingsDiv);
