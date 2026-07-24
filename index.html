@@ -1590,6 +1590,79 @@
         #call-more-menu.show {
             display: flex;
         }
+        #devtest-modal {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.55); display: none; z-index: 10003;
+            align-items: flex-end;
+        }
+        #devtest-modal.show { display: flex; }
+        .devtest-modal-content {
+            background: linear-gradient(to bottom, #1a1a2e, #16213e);
+            width: 100%; max-height: 85vh; border-radius: 20px 20px 0 0;
+            display: flex; flex-direction: column; animation: slideUp 0.3s ease-out;
+        }
+        .devtest-modal-header {
+            padding: 16px; border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .devtest-modal-title { font-weight: 700; color: #fff; font-size: 16px; display:flex; align-items:center; gap:8px; }
+        .devtest-modal-close { background: none; border: none; color: #fff; font-size: 24px; cursor: pointer; padding: 4px; }
+        .devtest-modal-body { flex: 1; overflow-y: auto; padding: 16px; }
+        .devtest-warning {
+            background: rgba(255, 176, 32, 0.12); border: 1px solid rgba(255, 176, 32, 0.35);
+            color: #ffd699; font-size: 12.5px; line-height: 1.7; border-radius: 10px;
+            padding: 10px 12px; margin-bottom: 16px;
+        }
+        .devtest-count-row {
+            display: flex; align-items: center; justify-content: space-between;
+            background: rgba(255,255,255,0.05); border-radius: 12px; padding: 12px 16px; margin-bottom: 12px;
+        }
+        .devtest-count-label { color: #fff; font-size: 14px; font-weight: 600; }
+        .devtest-count-stepper { display: flex; align-items: center; gap: 12px; }
+        .devtest-count-stepper button {
+            width: 34px; height: 34px; border-radius: 50%; border: none;
+            background: rgba(168,85,247,0.25); color: #fff; font-size: 18px; cursor: pointer;
+        }
+        .devtest-count-stepper span { color: #fff; font-size: 16px; font-weight: 700; min-width: 22px; text-align: center; }
+        .devtest-create-btn {
+            width: 100%; padding: 13px; border-radius: 12px; border: none;
+            background: linear-gradient(135deg, #667eea, #764ba2); color: #fff;
+            font-weight: 700; font-size: 14px; cursor: pointer; margin-bottom: 18px;
+            font-family: inherit;
+        }
+        .devtest-create-btn:disabled { opacity: 0.5; }
+        .devtest-section-title { color: rgba(255,255,255,0.6); font-size: 12.5px; font-weight: 700; margin: 4px 0 10px; }
+        .devtest-account-card {
+            display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.05);
+            border-radius: 12px; padding: 10px 12px; margin-bottom: 8px;
+        }
+        .devtest-account-avatar {
+            width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0;
+            background: linear-gradient(135deg,#667eea,#764ba2); color: #fff;
+            display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px;
+        }
+        .devtest-account-info { flex: 1; min-width: 0; }
+        .devtest-account-name { color: #fff; font-size: 13.5px; font-weight: 700; }
+        .devtest-account-email { color: rgba(255,255,255,0.45); font-size: 11px; direction: ltr; text-align: right; }
+        .devtest-account-actions { display: flex; gap: 6px; flex-shrink: 0; }
+        .devtest-account-actions button {
+            width: 34px; height: 34px; border-radius: 8px; border: none;
+            background: rgba(255,255,255,0.1); color: #fff; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .devtest-empty { color: rgba(255,255,255,0.4); font-size: 13px; text-align: center; padding: 20px 0; }
+        .devtest-end-btn {
+            width: 100%; padding: 13px; border-radius: 12px; border: 1px solid rgba(255,80,80,0.4);
+            background: rgba(255,80,80,0.12); color: #ff9d9d; font-weight: 700; font-size: 14px;
+            cursor: pointer; margin-top: 16px; font-family: inherit;
+        }
+        .devtest-end-btn:disabled { opacity: 0.5; }
+        .devtest-badge {
+            position: fixed; top: 8px; left: 50%; transform: translateX(-50%);
+            background: #ffb020; color: #1a1a2e; font-weight: 800; font-size: 11.5px;
+            padding: 4px 12px; border-radius: 20px; z-index: 99998; display: none;
+        }
+        .devtest-badge.show { display: block; }
         .call-menu-item {
             padding: 12px 16px;
             color: white;
@@ -2674,6 +2747,9 @@
                     <div class="menu-nav-item" id="menu-issues-btn" onclick="openAdminPanel('admin-issues')">
                         <span class="menu-nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span> أعطال المنصة <span id="menu-issues-badge" style="display:none;background:#ff4646;color:#fff;font-size:10px;border-radius:10px;padding:1px 6px;margin-right:6px">0</span>
                     </div>
+                    <div class="menu-nav-item" id="menu-devtest-btn" onclick="openDevTestPanel()">
+                        <span class="menu-nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2v6.5L4 18a2 2 0 0 0 1.8 3h12.4a2 2 0 0 0 1.8-3l-5-9.5V2"/><line x1="7.5" y1="2" x2="16.5" y2="2"/><line x1="8" y1="13" x2="16" y2="13"/></svg></span> اختبار وضع المطور
+                    </div>
                 </div>
 
                 <div class="menu-nav-divider"></div>
@@ -3214,6 +3290,40 @@
         </div>
     </div>
 
+    <!-- ===== DEVELOPER TEST MODE BADGE (shown only inside a devtest-account tab) ===== -->
+    <div class="devtest-badge" id="devtest-badge">🧪 حساب اختبار</div>
+
+    <!-- ===== DEVELOPER TEST MODE MODAL ===== -->
+    <div id="devtest-modal">
+        <div class="devtest-modal-content">
+            <div class="devtest-modal-header">
+                <span class="devtest-modal-title">🧪 اختبار وضع المطور</span>
+                <button class="devtest-modal-close" onclick="closeDevTestPanel()">✕</button>
+            </div>
+            <div class="devtest-modal-body">
+                <div class="devtest-warning">
+                    بينشئ حسابات تجريبية حقيقية على المنصة تقدر تفتح كل واحد منها في تبويب منفصل وتستخدم فيه أي حاجة (مكالمات، شات، متابعة...). لما تخلص اختبار، اضغط "إنهاء الاختبار" وهيتمسحوا كلهم تلقائي.
+                </div>
+
+                <div class="devtest-count-row">
+                    <span class="devtest-count-label">عدد الحسابات التجريبية</span>
+                    <div class="devtest-count-stepper">
+                        <button onclick="changeDevTestCount(-1)">-</button>
+                        <span id="devtest-count-value">2</span>
+                        <button onclick="changeDevTestCount(1)">+</button>
+                    </div>
+                </div>
+
+                <button class="devtest-create-btn" id="devtest-create-btn" onclick="createDevTestAccounts()">➕ إنشاء الحسابات</button>
+
+                <div class="devtest-section-title">الحسابات النشطة</div>
+                <div id="devtest-accounts-list"></div>
+
+                <button class="devtest-end-btn" id="devtest-end-btn" onclick="endDevTestSession()">🗑️ إنهاء الاختبار ومسح كل الحسابات</button>
+            </div>
+        </div>
+    </div>
+
     <!-- ===== ADD MEMBER TO CALL MODAL ===== -->
     <div id="add-member-modal">
         <div class="add-member-modal-content">
@@ -3492,7 +3602,11 @@
             signOut,
             onAuthStateChanged,
             browserLocalPersistence,
-            setPersistence
+            browserSessionPersistence,
+            setPersistence,
+            createUserWithEmailAndPassword,
+            signInWithEmailAndPassword,
+            deleteUser
         } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
         import {
             initializeFirestore,
@@ -3535,18 +3649,51 @@
             messagingSenderId: "556233466817",
             appId: "1:556233466817:web:f86580ee42b9e7f0f90540",
         };
-        const app = initializeApp(FIREBASE_CONFIG);
+        // ===== DEV TEST MODE (isolated per-tab identity) =====
+        // If this tab was opened from the "Developer Test Mode" panel, it carries
+        // ?devtest=1&e=<email>&p=<password> in the URL. In that case we run the
+        // ENTIRE app (auth/db/rtdb) on a separate, uniquely-named Firebase App
+        // instance instead of the default one. That keeps this tab's test-account
+        // session completely isolated from any real logged-in session running in
+        // another tab of the same browser, while every existing feature in the
+        // app (calls, chat, follows, etc.) keeps working normally because it just
+        // references the same `auth` / `db` / `rtdb` variables as before.
+        const _devtestParams = new URLSearchParams(window.location.search);
+        const DEVTEST_MODE = _devtestParams.get('devtest') === '1';
+        const DEVTEST_EMAIL = _devtestParams.get('e') || '';
+        const DEVTEST_PASS = _devtestParams.get('p') || '';
+        if (DEVTEST_MODE) {
+            // Clean the credentials out of the visible URL right away.
+            history.replaceState({}, '', window.location.pathname + window.location.hash);
+        }
+
+        const app = DEVTEST_MODE
+            ? initializeApp(FIREBASE_CONFIG, 'devtest-' + Math.random().toString(36).slice(2))
+            : initializeApp(FIREBASE_CONFIG);
         const auth = getAuth(app);
-        setPersistence(auth, browserLocalPersistence).catch(()=>{});
+        setPersistence(auth, DEVTEST_MODE ? browserSessionPersistence : browserLocalPersistence).catch(()=>{});
         const db = initializeFirestore(app, { experimentalForceLongPolling: true, useFetchStreams: false }, 'default');
         enableNetwork(db).catch(() => {});
         const rtdb = getDatabase(app);
+
+        if (DEVTEST_MODE && DEVTEST_EMAIL && DEVTEST_PASS) {
+            // Fire-and-forget: signInWithEmailAndPassword resolves before
+            // onAuthStateChanged below picks it up, so no race with the rest
+            // of the app's startup flow.
+            signInWithEmailAndPassword(auth, DEVTEST_EMAIL, DEVTEST_PASS).catch(err => {
+                console.error('Dev-test sign-in failed:', err);
+                setTimeout(() => alert('❌ فشل تسجيل الدخول لحساب الاختبار. الحساب ممكن يكون اتمسح.'), 300);
+            });
+        }
 
         // ===== STATE =====
         const S = {
             user: null,
             isAdmin: false,
             isMainAdmin: false,
+            devTestCount: 2,
+            devTestSessionId: null,
+            devTestAccounts: [], // [{uid, email, password, label}]
             adminExists: false,
             isBlocked: false,
             isSuspended: false,
@@ -6273,6 +6420,219 @@
             }
         });
 
+        // ===== DEVELOPER TEST MODE =====
+        // Lets a main admin spin up N throwaway-but-real Firebase Auth accounts,
+        // open each in its own browser tab (fully isolated session — see the
+        // DEVTEST_MODE block near the top of this script), and use every
+        // platform feature between them exactly like real users. One button
+        // wipes all of it — Auth accounts + their Firestore/RTDB traces — when
+        // testing is done.
+
+        function _devtestBuildUrl(email, password) {
+            const url = new URL(window.location.href.split('#')[0].split('?')[0]);
+            url.searchParams.set('devtest', '1');
+            url.searchParams.set('e', email);
+            url.searchParams.set('p', password);
+            return url.toString();
+        }
+
+        function _devtestRandomPassword() {
+            return 'Dt_' + Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
+        }
+
+        window.changeDevTestCount = function(delta) {
+            S.devTestCount = Math.min(10, Math.max(1, S.devTestCount + delta));
+            document.getElementById('devtest-count-value').textContent = S.devTestCount;
+        };
+
+        window.openDevTestPanel = function() {
+            if (!S.isMainAdmin) { showToast('🔑 المشرف الرئيسي بس يقدر يستخدم ده', '#ffb020'); return; }
+            closeMenuPanel();
+            document.getElementById('devtest-modal').classList.add('show');
+            document.getElementById('devtest-count-value').textContent = S.devTestCount;
+            _loadExistingDevTestSession();
+        };
+
+        window.closeDevTestPanel = function() {
+            document.getElementById('devtest-modal').classList.remove('show');
+        };
+
+        async function _loadExistingDevTestSession() {
+            if (!S.user) return;
+            try {
+                const q = query(collection(db, 'devTestSessions'), where('createdBy', '==', S.user.uid));
+                const snap = await getDocs(q);
+                if (!snap.empty) {
+                    const d = snap.docs[0];
+                    S.devTestSessionId = d.id;
+                    S.devTestAccounts = d.data().accounts || [];
+                } else {
+                    S.devTestSessionId = null;
+                    S.devTestAccounts = [];
+                }
+            } catch (e) {
+                console.error('Loading dev-test session failed:', e);
+            }
+            _renderDevTestAccounts();
+        }
+
+        function _renderDevTestAccounts() {
+            const container = document.getElementById('devtest-accounts-list');
+            if (!container) return;
+            if (!S.devTestAccounts.length) {
+                container.innerHTML = '<div class="devtest-empty">لسه مفيش حسابات تجريبية — اضغط إنشاء</div>';
+                return;
+            }
+            container.innerHTML = S.devTestAccounts.map((acc, i) => `
+                <div class="devtest-account-card">
+                    <div class="devtest-account-avatar">${i + 1}</div>
+                    <div class="devtest-account-info">
+                        <div class="devtest-account-name">${_escapeHtml(acc.label)}</div>
+                        <div class="devtest-account-email">${_escapeHtml(acc.email)}</div>
+                    </div>
+                    <div class="devtest-account-actions">
+                        <button onclick="openDevTestTab(${i})" title="افتح في تبويب جديد">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        </button>
+                        <button onclick="copyDevTestLink(${i})" title="نسخ الرابط">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        window.createDevTestAccounts = async function() {
+            if (!S.isMainAdmin) return;
+            const btn = document.getElementById('devtest-create-btn');
+            btn.disabled = true;
+            btn.textContent = '⏳ جاري الإنشاء...';
+
+            const count = S.devTestCount;
+            const sessionId = S.devTestSessionId || ('sess_' + Date.now());
+            const newAccounts = [];
+
+            // A short-lived secondary Firebase App used ONLY to provision test
+            // accounts, so creating them never signs the admin out of their
+            // real session in this tab.
+            const provApp = initializeApp(FIREBASE_CONFIG, 'devtest-prov-' + Date.now());
+            const provAuth = getAuth(provApp);
+
+            for (let i = 0; i < count; i++) {
+                const n = S.devTestAccounts.length + newAccounts.length + 1;
+                const email = `devtest.${sessionId}.${n}@gameverse.test`;
+                const password = _devtestRandomPassword();
+                try {
+                    const cred = await createUserWithEmailAndPassword(provAuth, email, password);
+                    const uid = cred.user.uid;
+                    const label = `حساب تجريبي ${n}`;
+                    // Create the matching Firestore profile so the account shows
+                    // up normally everywhere (members list, chat, calls...).
+                    await setDoc(doc(db, 'users', uid), {
+                        email, displayName: label, photoURL: '', isOnline: false,
+                        isTestAccount: true, createdAt: serverTimestamp()
+                    });
+                    newAccounts.push({ uid, email, password, label });
+                } catch (e) {
+                    console.error('Dev-test account creation failed:', e);
+                    showToast(`❌ فشل إنشاء حساب ${n}`, '#ff7a7a');
+                }
+            }
+            await signOut(provAuth).catch(() => {});
+
+            S.devTestAccounts = [...S.devTestAccounts, ...newAccounts];
+            S.devTestSessionId = sessionId;
+            try {
+                await setDoc(doc(db, 'devTestSessions', sessionId), {
+                    createdBy: S.user.uid,
+                    createdAt: serverTimestamp(),
+                    accounts: S.devTestAccounts
+                });
+            } catch (e) { console.error('Saving dev-test session failed:', e); }
+
+            btn.disabled = false;
+            btn.textContent = '➕ إنشاء الحسابات';
+            _renderDevTestAccounts();
+            showToast(`✅ اتعمل ${newAccounts.length} حساب تجريبي`, '#22c55e');
+        };
+
+        window.openDevTestTab = function(index) {
+            const acc = S.devTestAccounts[index];
+            if (!acc) return;
+            window.open(_devtestBuildUrl(acc.email, acc.password), '_blank');
+        };
+
+        window.copyDevTestLink = function(index) {
+            const acc = S.devTestAccounts[index];
+            if (!acc) return;
+            const url = _devtestBuildUrl(acc.email, acc.password);
+            navigator.clipboard?.writeText(url).then(
+                () => showToast('🔗 اتنسخ الرابط', '#22c55e'),
+                () => showToast('❌ متعرفش أنسخ الرابط', '#ff7a7a')
+            );
+        };
+
+        window.endDevTestSession = async function() {
+            if (!S.devTestAccounts.length) {
+                showToast('مفيش حسابات تجريبية دلوقتي', '#667eea');
+                return;
+            }
+            const btn = document.getElementById('devtest-end-btn');
+            btn.disabled = true;
+            btn.textContent = '⏳ جاري المسح...';
+
+            const provApp = initializeApp(FIREBASE_CONFIG, 'devtest-cleanup-' + Date.now());
+            const provAuth = getAuth(provApp);
+
+            for (const acc of S.devTestAccounts) {
+                try {
+                    // Wipe every trace of this uid from Firestore + RTDB.
+                    await deleteDoc(doc(db, 'users', acc.uid)).catch(() => {});
+                    await rtdbSet(rtdbRef(rtdb, 'status/' + acc.uid), null).catch(() => {});
+
+                    const followQ1 = query(collection(db, 'follows'), where('followerUid', '==', acc.uid));
+                    const followQ2 = query(collection(db, 'follows'), where('followingUid', '==', acc.uid));
+                    const [f1, f2] = await Promise.all([getDocs(followQ1), getDocs(followQ2)]);
+                    await Promise.all([...f1.docs, ...f2.docs].map(d => deleteDoc(d.ref).catch(() => {})));
+
+                    const callsQ1 = query(collection(db, 'calls'), where('callerUid', '==', acc.uid));
+                    const callsQ2 = query(collection(db, 'calls'), where('calleeUid', '==', acc.uid));
+                    const [c1, c2] = await Promise.all([getDocs(callsQ1), getDocs(callsQ2)]);
+                    await Promise.all([...c1.docs, ...c2.docs].map(d => deleteDoc(d.ref).catch(() => {})));
+
+                    const chatQ = query(collection(db, 'friendsChat'), where('participants', 'array-contains', acc.uid));
+                    const chatSnap = await getDocs(chatQ);
+                    await Promise.all(chatSnap.docs.map(d => deleteDoc(d.ref).catch(() => {})));
+
+                    // Finally remove the real Firebase Auth account.
+                    const cred = await signInWithEmailAndPassword(provAuth, acc.email, acc.password);
+                    await deleteUser(cred.user);
+                } catch (e) {
+                    console.error(`Cleanup failed for ${acc.email}:`, e);
+                }
+            }
+            await signOut(provAuth).catch(() => {});
+
+            if (S.devTestSessionId) {
+                await deleteDoc(doc(db, 'devTestSessions', S.devTestSessionId)).catch(() => {});
+            }
+            S.devTestAccounts = [];
+            S.devTestSessionId = null;
+
+            btn.disabled = false;
+            btn.textContent = '🗑️ إنهاء الاختبار ومسح كل الحسابات';
+            _renderDevTestAccounts();
+            showToast('🧹 اتمسحت كل الحسابات التجريبية', '#22c55e');
+        };
+
+        // Show the "test account" badge whenever this tab is running a devtest identity.
+        if (DEVTEST_MODE) {
+            document.addEventListener('DOMContentLoaded', () => {
+                const b = document.getElementById('devtest-badge');
+                if (b) b.classList.add('show');
+            });
+        }
+
         function _endCallCleanup() {
             _stopRingtone();
             if (_callTimerInterval) { clearInterval(_callTimerInterval); _callTimerInterval = null; }
@@ -6800,6 +7160,7 @@
                 document.getElementById('menu-admin-section').style.display = S.isAdmin ? 'block' : 'none';
                 document.getElementById('menu-add-admin-btn').style.display = S.isMainAdmin ? '' : 'none';
                 document.getElementById('menu-accounts-btn').style.display = S.isMainAdmin ? '' : 'none';
+                document.getElementById('menu-devtest-btn').style.display = S.isMainAdmin ? '' : 'none';
             }
             panel.classList.add('open');
             ov.style.display = 'block';
