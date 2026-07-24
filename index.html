@@ -743,6 +743,13 @@
             transform: scale(1.1);
             box-shadow: 0 0 24px rgba(192, 38, 211, 0.45);
         }
+        @media (hover: none), (pointer: coarse) {
+            .video-card:hover { transform: none; box-shadow: none; }
+            .video-card:hover::before { opacity: 0; }
+            .video-card.locked-card:hover { box-shadow: none; }
+            .video-card:hover .thumb-bg { transform: none; }
+            .play-btn:not(.locked-play):hover .play-circle { background: rgba(10, 8, 20, 0.65); border-color: rgba(255, 255, 255, 0.55); transform: none; box-shadow: none; }
+        }
         .drive-badge {
             position: absolute;
             top: 10px;
