@@ -5106,7 +5106,7 @@
             const roleEl = document.getElementById('member-profile-role');
             const roleLabel = entry.adminRole === 'main' ? `${UI_ICONS.crown} مشرف رئيسي` : entry.adminRole === 'normal' ? `${UI_ICONS.key} مشرف عادي` : `${UI_ICONS.user} مستخدم`;
             const online = isUserOnline(entry.uid);
-            roleEl.innerHTML = `${_escapeHtml(roleLabel)} <span style="display:inline-flex;align-items:center;gap:4px;margin-inline-start:6px;font-size:11px;color:${online ? '#3ddc84' : '#ff7a7a'}"><span style="width:8px;height:8px;border-radius:50%;display:inline-block;background:${online ? '#3ddc84' : '#ff7a7a'}"></span>${online ? 'متصل الآن' : 'غير متصل'}</span>`;
+            roleEl.innerHTML = `${roleLabel} <span style="display:inline-flex;align-items:center;gap:4px;margin-inline-start:6px;font-size:11px;color:${online ? '#3ddc84' : '#ff7a7a'}"><span style="width:8px;height:8px;border-radius:50%;display:inline-block;background:${online ? '#3ddc84' : '#ff7a7a'}"></span>${online ? 'متصل الآن' : 'غير متصل'}</span>`;
             const callBtn = document.getElementById('member-profile-call-btn');
             if (callBtn) { callBtn.style.opacity = online ? '1' : '0.45'; callBtn.style.filter = online ? 'none' : 'grayscale(1)'; }
             const img = document.getElementById('member-profile-img');
