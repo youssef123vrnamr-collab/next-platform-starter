@@ -16,7 +16,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700;900&family=Cairo:wght@400;500;600;700;900&display=swap" rel="stylesheet" />
     <style>
         /* ===== RESET & ROOT ===== */
-        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+        input, textarea, [contenteditable="true"] { -webkit-user-select: text; user-select: text; -webkit-touch-callout: default; }
         button, a, input, select, textarea, [onclick] { -webkit-tap-highlight-color: transparent; }
         :root {
             --void: #0a0814;
