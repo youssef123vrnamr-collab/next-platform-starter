@@ -4102,9 +4102,9 @@
                 <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:13px">
                     <span style="color:var(--bright)">${v.title||'—'} ${v.locked?'🔒':''}</span>
                     <div style="display:flex;gap:4px">
-                        <button class="act-btn ${v.locked?'btn-unlock':'btn-lock'}" onclick="handleToggleLock('${v.id}')" style="padding:2px 8px;font-size:11px">${v.locked?'فتح':'قفل'}</button>
-                        <button class="act-btn btn-edit" onclick="openEditModal(S.videos.find(x=>x.id==='${v.id}'))" style="padding:2px 8px;font-size:11px">تعديل</button>
-                        <button class="act-btn btn-del" onclick="handleDelete('${v.id}')" style="padding:2px 8px;font-size:11px">حذف</button>
+                        <button class="act-btn ${v.locked?'btn-unlock':'btn-lock'}" onclick="handleToggleLock('${v.id}')" style="padding:2px 8px;font-size:11px"><svg class="act-svg-icon" viewBox="0 0 24 24" width="1.2em" height="1.2em" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5s-5 2.24-5 5v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6zm9 14H6V10h12v10zm-6-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"/></svg> ${v.locked?'فتح':'قفل'}</button>
+                        <button class="act-btn btn-edit" onclick="openEditModal(S.videos.find(x=>x.id==='${v.id}'))" style="padding:2px 8px;font-size:11px"><svg class="act-svg-icon" viewBox="0 0 24 24" width="1.2em" height="1.2em" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"/><path d="M20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg> تعديل</button>
+                        <button class="act-btn btn-del" onclick="handleDelete('${v.id}')" style="padding:2px 8px;font-size:11px"><svg class="act-svg-icon" viewBox="0 0 24 24" width="1.2em" height="1.2em" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-9l-1 1H5v2h14V4z"/></svg> حذف</button>
                     </div>
                 </div>
             `).join('');
@@ -5931,8 +5931,8 @@
                     </div>
                     ${S.isAdmin ? `
                     <div class="admin-actions visible" onclick="event.stopPropagation()">
-                        <button class="act-btn btn-edit" onclick="openEditGameModal('${g.id}')">✏ تعديل</button>
-                        <button class="act-btn btn-del" onclick="handleDeleteGame('${g.id}')">🗑 حذف</button>
+                        <button class="act-btn btn-edit" onclick="openEditGameModal('${g.id}')"><svg class="act-svg-icon" viewBox="0 0 24 24" width="1.2em" height="1.2em" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"/><path d="M20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg> تعديل</button>
+                        <button class="act-btn btn-del" onclick="handleDeleteGame('${g.id}')"><svg class="act-svg-icon" viewBox="0 0 24 24" width="1.2em" height="1.2em" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-9l-1 1H5v2h14V4z"/></svg> حذف</button>
                     </div>` : ''}
                 </div>
             `).join('');
