@@ -7059,6 +7059,40 @@
                 startListening();
             }
         })();
+
+        // ===== DEBUG: LAYER INSPECTOR (activate with ?debug=1 in the URL) =====
+        (function() {
+            if (new URLSearchParams(location.search).get('debug') !== '1') return;
+            const COLORS = { fixed: '#ff2d55', sticky: '#ffb020', absolute: '#22d3ee' };
+            function scanLayers() {
+                document.querySelectorAll('.debug-layer-label, .debug-layer-outline').forEach(el => el.remove());
+                document.querySelectorAll('body *').forEach(el => {
+                    if (el.closest('#debug-scan-btn')) return;
+                    const cs = getComputedStyle(el);
+                    const pos = cs.position;
+                    if (pos !== 'fixed' && pos !== 'sticky' && !(pos === 'absolute' && parseInt(cs.zIndex || '0', 10) > 0)) return;
+                    const rect = el.getBoundingClientRect();
+                    if (rect.width === 0 || rect.height === 0) return;
+                    const color = COLORS[pos] || '#a855f7';
+                    const box = document.createElement('div');
+                    box.className = 'debug-layer-outline';
+                    box.style.cssText = `position:fixed;left:${rect.left}px;top:${rect.top}px;width:${rect.width}px;height:${rect.height}px;border:2px solid ${color};pointer-events:none;z-index:2147483000;box-sizing:border-box;`;
+                    const label = document.createElement('div');
+                    label.className = 'debug-layer-label';
+                    const cls = el.className && typeof el.className === 'string' ? '.' + el.className.trim().split(/\s+/).join('.') : '';
+                    label.textContent = `${el.tagName.toLowerCase()}${el.id ? '#' + el.id : ''}${cls} | ${pos} | z:${cs.zIndex}`;
+                    label.style.cssText = `position:fixed;left:${rect.left}px;top:${Math.max(0, rect.top - 14)}px;background:${color};color:#000;font-size:9px;font-weight:700;padding:1px 4px;pointer-events:none;z-index:2147483000;white-space:nowrap;max-width:90vw;overflow:hidden;text-overflow:ellipsis;font-family:monospace;`;
+                    document.body.appendChild(box);
+                    document.body.appendChild(label);
+                });
+            }
+            const btn = document.createElement('button');
+            btn.id = 'debug-scan-btn';
+            btn.textContent = '🔍 فحص الطبقات';
+            btn.style.cssText = 'position:fixed;bottom:14px;left:14px;z-index:2147483647;background:#ff2d55;color:#fff;border:none;padding:10px 14px;border-radius:20px;font-size:13px;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,0.5);';
+            btn.onclick = scanLayers;
+            document.body.appendChild(btn);
+        })();
     </script>
 </body>
 </html>
