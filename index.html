@@ -459,7 +459,7 @@
             -webkit-tap-highlight-color: transparent;
         }
         .menu-nav-item:hover { background: var(--surface-2); color: var(--bright); border-color: rgba(192,38,211,0.3); transform: translateX(5px); }
-        .menu-nav-item .menu-nav-icon { font-size: 18px; width: 28px; text-align: center; }
+        .menu-nav-item .menu-nav-icon { width: 28px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
         .menu-nav-item.danger { color: #ff7a7a; border-color: rgba(255,70,70,0.18); background: rgba(255,70,70,0.05); }
         .menu-nav-item.danger:hover { background: rgba(255,70,70,0.1); }
         .menu-nav-divider { height: 1px; background: var(--border); margin: 6px 0; }
@@ -616,8 +616,9 @@
             top: 50%;
             transform: translateY(-50%);
             color: var(--text-dim);
-            font-size: 17px;
             pointer-events: none;
+            display: flex;
+            align-items: center;
         }
         #main-search {
             width: 100%;
@@ -887,7 +888,7 @@
 
         /* ===== EMPTY ===== */
         .section-empty { grid-column: 1/-1; text-align: center; padding: 64px 20px; color: var(--text-dim); }
-        .section-empty .empty-icon { font-size: 42px; margin-bottom: 12px; opacity: .7; }
+        .section-empty .empty-icon { margin-bottom: 12px; opacity: .7; }
         .section-empty p { font-size: 14px; }
 
         /* ===== SIDE PANEL ===== */
@@ -1007,7 +1008,7 @@
             padding: 26px;
             text-align: center;
         }
-        .invite-card .crown { font-size: 46px; margin-bottom: 16px; display: block; }
+        .invite-card .crown { margin-bottom: 16px; display: block; color: #ffc862; }
         .invite-card h3 { color: var(--bright); margin: 0 0 10px; font-size: 16px; }
         .invite-card p { color: var(--text); font-size: 13px; line-height: 1.7; margin: 0 0 22px; }
         .btn-google {
@@ -1038,7 +1039,7 @@
             padding: 30px;
             text-align: center;
         }
-        .blocked-card .lock-icon { font-size: 46px; margin-bottom: 14px; display: block; }
+        .blocked-card .lock-icon { margin-bottom: 14px; display: block; color: #ff7a7a; }
         .blocked-card h3 { color: #ff7a7a; margin: 0 0 10px; font-size: 16px; }
         .blocked-card p { color: var(--text); font-size: 13px; line-height: 1.7; }
 
@@ -1322,7 +1323,7 @@
         }
         .player-count-card:hover { transform: translateY(-3px); border-color: rgba(192,38,211,0.55); box-shadow: 0 14px 34px -14px rgba(192,38,211,0.55); }
         .player-count-card:active { transform: translateY(0); }
-        .player-count-icon { font-size: 30px; margin-bottom: 10px; filter: drop-shadow(0 4px 10px rgba(192,38,211,0.5)); }
+        .player-count-icon { margin-bottom: 10px; filter: drop-shadow(0 4px 10px rgba(192,38,211,0.5)); color: var(--magenta); }
         .player-count-label { color: var(--bright); font-size: 15px; font-weight: 800; font-family: 'Rajdhani', sans-serif; letter-spacing: .3px; }
         .games-hub-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 2px; }
         .games-hub-change-btn {
@@ -2183,7 +2184,7 @@
             gap: 10px;
             padding: 40px 20px;
         }
-        .wachat-empty-icon { font-size: 46px; opacity: .6; }
+        .wachat-empty-icon { opacity: .6; }
         .wachat-empty p { font-size: 13px; text-align: center; }
 
         /* ===== SUSPENDED OVERLAY ===== */
@@ -2199,7 +2200,7 @@
             text-align: center;
             padding: 24px;
         }
-        #suspended-screen .sus-icon { font-size: 58px; margin-bottom: 16px; }
+        #suspended-screen .sus-icon { margin-bottom: 0; color: #ff7a7a; }
         #suspended-screen h2 { color: #ff7a7a; font-size: 22px; margin-bottom: 12px; }
         #suspended-screen p { color: var(--text); font-size: 15px; line-height: 1.7; max-width: 380px; }
 
@@ -2353,7 +2354,7 @@
                 تسجيل الدخول بحساب Google
             </button>
             <div id="login-error" class="error-msg"></div>
-            <div class="login-trust">🔒 دخول آمن وسريع عبر Google — بياناتك محمية</div>
+            <div class="login-trust" style="display:flex;align-items:center;justify-content:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> دخول آمن وسريع عبر Google — بياناتك محمية</div>
         </div>
     </div>
 
@@ -2403,26 +2404,26 @@
                 <div class="menu-section-title">التنقل</div>
 
                 <a class="menu-nav-item" href="#hero" onclick="closeMenuPanel()">
-                    <span class="menu-nav-icon"><svg class="menu-icon" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span> الرئيسية
+                    <span class="menu-nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span> الرئيسية
                 </a>
                 <a class="menu-nav-item" href="#section-unlocked" onclick="closeMenuPanel()">
-                    <span class="menu-nav-icon"><svg class="menu-icon" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.2-1"/><circle cx="9" cy="20" r="1" fill="currentColor"/></svg></span> فيديوهات مفتوحة
+                    <span class="menu-nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg></span> فيديوهات مفتوحة
                 </a>
                 <a class="menu-nav-item" href="#section-locked" onclick="closeMenuPanel()">
-                    <span class="menu-nav-icon"><svg class="menu-icon" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><circle cx="12" cy="20" r="1" fill="currentColor"/></svg></span> فيديوهات مقفولة
+                    <span class="menu-nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span> فيديوهات مقفولة
                 </a>
                 <div class="menu-nav-item" onclick="closeMenuPanel();openGamesModal()">
-                    <span class="menu-nav-icon"><svg class="menu-icon" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="6" width="20" height="12" rx="2" ry="2"/><circle cx="6" cy="12" r="1" fill="currentColor"/><circle cx="10" cy="10" r="1" fill="currentColor"/><circle cx="10" cy="14" r="1" fill="currentColor"/><circle cx="14" cy="10" r="1" fill="currentColor"/><line x1="16" y1="9" x2="22" y2="9"/><line x1="16" y1="12" x2="22" y2="12"/><line x1="16" y1="15" x2="22" y2="15"/></svg></span> ألعاب أونلاين
+                    <span class="menu-nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="12" x2="10" y2="12"/><line x1="8" y1="10" x2="8" y2="14"/><circle cx="15" cy="12" r="1" fill="currentColor"/><circle cx="17" cy="10" r="1" fill="currentColor"/><path d="M6 8h12a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2z"/></svg></span> ألعاب أونلاين
                 </div>
 
                 <div class="menu-nav-divider"></div>
                 <div class="menu-section-title">التواصل</div>
 
                 <div class="menu-nav-item" onclick="openMembersModal()">
-                    <span class="menu-nav-icon"><svg class="menu-icon" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span> الأعضاء ومتابعتهم
+                    <span class="menu-nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span> الأعضاء ومتابعتهم
                 </div>
                 <div class="menu-nav-item" onclick="openConversationsModal()">
-                    <span class="menu-nav-icon"><svg class="menu-icon" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="4" width="20" height="16" rx="2" ry="2"/><path d="M22 6l-10 7L2 6"/></svg></span> محادثاتي مع الأعضاء
+                    <span class="menu-nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg></span> محادثاتي مع الأعضاء
                 </div>
 
                 <!-- Admin only section -->
@@ -2430,26 +2431,26 @@
                     <div class="menu-nav-divider"></div>
                     <div class="menu-section-title">إدارة المنصة</div>
                     <div class="menu-nav-item" id="menu-add-admin-btn" onclick="openAdminPanel('admin-admins')">
-                        <span class="menu-nav-icon"><svg class="menu-icon" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span> إضافة / إدارة المشرفين
+                        <span class="menu-nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span> إضافة / إدارة المشرفين
                     </div>
                     <div class="menu-nav-item" id="menu-accounts-btn" onclick="openAdminPanel('admin-users')">
-                        <span class="menu-nav-icon"><svg class="menu-icon" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span> إدارة الحسابات
+                        <span class="menu-nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg></span> إدارة الحسابات
                     </div>
                     <div class="menu-nav-item" onclick="openAdminPanel('admin-ratings')">
-                        <span class="menu-nav-icon"><svg class="menu-icon" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></span> التقييمات
+                        <span class="menu-nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span> التقييمات
                     </div>
                     <div class="menu-nav-item" onclick="openAdminPanel('admin-comments')">
-                        <span class="menu-nav-icon"><svg class="menu-icon" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><polygon points="12 2 15.09 10.26 23.77 11.27 17.88 17.14 19.54 25.98 12 21.77 4.46 25.98 6.12 17.14 0.23 11.27 8.91 10.26 12 2"/></svg></span> التعليقات
+                        <span class="menu-nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span> التعليقات
                     </div>
                     <div class="menu-nav-item" id="menu-issues-btn" onclick="openAdminPanel('admin-issues')">
-                        <span class="menu-nav-icon"><svg class="menu-icon" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3.05h16.94a2 2 0 0 0 1.71-3.05L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span> أعطال المنصة <span id="menu-issues-badge" style="display:none;background:#ff4646;color:#fff;font-size:10px;border-radius:10px;padding:1px 6px;margin-right:6px">0</span>
+                        <span class="menu-nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span> أعطال المنصة <span id="menu-issues-badge" style="display:none;background:#ff4646;color:#fff;font-size:10px;border-radius:10px;padding:1px 6px;margin-right:6px">0</span>
                     </div>
                 </div>
 
                 <div class="menu-nav-divider"></div>
 
                 <div class="menu-nav-item danger" onclick="handleSignOut()">
-                    <span class="menu-nav-icon"><svg class="menu-icon" viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M18 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2z"/><circle cx="15" cy="12" r="1" fill="currentColor"/></svg></span> تسجيل الخروج
+                    <span class="menu-nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></span> تسجيل الخروج
                 </div>
 
             </div>
@@ -2481,7 +2482,7 @@
                 <!-- No admin -->
                 <div id="state-no-admin">
                     <div class="invite-card">
-                        <span class="crown">👑</span>
+                        <span class="crown" style="display:flex;justify-content:center;align-items:center"><svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h20"/><path d="M4 20l2-10 6 5 4-9 4 9 2-5v10"/></svg></span>
                         <h3>لا يوجد مشرف بعد!</h3>
                         <p>أنت أول شخص هنا.<br/>سجّل دخولك لتصبح المشرف الوحيد للمنصة.</p>
                         <button class="btn-google" id="login-admin-btn" onclick="handleAdminLogin()">
@@ -2494,7 +2495,7 @@
                 <!-- Blocked -->
                 <div id="state-blocked">
                     <div class="blocked-card">
-                        <span class="lock-icon">🔐</span>
+                        <span class="lock-icon" style="display:flex;justify-content:center;align-items:center"><svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><circle cx="12" cy="16" r="1.2" fill="currentColor"/></svg></span>
                         <h3>لا توجد صلاحيات كافية</h3>
                         <p>هذه المنصة لها مشرف بالفعل.<br/>لا يمكن إضافة مشرف آخر.</p>
                     </div>
@@ -2506,17 +2507,17 @@
                         <img id="panel-avatar" src="" alt="" />
                         <div>
                             <div class="p-name" id="panel-name">—</div>
-                            <div class="p-role" id="panel-role">👑 مشرف رئيسي</div>
+                            <div class="p-role" id="panel-role" style="display:flex;align-items:center;gap:6px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h20"/><path d="M4 20l2-10 6 5 4-9 4 9 2-5v10"/></svg> مشرف رئيسي</div>
                         </div>
                     </div>
 
                     <!-- Admin Tabs -->
                     <div class="panel-tabs">
-                        <button class="panel-tab" data-tab="admin-admins" onclick="switchPanelTab('admin-admins')">👥 مشرفين</button>
-                        <button class="panel-tab active" data-tab="admin-ratings" onclick="switchPanelTab('admin-ratings')">⭐ تقييمات</button>
-                        <button class="panel-tab" data-tab="admin-comments" onclick="switchPanelTab('admin-comments')">💬 تعليقات</button>
-                        <button class="panel-tab" data-tab="admin-issues" onclick="switchPanelTab('admin-issues')">⚠️ أعطال</button>
-                        <button class="panel-tab" data-tab="admin-users" onclick="switchPanelTab('admin-users')">🚫 المستخدمين</button>
+                        <button class="panel-tab" data-tab="admin-admins" onclick="switchPanelTab('admin-admins')" style="display:inline-flex;align-items:center;gap:4px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> مشرفين</button>
+                        <button class="panel-tab active" data-tab="admin-ratings" onclick="switchPanelTab('admin-ratings')" style="display:flex;align-items:center;gap:5px;justify-content:center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> تقييمات</button>
+                        <button class="panel-tab" data-tab="admin-comments" onclick="switchPanelTab('admin-comments')" style="display:flex;align-items:center;gap:5px;justify-content:center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> تعليقات</button>
+                        <button class="panel-tab" data-tab="admin-issues" onclick="switchPanelTab('admin-issues')" style="display:inline-flex;align-items:center;gap:4px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> أعطال</button>
+                        <button class="panel-tab" data-tab="admin-users" onclick="switchPanelTab('admin-users')" style="display:inline-flex;align-items:center;gap:4px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg> المستخدمين</button>
                     </div>
 
                     <!-- Admins -->
@@ -2525,7 +2526,7 @@
                         <div id="admin-list" style="margin-bottom:16px"></div>
 
                         <p class="panel-section-title">تحديد مشرف من الحسابات</p>
-                        <input type="text" id="directory-admins-search" class="directory-search" placeholder="🔍 دوّر بالاسم أو الإيميل..." oninput="renderUsersDirectory()" />
+                        <input type="text" id="directory-admins-search" class="directory-search" placeholder="دوّر بالاسم أو الإيميل..." oninput="renderUsersDirectory()" />
                         <p class="directory-hint">اضغط على الرتبة اللي عايزها لأي حساب عشان تخليه مشرف عادي أو رئيسي فورًا</p>
                         <div id="admin-directory-list" class="directory-list"></div>
 
@@ -2538,7 +2539,7 @@
                                     <option value="normal" selected>عادي</option>
                                 </select>
                             </div>
-                            <button class="mgmt-btn" onclick="handleAddAdmin()">➕ إضافة مشرف</button>
+                            <button class="mgmt-btn" onclick="handleAddAdmin()" style="display:inline-flex;align-items:center;gap:5px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> إضافة مشرف</button>
                         </div>
                     </div>
 
@@ -2554,7 +2555,7 @@
 
                     <div class="panel-tab-content" id="tab-admin-issues">
                         <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
-                            <button class="comment-delete-btn" onclick="clearAllAdminIssues()">🗑 مسح الكل</button>
+                            <button class="comment-delete-btn" onclick="clearAllAdminIssues()" style="display:inline-flex;align-items:center;gap:5px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg> مسح الكل</button>
                         </div>
                         <div id="admin-issues-list"></div>
                     </div>
@@ -2563,7 +2564,7 @@
                     <div class="panel-tab-content" id="tab-admin-users">
                         <p class="panel-section-title" style="margin-top:0">إدارة كل الحسابات</p>
                         <p class="directory-hint">قائمة بكل الحسابات اللي دخلت المنصة — اضغط "توقيف" عشان توقف أي حساب فورًا (كراش)، أو "رفع التوقيف" لإرجاعه</p>
-                        <input type="text" id="directory-users-search" class="directory-search" placeholder="🔍 دوّر بالاسم أو الإيميل..." oninput="renderUsersDirectory()" />
+                        <input type="text" id="directory-users-search" class="directory-search" placeholder="دوّر بالاسم أو الإيميل..." oninput="renderUsersDirectory()" />
                         <div id="accounts-list" class="directory-list"></div>
 
                         <p class="panel-section-title">توقيف يدوي (بالـ UID)</p>
@@ -2571,12 +2572,12 @@
                             <input type="text" id="suspend-uid-input" placeholder="UID المستخدم..." style="flex:1;padding:8px 12px;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:#fff;font-size:13px;outline:none"/>
                         </div>
                         <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
-                            <button class="btn-suspend" onclick="suspendUser()">🚫 توقيف الحساب</button>
-                            <button class="btn-unsuspend" onclick="unsuspendUser()">✅ رفع التوقيف</button>
+                            <button class="btn-suspend" onclick="suspendUser()" style="display:inline-flex;align-items:center;gap:5px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg> توقيف الحساب</button>
+                            <button class="btn-unsuspend" onclick="unsuspendUser()" style="display:inline-flex;align-items:center;gap:5px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> رفع التوقيف</button>
                         </div>
                     </div>
 
-                    <button class="btn-signout" onclick="handleSignOut()">🚪 تسجيل الخروج</button>
+                    <button class="btn-signout" onclick="handleSignOut()" style="display:flex;align-items:center;gap:8px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> تسجيل الخروج</button>
                 </div>
 
                 <!-- ===== USER VIEW ===== -->
@@ -2585,14 +2586,14 @@
                         <img id="user-avatar" src="" alt="" />
                         <div>
                             <div class="p-name" id="user-name">—</div>
-                            <div class="p-role" style="color:var(--text-dim)">👤 مستخدم</div>
-                            <div style="font-size:10px;color:var(--magenta);margin-top:2px">✏ اضغط لتعديل الملف</div>
+                            <div class="p-role" style="color:var(--text-dim)" style="display:flex;align-items:center;gap:5px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> مستخدم</div>
+                            <div style="font-size:10px;color:var(--magenta);margin-top:2px" style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--magenta);margin-top:2px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> اضغط لتعديل الملف</div>
                         </div>
                     </div>
 
                     <div class="panel-tab-content active" id="tab-user-chat" style="display:block"></div>
 
-                    <button class="btn-signout" onclick="handleSignOut()">🚪 تسجيل الخروج</button>
+                    <button class="btn-signout" onclick="handleSignOut()" style="display:flex;align-items:center;gap:8px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> تسجيل الخروج</button>
                 </div>
 
             </div>
@@ -2630,7 +2631,7 @@
         <!-- ===== SEARCH ===== -->
         <div id="search-section">
             <div class="search-wrap">
-                <span class="search-icon">🔍</span>
+                <span class="search-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
                 <input id="main-search" type="search" placeholder="ابحث عن أي فيديو..." oninput="onSearch(this)" />
                 <button class="search-clear" id="search-clear" onclick="clearSearch()">✕</button>
             </div>
@@ -2642,7 +2643,7 @@
             <div id="section-unlocked">
                 <div class="section-header">
                     <div class="section-title-wrap">
-                        <div class="section-icon unlocked">🔓</div>
+                        <div class="section-icon unlocked" style="display:flex;align-items:center;justify-content:center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg></div>
                         <span class="section-title">فيديوهات مفتوحة</span>
                         <span class="section-count" id="unlocked-count">0</span>
                     </div>
@@ -2651,7 +2652,7 @@
                 <div class="section-divider"></div>
                 <div class="video-grid" id="grid-unlocked">
                     <div class="section-empty" id="empty-unlocked">
-                        <div class="empty-icon">🎮</div>
+                        <div class="empty-icon" style="display:flex;justify-content:center"><svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="12" x2="10" y2="12"/><line x1="8" y1="10" x2="8" y2="14"/><circle cx="15" cy="12" r="1" fill="currentColor"/><circle cx="17" cy="10" r="1" fill="currentColor"/><path d="M6 8h12a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2z"/></svg></div>
                         <p>لا توجد فيديوهات مفتوحة</p>
                     </div>
                 </div>
@@ -2660,7 +2661,7 @@
             <div id="section-locked" style="margin-top:24px">
                 <div class="section-header">
                     <div class="section-title-wrap">
-                        <div class="section-icon locked">🔒</div>
+                        <div class="section-icon locked" style="display:flex;align-items:center;justify-content:center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
                         <span class="section-title">فيديوهات مقفولة</span>
                         <span class="section-count locked-count" id="locked-count">0</span>
                     </div>
@@ -2668,7 +2669,7 @@
                 <div class="section-divider locked-div"></div>
                 <div class="video-grid" id="grid-locked">
                     <div class="section-empty" id="empty-locked">
-                        <div class="empty-icon">🔐</div>
+                        <div class="empty-icon" style="display:flex;justify-content:center"><svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><circle cx="12" cy="16" r="1.2" fill="currentColor"/></svg></div>
                         <p>لا توجد فيديوهات مقفولة</p>
                     </div>
                 </div>
@@ -2685,7 +2686,7 @@
 
     <!-- ===== SUSPENDED SCREEN ===== -->
     <div id="suspended-screen">
-        <div class="sus-icon">🔐</div>
+        <div class="sus-icon" style="display:flex;justify-content:center;margin-bottom:16px"><svg width="58" height="58" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><circle cx="12" cy="16" r="1.2" fill="currentColor"/></svg></div>
         <h2>تم تعليق حسابك</h2>
         <p>تم إيقاف حسابك من قِبل أحد المشرفين.<br/>إذا كنت تعتقد أن هذا خطأ، تواصل مع إدارة المنصة.</p>
     </div>
@@ -2694,7 +2695,7 @@
     <div id="profile-modal">
         <div class="profile-fs-header">
             <button class="profile-fs-back" onclick="closeProfileModal()">✕</button>
-            <span class="profile-fs-title">🎮 الملف الشخصي</span>
+            <span class="profile-fs-title" style="display:flex;align-items:center;gap:7px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="12" x2="10" y2="12"/><line x1="8" y1="10" x2="8" y2="14"/><circle cx="15" cy="12" r="1" fill="currentColor"/><circle cx="17" cy="10" r="1" fill="currentColor"/><path d="M6 8h12a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2z"/></svg> الملف الشخصي</span>
         </div>
         <div class="profile-fs-cover">
             <div class="profile-fs-cover-pattern"></div>
@@ -2707,7 +2708,7 @@
         <div class="profile-fs-body">
             <div class="profile-fs-userinfo">
                 <div class="profile-fs-username" id="profile-display-name">—</div>
-                <div class="profile-fs-userrole" id="profile-display-role">👤 مستخدم</div>
+                <div class="profile-fs-userrole" id="profile-display-role" style="display:flex;align-items:center;gap:5px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> مستخدم</div>
                 <div class="follow-stats-row" id="profile-follow-stats"></div>
             </div>
             <div class="profile-fs-card">
@@ -2772,7 +2773,7 @@
     <div id="member-profile-modal">
         <div class="profile-fs-header">
             <button class="profile-fs-back" onclick="closeMemberProfile()">✕</button>
-            <span class="profile-fs-title">👤 ملف العضو</span>
+            <span class="profile-fs-title" style="display:flex;align-items:center;gap:7px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> ملف العضو</span>
         </div>
         <div class="profile-fs-cover" id="member-profile-cover">
             <div class="profile-fs-cover-pattern"></div>
@@ -2785,11 +2786,11 @@
         <div class="profile-fs-body">
             <div class="profile-fs-userinfo">
                 <div class="profile-fs-username" id="member-profile-name">—</div>
-                <div class="profile-fs-userrole" id="member-profile-role">👤 مستخدم</div>
+                <div class="profile-fs-userrole" id="member-profile-role" style="display:flex;align-items:center;gap:5px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> مستخدم</div>
                 <div class="follow-stats-row" id="member-profile-stats"></div>
             </div>
             <button class="profile-save-btn" id="member-profile-follow-btn" onclick="toggleFollow(window._viewedMemberUid, window._viewedMemberName)">+ متابعة</button>
-            <button class="profile-save-btn" style="margin-top:10px;background:var(--surface);color:var(--text);box-shadow:none" onclick="openFriendChat(window._viewedMemberUid, window._viewedMemberName, window._viewedMemberPhoto)">💬 ابدأ محادثة</button>
+            <button class="profile-save-btn" style="margin-top:10px;background:var(--surface);color:var(--text);box-shadow:none" onclick="openFriendChat(window._viewedMemberUid, window._viewedMemberName, window._viewedMemberPhoto)" style="display:inline-flex;align-items:center;gap:6px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> ابدأ محادثة</button>
             <button class="call-btn-profile" id="member-profile-call-btn" onclick="startCall(window._viewedMemberUid, window._viewedMemberName, window._viewedMemberPhoto)">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1C10.61 21 3 13.39 3 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.25 1.01l-2.2 2.2z"/></svg>
                 اتصال
@@ -2801,10 +2802,10 @@
     <div id="members-modal">
         <div class="profile-fs-header">
             <button class="profile-fs-back" onclick="closeMembersModal()">✕</button>
-            <span class="profile-fs-title">👥 الأعضاء</span>
+            <span class="profile-fs-title" style="display:flex;align-items:center;gap:7px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> الأعضاء</span>
         </div>
         <div class="members-fs-body">
-            <input type="text" id="members-search" class="directory-search" placeholder="🔍 دوّر عن عضو بالاسم..." oninput="renderMembersList()" />
+            <input type="text" id="members-search" class="directory-search" placeholder="دوّر عن عضو بالاسم..." oninput="renderMembersList()" />
             <p class="directory-hint">تابع أعضاء المنصة عشان تفضل قريب من أنشطتهم — يقدر أي عضو يشوف عدد متابعينه في ملفه الشخصي</p>
             <div id="members-list" class="directory-list members-fs-list"></div>
         </div>
@@ -2814,7 +2815,7 @@
     <div id="conversations-modal">
         <div class="profile-fs-header">
             <button class="profile-fs-back" onclick="closeConversationsModal()">✕</button>
-            <span class="profile-fs-title">📩 محادثاتي</span>
+            <span class="profile-fs-title" style="display:flex;align-items:center;gap:7px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg> محادثاتي</span>
         </div>
         <div class="members-fs-body">
             <p class="directory-hint">كل المحادثات اللي بدأتها مع الأعضاء — دوس على أي حد عشان تكمل الكلام. عايز تبدأ محادثة جديدة؟ روح لصفحة "الأعضاء"</p>
@@ -2826,7 +2827,7 @@
     <div id="games-modal">
         <div class="profile-fs-header">
             <button class="profile-fs-back" id="games-header-back" onclick="closeGamesModal()">✕</button>
-            <span class="profile-fs-title">🎮 ألعاب أونلاين</span>
+            <span class="profile-fs-title" style="display:flex;align-items:center;gap:7px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="12" x2="10" y2="12"/><line x1="8" y1="10" x2="8" y2="14"/><circle cx="15" cy="12" r="1" fill="currentColor"/><circle cx="17" cy="10" r="1" fill="currentColor"/><path d="M6 8h12a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2z"/></svg> ألعاب أونلاين</span>
         </div>
         <div class="games-fs-body">
 
@@ -2836,19 +2837,19 @@
                 <p class="directory-hint">اختار عدد اللاعبين وهنورّيك الألعاب المتاحة بنفس العدد</p>
                 <div class="players-select-grid">
                     <div class="player-count-card" onclick="selectGamesPlayerCount(1)">
-                        <div class="player-count-icon">🧍</div>
+                        <div class="player-count-icon" style="display:flex;justify-content:center"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="4"/><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/></svg></div>
                         <div class="player-count-label">لاعب واحد</div>
                     </div>
                     <div class="player-count-card" onclick="selectGamesPlayerCount(2)">
-                        <div class="player-count-icon">🧍‍🧍</div>
+                        <div class="player-count-icon" style="display:flex;justify-content:center"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
                         <div class="player-count-label">لاعبين اتنين</div>
                     </div>
                     <div class="player-count-card" onclick="selectGamesPlayerCount(3)">
-                        <div class="player-count-icon">🧍‍🧍‍🧍</div>
+                        <div class="player-count-icon" style="display:flex;justify-content:center"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/><text x="18" y="22" font-size="8" fill="currentColor" stroke="none">3</text></svg></div>
                         <div class="player-count-label">تلات لاعبين</div>
                     </div>
                     <div class="player-count-card" onclick="selectGamesPlayerCount(4)">
-                        <div class="player-count-icon">🧑‍🤝‍🧑</div>
+                        <div class="player-count-icon" style="display:flex;justify-content:center"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/><text x="18" y="22" font-size="8" fill="currentColor" stroke="none">4</text></svg></div>
                         <div class="player-count-label">أربع لاعبين</div>
                     </div>
                 </div>
@@ -2858,12 +2859,12 @@
             <div id="games-hub" style="display:none">
                 <div class="games-hub-header">
                     <p class="directory-hint" id="games-hub-hint" style="margin:0">ألعاب حصرية على GAMEVERSE — العب لوحدك وحاول تكسر رقمك القياسي</p>
-                    <button class="games-hub-change-btn" onclick="openGamesPlayerSelect()">🔁 غيّر العدد</button>
+                    <button class="games-hub-change-btn" onclick="openGamesPlayerSelect()" style="display:inline-flex;align-items:center;gap:5px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg> غيّر العدد</button>
                 </div>
                 <button id="add-game-btn" onclick="openAddGameModal()" style="display:none;margin-top:12px;background:linear-gradient(120deg,#7c3aed,#c026d3,#ff2d87);border:none;border-radius:9px;padding:9px 18px;color:#0a0814;font-size:13px;font-weight:900;cursor:pointer;white-space:nowrap">+ إضافة لعبة</button>
                 <div class="games-hub-grid" id="games-hub-grid"></div>
                 <div class="games-hub-empty" id="games-hub-empty">
-                    <span class="emoji">🛠️</span>
+                    <span class="emoji" style="display:flex;justify-content:center;margin-bottom:8px"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></span>
                     ألعاب اللاعبين دي لسه بتتضاف قريباً على GAMEVERSE.<br>
                     جرّب عدد لاعبين تاني دلوقتي.
                 </div>
@@ -2891,7 +2892,7 @@
             <button class="wachat-back-btn" onclick="closeFriendChat()">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
             </button>
-            <div class="wachat-header-avatar" id="friend-chat-avatar">💬</div>
+            <div class="wachat-header-avatar" id="friend-chat-avatar" style="display:flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
             <div class="wachat-header-info">
                 <span class="wachat-header-name" id="friend-chat-name">عضو</span>
                 <span class="wachat-header-status" id="friend-chat-status">محادثة خاصة</span>
@@ -2902,7 +2903,7 @@
         </div><!-- /wachat-header -->
         <div class="wachat-messages" id="friend-chat-messages-area">
             <div class="wachat-empty" style="display:flex">
-                <div class="wachat-empty-icon">💬</div>
+                <div class="wachat-empty-icon" style="display:flex;justify-content:center;align-items:center"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
                 <p>لا توجد رسائل بعد<br/>ابدأ المحادثة!</p>
             </div>
         </div>
@@ -2919,7 +2920,7 @@
         <div class="ic-avatar" id="ic-avatar">?</div>
         <div class="ic-info">
             <div class="ic-name" id="ic-name">مستخدم</div>
-            <div class="ic-sub" id="ic-sub">📞 مكالمة واردة...</div>
+            <div class="ic-sub" id="ic-sub" style="display:flex;align-items:center;gap:4px"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1C10.61 21 3 13.39 3 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.25 1.01l-2.2 2.2z"/></svg> مكالمة واردة...</div>
         </div>
         <div class="ic-actions">
             <button class="ic-btn ic-decline" onclick="declineIncomingCall()">✕</button>
@@ -2939,7 +2940,7 @@
                 <div class="cp-status" id="call-status-text">جاري الاتصال...</div>
             </div>
             <video id="call-local-video" autoplay playsinline muted></video>
-            <div class="call-topbar"><span id="call-timer-text">📞 مكالمة</span></div>
+            <div class="call-topbar"><span id="call-timer-text" data-phone-prefix="1">مكالمة</span></div>
         </div>
         <div class="call-controls">
             <button class="call-ctrl-btn" id="call-mic-btn" onclick="toggleCallMic()" title="كتم الصوت"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></button>
@@ -2979,7 +2980,7 @@
             <button class="wachat-back-btn" onclick="closeWaChat()">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
             </button>
-            <div class="wachat-header-avatar" id="wachat-header-avatar">💬</div>
+            <div class="wachat-header-avatar" id="wachat-header-avatar" style="display:flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
             <div class="wachat-header-info">
                 <span class="wachat-header-name" id="wachat-header-name">المشرفون</span>
                 <span class="wachat-header-status" id="wachat-header-status">متصل</span>
@@ -2987,7 +2988,7 @@
         </div>
         <div class="wachat-messages" id="wachat-messages-area">
             <div class="wachat-empty" id="wachat-empty-state">
-                <div class="wachat-empty-icon">💬</div>
+                <div class="wachat-empty-icon" style="display:flex;justify-content:center;align-items:center"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
                 <p>لا توجد رسائل بعد<br/>كن أول من يرسل!</p>
             </div>
         </div>
@@ -3010,10 +3011,10 @@
     <!-- ===== ADD VIDEO MODAL ===== -->
     <div id="add-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeAddModal()">
         <div class="modal-box">
-            <h2 class="modal-title">🎬 رفع فيديو جديد</h2>
+            <h2 class="modal-title" style="display:flex;align-items:center;gap:8px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/></svg> رفع فيديو جديد</h2>
             <div class="modal-tabs">
-                <button class="modal-tab active" id="tab-yt" onclick="switchTab('youtube')">▶ يوتيوب</button>
-                <button class="modal-tab" id="tab-drive" onclick="switchTab('drive')">📁 Google Drive</button>
+                <button class="modal-tab active" id="tab-yt" onclick="switchTab('youtube')" style="display:inline-flex;align-items:center;gap:5px"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg> يوتيوب</button>
+                <button class="modal-tab" id="tab-drive" onclick="switchTab('drive')" style="display:inline-flex;align-items:center;gap:5px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg> Google Drive</button>
             </div>
             <div class="tab-pane active" id="pane-youtube">
                 <div class="modal-field">
@@ -3050,7 +3051,7 @@
     <!-- ===== EDIT MODAL ===== -->
     <div id="edit-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeEditModal()">
         <div class="modal-box">
-            <h2 class="modal-title">✏ تعديل الفيديو</h2>
+            <h2 class="modal-title" style="display:flex;align-items:center;gap:8px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> تعديل الفيديو</h2>
             <div class="modal-field">
                 <label class="modal-label">العنوان</label>
                 <input id="edit-title" class="modal-input" type="text" />
@@ -3069,7 +3070,7 @@
     <!-- ===== ADD GAME MODAL (admin only) ===== -->
     <div id="add-game-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeAddGameModal()">
         <div class="modal-box">
-            <h2 class="modal-title">🎮 إضافة لعبة جديدة</h2>
+            <h2 class="modal-title" style="display:flex;align-items:center;gap:8px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="12" x2="10" y2="12"/><line x1="8" y1="10" x2="8" y2="14"/><circle cx="15" cy="12" r="1" fill="currentColor"/><circle cx="17" cy="10" r="1" fill="currentColor"/><path d="M6 8h12a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2z"/></svg> إضافة لعبة جديدة</h2>
             <div class="modal-field">
                 <label class="modal-label">عنوان اللعبة *</label>
                 <input id="add-game-title" class="modal-input" type="text" placeholder="اسم اللعبة" oninput="clearAddGameError()" />
@@ -3114,7 +3115,7 @@
     <!-- ===== EDIT GAME MODAL (admin only) ===== -->
     <div id="edit-game-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeEditGameModal()">
         <div class="modal-box">
-            <h2 class="modal-title">✏ تعديل اللعبة</h2>
+            <h2 class="modal-title" style="display:flex;align-items:center;gap:8px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> تعديل اللعبة</h2>
             <div class="modal-field">
                 <label class="modal-label">عنوان اللعبة *</label>
                 <input id="edit-game-title" class="modal-input" type="text" />
@@ -3183,7 +3184,7 @@
                 </div>
                 <div class="player-comments" id="player-comments">
                     <button class="comments-toggle-btn" id="comments-toggle-btn" onclick="togglePlayerComments()">
-                        💬 عرض التعليقات <span class="comments-toggle-count" id="comments-toggle-count">(0)</span>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> عرض التعليقات <span class="comments-toggle-count" id="comments-toggle-count">(0)</span>
                     </button>
                     <div class="player-comments-body" id="player-comments-body" style="display:none">
                         <div id="player-comments-list"></div>
@@ -5158,7 +5159,7 @@
             const area = document.getElementById('friend-chat-messages-area');
             if (!area) return;
             if (msgs.length === 0) {
-                area.innerHTML = `<div class="wachat-empty" style="display:flex"><div class="wachat-empty-icon">💬</div><p>لا توجد رسائل بعد<br/>ابدأ المحادثة!</p></div>`;
+                area.innerHTML = `<div class="wachat-empty" style="display:flex"><div class="wachat-empty-icon" style="display:flex;justify-content:center;align-items:center"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><p>لا توجد رسائل بعد<br/>ابدأ المحادثة!</p></div>`;
                 return;
             }
             const wasAtBottom = (area.scrollHeight - area.scrollTop - area.clientHeight) < 80;
@@ -5383,7 +5384,7 @@
             avatar.innerHTML = av || initial;
             avatar.style.cssText = av ? 'padding:0;border:2px solid #22c55e;border-radius:50%;overflow:hidden;width:46px;height:46px;' : '';
             document.getElementById('ic-name').textContent = data.callerName || 'مستخدم';
-            document.getElementById('ic-sub').textContent = '📞 مكالمة واردة...';
+            document.getElementById('ic-sub').innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1C10.61 21 3 13.39 3 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.25 1.01l-2.2 2.2z"/></svg> مكالمة واردة...';
             banner.classList.add('show');
             banner.style.transform = ''; banner.style.opacity = '1';
             _attachSwipeToDismiss(banner);
@@ -5574,7 +5575,7 @@
             document.getElementById('call-cam-btn').classList.remove('active');
             document.getElementById('call-cam-btn').innerHTML = CALL_ICONS.camOn;
             document.getElementById('call-local-video').classList.remove('show');
-            document.getElementById('call-timer-text').textContent = '📞 ' + _call.peerName;
+            document.getElementById('call-timer-text').textContent = _call.peerName;
             modal.classList.add('open');
             document.body.style.overflow = 'hidden';
             // Reset the floating widget too, in case a previous call left it in a stale state.
@@ -5597,7 +5598,7 @@
                 const secs = Math.floor((Date.now() - _call.startedAt) / 1000);
                 const m = String(Math.floor(secs / 60)).padStart(2, '0');
                 const s = String(secs % 60).padStart(2, '0');
-                document.getElementById('call-timer-text').textContent = `📞 ${_call.peerName} • ${m}:${s}`;
+                document.getElementById('call-timer-text').textContent = `${_call.peerName} • ${m}:${s}`;
                 const cmwTimer = document.getElementById('cmw-timer');
                 if (cmwTimer) cmwTimer.textContent = `${m}:${s}`;
             }, 1000);
@@ -7008,5 +7009,5 @@
             }
         })();
     </script>
-</body>
+<script src="https://replit-cdn.com/replit-pill/replit-pill.global.js" data-repl-id="d9f12767-e8e4-46c9-b573-da2e0e604009"></script></body>
 </html>
