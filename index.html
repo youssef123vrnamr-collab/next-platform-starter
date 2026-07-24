@@ -3610,6 +3610,7 @@
         } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
         import {
             initializeFirestore,
+            getFirestore,
             collection,
             getDocs,
             addDoc,
@@ -6517,6 +6518,7 @@
             // real session in this tab.
             const provApp = initializeApp(FIREBASE_CONFIG, 'devtest-prov-' + Date.now());
             const provAuth = getAuth(provApp);
+            const provDb = getFirestore(provApp);
 
             for (let i = 0; i < count; i++) {
                 const n = S.devTestAccounts.length + newAccounts.length + 1;
@@ -6526,9 +6528,10 @@
                     const cred = await createUserWithEmailAndPassword(provAuth, email, password);
                     const uid = cred.user.uid;
                     const label = `حساب تجريبي ${n}`;
-                    // Create the matching Firestore profile so the account shows
-                    // up normally everywhere (members list, chat, calls...).
-                    await setDoc(doc(db, 'users', uid), {
+                    // Written via provDb (bound to provAuth, currently signed in
+                    // AS this new uid) so request.auth.uid == uid — matching the
+                    // existing users/{uid} create rule exactly, no rule change needed.
+                    await setDoc(doc(provDb, 'users', uid), {
                         email, displayName: label, photoURL: '', isOnline: false,
                         isTestAccount: true, createdAt: serverTimestamp()
                     });
