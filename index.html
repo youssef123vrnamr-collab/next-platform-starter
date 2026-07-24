@@ -341,9 +341,7 @@
             position: fixed;
             inset: 0;
             z-index: 2998;
-            background: rgba(5,3,10,0.7);
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
+            background: rgba(5,3,10,0.82);
             display: none;
             touch-action: none;
         }
@@ -375,8 +373,7 @@
             flex-shrink: 0;
             position: sticky;
             top: 0;
-            background: rgba(10,8,20,0.95);
-            backdrop-filter: blur(12px);
+            background: #0d0a19;
             z-index: 2;
         }
         .menu-panel-logo {
@@ -3429,6 +3426,7 @@
         };
 
         // ===== CANVAS =====
+        window._canvasBgPaused = false;
         (function() {
             const canvas = document.getElementById('canvas-bg');
             const ctx = canvas.getContext('2d');
@@ -3438,15 +3436,17 @@
             window.addEventListener('resize', resize);
             for (let i = 0; i < 120; i++) stars.push({ x: Math.random() * 2000, y: Math.random() * 2000, r: Math.random() * 1.5 + .2, s: Math.random() * .4 + .1, hue: Math.random() > 0.5 ? '168,85,247' : '255,45,135' });
             function frame() {
-                ctx.clearRect(0, 0, w, h);
-                stars.forEach(s => {
-                    s.y -= s.s;
-                    if (s.y < 0) { s.y = h; s.x = Math.random() * w; }
-                    ctx.beginPath();
-                    ctx.arc(s.x % w, s.y, s.r, 0, Math.PI * 2);
-                    ctx.fillStyle = `rgba(${s.hue},${(Math.random()*.35+.12).toFixed(2)})`;
-                    ctx.fill();
-                });
+                if (!window._canvasBgPaused) {
+                    ctx.clearRect(0, 0, w, h);
+                    stars.forEach(s => {
+                        s.y -= s.s;
+                        if (s.y < 0) { s.y = h; s.x = Math.random() * w; }
+                        ctx.beginPath();
+                        ctx.arc(s.x % w, s.y, s.r, 0, Math.PI * 2);
+                        ctx.fillStyle = `rgba(${s.hue},${(Math.random()*.35+.12).toFixed(2)})`;
+                        ctx.fill();
+                    });
+                }
                 requestAnimationFrame(frame);
             }
             frame();
@@ -6285,12 +6285,14 @@
             panel.classList.add('open');
             ov.style.display = 'block';
             document.body.style.overflow = 'hidden';
+            window._canvasBgPaused = true;
         };
 
         window.closeMenuPanel = function() {
             document.getElementById('menu-panel').classList.remove('open');
             document.getElementById('menu-overlay').style.display = 'none';
             document.body.style.overflow = '';
+            window._canvasBgPaused = false;
         };
 
         window.togglePanel = function() {
