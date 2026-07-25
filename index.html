@@ -1503,23 +1503,6 @@
         #call-local-video.show { display: block; }
         .call-topbar { position: absolute; top: 0; right: 0; left: 0; padding: 16px; display: flex; align-items: center; justify-content: space-between; gap: 8px; z-index: 2; }
         .call-topbar span:not(.cap-icon) { color: var(--bright); font-size: 13px; font-weight: 700; background: rgba(0,0,0,0.35); padding: 6px 14px; border-radius: 20px; }
-        #call-add-person-panel {
-            display: none; position: absolute; top: 62px; right: 12px; left: 12px; z-index: 5;
-            background: #17101f; border: 1px solid rgba(168,85,247,0.25); border-radius: 16px;
-            box-shadow: 0 12px 32px rgba(0,0,0,0.5); max-height: 60vh; overflow: hidden;
-            flex-direction: column;
-        }
-        #call-add-person-panel.show { display: flex; }
-        .cap-panel-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; font-weight: 700; color: var(--bright); border-bottom: 1px solid rgba(255,255,255,0.06); }
-        .cap-panel-header button { background: none; border: none; color: var(--text-dim); font-size: 15px; cursor: pointer; }
-        .cap-search { margin: 10px 12px; padding: 9px 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.04); color: #fff; font-size: 13px; }
-        .cap-list { overflow-y: auto; padding: 4px 6px 10px; }
-        .cap-row { display: flex; align-items: center; gap: 10px; padding: 9px 8px; border-radius: 10px; cursor: pointer; }
-        .cap-row:active { background: rgba(255,255,255,0.06); }
-        .cap-row-avatar { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg,#a855f7,#ec4899); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #fff; overflow: hidden; flex-shrink: 0; }
-        .cap-row-avatar img { width: 100%; height: 100%; object-fit: cover; }
-        .cap-row-name { font-size: 13.5px; color: var(--bright); font-weight: 600; }
-        .cap-row-sub { font-size: 11px; color: var(--text-dim); }
         #call-more-menu {
             display: none; position: absolute; bottom: 60px; left: 50%; transform: translateX(-50%);
             background: #17101f; border: 1px solid rgba(168,85,247,0.25); border-radius: 14px;
@@ -3011,16 +2994,6 @@
                 <span id="call-timer-text" data-phone-prefix="1">مكالمة</span>
                 <span style="width:38px"></span>
             </div>
-            <!-- Picker shown when tapping the add-person button: lets you pick anyone
-                 from the platform to bring into the current call. -->
-            <div id="call-add-person-panel">
-                <div class="cap-panel-header">
-                    <span>إضافة شخص للمكالمة</span>
-                    <button onclick="closeAddToCallPicker()">✕</button>
-                </div>
-                <input id="call-add-person-search" class="cap-search" placeholder="ابحث عن اسم..." oninput="renderAddToCallList()" />
-                <div id="call-add-person-list" class="cap-list"></div>
-            </div>
         </div>
         <div class="call-controls">
             <button class="call-ctrl-btn" id="call-mic-btn" onclick="toggleCallMic()" title="كتم الصوت"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></button>
@@ -3044,10 +3017,6 @@
                     <button onclick="toggleCallFullscreen()">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
                         <span>ملء الشاشة</span>
-                    </button>
-                    <button onclick="openAddToCallPicker(); toggleCallMoreMenu();">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="16" y1="11" x2="22" y2="11"/></svg>
-                        <span>إضافة شخص للمكالمة</span>
                     </button>
                 </div>
             </div>
@@ -6268,47 +6237,8 @@
             }
         };
 
-        // ===== ADD PERSON TO CALL (picker UI) =====
-        // Opens a searchable list of everyone on the platform so you can bring
-        // someone else into the conversation you're already having. Actually
-        // pulling them into a live multi-person call needs a bigger upgrade to
-        // the calling backend (today it's built for exactly two people); for now
-        // this wires up the full picker UI/UX so it's ready to plug in.
-        window.openAddToCallPicker = async function() {
-            if (!_call) return;
-            const panel = document.getElementById('call-add-person-panel');
-            if (!panel) return;
-            panel.classList.add('show');
-            if (!S.membersDirectory || !S.membersDirectory.length) await loadMembersList();
-            renderAddToCallList();
-        };
-        window.closeAddToCallPicker = function() {
-            document.getElementById('call-add-person-panel')?.classList.remove('show');
-        };
-        window.renderAddToCallList = function() {
-            const listEl = document.getElementById('call-add-person-list');
-            if (!listEl) return;
-            const term = (document.getElementById('call-add-person-search')?.value || '').trim().toLowerCase();
-            const rows = (S.membersDirectory || [])
-                .filter(e => e.uid !== _call?.peerUid)
-                .filter(e => !term || (e.displayName || '').toLowerCase().includes(term));
-            if (!rows.length) { listEl.innerHTML = `<p class="directory-empty" style="padding:16px;text-align:center;">لا يوجد نتائج</p>`; return; }
-            listEl.innerHTML = rows.map(e => {
-                const initial = (e.displayName || '?').charAt(0).toUpperCase();
-                const avatar = avatarImgHtml(e.photoURL, '', initial) || initial;
-                const online = isUserOnline(e.uid);
-                return `<div class="cap-row" onclick="inviteToCall('${e.uid}', '${_escapeHtml(e.displayName).replace(/'/g, "\\'")}')">
-                    <div class="cap-row-avatar">${avatar}</div>
-                    <div>
-                        <div class="cap-row-name">${_escapeHtml(e.displayName)}</div>
-                        <div class="cap-row-sub">${online ? '🟢 متصل الآن' : 'غير متصل'}</div>
-                    </div>
-                </div>`;
-            }).join('');
-        };
-        window.inviteToCall = function(uid, name) {
-            showToast(`✨ قريبًا هتقدر تضيف ${name} فعليًا للمكالمة الجماعية`, '#a855f7');
-        };
+        // ===== ADD PERSON TO CALL: removed for now — group calling isn't
+        // supported by the backend yet (see prior conversation notes). =====
 
         window.hangUpCall = async function() {
             if (!_call) return;
@@ -6339,7 +6269,6 @@
             if (cmwFallback) cmwFallback.style.display = '';
             document.body.style.overflow = '';
             document.getElementById('call-more-menu')?.classList.remove('show');
-            document.getElementById('call-add-person-panel')?.classList.remove('show');
         }
 
         // ===== MINIMIZE / EXPAND ACTIVE CALL =====
