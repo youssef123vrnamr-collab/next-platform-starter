@@ -6169,7 +6169,7 @@
         // (instant, no renegotiation); otherwise we add the track the same way
         // the camera toggle does, which triggers the existing renegotiation flow.
         window.toggleScreenShare = async function() {
-            if (!_call || !_call.pc) { showToast('❌ لازم تكون في مكالمة الأول', '#ff7a7a'); return; }
+            if (!_call) { showToast('❌ لازم تكون في مكالمة الأول', '#ff7a7a'); return; }
             const label = document.getElementById('call-screenshare-label');
             if (_call.screenTrack) {
                 _stopScreenShare();
@@ -6185,12 +6185,14 @@
             _call.screenTrack = screenTrack;
             _call.preScreenShareCamTrack = _call.localVideoTrack || null;
             const localVideoEl = document.getElementById('call-local-video');
-            const videoSender = _call.pc.getSenders().find(s => s.track && s.track.kind === 'video');
-            if (videoSender) {
-                await videoSender.replaceTrack(screenTrack).catch(() => {});
-            } else {
-                _call.localStream.addTrack(screenTrack);
-                _call.pc.addTrack(screenTrack, _call.localStream);
+            if (_call.pc) {
+                const videoSender = _call.pc.getSenders().find(s => s.track && s.track.kind === 'video');
+                if (videoSender) {
+                    await videoSender.replaceTrack(screenTrack).catch(() => {});
+                } else {
+                    _call.localStream.addTrack(screenTrack);
+                    _call.pc.addTrack(screenTrack, _call.localStream);
+                }
             }
             localVideoEl.srcObject = new MediaStream([screenTrack]);
             localVideoEl.classList.add('show');
@@ -6211,7 +6213,7 @@
             if (label) label.textContent = 'مشاركة الشاشة';
             document.getElementById('call-more-btn')?.classList.remove('active');
             const localVideoEl = document.getElementById('call-local-video');
-            const videoSender = _call.pc.getSenders().find(s => s.track === screenTrack || (s.track && s.track.kind === 'video'));
+            const videoSender = _call.pc ? _call.pc.getSenders().find(s => s.track === screenTrack || (s.track && s.track.kind === 'video')) : null;
             const restoreTrack = _call.preScreenShareCamTrack;
             if (restoreTrack && restoreTrack.readyState !== 'ended') {
                 if (videoSender) await videoSender.replaceTrack(restoreTrack).catch(() => {});
@@ -6230,19 +6232,26 @@
             if (!_call || !_call.localVideoTrack) { showToast('⚠️ شغّل الكاميرا الأول', '#ffb020'); return; }
             if (_call.screenTrack) { showToast('⚠️ وقّف مشاركة الشاشة الأول', '#ffb020'); return; }
             _call.camFacingMode = _call.camFacingMode === 'environment' ? 'user' : 'environment';
+            const oldTrack = _call.localVideoTrack;
             try {
-                const newStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: _call.camFacingMode } });
+                // Stop the current camera track FIRST. On a lot of phones/webviews
+                // the camera hardware only allows one open stream at a time, so
+                // asking for the other-facing camera while this track is still
+                // running fails with a generic "not supported" error even though
+                // the device is fine.
+                try { oldTrack.stop(); } catch (e) {}
+                const newStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: _call.camFacingMode } } });
                 const newTrack = newStream.getVideoTracks()[0];
                 const videoSender = _call.pc ? _call.pc.getSenders().find(s => s.track && s.track.kind === 'video') : null;
                 if (videoSender) await videoSender.replaceTrack(newTrack).catch(() => {});
-                try { _call.localVideoTrack.stop(); } catch (e) {}
-                _call.localStream.removeTrack(_call.localVideoTrack);
+                _call.localStream.removeTrack(oldTrack);
                 _call.localStream.addTrack(newTrack);
                 _call.localVideoTrack = newTrack;
                 newTrack.enabled = _call.camOn;
                 document.getElementById('call-local-video').srcObject = new MediaStream([newTrack]);
                 showToast('🔄 تم تبديل الكاميرا', '#3ddc84');
             } catch (e) {
+                _call.camFacingMode = _call.camFacingMode === 'environment' ? 'user' : 'environment'; // revert the flip since it failed
                 showToast('❌ الجهاز مش بيدعم تبديل الكاميرا', '#ff7a7a');
             }
         };
