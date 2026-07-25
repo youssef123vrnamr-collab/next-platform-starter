@@ -3535,6 +3535,18 @@
             }
         };
 
+        // Small SVG badges used wherever an admin/user role is shown, instead
+        // of the 🔑 / 👑 emoji — kept as inline strings so they can drop
+        // straight into innerHTML-built markup (list rows, chat bubbles, etc).
+        const ROLE_ICON_KEY = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px"><circle cx="7.5" cy="15.5" r="5.5"/><path d="M21 2l-9.6 9.6"/><path d="M15.5 7.5l3 3L22 7l-3-3"/></svg>';
+        const ROLE_ICON_CROWN = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px"><path d="M3 18h18"/><path d="M3 18l1.5-9L9 12l3-6 3 6 4.5-3L21 18"/></svg>';
+        const ROLE_ICON_USER = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
+        function roleLabelHtml(adminRole) {
+            if (adminRole === 'main') return `${ROLE_ICON_CROWN} مشرف رئيسي`;
+            if (adminRole === 'normal') return `${ROLE_ICON_KEY} مشرف عادي`;
+            return `${ROLE_ICON_USER} مستخدم`;
+        }
+
         function avatarImgHtml(rawUrl, cssClass, fallbackInitial, ringColor) {
             const candidates = driveImageCandidates(rawUrl);
             if (candidates.length === 0) return '';
@@ -4818,7 +4830,7 @@
                 const initial = (e.displayName || '?').charAt(0).toUpperCase();
                 const avatar = avatarImgHtml(e.photoURL, 'directory-avatar', initial, e.ringColor) || `<div class="directory-avatar">${_escapeHtml(initial)}</div>`;
                 const isSelf = e.uid === S.user?.uid;
-                const roleLabel = e.adminRole === 'main' ? '👑 مشرف رئيسي' : e.adminRole === 'normal' ? '🔑 مشرف عادي' : 'مستخدم';
+                const roleLabel = roleLabelHtml(e.adminRole);
                 return `
                 <div class="directory-item ${e.suspended ? 'is-suspended' : ''}">
                     ${avatar}
@@ -5031,7 +5043,7 @@
                 <div class="wabubble ${isMine ? 'mine' : 'theirs'}${msg._pending ? ' pending' : ''}${msg._failed ? ' failed' : ''}" id="wamsg-${msg.id}">
                     ${!isMine ? avatarHtml : ''}
                     <div class="wabubble-content">
-                        ${!isMine ? `<span class="wabubble-sender">${isAdmin ? '👑 ' : ''}${_escapeHtml(name)}</span>` : ''}
+                        ${!isMine ? `<span class="wabubble-sender">${isAdmin ? ROLE_ICON_CROWN + ' ' : ''}${_escapeHtml(name)}</span>` : ''}
                         ${quoteHtml}
                         <div class="wabubble-text">${safeText}</div>
                         <div class="wabubble-meta">
@@ -5400,7 +5412,7 @@
                         <span class="presence-dot ${online ? 'online' : 'offline'}" title="${online ? 'متصل الآن' : 'غير متصل'}"></span>
                     </div>
                     <div class="directory-info">
-                        <div class="directory-name">${_escapeHtml(e.displayName)}${e.adminRole ? (e.adminRole === 'main' ? ' 👑' : ' 🔑') : ''}</div>
+                        <div class="directory-name">${_escapeHtml(e.displayName)}${e.adminRole ? (e.adminRole === 'main' ? ` ${ROLE_ICON_CROWN}` : ` ${ROLE_ICON_KEY}`) : ''}</div>
                         <div class="directory-email">${e.followersCount || 0} متابِع${online ? ' • <span style="color:#3ddc84">متصل الآن</span>' : ''}</div>
                     </div>
                 </div>`;
@@ -5449,9 +5461,9 @@
             window._viewedMemberPhoto = entry.photoURL || '';
             document.getElementById('member-profile-name').textContent = entry.displayName || '—';
             const roleEl = document.getElementById('member-profile-role');
-            const roleLabel = entry.adminRole === 'main' ? '👑 مشرف رئيسي' : entry.adminRole === 'normal' ? '🔑 مشرف عادي' : '👤 مستخدم';
+            const roleLabel = roleLabelHtml(entry.adminRole);
             const online = isUserOnline(entry.uid);
-            roleEl.innerHTML = `${_escapeHtml(roleLabel)} <span style="display:inline-flex;align-items:center;gap:4px;margin-inline-start:6px;font-size:11px;color:${online ? '#3ddc84' : '#ff7a7a'}"><span style="width:8px;height:8px;border-radius:50%;display:inline-block;background:${online ? '#3ddc84' : '#ff7a7a'}"></span>${online ? 'متصل الآن' : 'غير متصل'}</span>`;
+            roleEl.innerHTML = `${roleLabel} <span style="display:inline-flex;align-items:center;gap:4px;margin-inline-start:6px;font-size:11px;color:${online ? '#3ddc84' : '#ff7a7a'}"><span style="width:8px;height:8px;border-radius:50%;display:inline-block;background:${online ? '#3ddc84' : '#ff7a7a'}"></span>${online ? 'متصل الآن' : 'غير متصل'}</span>`;
             const callBtn = document.getElementById('member-profile-call-btn');
             if (callBtn) { callBtn.style.opacity = online ? '1' : '0.45'; callBtn.style.filter = online ? 'none' : 'grayscale(1)'; }
             const img = document.getElementById('member-profile-img');
@@ -6697,7 +6709,7 @@
             const dnEl = document.getElementById('profile-display-name');
             const drEl = document.getElementById('profile-display-role');
             if (dnEl) dnEl.textContent = currentName || '—';
-            if (drEl) drEl.textContent = S.isAdmin ? (S.isMainAdmin ? '👑 مشرف رئيسي' : '🔑 مشرف عادي') : '👤 مستخدم';
+            if (drEl) drEl.innerHTML = roleLabelHtml(S.isAdmin ? (S.isMainAdmin ? 'main' : 'normal') : null);
             previewProfilePhoto(currentPhoto);
             previewProfileCover(currentCover);
             const initials = (currentName || 'G').charAt(0).toUpperCase();
@@ -7361,7 +7373,7 @@
             if (isAdmin && user) {
                 setImgWithFallback(document.getElementById('panel-avatar'), currentAvatarUrl(), () => {});
                 document.getElementById('panel-name').textContent = (S.userProfile && S.userProfile.displayName) || user.displayName || '';
-                document.getElementById('panel-role').textContent = isMainAdmin ? '👑 مشرف رئيسي' : '🔑 مشرف عادي';
+                document.getElementById('panel-role').innerHTML = isMainAdmin ? `${ROLE_ICON_CROWN} مشرف رئيسي` : `${ROLE_ICON_KEY} مشرف عادي`;
                 const adminsTabBtn = document.querySelector('.panel-tab[data-tab="admin-admins"]');
                 const usersTabBtn = document.querySelector('.panel-tab[data-tab="admin-users"]');
                 if (adminsTabBtn) adminsTabBtn.style.display = isMainAdmin ? '' : 'none';
