@@ -5936,7 +5936,21 @@
             };
             pc.ontrack = e => {
                 const remoteVideo = document.getElementById('call-remote-video');
-                if (remoteVideo.srcObject !== e.streams[0]) remoteVideo.srcObject = e.streams[0];
+                if (remoteVideo.srcObject !== e.streams[0]) {
+                    remoteVideo.srcObject = e.streams[0];
+                    const p = remoteVideo.play();
+                    if (p && p.catch) {
+                        p.catch(err => {
+                            console.warn('remote video autoplay blocked, retrying muted:', err);
+                            // بعض الـ WebViews بتمنع autoplay لفيديو غير مكتوم؛ نجرب كتم مؤقت عشان يشتغل بصريًا
+                            // على الأقل، والصوت هيرجع لوحده أول ما اليوزر يعمل أي تفاعل (لمسة) في الشاشة.
+                            remoteVideo.muted = true;
+                            remoteVideo.play().catch(() => {});
+                            const unmuteOnTap = () => { remoteVideo.muted = false; document.removeEventListener('click', unmuteOnTap); };
+                            document.addEventListener('click', unmuteOnTap, { once: true });
+                        });
+                    }
+                }
                 _syncMiniWidgetRemoteVideo();
             };
             pc.onnegotiationneeded = async () => {
