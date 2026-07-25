@@ -2806,7 +2806,7 @@
             </div>
             <div class="profile-fs-card">
                 <div class="profile-fs-card-title">نغمة رنين المكالمات</div>
-                <p style="font-size:12px;color:var(--text-dim);margin:0 0 10px">اختار النغمة اللي هتسمعها وقت ما حد يتصل بيك — كل شخص يقدر يختار نغمته الخاصة</p>
+                <p style="font-size:12px;color:var(--text-dim);margin:0 0 10px">اختار النغمة اللي هتسمعها وقت ما حد يتصل بيك — كل شخص يقدر يختار نغمته الخاصة، أو يضيف نغمته الشخصية (رابط واحد بس لكل حساب)</p>
                 <div class="ringtone-grid" id="profile-ringtone-grid" data-selected="classic"></div>
             </div>
             <div class="profile-fs-card">
@@ -5641,8 +5641,12 @@
 
         // ===== RINGTONES =====
         // Every user can pick their own incoming-call ringtone from the profile
-        // screen. Each preset is just a wave-shape + a little note sequence, so no
-        // audio files are needed — it's all synthesized live with the Web Audio API.
+        // screen. The built-in presets are just a wave-shape + a little note
+        // sequence, synthesized live with the Web Audio API — no audio files
+        // needed. On top of those, each user can also add ONE ringtone of
+        // their own (a direct link or a Google Drive share link) which plays
+        // back as real audio instead of a synthesized tone.
+        let _ringAudioEl = null;
         const RINGTONES = {
             classic: { label: '🔔 كلاسيكي', wave: 'sine', notes: [[620, 500]], cycle: 1400 },
             chime: { label: '🎐 جرس', wave: 'triangle', notes: [[523, 160], [659, 160], [784, 260]], cycle: 1700 },
@@ -5651,6 +5655,17 @@
             gentle: { label: '🌙 هادئة', wave: 'sine', notes: [[440, 700]], cycle: 1900 },
             retro: { label: '👾 ريترو', wave: 'sawtooth', notes: [[320, 90], [520, 90], [720, 90], [520, 90]], cycle: 1500 }
         };
+
+        // Turns a pasted link into playable-audio candidates, same idea as
+        // driveImageCandidates() but for audio: a normal direct link is used
+        // as-is, while a Google Drive share link is turned into its direct
+        // download URL (the one form Drive serves that works in an <audio> tag).
+        function driveAudioCandidates(rawUrl) {
+            const id = extractDriveFileId(rawUrl);
+            if (id) return [`https://drive.google.com/uc?export=download&id=${id}`];
+            if (rawUrl && rawUrl.startsWith('http')) return [rawUrl];
+            return [];
+        }
 
         function _scheduleRingPattern(ctx, tone, pitchScale) {
             let t = ctx.currentTime;
@@ -5670,23 +5685,55 @@
             });
         }
 
+        // Plays a real audio file on loop for the custom ringtone. Falls back
+        // to the classic synthesized tone if the link fails to load (dead
+        // link, blocked by CORS, private Drive file, etc.) so a bad custom
+        // ringtone never leaves incoming calls silent.
+        function _playCustomAudio(url, volume, onFail) {
+            const candidates = driveAudioCandidates(url);
+            if (!candidates.length) { onFail(); return; }
+            const el = new Audio(candidates[0]);
+            el.loop = true;
+            el.volume = volume;
+            el.onerror = onFail;
+            el.play().catch(onFail);
+            _ringAudioEl = el;
+        }
+
         function _playRingtone(isOutgoing) {
             _stopRingtone();
+            // Incoming calls ring with *my own* chosen ringtone; outgoing calls
+            // just play a softer/lower version of the classic tone as a dial-back cue.
+            const key = (!isOutgoing && S.userProfile && S.userProfile.ringtone) ? S.userProfile.ringtone : 'classic';
+            const pitchScale = isOutgoing ? 0.78 : 1;
+            if (navigator.vibrate && !isOutgoing) navigator.vibrate([500, 400, 500, 400, 500]);
+            if (key === 'custom' && S.userProfile && S.userProfile.customRingtoneUrl) {
+                _playCustomAudio(S.userProfile.customRingtoneUrl, isOutgoing ? 0.6 : 1, () => _playSynthRingtone('classic', pitchScale));
+                return;
+            }
+            _playSynthRingtone(key, pitchScale);
+        }
+
+        function _playSynthRingtone(key, pitchScale) {
             try {
                 _ringAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                // Incoming calls ring with *my own* chosen ringtone; outgoing calls
-                // just play a softer/lower version of the classic tone as a dial-back cue.
-                const key = (!isOutgoing && S.userProfile && S.userProfile.ringtone) ? S.userProfile.ringtone : 'classic';
                 const tone = RINGTONES[key] || RINGTONES.classic;
-                const pitchScale = isOutgoing ? 0.78 : 1;
                 const play = () => { if (_ringAudioCtx) _scheduleRingPattern(_ringAudioCtx, tone, pitchScale); };
                 play();
                 _ringInterval = setInterval(play, tone.cycle);
-                if (navigator.vibrate && !isOutgoing) navigator.vibrate([500, 400, 500, 400, 500]);
             } catch (e) { /* ignore audio errors */ }
         }
 
         window.previewRingtone = function(key) {
+            if (key === 'custom') {
+                const grid = document.getElementById('profile-ringtone-grid');
+                const url = (grid && grid.dataset.customUrl) || (S.userProfile && S.userProfile.customRingtoneUrl);
+                if (!url) return;
+                _stopRingtone();
+                _playCustomAudio(url, 1, () => showToast('❌ تعذر تشغيل الرابط ده', '#ff7a7a'));
+                setTimeout(() => _stopRingtone(), 4000);
+                return;
+            }
             try {
                 const ctx = new (window.AudioContext || window.webkitAudioContext)();
                 const tone = RINGTONES[key] || RINGTONES.classic;
@@ -5695,30 +5742,64 @@
             } catch (e) { /* ignore audio errors */ }
         };
 
-        window._renderRingtoneOptions = function(selected) {
+        window._renderRingtoneOptions = function(selected, customUrl) {
             const grid = document.getElementById('profile-ringtone-grid');
             if (!grid) return;
-            const key = RINGTONES[selected] ? selected : 'classic';
+            const hasCustom = !!customUrl;
+            grid.dataset.customUrl = customUrl || '';
+            const key = (selected === 'custom' && hasCustom) ? 'custom' : (RINGTONES[selected] ? selected : 'classic');
             grid.dataset.selected = key;
-            grid.innerHTML = Object.keys(RINGTONES).map(k => {
+            const presetTiles = Object.keys(RINGTONES).map(k => {
                 const t = RINGTONES[k];
                 return `<button type="button" class="ringtone-opt${k === key ? ' active' : ''}" data-key="${k}" onclick="selectProfileRingtone('${k}')">
                     <span class="ro-name">${t.label}</span>
                     <span class="ro-play" onclick="event.stopPropagation();previewRingtone('${k}')">▶</span>
                 </button>`;
             }).join('');
+            const customTile = hasCustom
+                ? `<button type="button" class="ringtone-opt${key === 'custom' ? ' active' : ''}" data-key="custom" onclick="selectProfileRingtone('custom')">
+                    <span class="ro-name">🎵 نغمتي الخاصة</span>
+                    <span class="ro-play" onclick="event.stopPropagation();previewRingtone('custom')">▶</span>
+                   </button>
+                   <button type="button" class="ringtone-opt" onclick="event.stopPropagation();openCustomRingtoneForm()" style="justify-content:center;color:var(--text-dim)">
+                    <span class="ro-name">✏️ تغيير نغمتي</span>
+                   </button>`
+                : `<button type="button" class="ringtone-opt" onclick="event.stopPropagation();openCustomRingtoneForm()" style="justify-content:center;color:var(--magenta)">
+                    <span class="ro-name">➕ إضافة نغمتي الخاصة</span>
+                   </button>`;
+            grid.innerHTML = presetTiles + customTile;
+        };
+
+        // Small inline form (link only, for now) for adding your one personal
+        // ringtone: a direct audio link or a Google Drive share link. There's
+        // no file-storage backend wired into this app yet, so uploading a raw
+        // file straight from the phone isn't supported here — a link covers
+        // Drive and any other direct audio URL.
+        window.openCustomRingtoneForm = function() {
+            const grid = document.getElementById('profile-ringtone-grid');
+            const current = (grid && grid.dataset.customUrl) || '';
+            const url = window.prompt('الصق رابط النغمة (رابط مباشر لملف صوتي، أو رابط مشاركة من Google Drive):', current);
+            if (url === null) return; // cancelled
+            const trimmed = url.trim();
+            if (!trimmed) { return; }
+            if (!/^https?:\/\//i.test(trimmed)) { showToast('❌ الرابط لازم يبدأ بـ http:// أو https://', '#ff7a7a'); return; }
+            grid.dataset.customUrl = trimmed;
+            _renderRingtoneOptions('custom', trimmed);
+            previewRingtone('custom');
         };
 
         window.selectProfileRingtone = function(key) {
             const grid = document.getElementById('profile-ringtone-grid');
             if (!grid) return;
+            if (key === 'custom' && !grid.dataset.customUrl) { openCustomRingtoneForm(); return; }
             grid.dataset.selected = key;
-            grid.querySelectorAll('.ringtone-opt').forEach(b => b.classList.toggle('active', b.dataset.key === key));
+            grid.querySelectorAll('.ringtone-opt[data-key]').forEach(b => b.classList.toggle('active', b.dataset.key === key));
             previewRingtone(key);
         };
         function _stopRingtone() {
             if (_ringInterval) { clearInterval(_ringInterval); _ringInterval = null; }
             if (_ringAudioCtx) { try { _ringAudioCtx.close(); } catch (e) {} _ringAudioCtx = null; }
+            if (_ringAudioEl) { try { _ringAudioEl.pause(); } catch (e) {} _ringAudioEl = null; }
             if (navigator.vibrate) navigator.vibrate(0);
         }
 
@@ -6588,6 +6669,7 @@
             const currentGender = profile.gender || '';
             const currentRingColor = profile.ringColor || '';
             const currentRingtone = profile.ringtone || 'classic';
+            const currentCustomRingtoneUrl = profile.customRingtoneUrl || '';
             document.getElementById('profile-name-input').value = currentName;
             document.getElementById('profile-photo-url').value = currentPhoto;
             document.getElementById('profile-cover-url').value = currentCover;
@@ -6597,7 +6679,7 @@
             ringColorInput.value = currentRingColor || '#c026d3';
             ringColorInput.dataset.cleared = currentRingColor ? '' : '1';
             previewProfileRingColor(currentRingColor);
-            _renderRingtoneOptions(currentRingtone);
+            _renderRingtoneOptions(currentRingtone, currentCustomRingtoneUrl);
             const dnEl = document.getElementById('profile-display-name');
             const drEl = document.getElementById('profile-display-role');
             if (dnEl) dnEl.textContent = currentName || '—';
@@ -6669,7 +6751,10 @@
             const ringColorInput = document.getElementById('profile-ring-color');
             const ringColor = ringColorInput.dataset.cleared === '1' ? '' : ringColorInput.value;
             const ringtoneGrid = document.getElementById('profile-ringtone-grid');
-            const ringtone = (ringtoneGrid && RINGTONES[ringtoneGrid.dataset.selected]) ? ringtoneGrid.dataset.selected : 'classic';
+            const selectedRingtoneKey = ringtoneGrid ? ringtoneGrid.dataset.selected : 'classic';
+            const customRingtoneUrl = (ringtoneGrid && ringtoneGrid.dataset.customUrl) || '';
+            const ringtone = (selectedRingtoneKey === 'custom' && customRingtoneUrl) ? 'custom'
+                : (RINGTONES[selectedRingtoneKey] ? selectedRingtoneKey : 'classic');
             if (!name) { saveErr.textContent = '❌ أدخل اسمك'; saveErr.style.display = 'block'; return; }
             btn.disabled = true;
             btn.innerHTML = 'جاري الحفظ <span class="spinner-ring"></span>';
@@ -6683,6 +6768,7 @@
                     gender,
                     ringColor,
                     ringtone,
+                    customRingtoneUrl,
                     updatedAt: new Date()
                 };
                 await setDoc(doc(db, 'userProfiles', S.user.uid), profileData, { merge: true });
