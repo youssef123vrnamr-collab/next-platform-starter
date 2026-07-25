@@ -1503,13 +1503,6 @@
         #call-local-video.show { display: block; }
         .call-topbar { position: absolute; top: 0; right: 0; left: 0; padding: 16px; display: flex; align-items: center; justify-content: space-between; gap: 8px; z-index: 2; }
         .call-topbar span:not(.cap-icon) { color: var(--bright); font-size: 13px; font-weight: 700; background: rgba(0,0,0,0.35); padding: 6px 14px; border-radius: 20px; }
-        .call-add-person-btn {
-            width: 38px; height: 38px; border-radius: 50%; border: none; flex-shrink: 0;
-            background: rgba(0,0,0,0.4); color: #fff; display: flex; align-items: center; justify-content: center;
-            cursor: pointer; backdrop-filter: blur(4px);
-        }
-        .call-add-person-btn:active { transform: scale(0.92); }
-        .call-add-person-btn svg { width: 19px; height: 19px; }
         #call-add-person-panel {
             display: none; position: absolute; top: 62px; right: 12px; left: 12px; z-index: 5;
             background: #17101f; border: 1px solid rgba(168,85,247,0.25); border-radius: 16px;
@@ -3014,11 +3007,7 @@
             </div>
             <video id="call-local-video" autoplay playsinline muted></video>
             <div class="call-topbar">
-                <button class="call-add-person-btn" id="call-add-person-btn" onclick="openAddToCallPicker()" title="إضافة شخص للمكالمة">
-                    <span class="cap-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="16" y1="11" x2="22" y2="11"/></svg>
-                    </span>
-                </button>
+                <span style="width:38px"></span>
                 <span id="call-timer-text" data-phone-prefix="1">مكالمة</span>
                 <span style="width:38px"></span>
             </div>
