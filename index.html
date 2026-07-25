@@ -1585,11 +1585,13 @@
             transition: border-color .15s, background .15s, color .15s;
         }
         .ringtone-opt.active { border-color: var(--magenta); background: rgba(192,38,211,0.14); color: var(--bright); }
-        .ringtone-opt .ro-name { pointer-events: none; }
+        .ringtone-opt .ro-name { pointer-events: none; display: flex; align-items: center; gap: 7px; }
+        .ringtone-opt .ro-icon { display: flex; align-items: center; justify-content: center; flex-shrink: 0; opacity: 0.85; }
         .ringtone-opt .ro-play {
             width: 24px; height: 24px; border-radius: 50%; background: rgba(255,255,255,0.1);
-            display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 11px; color: #fff;
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #fff;
         }
+
         .ringtone-opt.active .ro-play { background: var(--magenta); }
 
         .ratings-list .rating-item { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.05); font-size: 13px; }
@@ -5647,13 +5649,25 @@
         // their own (a direct link or a Google Drive share link) which plays
         // back as real audio instead of a synthesized tone.
         let _ringAudioEl = null;
+        const RINGTONE_ICONS = {
+            classic: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>',
+            chime: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="5" x2="20" y2="5"/><line x1="7" y1="5" x2="7" y2="14"/><circle cx="7" cy="17" r="2"/><line x1="12" y1="5" x2="12" y2="17"/><circle cx="12" cy="20" r="2"/><line x1="17" y1="5" x2="17" y2="11"/><circle cx="17" cy="14" r="2"/></svg>',
+            digital: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="2"/><line x1="11" y1="18" x2="13" y2="18"/></svg>',
+            marimba: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>',
+            gentle: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>',
+            retro: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="12" x2="10" y2="12"/><line x1="8" y1="10" x2="8" y2="14"/><circle cx="15" cy="12" r="1" fill="currentColor"/><circle cx="17" cy="10" r="1" fill="currentColor"/><path d="M6 8h12a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2z"/></svg>',
+            custom: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="10" x2="4" y2="14"/><line x1="8" y1="6" x2="8" y2="18"/><line x1="12" y1="3" x2="12" y2="21"/><line x1="16" y1="6" x2="16" y2="18"/><line x1="20" y1="10" x2="20" y2="14"/></svg>',
+            edit: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>',
+            add: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>',
+            play: '<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>'
+        };
         const RINGTONES = {
-            classic: { label: '🔔 كلاسيكي', wave: 'sine', notes: [[620, 500]], cycle: 1400 },
-            chime: { label: '🎐 جرس', wave: 'triangle', notes: [[523, 160], [659, 160], [784, 260]], cycle: 1700 },
-            digital: { label: '📱 رقمي', wave: 'square', notes: [[700, 90], [0, 60], [700, 90], [0, 60], [700, 90]], cycle: 1250 },
-            marimba: { label: '🎵 ماريمبا', wave: 'sine', notes: [[784, 140], [659, 140], [523, 220]], cycle: 1600 },
-            gentle: { label: '🌙 هادئة', wave: 'sine', notes: [[440, 700]], cycle: 1900 },
-            retro: { label: '👾 ريترو', wave: 'sawtooth', notes: [[320, 90], [520, 90], [720, 90], [520, 90]], cycle: 1500 }
+            classic: { label: 'كلاسيكي', wave: 'sine', notes: [[620, 500]], cycle: 1400 },
+            chime: { label: 'جرس', wave: 'triangle', notes: [[523, 160], [659, 160], [784, 260]], cycle: 1700 },
+            digital: { label: 'رقمي', wave: 'square', notes: [[700, 90], [0, 60], [700, 90], [0, 60], [700, 90]], cycle: 1250 },
+            marimba: { label: 'ماريمبا', wave: 'sine', notes: [[784, 140], [659, 140], [523, 220]], cycle: 1600 },
+            gentle: { label: 'هادئة', wave: 'sine', notes: [[440, 700]], cycle: 1900 },
+            retro: { label: 'ريترو', wave: 'sawtooth', notes: [[320, 90], [520, 90], [720, 90], [520, 90]], cycle: 1500 }
         };
 
         // Turns a pasted link into playable-audio candidates, same idea as
@@ -5752,20 +5766,20 @@
             const presetTiles = Object.keys(RINGTONES).map(k => {
                 const t = RINGTONES[k];
                 return `<button type="button" class="ringtone-opt${k === key ? ' active' : ''}" data-key="${k}" onclick="selectProfileRingtone('${k}')">
-                    <span class="ro-name">${t.label}</span>
-                    <span class="ro-play" onclick="event.stopPropagation();previewRingtone('${k}')">▶</span>
+                    <span class="ro-name"><span class="ro-icon">${RINGTONE_ICONS[k]}</span>${t.label}</span>
+                    <span class="ro-play" onclick="event.stopPropagation();previewRingtone('${k}')">${RINGTONE_ICONS.play}</span>
                 </button>`;
             }).join('');
             const customTile = hasCustom
                 ? `<button type="button" class="ringtone-opt${key === 'custom' ? ' active' : ''}" data-key="custom" onclick="selectProfileRingtone('custom')">
-                    <span class="ro-name">🎵 نغمتي الخاصة</span>
-                    <span class="ro-play" onclick="event.stopPropagation();previewRingtone('custom')">▶</span>
+                    <span class="ro-name"><span class="ro-icon">${RINGTONE_ICONS.custom}</span>نغمتي الخاصة</span>
+                    <span class="ro-play" onclick="event.stopPropagation();previewRingtone('custom')">${RINGTONE_ICONS.play}</span>
                    </button>
                    <button type="button" class="ringtone-opt" onclick="event.stopPropagation();openCustomRingtoneForm()" style="justify-content:center;color:var(--text-dim)">
-                    <span class="ro-name">✏️ تغيير نغمتي</span>
+                    <span class="ro-name"><span class="ro-icon">${RINGTONE_ICONS.edit}</span>تغيير نغمتي</span>
                    </button>`
                 : `<button type="button" class="ringtone-opt" onclick="event.stopPropagation();openCustomRingtoneForm()" style="justify-content:center;color:var(--magenta)">
-                    <span class="ro-name">➕ إضافة نغمتي الخاصة</span>
+                    <span class="ro-name"><span class="ro-icon">${RINGTONE_ICONS.add}</span>إضافة نغمتي الخاصة</span>
                    </button>`;
             grid.innerHTML = presetTiles + customTile;
         };
