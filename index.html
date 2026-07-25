@@ -6294,6 +6294,66 @@
             }
         });
 
+        // ===== HUAWEI/HONOR REAR-CAMERA PURPLE TINT WORKAROUND =====
+        // Huawei/Honor phones only expose their full color-correction pipeline
+        // to their own native camera app; third-party apps (including browsers,
+        // which is what powers getUserMedia here) get a less-processed frame
+        // from the REAR camera on some models, which shows up as a magenta/
+        // purple cast. The front camera isn't affected. This re-processes the
+        // raw track frame-by-frame on a canvas to cancel the cast out, and
+        // hands back a corrected MediaStreamTrack that's used everywhere the
+        // raw one would've been (local preview + the track sent to the peer).
+        function _isHuaweiLikeDevice() {
+            return /huawei|honor/i.test(navigator.userAgent || '');
+        }
+
+        function _correctPurpleTint(rawTrack) {
+            const video = document.createElement('video');
+            video.muted = true; video.playsInline = true;
+            video.srcObject = new MediaStream([rawTrack]);
+            let ready = false;
+            video.onloadedmetadata = () => {
+                canvas.width = video.videoWidth || 1280;
+                canvas.height = video.videoHeight || 720;
+                ready = true;
+            };
+            video.play().catch(() => {});
+
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+
+            // Tuned by eye against the reported tint — pulls red/blue down and
+            // green up a bit. If it over- or under-corrects on a given phone,
+            // nudge these three numbers.
+            const R_GAIN = 0.82, G_GAIN = 1.12, B_GAIN = 0.86;
+
+            let rafId;
+            (function draw() {
+                if (ready && video.videoWidth) {
+                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    const frame = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    const d = frame.data;
+                    for (let i = 0; i < d.length; i += 4) {
+                        d[i] = Math.min(255, d[i] * R_GAIN);
+                        d[i + 1] = Math.min(255, d[i + 1] * G_GAIN);
+                        d[i + 2] = Math.min(255, d[i + 2] * B_GAIN);
+                    }
+                    ctx.putImageData(frame, 0, 0);
+                }
+                rafId = requestAnimationFrame(draw);
+            })();
+
+            const outTrack = canvas.captureStream(30).getVideoTracks()[0];
+            const origStop = outTrack.stop.bind(outTrack);
+            outTrack.stop = () => {
+                cancelAnimationFrame(rafId);
+                video.pause(); video.srcObject = null;
+                rawTrack.stop();
+                origStop();
+            };
+            return outTrack;
+        }
+
         // ===== SWITCH FRONT/BACK CAMERA =====
         window.switchCallCamera = async function() {
             if (!_call || !_call.localVideoTrack) { showToast('⚠️ شغّل الكاميرا الأول', '#ffb020'); return; }
@@ -6307,7 +6367,10 @@
                 // the device is fine.
                 try { oldTrack.stop(); } catch (e) {}
                 const newStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: _call.camFacingMode } } });
-                const newTrack = newStream.getVideoTracks()[0];
+                let newTrack = newStream.getVideoTracks()[0];
+                if (_call.camFacingMode === 'environment' && _isHuaweiLikeDevice()) {
+                    newTrack = _correctPurpleTint(newTrack);
+                }
                 const videoSender = _call.pc ? _call.pc.getSenders().find(s => s.track && s.track.kind === 'video') : null;
                 if (videoSender) await videoSender.replaceTrack(newTrack).catch(() => {});
                 _call.localStream.removeTrack(oldTrack);
