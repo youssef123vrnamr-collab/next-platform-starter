@@ -1262,7 +1262,8 @@
 
         #members-modal,
         #conversations-modal,
-        #games-modal {
+        #games-modal,
+        #guide-modal {
             position: fixed;
             inset: 0;
             z-index: 9999;
@@ -1275,6 +1276,22 @@
         }
         .members-fs-body { padding: 18px 18px 30px; max-width: 560px; margin: 0 auto; width: 100%; flex: 1; }
         .members-fs-list { max-height: none; }
+
+        /* ===== "How to use" guide ===== */
+        .guide-fs-body { padding: 18px 18px 40px; max-width: 620px; margin: 0 auto; width: 100%; flex: 1; }
+        .guide-card {
+            background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+            padding: 16px; margin-bottom: 12px;
+        }
+        .guide-card-title { display: flex; align-items: center; gap: 8px; color: var(--bright); font-size: 14.5px; font-weight: 800; margin-bottom: 8px; }
+        .guide-card-title .guide-num {
+            width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0;
+            background: linear-gradient(120deg, #7c3aed, #c026d3); color: #fff;
+            font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center;
+        }
+        .guide-steps { margin: 0; padding-inline-start: 20px; color: var(--text); font-size: 13px; line-height: 1.9; }
+        .guide-steps li { margin-bottom: 3px; }
+        .guide-intro { color: var(--text); font-size: 13px; line-height: 1.8; margin: 0 0 16px; }
 
         /* ===== Online Games hub ===== */
         .games-fs-body { padding: 18px 18px 40px; max-width: 620px; margin: 0 auto; width: 100%; flex: 1; }
@@ -2493,6 +2510,13 @@
                     <span class="menu-nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg></span> محادثاتي مع الأعضاء
                 </div>
 
+                <div class="menu-nav-divider"></div>
+                <div class="menu-section-title">مساعدة</div>
+
+                <div class="menu-nav-item" onclick="openGuideModal()">
+                    <span class="menu-nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span> كيف تستخدم المنصة
+                </div>
+
                 <!-- Admin only section -->
                 <div id="menu-admin-section" style="display:none">
                     <div class="menu-nav-divider"></div>
@@ -2950,6 +2974,161 @@
                 </div>
                 <div class="game-canvas-wrap">
                     <iframe id="custom-game-frame" style="width:100%;height:100%;border:0;border-radius:12px;background:#0a0814" sandbox="allow-scripts allow-same-origin allow-pointer-lock"></iframe>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ===== HOW-TO-USE GUIDE MODAL ===== -->
+    <div id="guide-modal">
+        <div class="profile-fs-header">
+            <button class="profile-fs-back" onclick="closeGuideModal()">✕</button>
+            <span class="profile-fs-title" style="display:flex;align-items:center;gap:7px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> كيف تستخدم المنصة</span>
+        </div>
+        <div class="guide-fs-body">
+
+            <div class="panel-tabs" id="guide-tabs">
+                <button class="panel-tab active" data-gtab="guide-users" onclick="switchGuideTab('guide-users')">👤 للمستخدمين</button>
+                <button class="panel-tab" data-gtab="guide-admins" id="guide-tab-admins-btn" style="display:none" onclick="switchGuideTab('guide-admins')">🛡️ للمشرفين</button>
+                <button class="panel-tab" data-gtab="guide-mainadmins" id="guide-tab-mainadmins-btn" style="display:none" onclick="switchGuideTab('guide-mainadmins')">👑 للمشرفين الرئيسيين</button>
+            </div>
+
+            <!-- ===== GUIDE: REGULAR USERS ===== -->
+            <div class="panel-tab-content active" id="tab-guide-users">
+                <p class="guide-intro">دليل سريع لكل حاجة تقدر تعملها على المنصة — كل كارت بيشرحلك منطقة مختلفة في خطوات بسيطة.</p>
+
+                <div class="guide-card">
+                    <div class="guide-card-title"><span class="guide-num">1</span> تصفح الفيديوهات</div>
+                    <ol class="guide-steps">
+                        <li>من الصفحة الرئيسية هتلاقي قسمين: "فيديوهات مفتوحة" تتفرج عليها فورًا، و"فيديوهات مقفولة" ليها شرط قبل ما تتفتحلك.</li>
+                        <li>دوس على أي فيديو عشان يشتغل في المشغّل.</li>
+                        <li>استخدم خانة البحث فوق عشان تدور على فيديو باسمه أو بجزء من وصفه.</li>
+                    </ol>
+                </div>
+
+                <div class="guide-card">
+                    <div class="guide-card-title"><span class="guide-num">2</span> تقييم فيديو والتعليق عليه</div>
+                    <ol class="guide-steps">
+                        <li>تحت كل فيديو هتلاقي زرار لايك ودِسلايك.</li>
+                        <li>تحت الفيديو كمان مساحة تعليقات — اكتب رأيك، وتقدر تحذف تعليقك في أي وقت.</li>
+                    </ol>
+                </div>
+
+                <div class="guide-card">
+                    <div class="guide-card-title"><span class="guide-num">3</span> الألعاب أونلاين</div>
+                    <ol class="guide-steps">
+                        <li>من القائمة الجانبية اختار "ألعاب أونلاين".</li>
+                        <li>حدد عدد اللاعبين اللي عايز تلعب بيهم.</li>
+                        <li>اختار اللعبة من اللي هتظهرلك بنفس عدد اللاعبين.</li>
+                    </ol>
+                </div>
+
+                <div class="guide-card">
+                    <div class="guide-card-title"><span class="guide-num">4</span> الأعضاء ومتابعتهم</div>
+                    <ol class="guide-steps">
+                        <li>من "الأعضاء ومتابعتهم" تقدر تدور على أي عضو بالاسم.</li>
+                        <li>دوس على العضو عشان تفتح بروفايله وتشوف بياناته.</li>
+                        <li>من نفس البروفايل تقدر "تتابعه"، "تبدأ محادثة" معاه، أو تعمله "اتصال" مباشر.</li>
+                    </ol>
+                </div>
+
+                <div class="guide-card">
+                    <div class="guide-card-title"><span class="guide-num">5</span> المحادثات الخاصة</div>
+                    <ol class="guide-steps">
+                        <li>"محادثاتي مع الأعضاء" فيها كل المحادثات اللي بدأتها.</li>
+                        <li>دوس على أي محادثة عشان تكمل فيها الكلام.</li>
+                    </ol>
+                </div>
+
+                <div class="guide-card">
+                    <div class="guide-card-title"><span class="guide-num">6</span> الاتصال الصوتي والفيديو</div>
+                    <ol class="guide-steps">
+                        <li>من بروفايل أي عضو متصل حاليًا دوس على زر "اتصال" لبدء مكالمة معاه.</li>
+                        <li>جوه المكالمة تقدر تكتم/تفعّل المايك، تشغّل/تقفل الكاميرا، أو تقفل المكالمة بالزر الأحمر.</li>
+                        <li>لو قفلت الشاشة أثناء المكالمة، بتفضل مصغّرة في widget عايم تقدر تكبّرها تاني.</li>
+                    </ol>
+                </div>
+
+                <div class="guide-card">
+                    <div class="guide-card-title"><span class="guide-num">7</span> التواصل مع المشرفين</div>
+                    <ol class="guide-steps">
+                        <li>لو عندك استفسار أو مشكلة، فيه شات مباشر مع فريق المشرفين تقدر تكتب فيه رسالتك.</li>
+                        <li>هتوصلك ردودهم في نفس المحادثة.</li>
+                    </ol>
+                </div>
+
+                <div class="guide-card">
+                    <div class="guide-card-title"><span class="guide-num">8</span> ملفك الشخصي</div>
+                    <ol class="guide-steps">
+                        <li>تقدر تعدّل اسمك وصورتك وبياناتك من صفحتك الشخصية.</li>
+                        <li>هتشوف فيها كمان عدد المتابعين بتوعك.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- ===== GUIDE: REGULAR ADMINS ===== -->
+            <div class="panel-tab-content" id="tab-guide-admins">
+                <p class="guide-intro">دليل صلاحياتك كمشرف عادي على المنصة.</p>
+
+                <div class="guide-card">
+                    <div class="guide-card-title"><span class="guide-num">1</span> إدارة التقييمات والتعليقات</div>
+                    <ol class="guide-steps">
+                        <li>من القائمة الجانبية > "إدارة المنصة" > "التقييمات" أو "التعليقات".</li>
+                        <li>راجع أي محتوى مخالف واحذفه مباشرة من هناك.</li>
+                    </ol>
+                </div>
+
+                <div class="guide-card">
+                    <div class="guide-card-title"><span class="guide-num">2</span> إدارة الفيديوهات</div>
+                    <ol class="guide-steps">
+                        <li>تقدر تضيف فيديو جديد (رابط يوتيوب أو Google Drive) بعنوان ووصف.</li>
+                        <li>تقدر تعدّل أو تحذف أي فيديو موجود، وتفتح/تقفل حالته من كارت الفيديو.</li>
+                    </ol>
+                </div>
+
+                <div class="guide-card">
+                    <div class="guide-card-title"><span class="guide-num">3</span> الرد في شات المشرفين</div>
+                    <ol class="guide-steps">
+                        <li>أي رسالة بتبعتها في شات "المشرفون" بتظهر لليوزر بعلامة مميزة إنها من مشرف.</li>
+                        <li>تقدر تحذف أي رسالة أو ترد على رسالة عضو محددة.</li>
+                    </ol>
+                </div>
+
+                <div class="guide-card">
+                    <div class="guide-card-title"><span class="guide-num">4</span> متابعة أعطال المنصة</div>
+                    <ol class="guide-steps">
+                        <li>من "أعطال المنصة" تقدر تشوف المشاكل التقنية المُبلَّغ عنها وتتابع حالتها.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- ===== GUIDE: MAIN ADMINS ===== -->
+            <div class="panel-tab-content" id="tab-guide-mainadmins">
+                <p class="guide-intro">دليل صلاحياتك كمشرف رئيسي — دي صلاحيات إضافية فوق صلاحيات المشرف العادي.</p>
+
+                <div class="guide-card">
+                    <div class="guide-card-title"><span class="guide-num">1</span> إضافة وإدارة المشرفين</div>
+                    <ol class="guide-steps">
+                        <li>من "إضافة / إدارة المشرفين" تقدر تدور على أي عضو من دليل الحسابات.</li>
+                        <li>دوس على الرتبة اللي عايزها ("عادي" أو "رئيسي") عشان تخليه مشرف فورًا.</li>
+                        <li>تقدر كمان تشيل صلاحية أي مشرف موجود.</li>
+                    </ol>
+                </div>
+
+                <div class="guide-card">
+                    <div class="guide-card-title"><span class="guide-num">2</span> إدارة الحسابات</div>
+                    <ol class="guide-steps">
+                        <li>من "إدارة الحسابات" تقدر توقف أي حساب مخالف.</li>
+                        <li>وتقدر ترفع الإيقاف عن أي حساب في أي وقت.</li>
+                    </ol>
+                </div>
+
+                <div class="guide-card">
+                    <div class="guide-card-title"><span class="guide-num">3</span> باقي الصلاحيات</div>
+                    <ol class="guide-steps">
+                        <li>كل صلاحيات المشرف العادي (إدارة الفيديوهات، التقييمات، التعليقات، شات المشرفين، أعطال المنصة) متاحة ليك برضو — تفاصيلها في تاب "للمشرفين".</li>
+                    </ol>
                 </div>
             </div>
 
@@ -5346,6 +5525,28 @@
             rtdbUpdate(_myStatusRef, { inCall: !!busy }).catch(() => {});
         }
 
+        // ===== "HOW TO USE" GUIDE MODAL =====
+        window.openGuideModal = function() {
+            closeMenuPanel();
+            document.getElementById('guide-modal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            const adminsBtn = document.getElementById('guide-tab-admins-btn');
+            const mainAdminsBtn = document.getElementById('guide-tab-mainadmins-btn');
+            if (adminsBtn) adminsBtn.style.display = S.isAdmin ? 'inline-flex' : 'none';
+            if (mainAdminsBtn) mainAdminsBtn.style.display = S.isMainAdmin ? 'inline-flex' : 'none';
+            switchGuideTab('guide-users');
+        };
+
+        window.closeGuideModal = function() {
+            document.getElementById('guide-modal').style.display = 'none';
+            document.body.style.overflow = '';
+        };
+
+        window.switchGuideTab = function(tab) {
+            document.querySelectorAll('#guide-tabs .panel-tab').forEach(t => t.classList.toggle('active', t.dataset.gtab === tab));
+            document.querySelectorAll('#guide-modal .panel-tab-content').forEach(c => c.classList.toggle('active', c.id === 'tab-' + tab));
+        };
+
         window.openMembersModal = function() {
             if (!S.user) { showToast('🔑 سجّل دخولك أولاً', '#ffb020'); return; }
             closeMenuPanel();
@@ -7576,7 +7777,7 @@
 
         // ESC
         document.addEventListener('keydown', e => {
-            if (e.key === 'Escape') { closePanel(); closeAddModal(); closeEditModal(); closePlayer(); closeWaChat(); closeProfileModal(); closeMenuPanel(); closeMembersModal(); closeConversationsModal(); closeFriendChat(); }
+            if (e.key === 'Escape') { closePanel(); closeAddModal(); closeEditModal(); closePlayer(); closeWaChat(); closeProfileModal(); closeMenuPanel(); closeMembersModal(); closeConversationsModal(); closeFriendChat(); closeGuideModal(); }
             if (e.key === 'Escape' && _call) { hangUpCall(); }
         });
 
