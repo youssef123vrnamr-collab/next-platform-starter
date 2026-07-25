@@ -4359,6 +4359,21 @@
                 try { const s = await getDocs(query(collection(db, 'follows'), where('followerUid', '==', uid))); await Promise.all(s.docs.map(d => deleteDoc(d.ref))); } catch (e) {}
                 try { const s = await getDocs(query(collection(db, 'follows'), where('followingUid', '==', uid))); await Promise.all(s.docs.map(d => deleteDoc(d.ref))); } catch (e) {}
                 try { await deleteDoc(doc(db, 'suspendedUsers', uid)); } catch (e) {}
+                // Calls the test account made or received, plus their WebRTC candidate
+                // subcollections — the security rules grant the main admin delete access
+                // here specifically for this cleanup.
+                try {
+                    const c1 = await getDocs(query(collection(db, 'calls'), where('callerUid', '==', uid)));
+                    const c2 = await getDocs(query(collection(db, 'calls'), where('calleeUid', '==', uid)));
+                    const callDocs = [...c1.docs, ...c2.docs];
+                    for (const callDoc of callDocs) {
+                        try {
+                            const candSnap = await getDocs(collection(db, 'calls', callDoc.id, 'candidates'));
+                            await Promise.all(candSnap.docs.map(cd => deleteDoc(cd.ref)));
+                        } catch (e) {}
+                        await deleteDoc(callDoc.ref);
+                    }
+                } catch (e) {}
             }
             // Comments live embedded inside each video doc's `comments` array, so they
             // need one pass across all videos rather than a per-uid query.
@@ -4381,6 +4396,13 @@
             try {
                 await deleteDoc(doc(db, 'users', uid));
                 await _wipeTestAccountData([uid]);
+                try {
+                    await addDoc(collection(db, 'devTestSessions'), {
+                        uids: [uid], action: 'deleted_one',
+                        deletedBy: S.user?.uid || '', deletedByName: S.user?.displayName || '',
+                        timestamp: serverTimestamp()
+                    });
+                } catch (e) { console.error('devTestSessions log error:', e); }
                 showToast('✅ اتمسح الحساب التجريبي');
                 renderDeveloperTestAccounts();
                 if (S.user && S.user.uid === uid) await handleSignOut();
@@ -4398,8 +4420,17 @@
                 btn.disabled = true;
                 btn.textContent = '⏳ جاري الحذف...';
                 const wasCurrentTest = S.user && S.user.isTestAccount;
+                const deleterUid = S.user?.uid || '';
+                const deleterName = S.user?.displayName || '';
                 await Promise.all(uids.map(uid => deleteDoc(doc(db, 'users', uid))));
                 await _wipeTestAccountData(uids);
+                try {
+                    await addDoc(collection(db, 'devTestSessions'), {
+                        uids, action: 'deleted_all',
+                        deletedBy: deleterUid, deletedByName: deleterName,
+                        timestamp: serverTimestamp()
+                    });
+                } catch (e) { console.error('devTestSessions log error:', e); }
                 showToast(`🧹 اتمسح ${uids.length} حساب تجريبي`, '#4ade80');
                 renderDeveloperTestAccounts();
                 if (wasCurrentTest) await handleSignOut();
