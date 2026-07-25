@@ -1496,7 +1496,7 @@
         .call-remote-placeholder .cp-name { color: var(--bright); font-weight: 800; font-size: 19px; }
         .call-remote-placeholder .cp-status { color: var(--text-dim); font-size: 13.5px; }
         #call-local-video {
-            position: absolute; width: 108px; height: 148px; border-radius: 14px; object-fit: cover;
+            position: absolute; width: 108px; height: 108px; border-radius: 50%; object-fit: cover;
             top: 16px; left: 16px; border: 2px solid rgba(255,255,255,0.25); box-shadow: 0 6px 18px rgba(0,0,0,0.45);
             background: #14101f; display: none; z-index: 2;
         }
@@ -5319,6 +5319,14 @@
         }
 
         window.isUserOnline = function(uid) {
+            // Developer test accounts aren't really signed in anywhere else (no
+            // second device/tab has to be open for them), so we treat them as
+            // always online/callable — this is what lets you practice-call one
+            // of your own test accounts from the same phone.
+            if (uid && S.user && uid !== S.user.uid) {
+                const entry = (S.membersDirectory || []).find(m => m.uid === uid);
+                if (entry && entry.isTestAccount) return true;
+            }
             return !!(uid && S.onlineUsers && S.onlineUsers.has(uid));
         };
 
@@ -5366,7 +5374,8 @@
                                 ringColor: u.ringColor || '',
                                 followersCount: u.followersCount || 0,
                                 followingCount: u.followingCount || 0,
-                                adminRole: adminsByEmail[email]?.role || null
+                                adminRole: adminsByEmail[email]?.role || null,
+                                isTestAccount: !!u.isTestAccount
                             };
                         })
                         .filter(u => u.uid !== S.user?.uid)
@@ -5960,12 +5969,47 @@
             }, 1000);
         }
 
+        // ===== PRACTICE CALL (developer test accounts) =====
+        // A test account made in "إعدادات المطور" isn't signed in on any other
+        // device, so there's no real second peer to answer a normal WebRTC
+        // call. Instead we skip Firestore signaling entirely and simulate the
+        // whole flow locally: a short ring, then auto-answer using your own
+        // mic (and camera, if you turn it on) — so the full call screen
+        // (timer, mute, camera, hang up) can be tried out solo on one phone.
+        // We deliberately don't loop your own mic audio back through the
+        // speaker — that would just cause an echo/feedback squeal since it's
+        // literally your own microphone.
+        async function _startPracticeCall(peerUid, peerName, peerPhoto) {
+            let stream;
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+            } catch (e) {
+                showToast('❌ محتاج إذن الميكروفون عشان تتصل', '#ff7a7a'); return;
+            }
+            closeFriendChat(); closeMembersModal();
+            _call = _newCallState('caller', 'practice-' + peerUid + '-' + Date.now(), { uid: peerUid, name: peerName, photo: peerPhoto });
+            _call.isPractice = true;
+            _call.localStream = stream;
+            _call.localAudioTrack = stream.getAudioTracks()[0];
+            _openCallScreen('جاري الاتصال...');
+            _playRingtone(true);
+            _call.ringTimeout = setTimeout(() => {
+                if (_call && _call.isPractice) {
+                    document.getElementById('call-status-text').textContent = 'متصل الآن';
+                    _onCallConnected();
+                    showToast('🧪 مكالمة تجريبية بحساب وهمي — الصوت والكاميرا شغالين عشان تجرب الشاشة بس', '#a855f7');
+                }
+            }, 1800);
+        }
+
         window.startCall = async function(peerUid, peerName, peerPhoto) {
             if (!S.user) { showToast('🔑 سجّل دخولك أولاً', '#ffb020'); return; }
             if (!peerUid) { showToast('❌ تعذر تحديد المستخدم', '#ff7a7a'); return; }
             if (peerUid === S.user.uid) { showToast('❌ ما تقدرش تتصل بنفسك 😅', '#ffb020'); return; }
             if (_call) { showToast('📞 عندك مكالمة شغالة بالفعل', '#ffb020'); return; }
             if (!isUserOnline(peerUid)) { showToast('⚠️ الشخص ده مش موجود على المنصة دلوقتي', '#ff7a7a'); return; }
+            const peerEntry = (S.membersDirectory || []).find(m => m.uid === peerUid);
+            if (peerEntry && peerEntry.isTestAccount) { return _startPracticeCall(peerUid, peerName, peerPhoto); }
             let stream;
             try {
                 stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
@@ -6080,7 +6124,7 @@
                     const track = camStream.getVideoTracks()[0];
                     _call.localVideoTrack = track;
                     _call.localStream.addTrack(track);
-                    _call.pc.addTrack(track, _call.localStream);
+                    if (_call.pc) _call.pc.addTrack(track, _call.localStream);
                     localVideoEl.srcObject = new MediaStream([track]);
                     localVideoEl.classList.add('show');
                 } catch (e) {
@@ -6099,8 +6143,10 @@
                 cmwCamBtn.innerHTML = _call.camOn ? CALL_ICONS.camOn : CALL_ICONS.camOff;
                 cmwCamBtn.classList.toggle('active', _call.camOn);
             }
-            const field = _call.role === 'caller' ? 'callerCamOn' : 'calleeCamOn';
-            updateDoc(_callDocRef(_call.id), { [field]: _call.camOn }).catch(() => {});
+            if (!_call.isPractice) {
+                const field = _call.role === 'caller' ? 'callerCamOn' : 'calleeCamOn';
+                updateDoc(_callDocRef(_call.id), { [field]: _call.camOn }).catch(() => {});
+            }
         };
 
         // ===== "MORE" MENU (three-dot button) =====
@@ -6187,7 +6233,7 @@
             try {
                 const newStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: _call.camFacingMode } });
                 const newTrack = newStream.getVideoTracks()[0];
-                const videoSender = _call.pc.getSenders().find(s => s.track && s.track.kind === 'video');
+                const videoSender = _call.pc ? _call.pc.getSenders().find(s => s.track && s.track.kind === 'video') : null;
                 if (videoSender) await videoSender.replaceTrack(newTrack).catch(() => {});
                 try { _call.localVideoTrack.stop(); } catch (e) {}
                 _call.localStream.removeTrack(_call.localVideoTrack);
@@ -6257,7 +6303,9 @@
 
         window.hangUpCall = async function() {
             if (!_call) return;
-            try { await updateDoc(_callDocRef(_call.id), { status: 'ended' }); } catch (e) {}
+            if (!_call.isPractice) {
+                try { await updateDoc(_callDocRef(_call.id), { status: 'ended' }); } catch (e) {}
+            }
             _endCallCleanup();
         };
 
