@@ -1683,6 +1683,23 @@
             border: 1px solid rgba(192, 38, 211, 0.2);
         }
         .modal-title { color: var(--bright); margin: 0 0 22px; font-size: 19px; font-weight: 700; }
+        /* Developer settings is opened often while actively testing things, so
+           it gets the full screen instead of a centered popup — more room for
+           the test-accounts list, no wasted dead space around it. Scoped to
+           this one modal only; every other modal keeps the normal popup look. */
+        #developer-settings-modal.modal-overlay {
+            padding: 0;
+            align-items: stretch;
+            justify-content: stretch;
+        }
+        #developer-settings-modal .modal-box {
+            width: 100%;
+            max-width: 100%;
+            height: 100%;
+            max-height: 100%;
+            border-radius: 0;
+            padding: max(20px, env(safe-area-inset-top)) 18px 20px;
+        }
         .modal-tabs { display: flex; gap: 8px; margin-bottom: 22px; }
         .modal-tab {
             flex: 1;
@@ -3006,10 +3023,6 @@
                     <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>
                 </button>
                 <div id="call-more-menu">
-                    <button onclick="toggleScreenShare()">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="13" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-                        <span id="call-screenshare-label">مشاركة الشاشة</span>
-                    </button>
                     <button onclick="switchCallCamera()" id="call-switch-cam-btn">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
                         <span>تبديل الكاميرا (أمامية/خلفية)</span>
@@ -5615,7 +5628,7 @@
             return {
                 role, id, peerUid: peer.uid, peerName: peer.name || 'مستخدم', peerPhoto: peer.photo || '',
                 pc: null, localStream: null, localAudioTrack: null, localVideoTrack: null,
-                screenTrack: null, preScreenShareCamTrack: null, camFacingMode: 'user',
+                camFacingMode: 'user',
                 micOn: true, camOn: false,
                 initialNegotiationDone: role === 'caller',
                 lastNegotiatedSenderCount: 0,
@@ -6132,74 +6145,9 @@
             }
         });
 
-        // ===== SCREEN SHARING =====
-        // Swaps the outgoing video track for a screen-capture track. If a camera
-        // track is already flowing we just replaceTrack() on the existing sender
-        // (instant, no renegotiation); otherwise we add the track the same way
-        // the camera toggle does, which triggers the existing renegotiation flow.
-        window.toggleScreenShare = async function() {
-            if (!_call) { showToast('❌ لازم تكون في مكالمة الأول', '#ff7a7a'); return; }
-            const label = document.getElementById('call-screenshare-label');
-            if (_call.screenTrack) {
-                _stopScreenShare();
-                return;
-            }
-            let screenStream;
-            try {
-                screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
-            } catch (e) {
-                return; // person cancelled the share picker — nothing to do
-            }
-            const screenTrack = screenStream.getVideoTracks()[0];
-            _call.screenTrack = screenTrack;
-            _call.preScreenShareCamTrack = _call.localVideoTrack || null;
-            const localVideoEl = document.getElementById('call-local-video');
-            if (_call.pc) {
-                const videoSender = _call.pc.getSenders().find(s => s.track && s.track.kind === 'video');
-                if (videoSender) {
-                    await videoSender.replaceTrack(screenTrack).catch(() => {});
-                } else {
-                    _call.localStream.addTrack(screenTrack);
-                    _call.pc.addTrack(screenTrack, _call.localStream);
-                }
-            }
-            localVideoEl.srcObject = new MediaStream([screenTrack]);
-            localVideoEl.classList.add('show');
-            if (label) label.textContent = 'إيقاف مشاركة الشاشة';
-            document.getElementById('call-more-btn')?.classList.add('active');
-            // If the person stops sharing from the browser/OS's own "stop sharing"
-            // control (instead of our button), catch that and revert cleanly.
-            screenTrack.onended = () => _stopScreenShare();
-            showToast('🖥️ بدأت مشاركة الشاشة', '#3ddc84');
-        };
-
-        async function _stopScreenShare() {
-            if (!_call || !_call.screenTrack) return;
-            const screenTrack = _call.screenTrack;
-            _call.screenTrack = null;
-            try { screenTrack.stop(); } catch (e) {}
-            const label = document.getElementById('call-screenshare-label');
-            if (label) label.textContent = 'مشاركة الشاشة';
-            document.getElementById('call-more-btn')?.classList.remove('active');
-            const localVideoEl = document.getElementById('call-local-video');
-            const videoSender = _call.pc ? _call.pc.getSenders().find(s => s.track === screenTrack || (s.track && s.track.kind === 'video')) : null;
-            const restoreTrack = _call.preScreenShareCamTrack;
-            if (restoreTrack && restoreTrack.readyState !== 'ended') {
-                if (videoSender) await videoSender.replaceTrack(restoreTrack).catch(() => {});
-                localVideoEl.srcObject = new MediaStream([restoreTrack]);
-                localVideoEl.classList.add('show');
-            } else {
-                if (videoSender) await videoSender.replaceTrack(null).catch(() => {});
-                localVideoEl.classList.remove('show');
-                localVideoEl.srcObject = null;
-            }
-            showToast('🖥️ توقفت مشاركة الشاشة', '#ffb020');
-        }
-
         // ===== SWITCH FRONT/BACK CAMERA =====
         window.switchCallCamera = async function() {
             if (!_call || !_call.localVideoTrack) { showToast('⚠️ شغّل الكاميرا الأول', '#ffb020'); return; }
-            if (_call.screenTrack) { showToast('⚠️ وقّف مشاركة الشاشة الأول', '#ffb020'); return; }
             _call.camFacingMode = _call.camFacingMode === 'environment' ? 'user' : 'environment';
             const oldTrack = _call.localVideoTrack;
             try {
