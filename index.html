@@ -1216,6 +1216,8 @@
         }
         .presence-dot.online { background: #3ddc84; box-shadow: 0 0 6px 1px rgba(61,220,132,0.7); }
         .presence-dot.offline { background: #ff4d4d; box-shadow: 0 0 6px 1px rgba(255,77,77,0.5); }
+        .presence-dot.busy { background: #9ca3af; box-shadow: 0 0 6px 1px rgba(156,163,175,0.7); animation: busyDotPulse 1.4s ease-in-out infinite; }
+        @keyframes busyDotPulse { 0%,100% { opacity: 1; } 50% { opacity: 0.45; } }
         .directory-info { flex: 1; min-width: 0; }
         .directory-name { color: var(--bright); font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .directory-email { color: var(--text-dim); font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -2965,9 +2967,6 @@
                 <span class="wachat-header-name" id="friend-chat-name">عضو</span>
                 <span class="wachat-header-status" id="friend-chat-status">محادثة خاصة</span>
             </div>
-            <button class="wachat-call-btn" onclick="startCall(_friendChatWith && _friendChatWith.uid, _friendChatWith && _friendChatWith.name, _friendChatWith && _friendChatWith.photo)" title="اتصال">
-                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1C10.61 21 3 13.39 3 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.25 1.01l-2.2 2.2z"/></svg>
-            </button>
         </div><!-- /wachat-header -->
         <div class="wachat-messages" id="friend-chat-messages-area">
             <div class="wachat-empty" style="display:flex">
@@ -3371,6 +3370,7 @@
             ref as rtdbRef,
             onValue as rtdbOnValue,
             set as rtdbSet,
+            update as rtdbUpdate,
             onDisconnect as rtdbOnDisconnect,
             serverTimestamp as rtdbServerTimestamp
         } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
@@ -3450,6 +3450,7 @@
             games: [],
             editingGameId: null,
             onlineUsers: new Set(),
+            busyUsers: new Set(),
         };
 
         // ===== HELPERS =====
@@ -5302,6 +5303,9 @@
                 S.onlineUsers = new Set(
                     Object.keys(val).filter(k => val[k] && val[k].state === 'online')
                 );
+                S.busyUsers = new Set(
+                    Object.keys(val).filter(k => val[k] && val[k].inCall)
+                );
                 renderMembersList();
             });
         }
@@ -5325,6 +5329,22 @@
             }
             return !!(uid && S.onlineUsers && S.onlineUsers.has(uid));
         };
+
+        // Whether a member is currently on a call — shown as a gray "busy"
+        // dot next to their avatar instead of the usual green/red presence
+        // dot, so people know why someone isn't picking up.
+        window.isUserBusy = function(uid) {
+            return !!(uid && S.busyUsers && S.busyUsers.has(uid));
+        };
+
+        // Marks my own presence node as "in a call" (or clears it) so other
+        // people watching the members list see the gray busy indicator next
+        // to my avatar. Uses a partial update so it never clobbers the
+        // online/offline state written by setUpPresence().
+        function _setBusyStatus(busy) {
+            if (!_myStatusRef) return;
+            rtdbUpdate(_myStatusRef, { inCall: !!busy }).catch(() => {});
+        }
 
         window.openMembersModal = function() {
             if (!S.user) { showToast('🔑 سجّل دخولك أولاً', '#ffb020'); return; }
@@ -5405,15 +5425,18 @@
                 const initial = (e.displayName || '?').charAt(0).toUpperCase();
                 const avatar = avatarImgHtml(e.photoURL, 'directory-avatar', initial, e.ringColor) || `<div class="directory-avatar">${_escapeHtml(initial)}</div>`;
                 const online = isUserOnline(e.uid);
+                const busy = isUserBusy(e.uid);
+                const presenceClass = busy ? 'busy' : (online ? 'online' : 'offline');
+                const presenceTitle = busy ? 'مشغول بمكالمة' : (online ? 'متصل الآن' : 'غير متصل');
                 return `
                 <div class="directory-item" onclick="openMemberProfile('${e.uid}')" style="cursor:pointer">
                     <div class="directory-avatar-wrap">
                         ${avatar}
-                        <span class="presence-dot ${online ? 'online' : 'offline'}" title="${online ? 'متصل الآن' : 'غير متصل'}"></span>
+                        <span class="presence-dot ${presenceClass}" title="${presenceTitle}"></span>
                     </div>
                     <div class="directory-info">
                         <div class="directory-name">${_escapeHtml(e.displayName)}${e.adminRole ? (e.adminRole === 'main' ? ` ${ROLE_ICON_CROWN}` : ` ${ROLE_ICON_KEY}`) : ''}</div>
-                        <div class="directory-email">${e.followersCount || 0} متابِع${online ? ' • <span style="color:#3ddc84">متصل الآن</span>' : ''}</div>
+                        <div class="directory-email">${e.followersCount || 0} متابِع${busy ? ' • <span style="color:#9ca3af">مشغول بمكالمة</span>' : (online ? ' • <span style="color:#3ddc84">متصل الآن</span>' : '')}</div>
                     </div>
                 </div>`;
             }).join('');
@@ -5463,9 +5486,12 @@
             const roleEl = document.getElementById('member-profile-role');
             const roleLabel = roleLabelHtml(entry.adminRole);
             const online = isUserOnline(entry.uid);
-            roleEl.innerHTML = `${roleLabel} <span style="display:inline-flex;align-items:center;gap:4px;margin-inline-start:6px;font-size:11px;color:${online ? '#3ddc84' : '#ff7a7a'}"><span style="width:8px;height:8px;border-radius:50%;display:inline-block;background:${online ? '#3ddc84' : '#ff7a7a'}"></span>${online ? 'متصل الآن' : 'غير متصل'}</span>`;
+            const busy = isUserBusy(entry.uid);
+            const presenceColor = busy ? '#9ca3af' : (online ? '#3ddc84' : '#ff7a7a');
+            const presenceText = busy ? 'مشغول بمكالمة' : (online ? 'متصل الآن' : 'غير متصل');
+            roleEl.innerHTML = `${roleLabel} <span style="display:inline-flex;align-items:center;gap:4px;margin-inline-start:6px;font-size:11px;color:${presenceColor}"><span style="width:8px;height:8px;border-radius:50%;display:inline-block;background:${presenceColor}"></span>${presenceText}</span>`;
             const callBtn = document.getElementById('member-profile-call-btn');
-            if (callBtn) { callBtn.style.opacity = online ? '1' : '0.45'; callBtn.style.filter = online ? 'none' : 'grayscale(1)'; }
+            if (callBtn) { callBtn.style.opacity = (online && !busy) ? '1' : '0.45'; callBtn.style.filter = (online && !busy) ? 'none' : 'grayscale(1)'; }
             const img = document.getElementById('member-profile-img');
             const initials = document.getElementById('member-profile-initials');
             initials.textContent = (entry.displayName || '?').charAt(0).toUpperCase();
@@ -5639,6 +5665,7 @@
         let _pendingIncoming = null; // { callId, data }
 
         function _newCallState(role, id, peer) {
+            _setBusyStatus(true);
             return {
                 role, id, peerUid: peer.uid, peerName: peer.name || 'مستخدم', peerPhoto: peer.photo || '',
                 pc: null, localStream: null, localAudioTrack: null, localVideoTrack: null,
@@ -6097,6 +6124,7 @@
             if (peerUid === S.user.uid) { showToast('❌ ما تقدرش تتصل بنفسك 😅', '#ffb020'); return; }
             if (_call) { showToast('📞 عندك مكالمة شغالة بالفعل', '#ffb020'); return; }
             if (!isUserOnline(peerUid)) { showToast('⚠️ الشخص ده مش موجود على المنصة دلوقتي', '#ff7a7a'); return; }
+            if (isUserBusy(peerUid)) { showToast('📞 الشخص ده مشغول بمكالمة تانية دلوقتي', '#ffb020'); return; }
             const peerEntry = (S.membersDirectory || []).find(m => m.uid === peerUid);
             if (peerEntry && peerEntry.isTestAccount) { return _startPracticeCall(peerUid, peerName, peerPhoto); }
             let stream;
@@ -6304,6 +6332,7 @@
         };
 
         function _endCallCleanup() {
+            _setBusyStatus(false);
             _stopRingtone();
             if (_callTimerInterval) { clearInterval(_callTimerInterval); _callTimerInterval = null; }
             if (_call) {
