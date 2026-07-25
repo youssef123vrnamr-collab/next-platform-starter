@@ -1501,8 +1501,46 @@
             background: #14101f; display: none; z-index: 2;
         }
         #call-local-video.show { display: block; }
-        .call-topbar { position: absolute; top: 0; right: 0; left: 0; padding: 16px; display: flex; justify-content: center; z-index: 2; }
-        .call-topbar span { color: var(--bright); font-size: 13px; font-weight: 700; background: rgba(0,0,0,0.35); padding: 6px 14px; border-radius: 20px; }
+        .call-topbar { position: absolute; top: 0; right: 0; left: 0; padding: 16px; display: flex; align-items: center; justify-content: space-between; gap: 8px; z-index: 2; }
+        .call-topbar span:not(.cap-icon) { color: var(--bright); font-size: 13px; font-weight: 700; background: rgba(0,0,0,0.35); padding: 6px 14px; border-radius: 20px; }
+        .call-add-person-btn {
+            width: 38px; height: 38px; border-radius: 50%; border: none; flex-shrink: 0;
+            background: rgba(0,0,0,0.4); color: #fff; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; backdrop-filter: blur(4px);
+        }
+        .call-add-person-btn:active { transform: scale(0.92); }
+        .call-add-person-btn svg { width: 19px; height: 19px; }
+        #call-add-person-panel {
+            display: none; position: absolute; top: 62px; right: 12px; left: 12px; z-index: 5;
+            background: #17101f; border: 1px solid rgba(168,85,247,0.25); border-radius: 16px;
+            box-shadow: 0 12px 32px rgba(0,0,0,0.5); max-height: 60vh; overflow: hidden;
+            display: flex; flex-direction: column;
+        }
+        #call-add-person-panel.show { display: flex; }
+        .cap-panel-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; font-weight: 700; color: var(--bright); border-bottom: 1px solid rgba(255,255,255,0.06); }
+        .cap-panel-header button { background: none; border: none; color: var(--text-dim); font-size: 15px; cursor: pointer; }
+        .cap-search { margin: 10px 12px; padding: 9px 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.04); color: #fff; font-size: 13px; }
+        .cap-list { overflow-y: auto; padding: 4px 6px 10px; }
+        .cap-row { display: flex; align-items: center; gap: 10px; padding: 9px 8px; border-radius: 10px; cursor: pointer; }
+        .cap-row:active { background: rgba(255,255,255,0.06); }
+        .cap-row-avatar { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg,#a855f7,#ec4899); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #fff; overflow: hidden; flex-shrink: 0; }
+        .cap-row-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .cap-row-name { font-size: 13.5px; color: var(--bright); font-weight: 600; }
+        .cap-row-sub { font-size: 11px; color: var(--text-dim); }
+        #call-more-menu {
+            display: none; position: absolute; bottom: 60px; left: 50%; transform: translateX(-50%);
+            background: #17101f; border: 1px solid rgba(168,85,247,0.25); border-radius: 14px;
+            min-width: 230px; box-shadow: 0 12px 32px rgba(0,0,0,0.5); overflow: hidden; z-index: 6;
+        }
+        #call-more-menu.show { display: block; }
+        #call-more-menu button {
+            width: 100%; display: flex; align-items: center; gap: 10px; padding: 12px 14px;
+            background: none; border: none; color: var(--bright); font-size: 13px; text-align: right; cursor: pointer;
+        }
+        #call-more-menu button:not(:last-child) { border-bottom: 1px solid rgba(255,255,255,0.05); }
+        #call-more-menu button:active { background: rgba(255,255,255,0.06); }
+        #call-more-menu svg { width: 17px; height: 17px; flex-shrink: 0; }
+        #call-more-menu button.active-feature { color: #a855f7; }
         .call-controls { display: flex; align-items: center; justify-content: center; gap: 22px; padding: 22px 16px 34px; }
         .call-ctrl-btn {
             width: 58px; height: 58px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.16); cursor: pointer; font-size: 22px;
@@ -2339,6 +2377,38 @@
 
     <canvas id="canvas-bg"></canvas>
 
+    <!-- ===== SESSION RESTORE OVERLAY =====
+         Shown for the brief moment right after opening/reopening the app while
+         Firebase is restoring the saved login session. Without this, the login
+         screen used to flash first (since S.user starts out null), which made
+         already-logged-in people think they had to sign in again — this bar
+         reassures them instead and disappears once the real state is known. -->
+    <style>
+        #session-restore-overlay {
+            position: fixed; inset: 0; z-index: 99999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 18px; background: radial-gradient(circle at 50% 30%, #1b1330 0%, #0a0612 70%);
+            transition: opacity 0.35s ease; opacity: 1;
+        }
+        #session-restore-overlay.hide { opacity: 0; pointer-events: none; }
+        #session-restore-overlay .sro-logo { font-size: 20px; font-weight: 800; color: #fff; letter-spacing: 0.5px; }
+        #session-restore-overlay .sro-logo em { color: #a855f7; font-style: normal; }
+        #session-restore-overlay .sro-bar-track {
+            width: min(240px, 60vw); height: 4px; border-radius: 4px; background: rgba(168,85,247,0.15); overflow: hidden;
+        }
+        #session-restore-overlay .sro-bar-fill {
+            height: 100%; width: 0%; border-radius: 4px;
+            background: linear-gradient(90deg, #a855f7, #ec4899);
+            transition: width 1.1s cubic-bezier(0.4,0,0.2,1);
+        }
+        #session-restore-overlay .sro-text { color: #cbb8e8; font-size: 13px; text-align: center; max-width: 260px; line-height: 1.6; }
+    </style>
+    <div id="session-restore-overlay">
+        <div class="sro-logo">GAME<em>VERSE</em></div>
+        <div class="sro-bar-track"><div class="sro-bar-fill" id="sro-bar-fill"></div></div>
+        <div class="sro-text" id="sro-text">جاري التحقق من جلستك... لسه مسجّل دخول، هتدخل تلقائي خلال لحظات ⏳</div>
+    </div>
+
     <!-- ===== LOGIN SCREEN ===== -->
     <div id="login-screen">
         <div class="login-bg-grid"></div>
@@ -2940,7 +3010,25 @@
                 <div class="cp-status" id="call-status-text">جاري الاتصال...</div>
             </div>
             <video id="call-local-video" autoplay playsinline muted></video>
-            <div class="call-topbar"><span id="call-timer-text" data-phone-prefix="1">مكالمة</span></div>
+            <div class="call-topbar">
+                <button class="call-add-person-btn" id="call-add-person-btn" onclick="openAddToCallPicker()" title="إضافة شخص للمكالمة">
+                    <span class="cap-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="16" y1="11" x2="22" y2="11"/></svg>
+                    </span>
+                </button>
+                <span id="call-timer-text" data-phone-prefix="1">مكالمة</span>
+                <span style="width:38px"></span>
+            </div>
+            <!-- Picker shown when tapping the add-person button: lets you pick anyone
+                 from the platform to bring into the current call. -->
+            <div id="call-add-person-panel">
+                <div class="cap-panel-header">
+                    <span>إضافة شخص للمكالمة</span>
+                    <button onclick="closeAddToCallPicker()">✕</button>
+                </div>
+                <input id="call-add-person-search" class="cap-search" placeholder="ابحث عن اسم..." oninput="renderAddToCallList()" />
+                <div id="call-add-person-list" class="cap-list"></div>
+            </div>
         </div>
         <div class="call-controls">
             <button class="call-ctrl-btn" id="call-mic-btn" onclick="toggleCallMic()" title="كتم الصوت"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></button>
@@ -2948,6 +3036,29 @@
             <button class="call-ctrl-btn" id="call-min-btn" onclick="minimizeCall()" title="تصغير المكالمة وكمّل تلعب">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2.2"/><rect x="12.3" y="12.2" width="8" height="5.8" rx="1" fill="currentColor" stroke="none"/></svg>
             </button>
+            <div style="position:relative">
+                <button class="call-ctrl-btn" id="call-more-btn" onclick="toggleCallMoreMenu()" title="المزيد">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>
+                </button>
+                <div id="call-more-menu">
+                    <button onclick="toggleScreenShare()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="13" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                        <span id="call-screenshare-label">مشاركة الشاشة</span>
+                    </button>
+                    <button onclick="switchCallCamera()" id="call-switch-cam-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+                        <span>تبديل الكاميرا (أمامية/خلفية)</span>
+                    </button>
+                    <button onclick="toggleCallFullscreen()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+                        <span>ملء الشاشة</span>
+                    </button>
+                    <button onclick="openAddToCallPicker(); toggleCallMoreMenu();">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="16" y1="11" x2="22" y2="11"/></svg>
+                        <span>إضافة شخص للمكالمة</span>
+                    </button>
+                </div>
+            </div>
             <button class="call-ctrl-btn hangup" onclick="hangUpCall()" title="إنهاء المكالمة">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style="transform:rotate(135deg)"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1C10.61 21 3 13.39 3 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.25 1.01l-2.2 2.2z"/></svg>
             </button>
@@ -3264,6 +3375,38 @@
         const app = initializeApp(FIREBASE_CONFIG);
         const auth = getAuth(app);
         setPersistence(auth, browserLocalPersistence).catch(()=>{});
+
+        // ===== SESSION RESTORE OVERLAY CONTROL =====
+        // Animate the bar toward "almost done" right away (so it doesn't look
+        // frozen), then hide the whole overlay once we actually know whether a
+        // session exists — but never before a small minimum time, so it doesn't
+        // just flicker on very fast connections, and never later than a hard
+        // safety timeout, so a slow/broken connection doesn't trap the user
+        // behind the overlay forever.
+        const _sroStartedAt = Date.now();
+        let _sroHidden = false;
+        requestAnimationFrame(() => {
+            const fill = document.getElementById('sro-bar-fill');
+            if (fill) fill.style.width = '78%';
+        });
+        function _hideSessionRestoreOverlay(foundUser) {
+            if (_sroHidden) return;
+            _sroHidden = true;
+            const overlay = document.getElementById('session-restore-overlay');
+            const fill = document.getElementById('sro-bar-fill');
+            if (fill) fill.style.width = '100%';
+            const minShow = 450; // ms — avoid an ugly instant flash-hide
+            const elapsed = Date.now() - _sroStartedAt;
+            const wait = Math.max(0, minShow - elapsed);
+            setTimeout(() => {
+                if (overlay) overlay.classList.add('hide');
+                setTimeout(() => { if (overlay) overlay.style.display = 'none'; }, 400);
+            }, wait);
+        }
+        // Safety net: never let the overlay block the app for more than 7s,
+        // even if Firebase is slow or offline — fall back to the normal
+        // login screen so the person is never stuck looking at a loading bar.
+        setTimeout(() => _hideSessionRestoreOverlay(false), 7000);
         const db = initializeFirestore(app, { experimentalForceLongPolling: true, useFetchStreams: false }, 'default');
         enableNetwork(db).catch(() => {});
         const rtdb = getDatabase(app);
@@ -4998,36 +5141,50 @@
         async function loadMembersList() {
             const listEl = document.getElementById('members-list');
             if (!listEl) return;
-            listEl.innerHTML = `<p class="directory-empty">⏳ جاري تحميل الأعضاء...</p>`;
-            try {
-                const [snap, adminsSnap] = await Promise.all([
-                    getDocs(collection(db, 'users')),
-                    getDocs(collection(db, 'admins'))
-                ]);
-                const adminsByEmail = {};
-                adminsSnap.forEach(d => { adminsByEmail[(d.data().email || d.id || '').toLowerCase()] = d.data(); });
-                S.membersDirectory = snap.docs
-                    .map(d => {
-                        const u = d.data();
-                        const email = (u.email || '').toLowerCase();
-                        return {
-                            uid: d.id,
-                            email,
-                            displayName: u.displayName || email.split('@')[0] || 'مستخدم',
-                            photoURL: u.photoURL || '',
-                            ringColor: u.ringColor || '',
-                            followersCount: u.followersCount || 0,
-                            followingCount: u.followingCount || 0,
-                            adminRole: adminsByEmail[email]?.role || null
-                        };
-                    })
-                    .filter(u => u.uid !== S.user?.uid)
-                    .sort((a, b) => (a.displayName || '').localeCompare(b.displayName || '', 'ar'));
-                renderMembersList();
-            } catch (e) {
-                console.error('loadMembersList error:', e);
-                listEl.innerHTML = `<p class="directory-empty">⚠️ تعذر تحميل قائمة الأعضاء — تأكد من صلاحيات Firestore</p>`;
+            // Loading the members/followers directory sometimes races Firestore
+            // right after login (rules/session not fully warmed up yet) and
+            // silently comes back empty or fails. Retry a few times before
+            // giving up, instead of showing an empty/broken list on the first hiccup.
+            const MAX_ATTEMPTS = 3;
+            let lastErr = null;
+            for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+                listEl.innerHTML = `<p class="directory-empty">⏳ جاري تحميل الأعضاء${attempt > 1 ? ` (محاولة ${attempt}/${MAX_ATTEMPTS})` : ''}...</p>`;
+                try {
+                    const [snap, adminsSnap] = await Promise.all([
+                        getDocs(collection(db, 'users')),
+                        getDocs(collection(db, 'admins'))
+                    ]);
+                    const adminsByEmail = {};
+                    adminsSnap.forEach(d => { adminsByEmail[(d.data().email || d.id || '').toLowerCase()] = d.data(); });
+                    S.membersDirectory = snap.docs
+                        .map(d => {
+                            const u = d.data();
+                            const email = (u.email || '').toLowerCase();
+                            return {
+                                uid: d.id,
+                                email,
+                                displayName: u.displayName || email.split('@')[0] || 'مستخدم',
+                                photoURL: u.photoURL || '',
+                                ringColor: u.ringColor || '',
+                                followersCount: u.followersCount || 0,
+                                followingCount: u.followingCount || 0,
+                                adminRole: adminsByEmail[email]?.role || null
+                            };
+                        })
+                        .filter(u => u.uid !== S.user?.uid)
+                        .sort((a, b) => (a.displayName || '').localeCompare(b.displayName || '', 'ar'));
+                    renderMembersList();
+                    return; // success — stop retrying
+                } catch (e) {
+                    lastErr = e;
+                    console.error(`loadMembersList error (attempt ${attempt}/${MAX_ATTEMPTS}):`, e);
+                    if (attempt < MAX_ATTEMPTS) {
+                        await new Promise(r => setTimeout(r, attempt * 700)); // 700ms, then 1400ms
+                    }
+                }
             }
+            listEl.innerHTML = `<p class="directory-empty">⚠️ تعذر تحميل قائمة الأعضاء بعد ${MAX_ATTEMPTS} محاولات — تأكد من الاتصال أو صلاحيات Firestore</p>`;
+            console.error('loadMembersList: exhausted retries', lastErr);
         }
 
         window.renderMembersList = function() {
@@ -5282,6 +5439,7 @@
             return {
                 role, id, peerUid: peer.uid, peerName: peer.name || 'مستخدم', peerPhoto: peer.photo || '',
                 pc: null, localStream: null, localAudioTrack: null, localVideoTrack: null,
+                screenTrack: null, preScreenShareCamTrack: null, camFacingMode: 'user',
                 micOn: true, camOn: false,
                 initialNegotiationDone: role === 'caller',
                 lastNegotiatedSenderCount: 0,
@@ -5747,6 +5905,158 @@
             updateDoc(_callDocRef(_call.id), { [field]: _call.camOn }).catch(() => {});
         };
 
+        // ===== "MORE" MENU (three-dot button) =====
+        window.toggleCallMoreMenu = function() {
+            const menu = document.getElementById('call-more-menu');
+            if (!menu) return;
+            menu.classList.toggle('show');
+        };
+        document.addEventListener('click', e => {
+            const menu = document.getElementById('call-more-menu');
+            const btn = document.getElementById('call-more-btn');
+            if (menu && menu.classList.contains('show') && !menu.contains(e.target) && e.target !== btn && !btn?.contains(e.target)) {
+                menu.classList.remove('show');
+            }
+        });
+
+        // ===== SCREEN SHARING =====
+        // Swaps the outgoing video track for a screen-capture track. If a camera
+        // track is already flowing we just replaceTrack() on the existing sender
+        // (instant, no renegotiation); otherwise we add the track the same way
+        // the camera toggle does, which triggers the existing renegotiation flow.
+        window.toggleScreenShare = async function() {
+            if (!_call || !_call.pc) { showToast('❌ لازم تكون في مكالمة الأول', '#ff7a7a'); return; }
+            const label = document.getElementById('call-screenshare-label');
+            if (_call.screenTrack) {
+                _stopScreenShare();
+                return;
+            }
+            let screenStream;
+            try {
+                screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+            } catch (e) {
+                return; // person cancelled the share picker — nothing to do
+            }
+            const screenTrack = screenStream.getVideoTracks()[0];
+            _call.screenTrack = screenTrack;
+            _call.preScreenShareCamTrack = _call.localVideoTrack || null;
+            const localVideoEl = document.getElementById('call-local-video');
+            const videoSender = _call.pc.getSenders().find(s => s.track && s.track.kind === 'video');
+            if (videoSender) {
+                await videoSender.replaceTrack(screenTrack).catch(() => {});
+            } else {
+                _call.localStream.addTrack(screenTrack);
+                _call.pc.addTrack(screenTrack, _call.localStream);
+            }
+            localVideoEl.srcObject = new MediaStream([screenTrack]);
+            localVideoEl.classList.add('show');
+            if (label) label.textContent = 'إيقاف مشاركة الشاشة';
+            document.getElementById('call-more-btn')?.classList.add('active');
+            // If the person stops sharing from the browser/OS's own "stop sharing"
+            // control (instead of our button), catch that and revert cleanly.
+            screenTrack.onended = () => _stopScreenShare();
+            showToast('🖥️ بدأت مشاركة الشاشة', '#3ddc84');
+        };
+
+        async function _stopScreenShare() {
+            if (!_call || !_call.screenTrack) return;
+            const screenTrack = _call.screenTrack;
+            _call.screenTrack = null;
+            try { screenTrack.stop(); } catch (e) {}
+            const label = document.getElementById('call-screenshare-label');
+            if (label) label.textContent = 'مشاركة الشاشة';
+            document.getElementById('call-more-btn')?.classList.remove('active');
+            const localVideoEl = document.getElementById('call-local-video');
+            const videoSender = _call.pc.getSenders().find(s => s.track === screenTrack || (s.track && s.track.kind === 'video'));
+            const restoreTrack = _call.preScreenShareCamTrack;
+            if (restoreTrack && restoreTrack.readyState !== 'ended') {
+                if (videoSender) await videoSender.replaceTrack(restoreTrack).catch(() => {});
+                localVideoEl.srcObject = new MediaStream([restoreTrack]);
+                localVideoEl.classList.add('show');
+            } else {
+                if (videoSender) await videoSender.replaceTrack(null).catch(() => {});
+                localVideoEl.classList.remove('show');
+                localVideoEl.srcObject = null;
+            }
+            showToast('🖥️ توقفت مشاركة الشاشة', '#ffb020');
+        }
+
+        // ===== SWITCH FRONT/BACK CAMERA =====
+        window.switchCallCamera = async function() {
+            if (!_call || !_call.localVideoTrack) { showToast('⚠️ شغّل الكاميرا الأول', '#ffb020'); return; }
+            if (_call.screenTrack) { showToast('⚠️ وقّف مشاركة الشاشة الأول', '#ffb020'); return; }
+            _call.camFacingMode = _call.camFacingMode === 'environment' ? 'user' : 'environment';
+            try {
+                const newStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: _call.camFacingMode } });
+                const newTrack = newStream.getVideoTracks()[0];
+                const videoSender = _call.pc.getSenders().find(s => s.track && s.track.kind === 'video');
+                if (videoSender) await videoSender.replaceTrack(newTrack).catch(() => {});
+                try { _call.localVideoTrack.stop(); } catch (e) {}
+                _call.localStream.removeTrack(_call.localVideoTrack);
+                _call.localStream.addTrack(newTrack);
+                _call.localVideoTrack = newTrack;
+                newTrack.enabled = _call.camOn;
+                document.getElementById('call-local-video').srcObject = new MediaStream([newTrack]);
+                showToast('🔄 تم تبديل الكاميرا', '#3ddc84');
+            } catch (e) {
+                showToast('❌ الجهاز مش بيدعم تبديل الكاميرا', '#ff7a7a');
+            }
+        };
+
+        // ===== FULLSCREEN =====
+        window.toggleCallFullscreen = function() {
+            const modal = document.getElementById('call-modal');
+            if (!document.fullscreenElement) {
+                (modal.requestFullscreen || modal.webkitRequestFullscreen)?.call(modal).catch(() => {
+                    showToast('⚠️ الجهاز مش بيدعم ملء الشاشة', '#ffb020');
+                });
+            } else {
+                (document.exitFullscreen || document.webkitExitFullscreen)?.call(document);
+            }
+        };
+
+        // ===== ADD PERSON TO CALL (picker UI) =====
+        // Opens a searchable list of everyone on the platform so you can bring
+        // someone else into the conversation you're already having. Actually
+        // pulling them into a live multi-person call needs a bigger upgrade to
+        // the calling backend (today it's built for exactly two people); for now
+        // this wires up the full picker UI/UX so it's ready to plug in.
+        window.openAddToCallPicker = async function() {
+            if (!_call) return;
+            const panel = document.getElementById('call-add-person-panel');
+            if (!panel) return;
+            panel.classList.add('show');
+            if (!S.membersDirectory || !S.membersDirectory.length) await loadMembersList();
+            renderAddToCallList();
+        };
+        window.closeAddToCallPicker = function() {
+            document.getElementById('call-add-person-panel')?.classList.remove('show');
+        };
+        window.renderAddToCallList = function() {
+            const listEl = document.getElementById('call-add-person-list');
+            if (!listEl) return;
+            const term = (document.getElementById('call-add-person-search')?.value || '').trim().toLowerCase();
+            const rows = (S.membersDirectory || [])
+                .filter(e => e.uid !== _call?.peerUid)
+                .filter(e => !term || (e.displayName || '').toLowerCase().includes(term));
+            if (!rows.length) { listEl.innerHTML = `<p class="directory-empty" style="padding:16px;text-align:center;">لا يوجد نتائج</p>`; return; }
+            listEl.innerHTML = rows.map(e => {
+                const initial = (e.displayName || '?').charAt(0).toUpperCase();
+                const avatar = avatarImgHtml(e.photoURL, '', initial) || initial;
+                const online = isUserOnline(e.uid);
+                return `<div class="cap-row" onclick="inviteToCall('${e.uid}', '${_escapeHtml(e.displayName).replace(/'/g, "\\'")}')">
+                    <div class="cap-row-avatar">${avatar}</div>
+                    <div>
+                        <div class="cap-row-name">${_escapeHtml(e.displayName)}</div>
+                        <div class="cap-row-sub">${online ? '🟢 متصل الآن' : 'غير متصل'}</div>
+                    </div>
+                </div>`;
+            }).join('');
+        };
+        window.inviteToCall = function(uid, name) {
+            showToast(`✨ قريبًا هتقدر تضيف ${name} فعليًا للمكالمة الجماعية`, '#a855f7');
+        };
+
         window.hangUpCall = async function() {
             if (!_call) return;
             try { await updateDoc(_callDocRef(_call.id), { status: 'ended' }); } catch (e) {}
@@ -5773,6 +6083,8 @@
             const cmwFallback = document.getElementById('cmw-avatar-fallback');
             if (cmwFallback) cmwFallback.style.display = '';
             document.body.style.overflow = '';
+            document.getElementById('call-more-menu')?.classList.remove('show');
+            document.getElementById('call-add-person-panel')?.classList.remove('show');
         }
 
         // ===== MINIMIZE / EXPAND ACTIVE CALL =====
@@ -6839,6 +7151,9 @@
         }).catch(e => { console.error('Redirect result error:', e); });
 
         onAuthStateChanged(auth, async fbUser => {
+            // The very first callback tells us definitively whether a saved
+            // session exists — that's our cue to drop the restore overlay.
+            _hideSessionRestoreOverlay(!!fbUser);
             if (fbUser && !S.user) {
                 S.fbLoading = true;
                 updateUI();
