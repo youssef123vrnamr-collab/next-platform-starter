@@ -1771,12 +1771,16 @@
            it gets the full screen instead of a centered popup — more room for
            the test-accounts list, no wasted dead space around it. Scoped to
            this one modal only; every other modal keeps the normal popup look. */
-        #developer-settings-modal.modal-overlay {
+        #developer-settings-modal.modal-overlay,
+        #add-modal.modal-overlay, #edit-modal.modal-overlay,
+        #add-game-modal.modal-overlay, #edit-game-modal.modal-overlay {
             padding: 0;
             align-items: stretch;
             justify-content: stretch;
         }
-        #developer-settings-modal .modal-box {
+        #developer-settings-modal .modal-box,
+        #add-modal .modal-box, #edit-modal .modal-box,
+        #add-game-modal .modal-box, #edit-game-modal .modal-box {
             width: 100%;
             max-width: 100%;
             height: 100%;
@@ -3621,6 +3625,7 @@
                 'toast.roleUpdated': 'تم تحديث الصلاحية:',
                 'toast.onlyMainAdminCanSuspend': 'فقط المشرف الرئيسي يقدر يوقف حسابات', 'toast.enterUid': 'أدخل UID المستخدم', 'confirm.suspendAccount': 'تأكيد توقيف الحساب: {uid}؟', 'toast.accountSuspended': 'تم توقيف الحساب', 'toast.onlyMainAdminCanUnsuspend': 'فقط المشرف الرئيسي يقدر يرفع التوقيف', 'confirm.unsuspendAccount': 'رفع توقيف الحساب: {uid}؟', 'toast.accountUnsuspended': 'تم رفع التوقيف', 'toast.cantSuspendSelf': 'ما تقدرش توقف حسابك الشخصي', 'verb.unsuspend': 'رفع التوقيف عن', 'verb.suspend': 'توقيف', 'confirm.confirmVerbAccount': 'تأكيد {verb} حساب {name}؟', 'toast.unsuspendedName': 'تم رفع التوقيف عن {name}', 'toast.suspendedName': 'تم توقيف {name}',
                 'profile.title': 'الملف الشخصي', 'profile.coverPhoto': 'صورة الغلاف (الخلفية)', 'profile.coverPhotoLabel': 'رابط صورة الغلاف اللي تظهر ورا الشعار (Google Drive)', 'profile.profilePhoto': 'صورة البروفايل', 'profile.profilePhotoLabel': 'رابط صورة البروفايل (Google Drive)', 'profile.ringColor': 'لون الدائرة حول صورتك', 'profile.ringColorHint': 'اختار أي لون يعجبك للدائرة المضيئة حوالين صورتك', 'profile.defaultBtn': 'افتراضي', 'profile.ringtone': 'نغمة رنين المكالمات', 'profile.ringtoneHint': 'اختار النغمة اللي هتسمعها وقت ما حد يتصل بيك — كل شخص يقدر يختار نغمته الخاصة، أو يضيف نغمته الشخصية (رابط واحد بس لكل حساب)', 'profile.personalInfo': 'المعلومات الشخصية', 'profile.nameLabel': 'الاسم', 'profile.namePlaceholder': 'اسمك...', 'profile.genderLabel': 'النوع', 'profile.genderChoose': '-- اختر --', 'profile.genderMale': 'ذكر', 'profile.genderFemale': 'أنثى', 'profile.genderPreferNot': 'أفضل عدم الذكر', 'profile.nationalityLabel': 'الجنسية', 'profile.nationalityPlaceholder': 'مثال: مصري، سعودي...', 'profile.saveSuccess': 'تم حفظ التغييرات', 'profile.saveBtn': 'حفظ التغييرات',
+                'common.edit': '✏ تعديل', 'common.delete': '🗑 حذف', 'common.lock': '🔒 قفل', 'common.unlock': '🔓 فتح', 'common.playNow': 'العب الآن ›', 'common.untitledGame': 'لعبة', 'common.uploadVideo': 'رفع فيديو',
             },
             en: {
                 'menu.navSection': 'Navigation', 'menu.home': 'Home', 'menu.unlockedVideos': 'Unlocked Videos',
@@ -3658,6 +3663,7 @@
                 'toast.roleUpdated': 'Role updated:',
                 'toast.onlyMainAdminCanSuspend': 'Only the main admin can suspend accounts', 'toast.enterUid': 'Enter the user UID', 'confirm.suspendAccount': 'Confirm suspending account: {uid}?', 'toast.accountSuspended': 'Account suspended', 'toast.onlyMainAdminCanUnsuspend': 'Only the main admin can unsuspend accounts', 'confirm.unsuspendAccount': 'Unsuspend account: {uid}?', 'toast.accountUnsuspended': 'Account unsuspended', 'toast.cantSuspendSelf': "You can\'t suspend your own account", 'verb.unsuspend': 'unsuspend', 'verb.suspend': 'suspend', 'confirm.confirmVerbAccount': 'Confirm {verb} account {name}?', 'toast.unsuspendedName': 'Unsuspended {name}', 'toast.suspendedName': 'Suspended {name}',
                 'profile.title': 'Profile', 'profile.coverPhoto': 'Cover Photo (Background)', 'profile.coverPhotoLabel': 'Cover photo link shown behind your logo (Google Drive)', 'profile.profilePhoto': 'Profile Photo', 'profile.profilePhotoLabel': 'Profile photo link (Google Drive)', 'profile.ringColor': 'Ring color around your photo', 'profile.ringColorHint': 'Pick any color you like for the glowing ring around your photo', 'profile.defaultBtn': 'Default', 'profile.ringtone': 'Call Ringtone', 'profile.ringtoneHint': 'Choose the tone you\'ll hear when someone calls you — each person can pick their own tone, or add a personal one (one link per account)', 'profile.personalInfo': 'Personal Information', 'profile.nameLabel': 'Name', 'profile.namePlaceholder': 'Your name...', 'profile.genderLabel': 'Gender', 'profile.genderChoose': '-- Select --', 'profile.genderMale': 'Male', 'profile.genderFemale': 'Female', 'profile.genderPreferNot': 'Prefer not to say', 'profile.nationalityLabel': 'Nationality', 'profile.nationalityPlaceholder': 'e.g. Egyptian, Saudi...', 'profile.saveSuccess': 'Changes saved', 'profile.saveBtn': 'Save Changes',
+                'common.edit': '✏ Edit', 'common.delete': '🗑 Delete', 'common.lock': '🔒 Lock', 'common.unlock': '🔓 Unlock', 'common.playNow': 'Play now ›', 'common.untitledGame': 'Game', 'common.uploadVideo': 'Upload video',
             },
             fr: {
                 'menu.navSection': 'Navigation', 'menu.home': 'Accueil', 'menu.unlockedVideos': 'Vidéos débloquées',
@@ -3695,6 +3701,7 @@
                 'toast.roleUpdated': 'Rôle mis à jour :',
                 'toast.onlyMainAdminCanSuspend': 'Seul l\'admin principal peut suspendre des comptes', 'toast.enterUid': 'Entrez l\'UID de l\'utilisateur', 'confirm.suspendAccount': 'Confirmer la suspension du compte : {uid} ?', 'toast.accountSuspended': 'Compte suspendu', 'toast.onlyMainAdminCanUnsuspend': 'Seul l\'admin principal peut réactiver des comptes', 'confirm.unsuspendAccount': 'Réactiver le compte : {uid} ?', 'toast.accountUnsuspended': 'Compte réactivé', 'toast.cantSuspendSelf': 'Vous ne pouvez pas suspendre votre propre compte', 'verb.unsuspend': 'réactiver', 'verb.suspend': 'suspendre', 'confirm.confirmVerbAccount': 'Confirmer {verb} le compte {name} ?', 'toast.unsuspendedName': '{name} réactivé', 'toast.suspendedName': '{name} suspendu',
                 'profile.title': 'Profil', 'profile.coverPhoto': 'Photo de couverture (arrière-plan)', 'profile.coverPhotoLabel': 'Lien de la photo de couverture affichée derrière le logo (Google Drive)', 'profile.profilePhoto': 'Photo de profil', 'profile.profilePhotoLabel': 'Lien de la photo de profil (Google Drive)', 'profile.ringColor': 'Couleur de l\'anneau autour de votre photo', 'profile.ringColorHint': 'Choisissez la couleur que vous préférez pour l\'anneau lumineux autour de votre photo', 'profile.defaultBtn': 'Par défaut', 'profile.ringtone': 'Sonnerie d\'appel', 'profile.ringtoneHint': 'Choisissez la sonnerie que vous entendrez quand quelqu\'un vous appelle — chacun peut choisir sa propre sonnerie ou en ajouter une personnelle (un seul lien par compte)', 'profile.personalInfo': 'Informations personnelles', 'profile.nameLabel': 'Nom', 'profile.namePlaceholder': 'Votre nom...', 'profile.genderLabel': 'Genre', 'profile.genderChoose': '-- Choisir --', 'profile.genderMale': 'Homme', 'profile.genderFemale': 'Femme', 'profile.genderPreferNot': 'Préfère ne pas préciser', 'profile.nationalityLabel': 'Nationalité', 'profile.nationalityPlaceholder': 'ex : Égyptien, Saoudien...', 'profile.saveSuccess': 'Modifications enregistrées', 'profile.saveBtn': 'Enregistrer les modifications',
+                'common.edit': '✏ Modifier', 'common.delete': '🗑 Supprimer', 'common.lock': '🔒 Verrouiller', 'common.unlock': '🔓 Déverrouiller', 'common.playNow': 'Jouer maintenant ›', 'common.untitledGame': 'Jeu', 'common.uploadVideo': 'Ajouter une vidéo',
             },
             de: {
                 'menu.navSection': 'Navigation', 'menu.home': 'Startseite', 'menu.unlockedVideos': 'Freigeschaltete Videos',
@@ -3732,6 +3739,7 @@
                 'toast.roleUpdated': 'Rolle aktualisiert:',
                 'toast.onlyMainAdminCanSuspend': 'Nur der Hauptadmin kann Konten sperren', 'toast.enterUid': 'Gib die Benutzer-UID ein', 'confirm.suspendAccount': 'Konto sperren bestätigen: {uid}?', 'toast.accountSuspended': 'Konto gesperrt', 'toast.onlyMainAdminCanUnsuspend': 'Nur der Hauptadmin kann Konten entsperren', 'confirm.unsuspendAccount': 'Konto entsperren: {uid}?', 'toast.accountUnsuspended': 'Konto entsperrt', 'toast.cantSuspendSelf': 'Du kannst dein eigenes Konto nicht sperren', 'verb.unsuspend': 'entsperren', 'verb.suspend': 'sperren', 'confirm.confirmVerbAccount': 'Konto {name} {verb} bestätigen?', 'toast.unsuspendedName': '{name} entsperrt', 'toast.suspendedName': '{name} gesperrt',
                 'profile.title': 'Profil', 'profile.coverPhoto': 'Titelbild (Hintergrund)', 'profile.coverPhotoLabel': 'Link zum Titelbild, das hinter dem Logo angezeigt wird (Google Drive)', 'profile.profilePhoto': 'Profilbild', 'profile.profilePhotoLabel': 'Link zum Profilbild (Google Drive)', 'profile.ringColor': 'Ringfarbe um dein Bild', 'profile.ringColorHint': 'Wähle eine beliebige Farbe für den leuchtenden Ring um dein Bild', 'profile.defaultBtn': 'Standard', 'profile.ringtone': 'Anruf-Klingelton', 'profile.ringtoneHint': 'Wähle den Ton, den du hörst, wenn dich jemand anruft — jeder kann seinen eigenen Ton wählen oder einen persönlichen hinzufügen (ein Link pro Konto)', 'profile.personalInfo': 'Persönliche Informationen', 'profile.nameLabel': 'Name', 'profile.namePlaceholder': 'Dein Name...', 'profile.genderLabel': 'Geschlecht', 'profile.genderChoose': '-- Auswählen --', 'profile.genderMale': 'Männlich', 'profile.genderFemale': 'Weiblich', 'profile.genderPreferNot': 'Keine Angabe', 'profile.nationalityLabel': 'Nationalität', 'profile.nationalityPlaceholder': 'z. B. Ägyptisch, Saudisch...', 'profile.saveSuccess': 'Änderungen gespeichert', 'profile.saveBtn': 'Änderungen speichern',
+                'common.edit': '✏ Bearbeiten', 'common.delete': '🗑 Löschen', 'common.lock': '🔒 Sperren', 'common.unlock': '🔓 Entsperren', 'common.playNow': 'Jetzt spielen ›', 'common.untitledGame': 'Spiel', 'common.uploadVideo': 'Video hochladen',
             },
             ru: {
                 'menu.navSection': 'Навигация', 'menu.home': 'Главная', 'menu.unlockedVideos': 'Открытые видео',
@@ -3769,6 +3777,7 @@
                 'toast.roleUpdated': 'Роль обновлена:',
                 'toast.onlyMainAdminCanSuspend': 'Только главный админ может блокировать аккаунты', 'toast.enterUid': 'Введите UID пользователя', 'confirm.suspendAccount': 'Подтвердить блокировку аккаунта: {uid}?', 'toast.accountSuspended': 'Аккаунт заблокирован', 'toast.onlyMainAdminCanUnsuspend': 'Только главный админ может разблокировать аккаунты', 'confirm.unsuspendAccount': 'Разблокировать аккаунт: {uid}?', 'toast.accountUnsuspended': 'Аккаунт разблокирован', 'toast.cantSuspendSelf': 'Вы не можете заблокировать свой собственный аккаунт', 'verb.unsuspend': 'разблокировать', 'verb.suspend': 'заблокировать', 'confirm.confirmVerbAccount': 'Подтвердить {verb} аккаунт {name}?', 'toast.unsuspendedName': '{name} разблокирован', 'toast.suspendedName': '{name} заблокирован',
                 'profile.title': 'Профиль', 'profile.coverPhoto': 'Обложка (фон)', 'profile.coverPhotoLabel': 'Ссылка на фото обложки за логотипом (Google Drive)', 'profile.profilePhoto': 'Фото профиля', 'profile.profilePhotoLabel': 'Ссылка на фото профиля (Google Drive)', 'profile.ringColor': 'Цвет кольца вокруг вашего фото', 'profile.ringColorHint': 'Выберите любой понравившийся цвет для светящегося кольца вокруг фото', 'profile.defaultBtn': 'По умолчанию', 'profile.ringtone': 'Рингтон звонка', 'profile.ringtoneHint': 'Выберите тон, который вы услышите, когда кто-то вам позвонит — каждый может выбрать свой тон или добавить личный (одна ссылка на аккаунт)', 'profile.personalInfo': 'Личная информация', 'profile.nameLabel': 'Имя', 'profile.namePlaceholder': 'Ваше имя...', 'profile.genderLabel': 'Пол', 'profile.genderChoose': '-- Выбрать --', 'profile.genderMale': 'Мужской', 'profile.genderFemale': 'Женский', 'profile.genderPreferNot': 'Не указывать', 'profile.nationalityLabel': 'Национальность', 'profile.nationalityPlaceholder': 'например: египтянин, саудовец...', 'profile.saveSuccess': 'Изменения сохранены', 'profile.saveBtn': 'Сохранить изменения',
+                'common.edit': '✏ Изменить', 'common.delete': '🗑 Удалить', 'common.lock': '🔒 Заблокировать', 'common.unlock': '🔓 Разблокировать', 'common.playNow': 'Играть сейчас ›', 'common.untitledGame': 'Игра', 'common.uploadVideo': 'Загрузить видео',
             },
             zh: {
                 'menu.navSection': '导航', 'menu.home': '主页', 'menu.unlockedVideos': '已解锁视频',
@@ -3806,6 +3815,7 @@
                 'toast.roleUpdated': '角色已更新：',
                 'toast.onlyMainAdminCanSuspend': '只有主管理员可以封禁账户', 'toast.enterUid': '请输入用户 UID', 'confirm.suspendAccount': '确认封禁账户：{uid}？', 'toast.accountSuspended': '账户已封禁', 'toast.onlyMainAdminCanUnsuspend': '只有主管理员可以解除封禁', 'confirm.unsuspendAccount': '解除封禁账户：{uid}？', 'toast.accountUnsuspended': '已解除封禁', 'toast.cantSuspendSelf': '你不能封禁自己的账户', 'verb.unsuspend': '解除封禁', 'verb.suspend': '封禁', 'confirm.confirmVerbAccount': '确认{verb}账户 {name}？', 'toast.unsuspendedName': '已解除封禁 {name}', 'toast.suspendedName': '已封禁 {name}',
                 'profile.title': '个人资料', 'profile.coverPhoto': '封面图片（背景）', 'profile.coverPhotoLabel': '显示在徽标后面的封面图片链接（Google Drive）', 'profile.profilePhoto': '头像照片', 'profile.profilePhotoLabel': '头像照片链接（Google Drive）', 'profile.ringColor': '照片周围的圆环颜色', 'profile.ringColorHint': '为你照片周围的发光圆环选择任意喜欢的颜色', 'profile.defaultBtn': '默认', 'profile.ringtone': '通话铃声', 'profile.ringtoneHint': '选择有人给你打电话时播放的铃声——每个人都可以选择自己的铃声，或添加个人铃声（每个账户仅限一个链接）', 'profile.personalInfo': '个人信息', 'profile.nameLabel': '姓名', 'profile.namePlaceholder': '你的名字...', 'profile.genderLabel': '性别', 'profile.genderChoose': '-- 选择 --', 'profile.genderMale': '男', 'profile.genderFemale': '女', 'profile.genderPreferNot': '不愿透露', 'profile.nationalityLabel': '国籍', 'profile.nationalityPlaceholder': '例如：埃及、沙特...', 'profile.saveSuccess': '更改已保存', 'profile.saveBtn': '保存更改',
+                'common.edit': '✏ 编辑', 'common.delete': '🗑 删除', 'common.lock': '🔒 锁定', 'common.unlock': '🔓 解锁', 'common.playNow': '立即玩 ›', 'common.untitledGame': '游戏', 'common.uploadVideo': '上传视频',
             },
         };
         function t(key) {
@@ -4283,15 +4293,18 @@
             actions.className = 'admin-actions' + (S.isAdmin ? ' visible' : '');
             const lockBtn = document.createElement('button');
             lockBtn.className = 'act-btn ' + (v.locked ? 'btn-unlock' : 'btn-lock');
-            lockBtn.textContent = v.locked ? '🔓 فتح' : '🔒 قفل';
+            lockBtn.setAttribute('data-i18n', v.locked ? 'common.unlock' : 'common.lock');
+            lockBtn.textContent = t(v.locked ? 'common.unlock' : 'common.lock');
             lockBtn.onclick = () => handleToggleLock(v.id);
             const editBtn = document.createElement('button');
             editBtn.className = 'act-btn btn-edit';
-            editBtn.textContent = '✏ تعديل';
+            editBtn.setAttribute('data-i18n', 'common.edit');
+            editBtn.textContent = t('common.edit');
             editBtn.onclick = () => openEditModal(v);
             const delBtn = document.createElement('button');
             delBtn.className = 'act-btn btn-del';
-            delBtn.textContent = '🗑 حذف';
+            delBtn.setAttribute('data-i18n', 'common.delete');
+            delBtn.textContent = t('common.delete');
             delBtn.onclick = () => handleDelete(v.id);
             actions.appendChild(lockBtn);
             actions.appendChild(editBtn);
@@ -4953,9 +4966,9 @@
                 <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:13px">
                     <span style="color:var(--bright)">${v.title||'—'} ${v.locked?'🔒':''}</span>
                     <div style="display:flex;gap:4px">
-                        <button class="act-btn ${v.locked?'btn-unlock':'btn-lock'}" onclick="handleToggleLock('${v.id}')" style="padding:2px 8px;font-size:11px">${v.locked?'فتح':'قفل'}</button>
-                        <button class="act-btn btn-edit" onclick="openEditModal(S.videos.find(x=>x.id==='${v.id}'))" style="padding:2px 8px;font-size:11px">تعديل</button>
-                        <button class="act-btn btn-del" onclick="handleDelete('${v.id}')" style="padding:2px 8px;font-size:11px">حذف</button>
+                        <button class="act-btn ${v.locked?'btn-unlock':'btn-lock'}" onclick="handleToggleLock('${v.id}')" style="padding:2px 8px;font-size:11px">${t(v.locked?'common.unlock':'common.lock').replace(/^[^\s]+\s/,'')}</button>
+                        <button class="act-btn btn-edit" onclick="openEditModal(S.videos.find(x=>x.id==='${v.id}'))" style="padding:2px 8px;font-size:11px">${t('common.edit').replace(/^[^\s]+\s/,'')}</button>
+                        <button class="act-btn btn-del" onclick="handleDelete('${v.id}')" style="padding:2px 8px;font-size:11px">${t('common.delete').replace(/^[^\s]+\s/,'')}</button>
                     </div>
                 </div>
             `).join('');
@@ -7035,19 +7048,31 @@
                 <div class="game-hub-card" data-players="${g.players}" onclick="openGame('${g.id}')">
                     ${g.badge ? `<span class="game-hub-badge">${_escapeHtml(g.badge)}</span>` : ''}
                     ${g.image ? `<img class="game-hub-thumb" src="${_escapeHtml(g.image)}" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'game-hub-icon',textContent:'${g.icon || '🎮'}'}))" />` : `<div class="game-hub-icon">${g.icon || '🎮'}</div>`}
-                    <div class="game-hub-title">${_escapeHtml(g.title || 'لعبة')}</div>
-                    <div class="game-hub-desc">${_escapeHtml(g.description || '')}</div>
+                    <div class="game-hub-title" id="gtitle-${g.id}"></div>
+                    <div class="game-hub-desc" id="gdesc-${g.id}"></div>
                     <div class="game-hub-meta">
                         <span class="game-hub-best">${_playerCountLabels()[g.players] || ''}</span>
-                        <span class="game-hub-play">العب الآن ›</span>
+                        <span class="game-hub-play" data-i18n="common.playNow">العب الآن ›</span>
                     </div>
                     ${S.isAdmin ? `
                     <div class="admin-actions visible" onclick="event.stopPropagation()">
-                        <button class="act-btn btn-edit" onclick="openEditGameModal('${g.id}')">✏ تعديل</button>
-                        <button class="act-btn btn-del" onclick="handleDeleteGame('${g.id}')">🗑 حذف</button>
+                        <button class="act-btn btn-edit" onclick="openEditGameModal('${g.id}')" data-i18n="common.edit">✏ تعديل</button>
+                        <button class="act-btn btn-del" onclick="handleDeleteGame('${g.id}')" data-i18n="common.delete">🗑 حذف</button>
                     </div>` : ''}
                 </div>
             `).join('');
+            // Game titles/descriptions are authored in Arabic by the admin — translate
+            // each one to the current viewer's language, same as video titles/descriptions.
+            games.forEach(g => {
+                const titleEl = document.getElementById('gtitle-' + g.id);
+                const descEl = document.getElementById('gdesc-' + g.id);
+                if (titleEl) {
+                    if (g.title) applyAutoTranslate(titleEl, g.title, 'ar');
+                    else titleEl.textContent = t('common.untitledGame');
+                }
+                if (descEl) applyAutoTranslate(descEl, g.description || '', 'ar');
+            });
+            applyTranslations();
         };
 
         window.openGame = function(id) {
@@ -7056,7 +7081,9 @@
             document.getElementById('games-hub').style.display = 'none';
             document.querySelectorAll('.game-play-wrap').forEach(w => w.classList.remove('active'));
             document.getElementById('game-play-custom').classList.add('active');
-            document.getElementById('custom-game-title').textContent = g.title || 'لعبة';
+            const hudTitle = document.getElementById('custom-game-title');
+            if (g.title) applyAutoTranslate(hudTitle, g.title, 'ar');
+            else hudTitle.textContent = t('common.untitledGame');
             const frame = document.getElementById('custom-game-frame');
             frame.srcdoc = g.code || '';
         };
