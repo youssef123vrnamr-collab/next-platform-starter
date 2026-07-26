@@ -2714,24 +2714,24 @@
 
                     <!-- Admins -->
                     <div class="panel-tab-content" id="tab-admin-admins">
-                        <p class="panel-section-title" style="margin-top:0">المشرفون الحاليون</p>
+                        <p class="panel-section-title" style="margin-top:0" data-i18n="panel.currentAdmins">المشرفون الحاليون</p>
                         <div id="admin-list" style="margin-bottom:16px"></div>
 
-                        <p class="panel-section-title">تحديد مشرف من الحسابات</p>
-                        <input type="text" id="directory-admins-search" class="directory-search" placeholder="دوّر بالاسم أو الإيميل..." oninput="renderUsersDirectory()" />
-                        <p class="directory-hint">اضغط على الرتبة اللي عايزها لأي حساب عشان تخليه مشرف عادي أو رئيسي فورًا</p>
+                        <p class="panel-section-title" data-i18n="panel.selectAdminFromAccounts">تحديد مشرف من الحسابات</p>
+                        <input type="text" id="directory-admins-search" class="directory-search" data-i18n-placeholder="panel.searchNameOrEmail" placeholder="دوّر بالاسم أو الإيميل..." oninput="renderUsersDirectory()" />
+                        <p class="directory-hint" data-i18n="panel.roleHint">اضغط على الرتبة اللي عايزها لأي حساب عشان تخليه مشرف عادي أو رئيسي فورًا</p>
                         <div id="admin-directory-list" class="directory-list"></div>
 
-                        <p class="panel-section-title">إضافة يدوية (بالإيميل)</p>
+                        <p class="panel-section-title" data-i18n="panel.manualAddAdmin">إضافة يدوية (بالإيميل)</p>
                         <div class="admin-mgmt-card">
                             <div class="mgmt-row">
-                                <input id="admin-email-input" type="text" placeholder="البريد الإلكتروني" />
+                                <input id="admin-email-input" type="text" data-i18n-placeholder="panel.emailPlaceholder" placeholder="البريد الإلكتروني" />
                                 <select id="admin-role-select">
-                                    <option value="main">رئيسي</option>
-                                    <option value="normal" selected>عادي</option>
+                                    <option value="main" data-i18n="panel.roleMain">رئيسي</option>
+                                    <option value="normal" selected data-i18n="panel.roleNormal">عادي</option>
                                 </select>
                             </div>
-                            <button class="mgmt-btn" onclick="handleAddAdmin()" style="display:inline-flex;align-items:center;gap:5px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> إضافة مشرف</button>
+                            <button class="mgmt-btn" onclick="handleAddAdmin()" style="display:inline-flex;align-items:center;gap:5px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> <span data-i18n="panel.addAdminBtn">إضافة مشرف</span></button>
                         </div>
                     </div>
 
@@ -2747,25 +2747,25 @@
 
                     <div class="panel-tab-content" id="tab-admin-issues">
                         <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
-                            <button class="comment-delete-btn" onclick="clearAllAdminIssues()" style="display:inline-flex;align-items:center;gap:5px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg> مسح الكل</button>
+                            <button class="comment-delete-btn" onclick="clearAllAdminIssues()" style="display:inline-flex;align-items:center;gap:5px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg> <span data-i18n="panel.clearAll">مسح الكل</span></button>
                         </div>
                         <div id="admin-issues-list"></div>
                     </div>
 
                     <!-- Users Management -->
                     <div class="panel-tab-content" id="tab-admin-users">
-                        <p class="panel-section-title" style="margin-top:0">إدارة كل الحسابات</p>
-                        <p class="directory-hint">قائمة بكل الحسابات اللي دخلت المنصة — اضغط "توقيف" عشان توقف أي حساب فورًا (كراش)، أو "رفع التوقيف" لإرجاعه</p>
-                        <input type="text" id="directory-users-search" class="directory-search" placeholder="دوّر بالاسم أو الإيميل..." oninput="renderUsersDirectory()" />
+                        <p class="panel-section-title" style="margin-top:0" data-i18n="panel.manageAllAccounts">إدارة كل الحسابات</p>
+                        <p class="directory-hint" data-i18n="panel.manageAccountsHint">قائمة بكل الحسابات اللي دخلت المنصة — اضغط "توقيف" عشان توقف أي حساب فورًا (كراش)، أو "رفع التوقيف" لإرجاعه</p>
+                        <input type="text" id="directory-users-search" class="directory-search" data-i18n-placeholder="panel.searchNameOrEmail" placeholder="دوّر بالاسم أو الإيميل..." oninput="renderUsersDirectory()" />
                         <div id="accounts-list" class="directory-list"></div>
 
-                        <p class="panel-section-title">توقيف يدوي (بالـ UID)</p>
+                        <p class="panel-section-title" data-i18n="panel.manualSuspend">توقيف يدوي (بالـ UID)</p>
                         <div style="display:flex;gap:8px;margin-bottom:10px">
-                            <input type="text" id="suspend-uid-input" placeholder="UID المستخدم..." style="flex:1;padding:8px 12px;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:#fff;font-size:13px;outline:none"/>
+                            <input type="text" id="suspend-uid-input" data-i18n-placeholder="panel.uidPlaceholder" placeholder="UID المستخدم..." style="flex:1;padding:8px 12px;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:#fff;font-size:13px;outline:none"/>
                         </div>
                         <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
-                            <button class="btn-suspend" onclick="suspendUser()" style="display:inline-flex;align-items:center;gap:5px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg> توقيف الحساب</button>
-                            <button class="btn-unsuspend" onclick="unsuspendUser()" style="display:inline-flex;align-items:center;gap:5px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> رفع التوقيف</button>
+                            <button class="btn-suspend" onclick="suspendUser()" style="display:inline-flex;align-items:center;gap:5px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg> <span data-i18n="panel.suspendAccount">توقيف الحساب</span></button>
+                            <button class="btn-unsuspend" onclick="unsuspendUser()" style="display:inline-flex;align-items:center;gap:5px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> <span data-i18n="panel.unsuspendAccount">رفع التوقيف</span></button>
                         </div>
                     </div>
 
@@ -2887,7 +2887,7 @@
     <div id="profile-modal">
         <div class="profile-fs-header">
             <button class="profile-fs-back" onclick="closeProfileModal()">✕</button>
-            <span class="profile-fs-title" style="display:flex;align-items:center;gap:7px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="12" x2="10" y2="12"/><line x1="8" y1="10" x2="8" y2="14"/><circle cx="15" cy="12" r="1" fill="currentColor"/><circle cx="17" cy="10" r="1" fill="currentColor"/><path d="M6 8h12a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2z"/></svg> الملف الشخصي</span>
+            <span class="profile-fs-title" style="display:flex;align-items:center;gap:7px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="12" x2="10" y2="12"/><line x1="8" y1="10" x2="8" y2="14"/><circle cx="15" cy="12" r="1" fill="currentColor"/><circle cx="17" cy="10" r="1" fill="currentColor"/><path d="M6 8h12a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2z"/></svg> <span data-i18n="profile.title">الملف الشخصي</span></span>
         </div>
         <div class="profile-fs-cover">
             <div class="profile-fs-cover-pattern"></div>
@@ -2900,64 +2900,64 @@
         <div class="profile-fs-body">
             <div class="profile-fs-userinfo">
                 <div class="profile-fs-username" id="profile-display-name">—</div>
-                <div class="profile-fs-userrole" id="profile-display-role" style="display:flex;align-items:center;gap:5px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> مستخدم</div>
+                <div class="profile-fs-userrole" id="profile-display-role" style="display:flex;align-items:center;gap:5px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> <span data-i18n="role.user">مستخدم</span></div>
                 <div class="follow-stats-row" id="profile-follow-stats"></div>
             </div>
             <div class="profile-fs-card">
-                <div class="profile-fs-card-title">صورة الغلاف (الخلفية)</div>
+                <div class="profile-fs-card-title" data-i18n="profile.coverPhoto">صورة الغلاف (الخلفية)</div>
                 <div class="profile-avatar-url-wrap">
-                    <label>رابط صورة الغلاف اللي تظهر ورا الشعار (Google Drive)</label>
+                    <label data-i18n="profile.coverPhotoLabel">رابط صورة الغلاف اللي تظهر ورا الشعار (Google Drive)</label>
                     <input type="url" id="profile-cover-url" class="profile-avatar-url-input"
                         placeholder="https://drive.google.com/..." oninput="previewProfileCover(this.value)" />
                 </div>
             </div>
             <div class="profile-fs-card">
-                <div class="profile-fs-card-title">صورة البروفايل</div>
+                <div class="profile-fs-card-title" data-i18n="profile.profilePhoto">صورة البروفايل</div>
                 <div class="profile-avatar-url-wrap">
-                    <label>رابط صورة البروفايل (Google Drive)</label>
+                    <label data-i18n="profile.profilePhotoLabel">رابط صورة البروفايل (Google Drive)</label>
                     <input type="url" id="profile-photo-url" class="profile-avatar-url-input"
                         placeholder="https://drive.google.com/file/d/.../view"
                         oninput="previewProfilePhoto(this.value)" />
                 </div>
             </div>
             <div class="profile-fs-card">
-                <div class="profile-fs-card-title">لون الدائرة حول صورتك</div>
+                <div class="profile-fs-card-title" data-i18n="profile.ringColor">لون الدائرة حول صورتك</div>
                 <div class="profile-avatar-url-wrap" style="display:flex;align-items:center;gap:10px;">
                     <input type="color" id="profile-ring-color" value="#c026d3"
                         style="width:46px;height:36px;border:1px solid var(--border);border-radius:8px;background:transparent;cursor:pointer;padding:2px;"
                         oninput="this.dataset.cleared='';previewProfileRingColor(this.value)" />
-                    <span style="font-size:12px;color:var(--text-dim);flex:1">اختار أي لون يعجبك للدائرة المضيئة حوالين صورتك</span>
-                    <button type="button" onclick="resetProfileRingColor()" style="background:var(--surface);border:1px solid var(--border);color:var(--text-dim);border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer">افتراضي</button>
+                    <span style="font-size:12px;color:var(--text-dim);flex:1" data-i18n="profile.ringColorHint">اختار أي لون يعجبك للدائرة المضيئة حوالين صورتك</span>
+                    <button type="button" onclick="resetProfileRingColor()" style="background:var(--surface);border:1px solid var(--border);color:var(--text-dim);border-radius:8px;padding:6px 10px;font-size:12px;cursor:pointer" data-i18n="profile.defaultBtn">افتراضي</button>
                 </div>
             </div>
             <div class="profile-fs-card">
-                <div class="profile-fs-card-title">نغمة رنين المكالمات</div>
-                <p style="font-size:12px;color:var(--text-dim);margin:0 0 10px">اختار النغمة اللي هتسمعها وقت ما حد يتصل بيك — كل شخص يقدر يختار نغمته الخاصة، أو يضيف نغمته الشخصية (رابط واحد بس لكل حساب)</p>
+                <div class="profile-fs-card-title" data-i18n="profile.ringtone">نغمة رنين المكالمات</div>
+                <p style="font-size:12px;color:var(--text-dim);margin:0 0 10px" data-i18n="profile.ringtoneHint">اختار النغمة اللي هتسمعها وقت ما حد يتصل بيك — كل شخص يقدر يختار نغمته الخاصة، أو يضيف نغمته الشخصية (رابط واحد بس لكل حساب)</p>
                 <div class="ringtone-grid" id="profile-ringtone-grid" data-selected="classic"></div>
             </div>
             <div class="profile-fs-card">
-                <div class="profile-fs-card-title">المعلومات الشخصية</div>
+                <div class="profile-fs-card-title" data-i18n="profile.personalInfo">المعلومات الشخصية</div>
                 <div class="profile-field">
-                    <label class="profile-label">الاسم</label>
-                    <input type="text" id="profile-name-input" class="profile-input" placeholder="اسمك..." />
+                    <label class="profile-label" data-i18n="profile.nameLabel">الاسم</label>
+                    <input type="text" id="profile-name-input" class="profile-input" data-i18n-placeholder="profile.namePlaceholder" placeholder="اسمك..." />
                 </div>
                 <div class="profile-field">
-                    <label class="profile-label">النوع</label>
+                    <label class="profile-label" data-i18n="profile.genderLabel">النوع</label>
                     <select id="profile-gender-select" class="profile-select">
-                        <option value="">-- اختر --</option>
-                        <option value="ذكر">ذكر</option>
-                        <option value="أنثى">أنثى</option>
-                        <option value="أفضل عدم الذكر">أفضل عدم الذكر</option>
+                        <option value="" data-i18n="profile.genderChoose">-- اختر --</option>
+                        <option value="ذكر" data-i18n="profile.genderMale">ذكر</option>
+                        <option value="أنثى" data-i18n="profile.genderFemale">أنثى</option>
+                        <option value="أفضل عدم الذكر" data-i18n="profile.genderPreferNot">أفضل عدم الذكر</option>
                     </select>
                 </div>
                 <div class="profile-field">
-                    <label class="profile-label">الجنسية</label>
-                    <input type="text" id="profile-nationality-input" class="profile-input" placeholder="مثال: مصري، سعودي..." />
+                    <label class="profile-label" data-i18n="profile.nationalityLabel">الجنسية</label>
+                    <input type="text" id="profile-nationality-input" class="profile-input" data-i18n-placeholder="profile.nationalityPlaceholder" placeholder="مثال: مصري، سعودي..." />
                 </div>
             </div>
-            <p id="profile-save-msg" style="color:#4fc3f7;font-size:13px;display:none;margin-bottom:8px;text-align:center">✅ تم حفظ التغييرات</p>
+            <p id="profile-save-msg" style="color:#4fc3f7;font-size:13px;display:none;margin-bottom:8px;text-align:center">✅ <span data-i18n="profile.saveSuccess">تم حفظ التغييرات</span></p>
             <p id="profile-save-err" style="color:#ff7a7a;font-size:13px;display:none;margin-bottom:8px;text-align:center"></p>
-            <button class="profile-save-btn" id="profile-save-btn" onclick="saveProfileChanges()">💾 حفظ التغييرات</button>
+            <button class="profile-save-btn" id="profile-save-btn" onclick="saveProfileChanges()">💾 <span data-i18n="profile.saveBtn">حفظ التغييرات</span></button>
         </div>
     </div>
 
@@ -2994,11 +2994,11 @@
     <div id="members-modal">
         <div class="profile-fs-header">
             <button class="profile-fs-back" onclick="closeMembersModal()">✕</button>
-            <span class="profile-fs-title" style="display:flex;align-items:center;gap:7px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> الأعضاء</span>
+            <span class="profile-fs-title" style="display:flex;align-items:center;gap:7px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> <span data-i18n="members.title">الأعضاء</span></span>
         </div>
         <div class="members-fs-body">
-            <input type="text" id="members-search" class="directory-search" placeholder="دوّر عن عضو بالاسم..." oninput="renderMembersList()" />
-            <p class="directory-hint">تابع أعضاء المنصة عشان تفضل قريب من أنشطتهم — يقدر أي عضو يشوف عدد متابعينه في ملفه الشخصي</p>
+            <input type="text" id="members-search" class="directory-search" data-i18n-placeholder="members.searchPlaceholder" placeholder="دوّر عن عضو بالاسم..." oninput="renderMembersList()" />
+            <p class="directory-hint" data-i18n="members.hint">تابع أعضاء المنصة عشان تفضل قريب من أنشطتهم — يقدر أي عضو يشوف عدد متابعينه في ملفه الشخصي</p>
             <div id="members-list" class="directory-list members-fs-list"></div>
         </div>
     </div>
@@ -3007,10 +3007,10 @@
     <div id="conversations-modal">
         <div class="profile-fs-header">
             <button class="profile-fs-back" onclick="closeConversationsModal()">✕</button>
-            <span class="profile-fs-title" style="display:flex;align-items:center;gap:7px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg> محادثاتي</span>
+            <span class="profile-fs-title" style="display:flex;align-items:center;gap:7px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg> <span data-i18n="chats.title">محادثاتي</span></span>
         </div>
         <div class="members-fs-body">
-            <p class="directory-hint">كل المحادثات اللي بدأتها مع الأعضاء — دوس على أي حد عشان تكمل الكلام. عايز تبدأ محادثة جديدة؟ روح لصفحة "الأعضاء"</p>
+            <p class="directory-hint" data-i18n="chats.hint">كل المحادثات اللي بدأتها مع الأعضاء — دوس على أي حد عشان تكمل الكلام. عايز تبدأ محادثة جديدة؟ روح لصفحة "الأعضاء"</p>
             <div id="conversations-list" class="directory-list members-fs-list"></div>
         </div>
     </div>
@@ -3019,30 +3019,30 @@
     <div id="games-modal">
         <div class="profile-fs-header">
             <button class="profile-fs-back" id="games-header-back" onclick="closeGamesModal()">✕</button>
-            <span class="profile-fs-title" style="display:flex;align-items:center;gap:7px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="12" x2="10" y2="12"/><line x1="8" y1="10" x2="8" y2="14"/><circle cx="15" cy="12" r="1" fill="currentColor"/><circle cx="17" cy="10" r="1" fill="currentColor"/><path d="M6 8h12a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2z"/></svg> ألعاب أونلاين</span>
+            <span class="profile-fs-title" style="display:flex;align-items:center;gap:7px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="12" x2="10" y2="12"/><line x1="8" y1="10" x2="8" y2="14"/><circle cx="15" cy="12" r="1" fill="currentColor"/><circle cx="17" cy="10" r="1" fill="currentColor"/><path d="M6 8h12a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2z"/></svg> <span data-i18n="games.title">ألعاب أونلاين</span></span>
         </div>
         <div class="games-fs-body">
 
             <!-- Player count selection -->
             <div id="games-player-select" class="players-select-wrap">
-                <div class="players-select-title">عايز تلعب بكام لاعب؟</div>
-                <p class="directory-hint">اختار عدد اللاعبين وهنورّيك الألعاب المتاحة بنفس العدد</p>
+                <div class="players-select-title" data-i18n="games.selectTitle">عايز تلعب بكام لاعب؟</div>
+                <p class="directory-hint" data-i18n="games.selectHint">اختار عدد اللاعبين وهنورّيك الألعاب المتاحة بنفس العدد</p>
                 <div class="players-select-grid">
                     <div class="player-count-card" onclick="selectGamesPlayerCount(1)">
                         <div class="player-count-icon" style="display:flex;justify-content:center"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="4"/><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/></svg></div>
-                        <div class="player-count-label">لاعب واحد</div>
+                        <div class="player-count-label" data-i18n="players.one">لاعب واحد</div>
                     </div>
                     <div class="player-count-card" onclick="selectGamesPlayerCount(2)">
                         <div class="player-count-icon" style="display:flex;justify-content:center"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
-                        <div class="player-count-label">لاعبين اتنين</div>
+                        <div class="player-count-label" data-i18n="players.two">لاعبين اتنين</div>
                     </div>
                     <div class="player-count-card" onclick="selectGamesPlayerCount(3)">
                         <div class="player-count-icon" style="display:flex;justify-content:center"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><g transform="translate(0,6) scale(0.42)"><circle cx="12" cy="7" r="4"/><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/></g><g transform="translate(7,6) scale(0.42)"><circle cx="12" cy="7" r="4"/><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/></g><g transform="translate(14,6) scale(0.42)"><circle cx="12" cy="7" r="4"/><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/></g></svg></div>
-                        <div class="player-count-label">تلات لاعبين</div>
+                        <div class="player-count-label" data-i18n="players.three">تلات لاعبين</div>
                     </div>
                     <div class="player-count-card" onclick="selectGamesPlayerCount(4)">
                         <div class="player-count-icon" style="display:flex;justify-content:center"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><g transform="translate(-1.1,6.6) scale(0.34)"><circle cx="12" cy="7" r="4"/><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/></g><g transform="translate(4.9,6.6) scale(0.34)"><circle cx="12" cy="7" r="4"/><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/></g><g transform="translate(10.9,6.6) scale(0.34)"><circle cx="12" cy="7" r="4"/><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/></g><g transform="translate(16.9,6.6) scale(0.34)"><circle cx="12" cy="7" r="4"/><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/></g></svg></div>
-                        <div class="player-count-label">أربع لاعبين</div>
+                        <div class="player-count-label" data-i18n="players.four">أربع لاعبين</div>
                     </div>
                 </div>
             </div>
@@ -3302,10 +3302,10 @@
             <div class="modal-field">
                 <label class="modal-label">عدد اللاعبين *</label>
                 <select id="add-game-players" class="modal-input">
-                    <option value="1">لاعب واحد</option>
-                    <option value="2">لاعبين اتنين</option>
-                    <option value="3">تلات لاعبين</option>
-                    <option value="4">أربع لاعبين</option>
+                    <option value="1" data-i18n="players.one">لاعب واحد</option>
+                    <option value="2" data-i18n="players.two">لاعبين اتنين</option>
+                    <option value="3" data-i18n="players.three">تلات لاعبين</option>
+                    <option value="4" data-i18n="players.four">أربع لاعبين</option>
                 </select>
             </div>
             <div class="modal-field">
@@ -3347,10 +3347,10 @@
             <div class="modal-field">
                 <label class="modal-label">عدد اللاعبين *</label>
                 <select id="edit-game-players" class="modal-input">
-                    <option value="1">لاعب واحد</option>
-                    <option value="2">لاعبين اتنين</option>
-                    <option value="3">تلات لاعبين</option>
-                    <option value="4">أربع لاعبين</option>
+                    <option value="1" data-i18n="players.one">لاعب واحد</option>
+                    <option value="2" data-i18n="players.two">لاعبين اتنين</option>
+                    <option value="3" data-i18n="players.three">تلات لاعبين</option>
+                    <option value="4" data-i18n="players.four">أربع لاعبين</option>
                 </select>
             </div>
             <div class="modal-field">
@@ -3598,7 +3598,29 @@
                 'panel.tabAdmins': 'مشرفين', 'panel.tabRatings': 'تقييمات', 'panel.tabComments': 'تعليقات', 'panel.tabIssues': 'أعطال', 'panel.tabUsers': 'المستخدمين',
                 'panel.editProfile': 'اضغط لتعديل الملف', 'panel.addVideo': '+ رفع فيديو',
                 'games.hint': 'ألعاب حصرية على GAMEVERSE — العب لوحدك وحاول تكسر رقمك القياسي', 'games.changeCount': 'غيّر العدد', 'games.addGame': '+ إضافة لعبة',
-                'role.mainAdmin': 'مشرف رئيسي', 'role.normalAdmin': 'مشرف عادي', 'role.user': 'عادي',
+                'role.mainAdmin': 'مشرف رئيسي', 'role.normalAdmin': 'مشرف عادي', 'role.user': 'مستخدم',
+                'members.title': 'الأعضاء', 'members.searchPlaceholder': 'دوّر عن عضو بالاسم...',
+                'members.hint': 'تابع أعضاء المنصة عشان تفضل قريب من أنشطتهم — يقدر أي عضو يشوف عدد متابعينه في ملفه الشخصي',
+                'chats.title': 'محادثاتي', 'chats.hint': 'كل المحادثات اللي بدأتها مع الأعضاء — دوس على أي حد عشان تكمل الكلام. عايز تبدأ محادثة جديدة؟ روح لصفحة "الأعضاء"',
+                'chats.empty': 'لسه معملتش أي محادثة — روح "الأعضاء" وابدأ كلام مع حد 👋',
+                'games.title': 'ألعاب أونلاين', 'games.selectTitle': 'عايز تلعب بكام لاعب؟', 'games.selectHint': 'اختار عدد اللاعبين وهنورّيك الألعاب المتاحة بنفس العدد',
+                'games.searchingFor': 'بتدور على ألعاب لـ',
+                'players.one': 'لاعب واحد', 'players.two': 'لاعبين اتنين', 'players.three': 'تلات لاعبين', 'players.four': 'أربع لاعبين',
+                'panel.currentAdmins': 'المشرفون الحاليون', 'panel.selectAdminFromAccounts': 'تحديد مشرف من الحسابات',
+                'panel.searchNameOrEmail': 'دوّر بالاسم أو الإيميل...', 'panel.roleHint': 'اضغط على الرتبة اللي عايزها لأي حساب عشان تخليه مشرف عادي أو رئيسي فورًا',
+                'panel.manualAddAdmin': 'إضافة يدوية (بالإيميل)', 'panel.emailPlaceholder': 'البريد الإلكتروني',
+                'panel.roleMain': 'رئيسي', 'panel.roleNormal': 'عادي', 'panel.addAdminBtn': 'إضافة مشرف',
+                'panel.manageAllAccounts': 'إدارة كل الحسابات',
+                'panel.manageAccountsHint': 'قائمة بكل الحسابات اللي دخلت المنصة — اضغط "توقيف" عشان توقف أي حساب فورًا (كراش)، أو "رفع التوقيف" لإرجاعه',
+                'panel.manualSuspend': 'توقيف يدوي (بالـ UID)', 'panel.uidPlaceholder': 'UID المستخدم...',
+                'panel.suspendAccount': 'توقيف الحساب', 'panel.unsuspendAccount': 'رفع التوقيف', 'panel.clearAll': 'مسح الكل',
+                'directory.loading': 'جاري تحميل الأعضاء', 'directory.attempt': 'محاولة',
+                'directory.loadError': 'تعذر تحميل قائمة الأعضاء بعد {n} محاولات — تأكد من الاتصال أو صلاحيات Firestore',
+                'directory.retry': 'إعادة المحاولة', 'directory.you': 'أنت', 'directory.retrying': 'جاري إعادة المحاولة', 'directory.connectError': 'تعذر الاتصال بالسيرفر لتحميل قائمة الحسابات',
+                'toast.onlyMainAdminCanAdd': 'فقط المشرف الرئيسي يمكنه إضافة مشرفين', 'toast.enterEmailOrUid': 'أدخل البريد الإلكتروني أو UID',
+                'toast.roleUpdated': 'تم تحديث الصلاحية:',
+                'toast.onlyMainAdminCanSuspend': 'فقط المشرف الرئيسي يقدر يوقف حسابات', 'toast.enterUid': 'أدخل UID المستخدم', 'confirm.suspendAccount': 'تأكيد توقيف الحساب: {uid}؟', 'toast.accountSuspended': 'تم توقيف الحساب', 'toast.onlyMainAdminCanUnsuspend': 'فقط المشرف الرئيسي يقدر يرفع التوقيف', 'confirm.unsuspendAccount': 'رفع توقيف الحساب: {uid}؟', 'toast.accountUnsuspended': 'تم رفع التوقيف', 'toast.cantSuspendSelf': 'ما تقدرش توقف حسابك الشخصي', 'verb.unsuspend': 'رفع التوقيف عن', 'verb.suspend': 'توقيف', 'confirm.confirmVerbAccount': 'تأكيد {verb} حساب {name}؟', 'toast.unsuspendedName': 'تم رفع التوقيف عن {name}', 'toast.suspendedName': 'تم توقيف {name}',
+                'profile.title': 'الملف الشخصي', 'profile.coverPhoto': 'صورة الغلاف (الخلفية)', 'profile.coverPhotoLabel': 'رابط صورة الغلاف اللي تظهر ورا الشعار (Google Drive)', 'profile.profilePhoto': 'صورة البروفايل', 'profile.profilePhotoLabel': 'رابط صورة البروفايل (Google Drive)', 'profile.ringColor': 'لون الدائرة حول صورتك', 'profile.ringColorHint': 'اختار أي لون يعجبك للدائرة المضيئة حوالين صورتك', 'profile.defaultBtn': 'افتراضي', 'profile.ringtone': 'نغمة رنين المكالمات', 'profile.ringtoneHint': 'اختار النغمة اللي هتسمعها وقت ما حد يتصل بيك — كل شخص يقدر يختار نغمته الخاصة، أو يضيف نغمته الشخصية (رابط واحد بس لكل حساب)', 'profile.personalInfo': 'المعلومات الشخصية', 'profile.nameLabel': 'الاسم', 'profile.namePlaceholder': 'اسمك...', 'profile.genderLabel': 'النوع', 'profile.genderChoose': '-- اختر --', 'profile.genderMale': 'ذكر', 'profile.genderFemale': 'أنثى', 'profile.genderPreferNot': 'أفضل عدم الذكر', 'profile.nationalityLabel': 'الجنسية', 'profile.nationalityPlaceholder': 'مثال: مصري، سعودي...', 'profile.saveSuccess': 'تم حفظ التغييرات', 'profile.saveBtn': 'حفظ التغييرات',
             },
             en: {
                 'menu.navSection': 'Navigation', 'menu.home': 'Home', 'menu.unlockedVideos': 'Unlocked Videos',
@@ -3614,6 +3636,28 @@
                 'panel.editProfile': 'Tap to edit profile', 'panel.addVideo': '+ Upload video',
                 'games.hint': 'Exclusive games on GAMEVERSE — play solo and try to beat your high score', 'games.changeCount': 'Change count', 'games.addGame': '+ Add game',
                 'role.mainAdmin': 'Main Admin', 'role.normalAdmin': 'Admin', 'role.user': 'Member',
+                'members.title': 'Members', 'members.searchPlaceholder': 'Search a member by name...',
+                'members.hint': "Follow platform members to stay close to their activity — any member can see their follower count on their profile",
+                'chats.title': 'My Chats', 'chats.hint': 'All the conversations you\'ve started with members — tap anyone to keep chatting. Want to start a new conversation? Go to the "Members" page',
+                'chats.empty': 'No conversations yet — go to "Members" and start chatting with someone 👋',
+                'games.title': 'Online Games', 'games.selectTitle': 'How many players?', 'games.selectHint': "Pick the number of players and we'll show you games available for that count",
+                'games.searchingFor': 'Showing games for',
+                'players.one': 'One player', 'players.two': 'Two players', 'players.three': 'Three players', 'players.four': 'Four players',
+                'panel.currentAdmins': 'Current Admins', 'panel.selectAdminFromAccounts': 'Set an admin from accounts',
+                'panel.searchNameOrEmail': 'Search by name or email...', 'panel.roleHint': 'Tap the role you want for any account to instantly make it a regular or main admin',
+                'panel.manualAddAdmin': 'Add manually (by email)', 'panel.emailPlaceholder': 'Email address',
+                'panel.roleMain': 'Main', 'panel.roleNormal': 'Regular', 'panel.addAdminBtn': 'Add Admin',
+                'panel.manageAllAccounts': 'Manage all accounts',
+                'panel.manageAccountsHint': 'A list of every account that has entered the platform — tap "Suspend" to instantly suspend any account (crash), or "Unsuspend" to restore it',
+                'panel.manualSuspend': 'Manual suspend (by UID)', 'panel.uidPlaceholder': 'User UID...',
+                'panel.suspendAccount': 'Suspend Account', 'panel.unsuspendAccount': 'Unsuspend', 'panel.clearAll': 'Clear All',
+                'directory.loading': 'Loading members', 'directory.attempt': 'attempt',
+                'directory.loadError': 'Could not load the members list after {n} attempts — check your connection or Firestore permissions',
+                'directory.retry': 'Retry', 'directory.you': 'you', 'directory.retrying': 'Retrying', 'directory.connectError': 'Could not connect to the server to load the accounts list',
+                'toast.onlyMainAdminCanAdd': 'Only the main admin can add admins', 'toast.enterEmailOrUid': 'Enter an email address or UID',
+                'toast.roleUpdated': 'Role updated:',
+                'toast.onlyMainAdminCanSuspend': 'Only the main admin can suspend accounts', 'toast.enterUid': 'Enter the user UID', 'confirm.suspendAccount': 'Confirm suspending account: {uid}?', 'toast.accountSuspended': 'Account suspended', 'toast.onlyMainAdminCanUnsuspend': 'Only the main admin can unsuspend accounts', 'confirm.unsuspendAccount': 'Unsuspend account: {uid}?', 'toast.accountUnsuspended': 'Account unsuspended', 'toast.cantSuspendSelf': 'You can't suspend your own account', 'verb.unsuspend': 'unsuspend', 'verb.suspend': 'suspend', 'confirm.confirmVerbAccount': 'Confirm {verb} account {name}?', 'toast.unsuspendedName': 'Unsuspended {name}', 'toast.suspendedName': 'Suspended {name}',
+                'profile.title': 'Profile', 'profile.coverPhoto': 'Cover Photo (Background)', 'profile.coverPhotoLabel': 'Cover photo link shown behind your logo (Google Drive)', 'profile.profilePhoto': 'Profile Photo', 'profile.profilePhotoLabel': 'Profile photo link (Google Drive)', 'profile.ringColor': 'Ring color around your photo', 'profile.ringColorHint': 'Pick any color you like for the glowing ring around your photo', 'profile.defaultBtn': 'Default', 'profile.ringtone': 'Call Ringtone', 'profile.ringtoneHint': 'Choose the tone you'll hear when someone calls you — each person can pick their own tone, or add a personal one (one link per account)', 'profile.personalInfo': 'Personal Information', 'profile.nameLabel': 'Name', 'profile.namePlaceholder': 'Your name...', 'profile.genderLabel': 'Gender', 'profile.genderChoose': '-- Select --', 'profile.genderMale': 'Male', 'profile.genderFemale': 'Female', 'profile.genderPreferNot': 'Prefer not to say', 'profile.nationalityLabel': 'Nationality', 'profile.nationalityPlaceholder': 'e.g. Egyptian, Saudi...', 'profile.saveSuccess': 'Changes saved', 'profile.saveBtn': 'Save Changes',
             },
             fr: {
                 'menu.navSection': 'Navigation', 'menu.home': 'Accueil', 'menu.unlockedVideos': 'Vidéos débloquées',
@@ -3629,6 +3673,28 @@
                 'panel.editProfile': 'Touchez pour modifier le profil', 'panel.addVideo': '+ Ajouter une vidéo',
                 'games.hint': 'Jeux exclusifs sur GAMEVERSE — jouez seul et battez votre record', 'games.changeCount': 'Changer le nombre', 'games.addGame': '+ Ajouter un jeu',
                 'role.mainAdmin': 'Admin principal', 'role.normalAdmin': 'Admin', 'role.user': 'Membre',
+                'members.title': 'Membres', 'members.searchPlaceholder': 'Rechercher un membre par nom...',
+                'members.hint': "Suivez les membres de la plateforme pour rester proche de leur activité — chaque membre peut voir son nombre d'abonnés sur son profil",
+                'chats.title': 'Mes discussions', 'chats.hint': 'Toutes les conversations que vous avez commencées avec des membres — touchez quelqu\'un pour continuer à discuter. Envie de commencer une nouvelle conversation ? Allez sur la page "Membres"',
+                'chats.empty': 'Pas encore de conversation — allez sur "Membres" et commencez à discuter avec quelqu\'un 👋',
+                'games.title': 'Jeux en ligne', 'games.selectTitle': 'Combien de joueurs ?', 'games.selectHint': 'Choisissez le nombre de joueurs et nous vous montrerons les jeux disponibles pour ce nombre',
+                'games.searchingFor': 'Affichage des jeux pour',
+                'players.one': 'Un joueur', 'players.two': 'Deux joueurs', 'players.three': 'Trois joueurs', 'players.four': 'Quatre joueurs',
+                'panel.currentAdmins': 'Admins actuels', 'panel.selectAdminFromAccounts': 'Définir un admin depuis les comptes',
+                'panel.searchNameOrEmail': 'Rechercher par nom ou email...', 'panel.roleHint': "Touchez le rôle souhaité pour un compte afin d'en faire instantanément un admin normal ou principal",
+                'panel.manualAddAdmin': 'Ajout manuel (par email)', 'panel.emailPlaceholder': 'Adresse email',
+                'panel.roleMain': 'Principal', 'panel.roleNormal': 'Normal', 'panel.addAdminBtn': 'Ajouter un admin',
+                'panel.manageAllAccounts': 'Gérer tous les comptes',
+                'panel.manageAccountsHint': 'Liste de tous les comptes ayant rejoint la plateforme — touchez "Suspendre" pour suspendre instantanément un compte (crash), ou "Réactiver" pour le restaurer',
+                'panel.manualSuspend': 'Suspension manuelle (par UID)', 'panel.uidPlaceholder': 'UID utilisateur...',
+                'panel.suspendAccount': 'Suspendre le compte', 'panel.unsuspendAccount': 'Réactiver', 'panel.clearAll': 'Tout effacer',
+                'directory.loading': 'Chargement des membres', 'directory.attempt': 'tentative',
+                'directory.loadError': "Impossible de charger la liste des membres après {n} tentatives — vérifiez votre connexion ou les permissions Firestore",
+                'directory.retry': 'Réessayer', 'directory.you': 'vous', 'directory.retrying': 'Nouvelle tentative', 'directory.connectError': 'Impossible de se connecter au serveur pour charger la liste des comptes',
+                'toast.onlyMainAdminCanAdd': "Seul l'admin principal peut ajouter des admins", 'toast.enterEmailOrUid': 'Entrez une adresse email ou un UID',
+                'toast.roleUpdated': 'Rôle mis à jour :',
+                'toast.onlyMainAdminCanSuspend': 'Seul l'admin principal peut suspendre des comptes', 'toast.enterUid': 'Entrez l'UID de l'utilisateur', 'confirm.suspendAccount': 'Confirmer la suspension du compte : {uid} ?', 'toast.accountSuspended': 'Compte suspendu', 'toast.onlyMainAdminCanUnsuspend': 'Seul l'admin principal peut réactiver des comptes', 'confirm.unsuspendAccount': 'Réactiver le compte : {uid} ?', 'toast.accountUnsuspended': 'Compte réactivé', 'toast.cantSuspendSelf': 'Vous ne pouvez pas suspendre votre propre compte', 'verb.unsuspend': 'réactiver', 'verb.suspend': 'suspendre', 'confirm.confirmVerbAccount': 'Confirmer {verb} le compte {name} ?', 'toast.unsuspendedName': '{name} réactivé', 'toast.suspendedName': '{name} suspendu',
+                'profile.title': 'Profil', 'profile.coverPhoto': 'Photo de couverture (arrière-plan)', 'profile.coverPhotoLabel': 'Lien de la photo de couverture affichée derrière le logo (Google Drive)', 'profile.profilePhoto': 'Photo de profil', 'profile.profilePhotoLabel': 'Lien de la photo de profil (Google Drive)', 'profile.ringColor': 'Couleur de l'anneau autour de votre photo', 'profile.ringColorHint': 'Choisissez la couleur que vous préférez pour l'anneau lumineux autour de votre photo', 'profile.defaultBtn': 'Par défaut', 'profile.ringtone': 'Sonnerie d'appel', 'profile.ringtoneHint': 'Choisissez la sonnerie que vous entendrez quand quelqu'un vous appelle — chacun peut choisir sa propre sonnerie ou en ajouter une personnelle (un seul lien par compte)', 'profile.personalInfo': 'Informations personnelles', 'profile.nameLabel': 'Nom', 'profile.namePlaceholder': 'Votre nom...', 'profile.genderLabel': 'Genre', 'profile.genderChoose': '-- Choisir --', 'profile.genderMale': 'Homme', 'profile.genderFemale': 'Femme', 'profile.genderPreferNot': 'Préfère ne pas préciser', 'profile.nationalityLabel': 'Nationalité', 'profile.nationalityPlaceholder': 'ex : Égyptien, Saoudien...', 'profile.saveSuccess': 'Modifications enregistrées', 'profile.saveBtn': 'Enregistrer les modifications',
             },
             de: {
                 'menu.navSection': 'Navigation', 'menu.home': 'Startseite', 'menu.unlockedVideos': 'Freigeschaltete Videos',
@@ -3644,6 +3710,28 @@
                 'panel.editProfile': 'Zum Bearbeiten des Profils tippen', 'panel.addVideo': '+ Video hochladen',
                 'games.hint': 'Exklusive Spiele auf GAMEVERSE — spiele allein und knacke deinen Rekord', 'games.changeCount': 'Anzahl ändern', 'games.addGame': '+ Spiel hinzufügen',
                 'role.mainAdmin': 'Hauptadmin', 'role.normalAdmin': 'Admin', 'role.user': 'Mitglied',
+                'members.title': 'Mitglieder', 'members.searchPlaceholder': 'Mitglied nach Namen suchen...',
+                'members.hint': 'Folge Plattform-Mitgliedern, um ihren Aktivitäten nah zu bleiben — jedes Mitglied kann seine Follower-Zahl im Profil sehen',
+                'chats.title': 'Meine Chats', 'chats.hint': 'Alle Unterhaltungen, die du mit Mitgliedern begonnen hast — tippe auf jemanden, um weiterzuchatten. Neue Unterhaltung starten? Geh zur Seite "Mitglieder"',
+                'chats.empty': 'Noch keine Unterhaltungen — geh zu "Mitglieder" und chatte mit jemandem 👋',
+                'games.title': 'Online-Spiele', 'games.selectTitle': 'Wie viele Spieler?', 'games.selectHint': 'Wähle die Spieleranzahl und wir zeigen dir passende Spiele',
+                'games.searchingFor': 'Zeige Spiele für',
+                'players.one': 'Ein Spieler', 'players.two': 'Zwei Spieler', 'players.three': 'Drei Spieler', 'players.four': 'Vier Spieler',
+                'panel.currentAdmins': 'Aktuelle Admins', 'panel.selectAdminFromAccounts': 'Admin aus Konten festlegen',
+                'panel.searchNameOrEmail': 'Nach Namen oder E-Mail suchen...', 'panel.roleHint': 'Tippe auf die gewünschte Rolle für ein Konto, um es sofort zum normalen oder Hauptadmin zu machen',
+                'panel.manualAddAdmin': 'Manuell hinzufügen (per E-Mail)', 'panel.emailPlaceholder': 'E-Mail-Adresse',
+                'panel.roleMain': 'Haupt', 'panel.roleNormal': 'Normal', 'panel.addAdminBtn': 'Admin hinzufügen',
+                'panel.manageAllAccounts': 'Alle Konten verwalten',
+                'panel.manageAccountsHint': 'Liste aller Konten, die der Plattform beigetreten sind — tippe auf "Sperren", um ein Konto sofort zu sperren (Crash), oder "Entsperren", um es wiederherzustellen',
+                'panel.manualSuspend': 'Manuell sperren (per UID)', 'panel.uidPlaceholder': 'Benutzer-UID...',
+                'panel.suspendAccount': 'Konto sperren', 'panel.unsuspendAccount': 'Entsperren', 'panel.clearAll': 'Alle löschen',
+                'directory.loading': 'Mitglieder werden geladen', 'directory.attempt': 'Versuch',
+                'directory.loadError': 'Mitgliederliste konnte nach {n} Versuchen nicht geladen werden — prüfe deine Verbindung oder die Firestore-Berechtigungen',
+                'directory.retry': 'Erneut versuchen', 'directory.you': 'du', 'directory.retrying': 'Erneuter Versuch', 'directory.connectError': 'Verbindung zum Server zum Laden der Kontoliste fehlgeschlagen',
+                'toast.onlyMainAdminCanAdd': 'Nur der Hauptadmin kann Admins hinzufügen', 'toast.enterEmailOrUid': 'Gib eine E-Mail-Adresse oder UID ein',
+                'toast.roleUpdated': 'Rolle aktualisiert:',
+                'toast.onlyMainAdminCanSuspend': 'Nur der Hauptadmin kann Konten sperren', 'toast.enterUid': 'Gib die Benutzer-UID ein', 'confirm.suspendAccount': 'Konto sperren bestätigen: {uid}?', 'toast.accountSuspended': 'Konto gesperrt', 'toast.onlyMainAdminCanUnsuspend': 'Nur der Hauptadmin kann Konten entsperren', 'confirm.unsuspendAccount': 'Konto entsperren: {uid}?', 'toast.accountUnsuspended': 'Konto entsperrt', 'toast.cantSuspendSelf': 'Du kannst dein eigenes Konto nicht sperren', 'verb.unsuspend': 'entsperren', 'verb.suspend': 'sperren', 'confirm.confirmVerbAccount': 'Konto {name} {verb} bestätigen?', 'toast.unsuspendedName': '{name} entsperrt', 'toast.suspendedName': '{name} gesperrt',
+                'profile.title': 'Profil', 'profile.coverPhoto': 'Titelbild (Hintergrund)', 'profile.coverPhotoLabel': 'Link zum Titelbild, das hinter dem Logo angezeigt wird (Google Drive)', 'profile.profilePhoto': 'Profilbild', 'profile.profilePhotoLabel': 'Link zum Profilbild (Google Drive)', 'profile.ringColor': 'Ringfarbe um dein Bild', 'profile.ringColorHint': 'Wähle eine beliebige Farbe für den leuchtenden Ring um dein Bild', 'profile.defaultBtn': 'Standard', 'profile.ringtone': 'Anruf-Klingelton', 'profile.ringtoneHint': 'Wähle den Ton, den du hörst, wenn dich jemand anruft — jeder kann seinen eigenen Ton wählen oder einen persönlichen hinzufügen (ein Link pro Konto)', 'profile.personalInfo': 'Persönliche Informationen', 'profile.nameLabel': 'Name', 'profile.namePlaceholder': 'Dein Name...', 'profile.genderLabel': 'Geschlecht', 'profile.genderChoose': '-- Auswählen --', 'profile.genderMale': 'Männlich', 'profile.genderFemale': 'Weiblich', 'profile.genderPreferNot': 'Keine Angabe', 'profile.nationalityLabel': 'Nationalität', 'profile.nationalityPlaceholder': 'z. B. Ägyptisch, Saudisch...', 'profile.saveSuccess': 'Änderungen gespeichert', 'profile.saveBtn': 'Änderungen speichern',
             },
             ru: {
                 'menu.navSection': 'Навигация', 'menu.home': 'Главная', 'menu.unlockedVideos': 'Открытые видео',
@@ -3659,6 +3747,28 @@
                 'panel.editProfile': 'Нажмите, чтобы изменить профиль', 'panel.addVideo': '+ Загрузить видео',
                 'games.hint': 'Эксклюзивные игры на GAMEVERSE — играйте в одиночку и побейте свой рекорд', 'games.changeCount': 'Изменить количество', 'games.addGame': '+ Добавить игру',
                 'role.mainAdmin': 'Главный админ', 'role.normalAdmin': 'Админ', 'role.user': 'Участник',
+                'members.title': 'Участники', 'members.searchPlaceholder': 'Найти участника по имени...',
+                'members.hint': 'Подписывайтесь на участников платформы, чтобы следить за их активностью — каждый участник видит число подписчиков в своём профиле',
+                'chats.title': 'Мои чаты', 'chats.hint': 'Все разговоры, которые вы начали с участниками — нажмите на любого, чтобы продолжить общение. Хотите начать новый разговор? Перейдите на страницу "Участники"',
+                'chats.empty': 'Пока нет разговоров — перейдите в "Участники" и начните общение 👋',
+                'games.title': 'Онлайн-игры', 'games.selectTitle': 'На сколько игроков?', 'games.selectHint': 'Выберите количество игроков, и мы покажем доступные игры',
+                'games.searchingFor': 'Показ игр для',
+                'players.one': 'Один игрок', 'players.two': 'Два игрока', 'players.three': 'Три игрока', 'players.four': 'Четыре игрока',
+                'panel.currentAdmins': 'Текущие админы', 'panel.selectAdminFromAccounts': 'Назначить админа из аккаунтов',
+                'panel.searchNameOrEmail': 'Поиск по имени или email...', 'panel.roleHint': 'Нажмите на нужную роль для аккаунта, чтобы сразу сделать его обычным или главным админом',
+                'panel.manualAddAdmin': 'Добавить вручную (по email)', 'panel.emailPlaceholder': 'Email адрес',
+                'panel.roleMain': 'Главный', 'panel.roleNormal': 'Обычный', 'panel.addAdminBtn': 'Добавить админа',
+                'panel.manageAllAccounts': 'Управление всеми аккаунтами',
+                'panel.manageAccountsHint': 'Список всех аккаунтов, зашедших на платформу — нажмите "Заблокировать", чтобы мгновенно заблокировать аккаунт (крах), или "Разблокировать", чтобы восстановить его',
+                'panel.manualSuspend': 'Ручная блокировка (по UID)', 'panel.uidPlaceholder': 'UID пользователя...',
+                'panel.suspendAccount': 'Заблокировать аккаунт', 'panel.unsuspendAccount': 'Разблокировать', 'panel.clearAll': 'Очистить всё',
+                'directory.loading': 'Загрузка участников', 'directory.attempt': 'попытка',
+                'directory.loadError': 'Не удалось загрузить список участников после {n} попыток — проверьте подключение или права Firestore',
+                'directory.retry': 'Повторить', 'directory.you': 'вы', 'directory.retrying': 'Повторная попытка', 'directory.connectError': 'Не удалось подключиться к серверу для загрузки списка аккаунтов',
+                'toast.onlyMainAdminCanAdd': 'Только главный админ может добавлять админов', 'toast.enterEmailOrUid': 'Введите email адрес или UID',
+                'toast.roleUpdated': 'Роль обновлена:',
+                'toast.onlyMainAdminCanSuspend': 'Только главный админ может блокировать аккаунты', 'toast.enterUid': 'Введите UID пользователя', 'confirm.suspendAccount': 'Подтвердить блокировку аккаунта: {uid}?', 'toast.accountSuspended': 'Аккаунт заблокирован', 'toast.onlyMainAdminCanUnsuspend': 'Только главный админ может разблокировать аккаунты', 'confirm.unsuspendAccount': 'Разблокировать аккаунт: {uid}?', 'toast.accountUnsuspended': 'Аккаунт разблокирован', 'toast.cantSuspendSelf': 'Вы не можете заблокировать свой собственный аккаунт', 'verb.unsuspend': 'разблокировать', 'verb.suspend': 'заблокировать', 'confirm.confirmVerbAccount': 'Подтвердить {verb} аккаунт {name}?', 'toast.unsuspendedName': '{name} разблокирован', 'toast.suspendedName': '{name} заблокирован',
+                'profile.title': 'Профиль', 'profile.coverPhoto': 'Обложка (фон)', 'profile.coverPhotoLabel': 'Ссылка на фото обложки за логотипом (Google Drive)', 'profile.profilePhoto': 'Фото профиля', 'profile.profilePhotoLabel': 'Ссылка на фото профиля (Google Drive)', 'profile.ringColor': 'Цвет кольца вокруг вашего фото', 'profile.ringColorHint': 'Выберите любой понравившийся цвет для светящегося кольца вокруг фото', 'profile.defaultBtn': 'По умолчанию', 'profile.ringtone': 'Рингтон звонка', 'profile.ringtoneHint': 'Выберите тон, который вы услышите, когда кто-то вам позвонит — каждый может выбрать свой тон или добавить личный (одна ссылка на аккаунт)', 'profile.personalInfo': 'Личная информация', 'profile.nameLabel': 'Имя', 'profile.namePlaceholder': 'Ваше имя...', 'profile.genderLabel': 'Пол', 'profile.genderChoose': '-- Выбрать --', 'profile.genderMale': 'Мужской', 'profile.genderFemale': 'Женский', 'profile.genderPreferNot': 'Не указывать', 'profile.nationalityLabel': 'Национальность', 'profile.nationalityPlaceholder': 'например: египтянин, саудовец...', 'profile.saveSuccess': 'Изменения сохранены', 'profile.saveBtn': 'Сохранить изменения',
             },
             zh: {
                 'menu.navSection': '导航', 'menu.home': '主页', 'menu.unlockedVideos': '已解锁视频',
@@ -3674,6 +3784,28 @@
                 'panel.editProfile': '点击编辑资料', 'panel.addVideo': '+ 上传视频',
                 'games.hint': 'GAMEVERSE 独家游戏 — 独自游玩，尝试打破你的最高纪录', 'games.changeCount': '更改人数', 'games.addGame': '+ 添加游戏',
                 'role.mainAdmin': '主管理员', 'role.normalAdmin': '管理员', 'role.user': '普通用户',
+                'members.title': '成员', 'members.searchPlaceholder': '按名称搜索成员...',
+                'members.hint': '关注平台成员以了解他们的动态——每个成员都可以在个人资料中看到自己的关注者数量',
+                'chats.title': '我的聊天', 'chats.hint': '你与成员开始的所有对话——点击任意一位继续聊天。想开始新对话？前往"成员"页面',
+                'chats.empty': '还没有任何对话——前往"成员"并开始和某人聊天 👋',
+                'games.title': '在线游戏', 'games.selectTitle': '你想几人玩？', 'games.selectHint': '选择玩家人数，我们会显示相应的可用游戏',
+                'games.searchingFor': '正在显示适合人数的游戏：',
+                'players.one': '单人', 'players.two': '双人', 'players.three': '三人', 'players.four': '四人',
+                'panel.currentAdmins': '当前管理员', 'panel.selectAdminFromAccounts': '从账户中指定管理员',
+                'panel.searchNameOrEmail': '按名称或邮箱搜索...', 'panel.roleHint': '点击任意账户想要的角色，即可立即将其设为普通或主管理员',
+                'panel.manualAddAdmin': '手动添加（按邮箱）', 'panel.emailPlaceholder': '电子邮箱',
+                'panel.roleMain': '主管理员', 'panel.roleNormal': '普通', 'panel.addAdminBtn': '添加管理员',
+                'panel.manageAllAccounts': '管理所有账户',
+                'panel.manageAccountsHint': '所有已加入平台的账户列表——点击"封禁"立即封禁任意账户（崩溃），或点击"解除封禁"以恢复',
+                'panel.manualSuspend': '手动封禁（按 UID）', 'panel.uidPlaceholder': '用户 UID...',
+                'panel.suspendAccount': '封禁账户', 'panel.unsuspendAccount': '解除封禁', 'panel.clearAll': '清除全部',
+                'directory.loading': '正在加载成员', 'directory.attempt': '尝试',
+                'directory.loadError': '尝试 {n} 次后仍无法加载成员列表——请检查网络连接或 Firestore 权限',
+                'directory.retry': '重试', 'directory.you': '你', 'directory.retrying': '正在重试', 'directory.connectError': '无法连接服务器以加载账户列表',
+                'toast.onlyMainAdminCanAdd': '只有主管理员可以添加管理员', 'toast.enterEmailOrUid': '请输入电子邮箱或 UID',
+                'toast.roleUpdated': '角色已更新：',
+                'toast.onlyMainAdminCanSuspend': '只有主管理员可以封禁账户', 'toast.enterUid': '请输入用户 UID', 'confirm.suspendAccount': '确认封禁账户：{uid}？', 'toast.accountSuspended': '账户已封禁', 'toast.onlyMainAdminCanUnsuspend': '只有主管理员可以解除封禁', 'confirm.unsuspendAccount': '解除封禁账户：{uid}？', 'toast.accountUnsuspended': '已解除封禁', 'toast.cantSuspendSelf': '你不能封禁自己的账户', 'verb.unsuspend': '解除封禁', 'verb.suspend': '封禁', 'confirm.confirmVerbAccount': '确认{verb}账户 {name}？', 'toast.unsuspendedName': '已解除封禁 {name}', 'toast.suspendedName': '已封禁 {name}',
+                'profile.title': '个人资料', 'profile.coverPhoto': '封面图片（背景）', 'profile.coverPhotoLabel': '显示在徽标后面的封面图片链接（Google Drive）', 'profile.profilePhoto': '头像照片', 'profile.profilePhotoLabel': '头像照片链接（Google Drive）', 'profile.ringColor': '照片周围的圆环颜色', 'profile.ringColorHint': '为你照片周围的发光圆环选择任意喜欢的颜色', 'profile.defaultBtn': '默认', 'profile.ringtone': '通话铃声', 'profile.ringtoneHint': '选择有人给你打电话时播放的铃声——每个人都可以选择自己的铃声，或添加个人铃声（每个账户仅限一个链接）', 'profile.personalInfo': '个人信息', 'profile.nameLabel': '姓名', 'profile.namePlaceholder': '你的名字...', 'profile.genderLabel': '性别', 'profile.genderChoose': '-- 选择 --', 'profile.genderMale': '男', 'profile.genderFemale': '女', 'profile.genderPreferNot': '不愿透露', 'profile.nationalityLabel': '国籍', 'profile.nationalityPlaceholder': '例如：埃及、沙特...', 'profile.saveSuccess': '更改已保存', 'profile.saveBtn': '保存更改',
             },
         };
         function t(key) {
@@ -3692,6 +3824,10 @@
             document.querySelectorAll('[data-i18n-aria]').forEach(el => {
                 const key = el.getAttribute('data-i18n-aria');
                 el.setAttribute('aria-label', t(key));
+            });
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                const key = el.getAttribute('data-i18n-placeholder');
+                el.setAttribute('placeholder', t(key));
             });
         }
 
@@ -3889,9 +4025,9 @@
         const ROLE_ICON_CROWN = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px"><path d="M3 18h18"/><path d="M3 18l1.5-9L9 12l3-6 3 6 4.5-3L21 18"/></svg>';
         const ROLE_ICON_USER = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
         function roleLabelHtml(adminRole) {
-            if (adminRole === 'main') return `${ROLE_ICON_CROWN} مشرف رئيسي`;
-            if (adminRole === 'normal') return `${ROLE_ICON_KEY} مشرف عادي`;
-            return `${ROLE_ICON_USER} مستخدم`;
+            if (adminRole === 'main') return `${ROLE_ICON_CROWN} ${t('role.mainAdmin')}`;
+            if (adminRole === 'normal') return `${ROLE_ICON_KEY} ${t('role.normalAdmin')}`;
+            return `${ROLE_ICON_USER} ${t('role.user')}`;
         }
 
         function avatarImgHtml(rawUrl, cssClass, fallbackInitial, ringColor) {
@@ -4550,12 +4686,12 @@
         // ===== ADMIN MANAGEMENT =====
         window.handleAddAdmin = async function() {
             if (!S.isAdmin || !S.isMainAdmin) {
-                showToast('❌ فقط المشرف الرئيسي يمكنه إضافة مشرفين', '#ff7a7a');
+                showToast('❌ ' + t('toast.onlyMainAdminCanAdd'), '#ff7a7a');
                 return;
             }
             const email = document.getElementById('admin-email-input').value.trim();
             const role = document.getElementById('admin-role-select').value;
-            if (!email) { showToast('❌ أدخل البريد الإلكتروني أو UID', '#ff7a7a'); return; }
+            if (!email) { showToast('❌ ' + t('toast.enterEmailOrUid'), '#ff7a7a'); return; }
             try {
                 const q = query(collection(db, 'admins'), where('email', '==', email.toLowerCase()));
                 const snap = await getDocs(q);
@@ -4983,44 +5119,44 @@
         }
 
         window.suspendUser = async function() {
-            if (!S.isAdmin || !S.isMainAdmin) { showToast('❌ فقط المشرف الرئيسي يقدر يوقف حسابات', '#ff7a7a'); return; }
+            if (!S.isAdmin || !S.isMainAdmin) { showToast('❌ ' + t('toast.onlyMainAdminCanSuspend'), '#ff7a7a'); return; }
             const uid = document.getElementById('suspend-uid-input').value.trim();
-            if (!uid) { showToast('❌ أدخل UID المستخدم', '#ff7a7a'); return; }
-            if (!confirm(`تأكيد توقيف الحساب: ${uid}؟`)) return;
+            if (!uid) { showToast('❌ ' + t('toast.enterUid'), '#ff7a7a'); return; }
+            if (!confirm(t('confirm.suspendAccount').replace('{uid}', uid))) return;
             try {
                 await setDoc(doc(db, 'suspendedUsers', uid), { uid, suspendedAt: new Date(), suspendedBy: S.user?.uid || 'admin' });
                 document.getElementById('suspend-uid-input').value = '';
-                showToast('🚫 تم توقيف الحساب');
+                showToast('🚫 ' + t('toast.accountSuspended'));
                 renderUsersDirectory();
             } catch (e) { showToast('❌ خطأ: ' + e.message, '#ff7a7a'); }
         };
 
         window.unsuspendUser = async function() {
-            if (!S.isAdmin || !S.isMainAdmin) { showToast('❌ فقط المشرف الرئيسي يقدر يرفع التوقيف', '#ff7a7a'); return; }
+            if (!S.isAdmin || !S.isMainAdmin) { showToast('❌ ' + t('toast.onlyMainAdminCanUnsuspend'), '#ff7a7a'); return; }
             const uid = document.getElementById('suspend-uid-input').value.trim();
-            if (!uid) { showToast('❌ أدخل UID المستخدم', '#ff7a7a'); return; }
-            if (!confirm(`رفع توقيف الحساب: ${uid}؟`)) return;
+            if (!uid) { showToast('❌ ' + t('toast.enterUid'), '#ff7a7a'); return; }
+            if (!confirm(t('confirm.unsuspendAccount').replace('{uid}', uid))) return;
             try {
                 await deleteDoc(doc(db, 'suspendedUsers', uid));
                 document.getElementById('suspend-uid-input').value = '';
-                showToast('✅ تم رفع التوقيف');
+                showToast('✅ ' + t('toast.accountUnsuspended'));
                 renderUsersDirectory();
             } catch (e) { showToast('❌ خطأ: ' + e.message, '#ff7a7a'); }
         };
 
         // Toggle ban ("crash") on/off for a specific account, straight from the accounts list.
         window.toggleAccountSuspension = async function(uid, name, isCurrentlySuspended) {
-            if (!S.isAdmin || !S.isMainAdmin) { showToast('❌ فقط المشرف الرئيسي يقدر يوقف حسابات', '#ff7a7a'); return; }
-            if (uid === S.user?.uid) { showToast('❌ ما تقدرش توقف حسابك الشخصي', '#ff7a7a'); return; }
-            const verb = isCurrentlySuspended ? 'رفع التوقيف عن' : 'توقيف';
-            if (!confirm(`تأكيد ${verb} حساب ${name}؟`)) return;
+            if (!S.isAdmin || !S.isMainAdmin) { showToast('❌ ' + t('toast.onlyMainAdminCanSuspend'), '#ff7a7a'); return; }
+            if (uid === S.user?.uid) { showToast('❌ ' + t('toast.cantSuspendSelf'), '#ff7a7a'); return; }
+            const verb = isCurrentlySuspended ? t('verb.unsuspend') : t('verb.suspend');
+            if (!confirm(t('confirm.confirmVerbAccount').replace('{verb}', verb).replace('{name}', name))) return;
             try {
                 if (isCurrentlySuspended) {
                     await deleteDoc(doc(db, 'suspendedUsers', uid));
-                    showToast('✅ تم رفع التوقيف عن ' + name);
+                    showToast('✅ ' + t('toast.unsuspendedName').replace('{name}', name));
                 } else {
                     await setDoc(doc(db, 'suspendedUsers', uid), { uid, suspendedAt: new Date(), suspendedBy: S.user?.uid || 'admin' });
-                    showToast('🚫 تم توقيف ' + name);
+                    showToast('🚫 ' + t('toast.suspendedName').replace('{name}', name));
                 }
                 renderUsersDirectory();
             } catch (e) { showToast('❌ خطأ: ' + e.message, '#ff7a7a'); }
@@ -5047,7 +5183,7 @@
                         createdAt: new Date(),
                         addedBy: S.user?.uid || 'unknown'
                     }, { merge: true });
-                    showToast('✅ تم تحديث الصلاحية: ' + (role === 'main' ? 'مشرف رئيسي' : 'مشرف عادي'));
+                    showToast('✅ ' + t('toast.roleUpdated') + ' ' + (role === 'main' ? t('role.mainAdmin') : t('role.normalAdmin')));
                 }
                 renderAdminList();
                 renderUsersDirectory();
@@ -5082,7 +5218,7 @@
                 if (adminsList) adminsList.innerHTML = skel;
                 if (accountsList) accountsList.innerHTML = skel;
             } else {
-                const retryingHtml = `<div class="directory-retrying-box"><span class="spinner-ring light"></span> جاري إعادة المحاولة (${_attempt}/4)...</div>`;
+                const retryingHtml = `<div class="directory-retrying-box"><span class="spinner-ring light"></span> ${t('directory.retrying')} (${_attempt}/4)...</div>`;
                 if (adminsList) adminsList.innerHTML = retryingHtml;
                 if (accountsList) accountsList.innerHTML = retryingHtml;
             }
@@ -5122,8 +5258,8 @@
                     return;
                 }
                 const errHtml = `<div class="directory-retry-box">
-                    <p>⚠️ تعذر الاتصال بالسيرفر لتحميل قائمة الحسابات</p>
-                    <button class="directory-retry-btn" onclick="renderUsersDirectory()">🔄 إعادة المحاولة</button>
+                    <p>⚠️ ${t('directory.connectError')}</p>
+                    <button class="directory-retry-btn" onclick="renderUsersDirectory()">🔄 ${t('directory.retry')}</button>
                 </div>`;
                 if (adminsList) adminsList.innerHTML = errHtml;
                 if (accountsList) accountsList.innerHTML = errHtml;
@@ -5154,13 +5290,13 @@
                 <div class="directory-item">
                     ${avatar}
                     <div class="directory-info">
-                        <div class="directory-name">${_escapeHtml(e.displayName)}${isSelf ? ' (أنت)' : ''}</div>
+                        <div class="directory-name">${_escapeHtml(e.displayName)}${isSelf ? ' (' + t('directory.you') + ')' : ''}</div>
                         <div class="directory-email">${_escapeHtml(e.email)}</div>
                     </div>
                     <div class="directory-actions">
-                        <button class="dir-btn role-none ${role==='none'?'active':''}" ${isSelf?'disabled':''} onclick="setUserAdminRole('${e.email}','${_escapeHtml(e.displayName).replace(/'/g,"\\'")}','${e.photoURL}','none')">مستخدم</button>
-                        <button class="dir-btn role-normal ${role==='normal'?'active':''}" onclick="setUserAdminRole('${e.email}','${_escapeHtml(e.displayName).replace(/'/g,"\\'")}','${e.photoURL}','normal')">مشرف عادي</button>
-                        <button class="dir-btn role-main ${role==='main'?'active':''}" onclick="setUserAdminRole('${e.email}','${_escapeHtml(e.displayName).replace(/'/g,"\\'")}','${e.photoURL}','main')">مشرف رئيسي</button>
+                        <button class="dir-btn role-none ${role==='none'?'active':''}" ${isSelf?'disabled':''} onclick="setUserAdminRole('${e.email}','${_escapeHtml(e.displayName).replace(/'/g,"\\'")}','${e.photoURL}','none')">${t('role.user')}</button>
+                        <button class="dir-btn role-normal ${role==='normal'?'active':''}" onclick="setUserAdminRole('${e.email}','${_escapeHtml(e.displayName).replace(/'/g,"\\'")}','${e.photoURL}','normal')">${t('role.normalAdmin')}</button>
+                        <button class="dir-btn role-main ${role==='main'?'active':''}" onclick="setUserAdminRole('${e.email}','${_escapeHtml(e.displayName).replace(/'/g,"\\'")}','${e.photoURL}','main')">${t('role.mainAdmin')}</button>
                     </div>
                 </div>`;
             }).join('');
@@ -5188,7 +5324,7 @@
                         <div class="directory-email">${_escapeHtml(e.email)} · ${roleLabel}</div>
                     </div>
                     <div class="directory-actions">
-                        ${isSelf ? '' : `<button class="dir-btn ${e.suspended ? 'unban' : 'ban'}" onclick="toggleAccountSuspension('${e.uid}','${_escapeHtml(e.displayName).replace(/'/g,"\\'")}',${e.suspended})">${e.suspended ? '✅ رفع التوقيف' : '🚫 توقيف'}</button>`}
+                        ${isSelf ? '' : `<button class="dir-btn ${e.suspended ? 'unban' : 'ban'}" onclick="toggleAccountSuspension('${e.uid}','${_escapeHtml(e.displayName).replace(/'/g,"\\'")}',${e.suspended})">${e.suspended ? '✅ ' + t('panel.unsuspendAccount') : '🚫 ' + t('verb.suspend')}</button>`}
                     </div>
                 </div>`;
             }).join('');
@@ -5718,7 +5854,7 @@
             const MAX_ATTEMPTS = 3;
             let lastErr = null;
             for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
-                listEl.innerHTML = `<p class="directory-empty">⏳ جاري تحميل الأعضاء${attempt > 1 ? ` (محاولة ${attempt}/${MAX_ATTEMPTS})` : ''}...</p>`;
+                listEl.innerHTML = `<p class="directory-empty">⏳ ${t('directory.loading')}${attempt > 1 ? ` (${t('directory.attempt')} ${attempt}/${MAX_ATTEMPTS})` : ''}...</p>`;
                 try {
                     const [snap, adminsSnap] = await Promise.all([
                         getDocs(collection(db, 'users')),
@@ -5754,7 +5890,7 @@
                     }
                 }
             }
-            listEl.innerHTML = `<p class="directory-empty">⚠️ تعذر تحميل قائمة الأعضاء بعد ${MAX_ATTEMPTS} محاولات — تأكد من الاتصال أو صلاحيات Firestore</p>`;
+            listEl.innerHTML = `<p class="directory-empty">⚠️ ${t('directory.loadError').replace('{n}', MAX_ATTEMPTS)}</p>`;
             console.error('loadMembersList: exhausted retries', lastErr);
         }
 
@@ -6804,7 +6940,9 @@
         };
 
         // ================= ONLINE GAMES (admin-added, code-driven) =================
-        const _playerCountLabels = { 1: 'لاعب واحد', 2: 'لاعبين اتنين', 3: 'تلات لاعبين', 4: 'أربع لاعبين' };
+        function _playerCountLabels() {
+            return { 1: t('players.one'), 2: t('players.two'), 3: t('players.three'), 4: t('players.four') };
+        }
 
         window.openGamesModal = function() {
             closeMenuPanel();
@@ -6831,7 +6969,7 @@
             document.getElementById('games-player-select').classList.add('hidden');
             document.getElementById('games-hub').style.display = 'block';
             const hint = document.getElementById('games-hub-hint');
-            if (hint) hint.textContent = `بتدور على ألعاب لـ ${_playerCountLabels[n] || n}`;
+            if (hint) hint.textContent = `${t('games.searchingFor')} ${_playerCountLabels()[n] || n}`;
             renderGamesHub();
         };
 
@@ -6855,7 +6993,7 @@
                     <div class="game-hub-title">${_escapeHtml(g.title || 'لعبة')}</div>
                     <div class="game-hub-desc">${_escapeHtml(g.description || '')}</div>
                     <div class="game-hub-meta">
-                        <span class="game-hub-best">${_playerCountLabels[g.players] || ''}</span>
+                        <span class="game-hub-best">${_playerCountLabels()[g.players] || ''}</span>
                         <span class="game-hub-play">العب الآن ›</span>
                     </div>
                     ${S.isAdmin ? `
@@ -7037,7 +7175,7 @@
                 });
                 const rows = Array.from(map.values()).sort((a, b) => b.ts - a.ts);
                 if (rows.length === 0) {
-                    listEl.innerHTML = `<p class="directory-empty">لسه معملتش أي محادثة — روح "الأعضاء" وابدأ كلام مع حد 👋</p>`;
+                    listEl.innerHTML = `<p class="directory-empty">${t('chats.empty')}</p>`;
                     return;
                 }
                 listEl.innerHTML = rows.map(r => {
