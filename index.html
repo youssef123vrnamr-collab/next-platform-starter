@@ -3842,12 +3842,18 @@
         function saveTranslateCache() {
             try { localStorage.setItem(TRANSLATE_CACHE_KEY, JSON.stringify(translateCache)); } catch (e) {}
         }
-        async function autoTranslate(text, targetLang) {
-            if (!text || !text.trim() || !targetLang || targetLang === 'ar') return text;
-            const key = targetLang + '::' + text;
+        // sourceLang lets us translate content that wasn't typed in Arabic —
+        // e.g. a chat message someone typed while their own app language was
+        // set to Russian. Defaults to 'ar' to keep every existing call site
+        // (video titles/descriptions/comments, which ARE always Arabic) working
+        // exactly as before.
+        async function autoTranslate(text, targetLang, sourceLang) {
+            sourceLang = sourceLang || 'ar';
+            if (!text || !text.trim() || !targetLang || targetLang === sourceLang) return text;
+            const key = sourceLang + '>' + targetLang + '::' + text;
             if (translateCache[key]) return translateCache[key];
             try {
-                const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=ar|${targetLang}`);
+                const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${sourceLang}|${targetLang}`);
                 const data = await res.json();
                 const translated = data && data.responseData && data.responseData.translatedText;
                 if (translated && !/MYMEMORY WARNING/i.test(translated)) {
@@ -3858,32 +3864,54 @@
             } catch (e) { console.error('autoTranslate error:', e); }
             return text;
         }
-        // Sets an element's text to the given Arabic source text, translated to
-        // the current viewer language. Stashes the Arabic original on the
-        // element (data-ar-text) so retranslateDynamicContent() can re-run it
-        // whenever the person switches language later.
-        function applyAutoTranslate(el, arabicText) {
+        // Sets an element's text to the given source text, translated to
+        // the current viewer language. Stashes the original + its source
+        // language on the element (data-ar-text / data-src-lang) so
+        // retranslateDynamicContent() can re-run it whenever the person
+        // switches language later, or whenever the sender's language differs
+        // from 'ar' (e.g. chat messages).
+        function applyAutoTranslate(el, sourceText, sourceLang) {
             if (!el) return;
-            arabicText = arabicText || '';
-            el.dataset.arText = arabicText;
+            sourceText = sourceText || '';
+            sourceLang = sourceLang || 'ar';
+            el.dataset.arText = sourceText;
+            el.dataset.srcLang = sourceLang;
             const lang = S.language || 'ar';
-            el.textContent = arabicText;
-            if (!arabicText || lang === 'ar') return;
-            autoTranslate(arabicText, lang).then(translated => {
+            el.textContent = sourceText;
+            if (!sourceText || lang === sourceLang) return;
+            autoTranslate(sourceText, lang, sourceLang).then(translated => {
                 if ((S.language || 'ar') === lang && el.isConnected) el.textContent = translated;
             });
         }
+        // Same idea but preserves line breaks (as <br>) — used for chat
+        // bubbles, where the raw text can be multi-line.
+        function applyAutoTranslateHtml(el, sourceText, sourceLang) {
+            if (!el) return;
+            sourceText = sourceText || '';
+            sourceLang = sourceLang || 'ar';
+            el.dataset.arText = sourceText;
+            el.dataset.srcLang = sourceLang;
+            el.dataset.msgHtml = '1';
+            const lang = S.language || 'ar';
+            el.innerHTML = _escapeHtml(sourceText).replace(/\n/g, '<br>');
+            if (!sourceText || lang === sourceLang) return;
+            autoTranslate(sourceText, lang, sourceLang).then(translated => {
+                if ((S.language || 'ar') === lang && el.isConnected) el.innerHTML = _escapeHtml(translated).replace(/\n/g, '<br>');
+            });
+        }
         // For raw HTML strings (comments, etc.) where we can't call
-        // applyAutoTranslate directly: embeds the Arabic source safely into a
+        // applyAutoTranslate directly: embeds the source text safely into a
         // data-ar-text="" attribute so retranslateWithin() can pick it up once
-        // the HTML is inserted into the DOM.
+        // the HTML is inserted into the DOM. Source is always Arabic here
+        // (admin-authored content).
         function autoTranslateAttr(arabicText) {
             return _escapeHtml(arabicText || '');
         }
         function retranslateWithin(container) {
             if (!container) return;
             container.querySelectorAll('[data-ar-text]').forEach(el => {
-                applyAutoTranslate(el, el.dataset.arText);
+                if (el.dataset.msgHtml) applyAutoTranslateHtml(el, el.dataset.arText, el.dataset.srcLang || 'ar');
+                else applyAutoTranslate(el, el.dataset.arText, el.dataset.srcLang || 'ar');
             });
         }
         // Re-translates every piece of dynamic content currently on screen.
@@ -5507,7 +5535,6 @@
                 const deleteBtn = canDelete ? `<button class="wabubble-delete-btn" onclick="deleteWaMsg('${msg.id}')" title="حذف الرسالة">🗑</button>` : '';
                 const editBtn = canEdit ? `<button class="wabubble-action-btn" onclick='wachatEditMsg(${JSON.stringify(msg.id)})' title="تعديل الرسالة">✏️</button>` : '';
                 const replyBtn = (!msg._pending && S.isAdmin) ? `<button class="wabubble-action-btn" onclick='wachatReplyTo(${JSON.stringify(msg.id)},${JSON.stringify(name)},${JSON.stringify(msg.text)})' title="رد على الرسالة">↩️</button>` : '';
-                const safeText = _escapeHtml(msg.text).replace(/\n/g, '<br>');
                 let statusHtml = '';
                 if (msg._failed) {
                     statusHtml = '<span class="wabubble-status failed" title="فشل الإرسال">⚠️ فشل</span>';
@@ -5530,7 +5557,7 @@
                     <div class="wabubble-content">
                         ${!isMine ? `<span class="wabubble-sender">${isAdmin ? ROLE_ICON_CROWN + ' ' : ''}${_escapeHtml(name)}</span>` : ''}
                         ${quoteHtml}
-                        <div class="wabubble-text">${safeText}</div>
+                        <div class="wabubble-text" id="watext-${msg.id}"></div>
                         <div class="wabubble-meta">
                             ${replyBtn}
                             ${editBtn}
@@ -5544,6 +5571,13 @@
                 </div>`;
             });
             area.innerHTML = html;
+            // Each bubble is translated from whatever language its sender had
+            // selected when they sent it (msg.lang), into whatever language the
+            // current viewer has chosen — not always Arabic in either direction.
+            msgs.forEach(msg => {
+                const textEl = document.getElementById('watext-' + msg.id);
+                if (textEl) applyAutoTranslateHtml(textEl, msg.text || '', msg.lang || 'ar');
+            });
             if (wasAtBottom) area.scrollTop = area.scrollHeight;
         }
 
@@ -5624,10 +5658,10 @@
                 const bar = document.querySelector('.wachat-input-bar');
                 if (bar) bar.classList.remove('editing');
                 const cached = _wachatLastMsgs.find(m => m.id === msgId);
-                if (cached) cached.text = text, cached.editedAt = new Date();
+                if (cached) cached.text = text, cached.lang = S.language || 'ar', cached.editedAt = new Date();
                 _renderWaMsgs(_wachatLastMsgs.concat(_wachatPending));
                 try {
-                    await updateDoc(doc(db, 'chatMessages', msgId), { text, editedAt: serverTimestamp() });
+                    await updateDoc(doc(db, 'chatMessages', msgId), { text, lang: S.language || 'ar', editedAt: serverTimestamp() });
                     showToast('✅ تم تعديل الرسالة');
                 } catch (e) {
                     console.error('WaChat edit error:', e);
@@ -5642,9 +5676,15 @@
             const replyTo = _wachatReplyTo ? { id: _wachatReplyTo.id, senderName: _wachatReplyTo.senderName, text: _wachatReplyTo.text } : null;
             wachatCancelReply();
 
+            // Remember the language the sender had selected at the moment of
+            // sending, so anyone viewing this message later — in any language —
+            // gets it translated FROM the right source language, not always
+            // assumed to be Arabic.
+            const msgLang = S.language || 'ar';
+
             // ===== OPTIMISTIC RENDER: show the message instantly, don't wait for the server =====
             const localId = 'local_' + Date.now() + '_' + Math.random().toString(36).slice(2);
-            const pendingMsg = { id: localId, sender: S.user.uid, senderName: name, senderPhoto: photo, text, timestamp: new Date(), isAdmin: S.isAdmin, replyTo, _pending: true };
+            const pendingMsg = { id: localId, sender: S.user.uid, senderName: name, senderPhoto: photo, text, lang: msgLang, timestamp: new Date(), isAdmin: S.isAdmin, replyTo, _pending: true };
             _wachatPending.push(pendingMsg);
             _renderWaMsgs(_wachatLastMsgs.concat(_wachatPending));
 
@@ -5654,6 +5694,7 @@
                     senderName: name,
                     senderPhoto: photo,
                     text,
+                    lang: msgLang,
                     timestamp: serverTimestamp(),
                     isAdmin: S.isAdmin
                 };
@@ -6048,7 +6089,6 @@
                 }
                 const initial = (msg.senderName || '?').charAt(0).toUpperCase();
                 const avatarHtml = !isMine ? (avatarImgHtml(msg.senderPhoto, 'wabubble-avatar', initial) || `<div class="wabubble-avatar">${_escapeHtml(initial)}</div>`) : '';
-                const safeText = _escapeHtml(msg.text || '').replace(/\n/g, '<br>');
                 const deleteBtn = isMine ? `<button class="wabubble-delete-btn" onclick="deleteFriendMsg('${msg.id}')" title="حذف الرسالة">🗑</button>` : '';
                 const statusHtml = isMine ? '<span class="wabubble-tick">✓✓</span>' : '';
                 html += `
@@ -6056,7 +6096,7 @@
                     ${!isMine ? avatarHtml : ''}
                     <div class="wabubble-content">
                         ${!isMine ? `<span class="wabubble-sender">${_escapeHtml(name)}</span>` : ''}
-                        <div class="wabubble-text">${safeText}</div>
+                        <div class="wabubble-text" id="frtext-${msg.id}"></div>
                         <div class="wabubble-meta">
                             ${deleteBtn}
                             <span class="wabubble-time">${timeStr}</span>
@@ -6066,6 +6106,10 @@
                 </div>`;
             });
             area.innerHTML = html;
+            msgs.forEach(msg => {
+                const textEl = document.getElementById('frtext-' + msg.id);
+                if (textEl) applyAutoTranslateHtml(textEl, msg.text || '', msg.lang || 'ar');
+            });
             if (wasAtBottom) area.scrollTop = area.scrollHeight;
         }
 
@@ -6125,6 +6169,7 @@
                     toName: _friendChatWith.name,
                     toPhoto: _friendChatWith.photo,
                     text,
+                    lang: S.language || 'ar',
                     timestamp: serverTimestamp()
                 });
             } catch (e) {
