@@ -206,6 +206,8 @@
             padding: 20px;
         }
         #language-screen.visible { display: flex; }
+        #language-screen.change-mode { background: rgba(10,8,20,0.92); }
+        #language-screen.change-mode #lang-close-btn { display: block !important; }
         .lang-card {
             position: relative;
             z-index: 1;
@@ -2506,9 +2508,10 @@
     <!-- ===== LANGUAGE SELECT SCREEN (shown once, right after first login) ===== -->
     <div id="language-screen">
         <div class="lang-card">
+            <button id="lang-close-btn" onclick="closeChangeLanguage()" style="display:none;position:absolute;top:14px;left:14px;background:transparent;border:none;color:var(--text-dim);font-size:20px;cursor:pointer;line-height:1">✕</button>
             <div class="logo">GAMEVERSE</div>
-            <div class="lang-title" id="lang-title-ar">اختر لغتك</div>
-            <div class="lang-sub" id="lang-sub-ar">هتقدر تستخدم المنصة باللغة دي. الاختيار ده نهائي ومش هيتغير تاني.</div>
+            <div class="lang-title" id="lang-title-ar">Choose your language</div>
+            <div class="lang-sub" id="lang-sub-ar">You'll use the platform in this language. You can change it anytime from the side menu.</div>
             <div class="lang-list">
                 <div class="lang-option" onclick="selectAppLanguage('ar')">
                     <span class="lang-flag">🇸🇦</span>
@@ -2535,7 +2538,6 @@
                     <span class="lang-native">中文<small>الصينية</small></span>
                 </div>
             </div>
-            <div class="lang-note" id="lang-note-ar">⚠️ ده اختيار نهائي — مش هينفع تغيّر اللغة بعد كده.</div>
         </div>
     </div>
 
@@ -2629,6 +2631,12 @@
                     <div class="menu-nav-item" id="menu-dev-settings-btn" style="display:none" onclick="closeMenuPanel();openDeveloperSettingsModal()">
                         <span class="menu-nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></span> <span data-i18n="menu.devSettings">إعدادات المطور</span>
                     </div>
+                </div>
+
+                <div class="menu-nav-divider"></div>
+
+                <div class="menu-nav-item" onclick="openChangeLanguage()">
+                    <span class="menu-nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span> <span data-i18n="menu.changeLanguage">تغيير اللغة</span>
                 </div>
 
                 <div class="menu-nav-divider"></div>
@@ -3583,7 +3591,7 @@
                 'menu.socialSection': 'التواصل', 'menu.members': 'الأعضاء ومتابعتهم', 'menu.myChats': 'محادثاتي مع الأعضاء',
                 'menu.adminSection': 'إدارة المنصة', 'menu.manageAdmins': 'إضافة / إدارة المشرفين', 'menu.manageAccounts': 'إدارة الحسابات',
                 'menu.ratings': 'التقييمات', 'menu.comments': 'التعليقات', 'menu.platformIssues': 'أعطال المنصة', 'menu.devSettings': 'إعدادات المطور',
-                'menu.signOut': 'تسجيل الخروج', 'menu.aria': 'القائمة',
+                'menu.signOut': 'تسجيل الخروج', 'menu.aria': 'القائمة', 'menu.changeLanguage': 'تغيير اللغة',
                 'panel.title': 'لوحة التحكم', 'panel.loading': 'جاري التحميل...', 'panel.noAdminTitle': 'لا يوجد مشرف بعد!',
                 'panel.noAdminBody': 'أنت أول شخص هنا.<br/>سجّل دخولك لتصبح المشرف الوحيد للمنصة.', 'panel.enterAsAdmin': 'ادخل كمشرف بـ Google',
                 'panel.blockedTitle': 'لا توجد صلاحيات كافية', 'panel.blockedBody': 'هذه المنصة لها مشرف بالفعل.<br/>لا يمكن إضافة مشرف آخر.',
@@ -3598,7 +3606,7 @@
                 'menu.socialSection': 'Social', 'menu.members': 'Members & Following', 'menu.myChats': 'My Chats with Members',
                 'menu.adminSection': 'Platform Management', 'menu.manageAdmins': 'Add / Manage Admins', 'menu.manageAccounts': 'Manage Accounts',
                 'menu.ratings': 'Ratings', 'menu.comments': 'Comments', 'menu.platformIssues': 'Platform Issues', 'menu.devSettings': 'Developer Settings',
-                'menu.signOut': 'Sign Out', 'menu.aria': 'Menu',
+                'menu.signOut': 'Sign Out', 'menu.aria': 'Menu', 'menu.changeLanguage': 'Change Language',
                 'panel.title': 'Dashboard', 'panel.loading': 'Loading...', 'panel.noAdminTitle': 'No admin yet!',
                 'panel.noAdminBody': "You're the first person here.<br/>Sign in to become the platform's sole admin.", 'panel.enterAsAdmin': 'Sign in as admin with Google',
                 'panel.blockedTitle': 'Insufficient permissions', 'panel.blockedBody': 'This platform already has an admin.<br/>Another admin cannot be added.',
@@ -3613,7 +3621,7 @@
                 'menu.socialSection': 'Communauté', 'menu.members': 'Membres et abonnements', 'menu.myChats': 'Mes discussions avec les membres',
                 'menu.adminSection': 'Gestion de la plateforme', 'menu.manageAdmins': 'Ajouter / gérer les admins', 'menu.manageAccounts': 'Gérer les comptes',
                 'menu.ratings': 'Évaluations', 'menu.comments': 'Commentaires', 'menu.platformIssues': 'Problèmes de la plateforme', 'menu.devSettings': 'Paramètres développeur',
-                'menu.signOut': 'Déconnexion', 'menu.aria': 'Menu',
+                'menu.signOut': 'Déconnexion', 'menu.aria': 'Menu', 'menu.changeLanguage': 'Changer de langue',
                 'panel.title': 'Tableau de bord', 'panel.loading': 'Chargement...', 'panel.noAdminTitle': "Pas encore d'admin !",
                 'panel.noAdminBody': 'Vous êtes la première personne ici.<br/>Connectez-vous pour devenir le seul admin de la plateforme.', 'panel.enterAsAdmin': 'Se connecter en admin avec Google',
                 'panel.blockedTitle': 'Permissions insuffisantes', 'panel.blockedBody': 'Cette plateforme a déjà un admin.<br/>Impossible d\'en ajouter un autre.',
@@ -3628,7 +3636,7 @@
                 'menu.socialSection': 'Community', 'menu.members': 'Mitglieder & Follower', 'menu.myChats': 'Meine Chats mit Mitgliedern',
                 'menu.adminSection': 'Plattformverwaltung', 'menu.manageAdmins': 'Admins hinzufügen / verwalten', 'menu.manageAccounts': 'Konten verwalten',
                 'menu.ratings': 'Bewertungen', 'menu.comments': 'Kommentare', 'menu.platformIssues': 'Plattformprobleme', 'menu.devSettings': 'Entwicklereinstellungen',
-                'menu.signOut': 'Abmelden', 'menu.aria': 'Menü',
+                'menu.signOut': 'Abmelden', 'menu.aria': 'Menü', 'menu.changeLanguage': 'Sprache ändern',
                 'panel.title': 'Dashboard', 'panel.loading': 'Wird geladen...', 'panel.noAdminTitle': 'Noch kein Admin!',
                 'panel.noAdminBody': 'Du bist die erste Person hier.<br/>Melde dich an, um alleiniger Admin der Plattform zu werden.', 'panel.enterAsAdmin': 'Als Admin mit Google anmelden',
                 'panel.blockedTitle': 'Unzureichende Berechtigungen', 'panel.blockedBody': 'Diese Plattform hat bereits einen Admin.<br/>Es kann kein weiterer hinzugefügt werden.',
@@ -3643,7 +3651,7 @@
                 'menu.socialSection': 'Общение', 'menu.members': 'Участники и подписки', 'menu.myChats': 'Мои чаты с участниками',
                 'menu.adminSection': 'Управление платформой', 'menu.manageAdmins': 'Добавить / управлять админами', 'menu.manageAccounts': 'Управление аккаунтами',
                 'menu.ratings': 'Оценки', 'menu.comments': 'Комментарии', 'menu.platformIssues': 'Проблемы платформы', 'menu.devSettings': 'Настройки разработчика',
-                'menu.signOut': 'Выйти', 'menu.aria': 'Меню',
+                'menu.signOut': 'Выйти', 'menu.aria': 'Меню', 'menu.changeLanguage': 'Изменить язык',
                 'panel.title': 'Панель управления', 'panel.loading': 'Загрузка...', 'panel.noAdminTitle': 'Пока нет админа!',
                 'panel.noAdminBody': 'Вы первый человек здесь.<br/>Войдите, чтобы стать единственным админом платформы.', 'panel.enterAsAdmin': 'Войти как админ через Google',
                 'panel.blockedTitle': 'Недостаточно прав', 'panel.blockedBody': 'У этой платформы уже есть админ.<br/>Добавить другого нельзя.',
@@ -3658,7 +3666,7 @@
                 'menu.socialSection': '社交', 'menu.members': '成员与关注', 'menu.myChats': '我与成员的聊天',
                 'menu.adminSection': '平台管理', 'menu.manageAdmins': '添加/管理管理员', 'menu.manageAccounts': '账户管理',
                 'menu.ratings': '评分', 'menu.comments': '评论', 'menu.platformIssues': '平台故障', 'menu.devSettings': '开发者设置',
-                'menu.signOut': '退出登录', 'menu.aria': '菜单',
+                'menu.signOut': '退出登录', 'menu.aria': '菜单', 'menu.changeLanguage': '更改语言',
                 'panel.title': '控制面板', 'panel.loading': '加载中...', 'panel.noAdminTitle': '还没有管理员！',
                 'panel.noAdminBody': '你是这里的第一个人。<br/>登录即可成为平台唯一的管理员。', 'panel.enterAsAdmin': '使用 Google 以管理员身份登录',
                 'panel.blockedTitle': '权限不足', 'panel.blockedBody': '该平台已有管理员。<br/>无法再添加其他管理员。',
@@ -3686,21 +3694,93 @@
                 el.setAttribute('aria-label', t(key));
             });
         }
-        // Called only once, the very first time a user picks a language on the
-        // gate screen. After this, the choice is written to Firestore and is
-        // never shown or editable again for that account.
+
+        // ===== AUTO-TRANSLATE (for content typed by the admin/users, e.g. video
+        // titles, descriptions, comments) =====
+        // Arabic stays the "source of truth" everywhere in Firestore. This layer
+        // only translates what's shown on screen, on the fly, based on the
+        // viewer's chosen language — nothing stored ever changes.
+        const TRANSLATE_CACHE_KEY = 'gv_translate_cache_v1';
+        let translateCache = {};
+        try { translateCache = JSON.parse(localStorage.getItem(TRANSLATE_CACHE_KEY) || '{}'); } catch (e) { translateCache = {}; }
+        function saveTranslateCache() {
+            try { localStorage.setItem(TRANSLATE_CACHE_KEY, JSON.stringify(translateCache)); } catch (e) {}
+        }
+        async function autoTranslate(text, targetLang) {
+            if (!text || !text.trim() || !targetLang || targetLang === 'ar') return text;
+            const key = targetLang + '::' + text;
+            if (translateCache[key]) return translateCache[key];
+            try {
+                const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=ar|${targetLang}`);
+                const data = await res.json();
+                const translated = data && data.responseData && data.responseData.translatedText;
+                if (translated && !/MYMEMORY WARNING/i.test(translated)) {
+                    translateCache[key] = translated;
+                    saveTranslateCache();
+                    return translated;
+                }
+            } catch (e) { console.error('autoTranslate error:', e); }
+            return text;
+        }
+        // Sets an element's text to the given Arabic source text, translated to
+        // the current viewer language. Stashes the Arabic original on the
+        // element (data-ar-text) so retranslateDynamicContent() can re-run it
+        // whenever the person switches language later.
+        function applyAutoTranslate(el, arabicText) {
+            if (!el) return;
+            arabicText = arabicText || '';
+            el.dataset.arText = arabicText;
+            const lang = S.language || 'ar';
+            el.textContent = arabicText;
+            if (!arabicText || lang === 'ar') return;
+            autoTranslate(arabicText, lang).then(translated => {
+                if ((S.language || 'ar') === lang && el.isConnected) el.textContent = translated;
+            });
+        }
+        // For raw HTML strings (comments, etc.) where we can't call
+        // applyAutoTranslate directly: embeds the Arabic source safely into a
+        // data-ar-text="" attribute so retranslateWithin() can pick it up once
+        // the HTML is inserted into the DOM.
+        function autoTranslateAttr(arabicText) {
+            return _escapeHtml(arabicText || '');
+        }
+        function retranslateWithin(container) {
+            if (!container) return;
+            container.querySelectorAll('[data-ar-text]').forEach(el => {
+                applyAutoTranslate(el, el.dataset.arText);
+            });
+        }
+        // Re-translates every piece of dynamic content currently on screen.
+        // Called whenever the viewer changes their language.
+        function retranslateDynamicContent() {
+            retranslateWithin(document);
+        }
+
+        // Called the first time a user picks a language on the gate screen, and
+        // also whenever they change it later from the side menu. The choice is
+        // saved to Firestore and can always be changed again from the menu.
         window.selectAppLanguage = async function(lang) {
             if (!SUPPORTED_LANGS.includes(lang)) return;
             S.language = lang;
             applyTranslations();
-            document.getElementById('language-screen').classList.remove('visible');
+            document.getElementById('language-screen').classList.remove('visible', 'change-mode');
             document.getElementById('app').classList.add('visible');
             try {
                 if (S.user && S.user.uid) {
                     await setDoc(doc(db, 'users', S.user.uid), { appLanguage: lang }, { merge: true });
                 }
             } catch (e) { console.error('appLanguage save error:', e); }
+            retranslateDynamicContent();
             updateUI();
+        };
+        // Opens the language screen again so the person can switch languages at
+        // any time — triggered from the "Change language" item in the side menu.
+        window.openChangeLanguage = function() {
+            if (typeof closeMenuPanel === 'function') closeMenuPanel();
+            document.getElementById('language-screen').classList.add('visible', 'change-mode');
+        };
+        window.closeChangeLanguage = function() {
+            document.getElementById('language-screen').classList.remove('visible', 'change-mode');
         };
         // Reads the saved language off the account (if any), right after login,
         // once per account. updateUI() then decides whether to show the gate
@@ -3991,12 +4071,12 @@
             textDiv.style.flex = '1';
             const title = document.createElement('h3');
             title.className = 'video-title';
-            title.textContent = v.title || '—';
+            applyAutoTranslate(title, v.title || '—');
             textDiv.appendChild(title);
             if (v.description) {
                 const desc = document.createElement('p');
                 desc.className = 'video-desc';
-                desc.textContent = v.description;
+                applyAutoTranslate(desc, v.description);
                 textDiv.appendChild(desc);
             }
             meta.appendChild(textDiv);
@@ -4032,6 +4112,7 @@
             commentsSection.className = 'comments-section';
             commentsSection.id = `comments-${v.id}`;
             commentsSection.innerHTML = buildCommentsHTML(v);
+            retranslateWithin(commentsSection);
             info.appendChild(commentsSection);
 
             const actions = document.createElement('div');
@@ -4072,7 +4153,7 @@
                     </div>
                     <div class="comment-body">
                         <div class="comment-name">${c.name||'مستخدم'}</div>
-                        <div class="comment-text">${c.text||''}</div>
+                        <div class="comment-text" data-ar-text="${autoTranslateAttr(c.text||'')}">${c.text||''}</div>
                         <div class="comment-time">${getTimeAgo(c.timestamp)}</div>
                         ${canDelete ? `<button class="comment-delete-btn" onclick="deleteCardComment('${v.id}',${idx})">🗑 حذف</button>` : ''}
                     </div>
@@ -4367,7 +4448,7 @@
                     <div class="comment-body">
                         <div class="comment-name">${c.name||'مستخدم'}</div>
                         ${replyQuoteHtml}
-                        <div class="comment-text">${c.text||''}</div>
+                        <div class="comment-text" data-ar-text="${autoTranslateAttr(c.text||'')}">${c.text||''}</div>
                         <div class="comment-time">
                             ${getTimeAgo(c.timestamp)}${editedTag}
                         </div>
@@ -4379,6 +4460,7 @@
                 </div>
                 `;
             }).join('');
+            retranslateWithin(list);
             list.scrollTop = list.scrollHeight;
         }
 
@@ -4398,7 +4480,7 @@
                 await updateDoc(doc(db, 'videos', videoId), { comments: newComments });
                 v.comments = newComments;
                 const sec = document.getElementById(`comments-${videoId}`);
-                if (sec) sec.innerHTML = buildCommentsHTML(v);
+                if (sec) { sec.innerHTML = buildCommentsHTML(v); retranslateWithin(sec); }
                 renderVideos();
                 showToast('🗑 تم حذف التعليق');
             } catch (e) { showToast('❌ خطأ: ' + e.message, '#ff7a7a'); }
@@ -7289,8 +7371,8 @@
                 iframe.allowFullscreen = true;
             }
             container.appendChild(iframe);
-            document.getElementById('player-title').textContent = v.title || '—';
-            document.getElementById('player-fs-header-title').textContent = v.title || 'فيديو';
+            applyAutoTranslate(document.getElementById('player-title'), v.title || '—');
+            applyAutoTranslate(document.getElementById('player-fs-header-title'), v.title || 'فيديو');
             document.getElementById('player-desc').textContent = v.description || '';
             document.getElementById('player-like-count').textContent = v.likes || 0;
             document.getElementById('player-dislike-count').textContent = v.dislikes || 0;
