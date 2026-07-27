@@ -208,64 +208,125 @@
         #language-screen.visible { display: flex; }
         #language-screen.change-mode { background: rgba(10,8,20,0.92); }
         #language-screen.change-mode #lang-close-btn { display: block !important; }
+        @keyframes langCardIn { from { opacity: 0; transform: translateY(10px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
         .lang-card {
             position: relative;
             z-index: 1;
             width: 100%;
-            max-width: 420px;
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 20px;
-            padding: 32px 26px;
-            backdrop-filter: blur(20px);
+            max-width: 460px;
+            max-height: calc(100vh - 40px);
+            overflow-y: auto;
+            background: rgba(255,255,255,0.035);
+            border: 1px solid rgba(255,255,255,0.09);
+            border-radius: 26px;
+            padding: 36px 26px 30px;
+            backdrop-filter: blur(24px);
             text-align: center;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.45), 0 0 0 1px rgba(192,38,211,0.06) inset;
+            animation: langCardIn .35s cubic-bezier(.2,.8,.2,1);
         }
+        @media (prefers-reduced-motion: reduce) { .lang-card { animation: none; } }
         .lang-card .logo {
-            font-size: 26px;
+            font-size: 27px;
             font-weight: 900;
             background: linear-gradient(120deg,#7c3aed,#c026d3,#ff2d87);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            margin-bottom: 6px;
+            margin-bottom: 10px;
         }
+        .lang-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 13px;
+            border-radius: 999px;
+            border: 1px solid rgba(192,38,211,0.3);
+            background: rgba(192,38,211,0.1);
+            color: #e3aaff;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: .02em;
+            margin-bottom: 14px;
+        }
+        .lang-eyebrow .dot { width: 5px; height: 5px; border-radius: 50%; background: #ff2d87; box-shadow: 0 0 6px #ff2d87; }
         .lang-card .lang-title {
-            font-size: 16px;
+            font-size: 19px;
             font-weight: 800;
             color: #fff;
-            margin: 6px 0 4px;
+            margin: 4px 0 4px;
+            letter-spacing: -0.01em;
+        }
+        .lang-title-rule {
+            width: 44px;
+            height: 3px;
+            margin: 10px auto 16px;
+            border-radius: 4px;
+            background: linear-gradient(90deg,#7c3aed,#ff2d87);
         }
         .lang-card .lang-sub {
             font-size: 12.5px;
             color: var(--text-dim);
-            margin-bottom: 22px;
+            margin-bottom: 24px;
             line-height: 1.7;
         }
-        .lang-list { display: flex; flex-direction: column; gap: 10px; }
+        .lang-list { display: flex; flex-direction: column; gap: 12px; }
         .lang-option {
+            position: relative;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 12px;
-            padding: 14px 18px;
-            border-radius: 12px;
+            gap: 14px;
+            padding: 16px 20px;
+            border-radius: 18px;
             border: 1px solid rgba(255,255,255,0.08);
-            background: rgba(255,255,255,0.04);
+            background: rgba(255,255,255,0.035);
             color: #fff;
-            font-size: 15px;
+            font-size: 16px;
             font-weight: 700;
             cursor: pointer;
-            transition: all .18s ease;
+            transition: transform .16s ease, border-color .16s ease, background .16s ease, box-shadow .16s ease;
             direction: ltr;
+            overflow: hidden;
+        }
+        .lang-option::before {
+            content: '';
+            position: absolute;
+            inset: 0 auto 0 0;
+            width: 3px;
+            background: linear-gradient(180deg,#7c3aed,#ff2d87);
+            opacity: 0;
+            transition: opacity .16s ease;
         }
         .lang-option:hover, .lang-option:active {
-            border-color: rgba(192,38,211,0.45);
-            background: rgba(192,38,211,0.12);
-            transform: translateY(-1px);
+            border-color: rgba(192,38,211,0.5);
+            background: rgba(192,38,211,0.13);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 26px rgba(124,58,237,0.22);
         }
-        .lang-option .lang-flag { font-size: 20px; }
+        .lang-option:hover::before { opacity: 1; }
+        .lang-option .lang-flag-chip {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 42px;
+            height: 42px;
+            border-radius: 13px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.08);
+            font-size: 22px;
+            flex-shrink: 0;
+        }
         .lang-option .lang-native { flex: 1; text-align: left; }
-        .lang-option .lang-native small { display: block; font-size: 11px; font-weight: 500; color: var(--text-dim); margin-top: 2px; }
+        .lang-option .lang-native small { display: block; font-size: 11.5px; font-weight: 500; color: var(--text-dim); margin-top: 3px; }
+        .lang-option .lang-chevron {
+            color: var(--text-dim);
+            opacity: .6;
+            transform: translateX(0);
+            transition: transform .16s ease, opacity .16s ease, color .16s ease;
+            flex-shrink: 0;
+        }
+        .lang-option:hover .lang-chevron { opacity: 1; transform: translateX(3px); color: #ff8fd6; }
         .lang-note {
             margin-top: 20px;
             font-size: 11px;
@@ -2514,32 +2575,40 @@
         <div class="lang-card">
             <button id="lang-close-btn" onclick="closeChangeLanguage()" style="display:none;position:absolute;top:14px;left:14px;background:transparent;border:none;color:var(--text-dim);font-size:20px;cursor:pointer;line-height:1">✕</button>
             <div class="logo">GAMEVERSE</div>
+            <div class="lang-eyebrow"><span class="dot"></span><span>6 Languages · 6 لغات</span></div>
             <div class="lang-title" id="lang-title-ar">Choose your language</div>
+            <div class="lang-title-rule"></div>
             <div class="lang-sub" id="lang-sub-ar">You'll use the platform in this language. You can change it anytime from the side menu.</div>
             <div class="lang-list">
                 <div class="lang-option" onclick="selectAppLanguage('ar')">
-                    <span class="lang-flag">🇸🇦</span>
+                    <span class="lang-flag-chip">🇸🇦</span>
                     <span class="lang-native" style="text-align:right">العربية<small>Arabic</small></span>
+                    <svg class="lang-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
                 </div>
                 <div class="lang-option" onclick="selectAppLanguage('en')">
-                    <span class="lang-flag">🇬🇧</span>
+                    <span class="lang-flag-chip">🇬🇧</span>
                     <span class="lang-native">English<small>الإنجليزية</small></span>
+                    <svg class="lang-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
                 </div>
                 <div class="lang-option" onclick="selectAppLanguage('fr')">
-                    <span class="lang-flag">🇫🇷</span>
+                    <span class="lang-flag-chip">🇫🇷</span>
                     <span class="lang-native">Français<small>الفرنسية</small></span>
+                    <svg class="lang-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
                 </div>
                 <div class="lang-option" onclick="selectAppLanguage('de')">
-                    <span class="lang-flag">🇩🇪</span>
+                    <span class="lang-flag-chip">🇩🇪</span>
                     <span class="lang-native">Deutsch<small>الألمانية</small></span>
+                    <svg class="lang-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
                 </div>
                 <div class="lang-option" onclick="selectAppLanguage('ru')">
-                    <span class="lang-flag">🇷🇺</span>
+                    <span class="lang-flag-chip">🇷🇺</span>
                     <span class="lang-native">Русский<small>الروسية</small></span>
+                    <svg class="lang-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
                 </div>
                 <div class="lang-option" onclick="selectAppLanguage('zh')">
-                    <span class="lang-flag">🇨🇳</span>
+                    <span class="lang-flag-chip">🇨🇳</span>
                     <span class="lang-native">中文<small>الصينية</small></span>
+                    <svg class="lang-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
                 </div>
             </div>
         </div>
@@ -8097,6 +8166,20 @@
             _hideSessionRestoreOverlay(!!fbUser);
             if (fbUser && !S.user) {
                 S.fbLoading = true;
+                // Prime the language from cache BEFORE anything calls updateUI() —
+                // processUser() below calls updateUI() internally several times
+                // while S.user is being set up, and if S.language is still null at
+                // that moment the language gate flashes on screen every single time
+                // the app opens, even for a returning user who already chose one.
+                if (!S.language) {
+                    try {
+                        const cachedLang = localStorage.getItem('gv_lang_' + fbUser.uid);
+                        if (cachedLang && SUPPORTED_LANGS.includes(cachedLang)) {
+                            S.language = cachedLang;
+                            applyTranslations();
+                        }
+                    } catch (e) {}
+                }
                 updateUI();
                 try { await processUser(fbUser, false); } catch (e) { console.error('Auth error:', e); }
                 // Load profile after login
