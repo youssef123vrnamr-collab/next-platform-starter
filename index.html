@@ -2801,25 +2801,25 @@
             <div class="hero-glow hero-glow-1"></div>
             <div class="hero-glow hero-glow-2"></div>
             <div class="hero-content">
-                <div class="hero-tag"><span class="dot"></span>منصة الجيمنج الأولى</div>
+                <div class="hero-tag"><span class="dot"></span><span data-i18n="hero.tag">منصة الجيمنج الأولى</span></div>
                 <h1 class="hero-title">GAMEVERSE</h1>
-                <p class="hero-sub">اكتشف أفضل فيديوهات الجيمنج في مكان واحد</p>
+                <p class="hero-sub" data-i18n="hero.sub">اكتشف أفضل فيديوهات الجيمنج في مكان واحد</p>
                 <div class="hero-stats">
                     <div class="hero-stat">
                         <span class="hero-stat-num" id="stat-total">0</span>
-                        <span class="hero-stat-label">فيديو</span>
+                        <span class="hero-stat-label" data-i18n="hero.statVideo">فيديو</span>
                     </div>
                     <div class="hero-stat">
                         <span class="hero-stat-num" id="stat-free">0</span>
-                        <span class="hero-stat-label">مفتوح</span>
+                        <span class="hero-stat-label" data-i18n="hero.statFree">مفتوح</span>
                     </div>
                     <div class="hero-stat">
                         <span class="hero-stat-num" id="stat-locked">0</span>
-                        <span class="hero-stat-label">مقفول</span>
+                        <span class="hero-stat-label" data-i18n="hero.statLocked">مقفول</span>
                     </div>
                 </div>
                 <button class="hero-btn" onclick="document.getElementById('search-section').scrollIntoView({behavior:'smooth'})">
-                    استكشف الفيديوهات ↓
+                    <span data-i18n="hero.exploreBtn">استكشف الفيديوهات ↓</span>
                 </button>
             </div>
         </div>
@@ -2828,7 +2828,7 @@
         <div id="search-section">
             <div class="search-wrap">
                 <span class="search-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
-                <input id="main-search" type="search" placeholder="ابحث عن أي فيديو..." oninput="onSearch(this)" />
+                <input id="main-search" type="search" placeholder="ابحث عن أي فيديو..." data-i18n-placeholder="search.placeholder" oninput="onSearch(this)" />
                 <button class="search-clear" id="search-clear" onclick="clearSearch()">✕</button>
             </div>
         </div>
@@ -2840,7 +2840,7 @@
                 <div class="section-header">
                     <div class="section-title-wrap">
                         <div class="section-icon unlocked" style="display:flex;align-items:center;justify-content:center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg></div>
-                        <span class="section-title">فيديوهات مفتوحة</span>
+                        <span class="section-title" data-i18n="section.unlockedTitle">فيديوهات مفتوحة</span>
                         <span class="section-count" id="unlocked-count">0</span>
                     </div>
                     <button id="add-video-btn" onclick="openAddModal('youtube')" style="display:none;background:linear-gradient(120deg,#7c3aed,#c026d3,#ff2d87);border:none;border-radius:9px;padding:9px 18px;color:#0a0814;font-size:13px;font-weight:900;cursor:pointer;white-space:nowrap"><span data-i18n="panel.addVideo">+ رفع فيديو</span></button>
@@ -2849,7 +2849,7 @@
                 <div class="video-grid" id="grid-unlocked">
                     <div class="section-empty" id="empty-unlocked">
                         <div class="empty-icon" style="display:flex;justify-content:center"><svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="12" x2="10" y2="12"/><line x1="8" y1="10" x2="8" y2="14"/><circle cx="15" cy="12" r="1" fill="currentColor"/><circle cx="17" cy="10" r="1" fill="currentColor"/><path d="M6 8h12a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2z"/></svg></div>
-                        <p>لا توجد فيديوهات مفتوحة</p>
+                        <p data-i18n="section.emptyUnlocked">لا توجد فيديوهات مفتوحة</p>
                     </div>
                 </div>
             </div>
@@ -2858,7 +2858,7 @@
                 <div class="section-header">
                     <div class="section-title-wrap">
                         <div class="section-icon locked" style="display:flex;align-items:center;justify-content:center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
-                        <span class="section-title">فيديوهات مقفولة</span>
+                        <span class="section-title" data-i18n="section.lockedTitle">فيديوهات مقفولة</span>
                         <span class="section-count locked-count" id="locked-count">0</span>
                     </div>
                 </div>
@@ -2866,7 +2866,7 @@
                 <div class="video-grid" id="grid-locked">
                     <div class="section-empty" id="empty-locked">
                         <div class="empty-icon" style="display:flex;justify-content:center"><svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><circle cx="12" cy="16" r="1.2" fill="currentColor"/></svg></div>
-                        <p>لا توجد فيديوهات مقفولة</p>
+                        <p data-i18n="section.emptyLocked">لا توجد فيديوهات مقفولة</p>
                     </div>
                 </div>
             </div>
@@ -2875,7 +2875,7 @@
 
         <!-- ===== FOOTER ===== -->
         <footer>
-            <strong>GAMEVERSE</strong> — منصة الجيمنج الاحترافية &nbsp;|&nbsp; جميع الحقوق محفوظة
+            <strong>GAMEVERSE</strong> — <span data-i18n="footer.brandLine">منصة الجيمنج الاحترافية</span> &nbsp;|&nbsp; <span data-i18n="footer.rights">جميع الحقوق محفوظة</span>
         </footer>
 
     </div><!-- end #app -->
@@ -3223,39 +3223,39 @@
     <!-- ===== ADD VIDEO MODAL ===== -->
     <div id="add-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeAddModal()">
         <div class="modal-box">
-            <h2 class="modal-title" style="display:flex;align-items:center;gap:8px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/></svg> رفع فيديو جديد</h2>
+            <h2 class="modal-title" style="display:flex;align-items:center;gap:8px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/></svg> <span data-i18n="modal.addVideoTitle">رفع فيديو جديد</span></h2>
             <div class="modal-tabs">
-                <button class="modal-tab active" id="tab-yt" onclick="switchTab('youtube')" style="display:inline-flex;align-items:center;gap:5px"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg> يوتيوب</button>
-                <button class="modal-tab" id="tab-drive" onclick="switchTab('drive')" style="display:inline-flex;align-items:center;gap:5px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg> Google Drive</button>
+                <button class="modal-tab active" id="tab-yt" onclick="switchTab('youtube')" style="display:inline-flex;align-items:center;gap:5px"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg> <span data-i18n="modal.tabYoutube">يوتيوب</span></button>
+                <button class="modal-tab" id="tab-drive" onclick="switchTab('drive')" style="display:inline-flex;align-items:center;gap:5px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg> <span data-i18n="modal.tabDrive">Google Drive</span></button>
             </div>
             <div class="tab-pane active" id="pane-youtube">
                 <div class="modal-field">
-                    <label class="modal-label">رابط يوتيوب *</label>
+                    <label class="modal-label" data-i18n="modal.youtubeLinkLabel">رابط يوتيوب *</label>
                     <input id="add-yt-url" class="modal-input" type="url" inputmode="url" placeholder="https://www.youtube.com/watch?v=..." oninput="clearAddError()" />
                 </div>
             </div>
             <div class="tab-pane" id="pane-drive">
                 <div class="modal-field">
-                    <label class="modal-label">رابط Google Drive *</label>
+                    <label class="modal-label" data-i18n="modal.driveLinkLabel">رابط Google Drive *</label>
                     <input id="add-drive-url" class="modal-input" type="url" inputmode="url" placeholder="https://drive.google.com/file/d/..." oninput="clearAddError()" />
                 </div>
                 <div class="modal-field">
-                    <label class="modal-label">صورة مصغرة (URL اختياري)</label>
+                    <label class="modal-label" data-i18n="modal.thumbLabel">صورة مصغرة (URL اختياري)</label>
                     <input id="add-drive-thumb" class="modal-input" type="url" inputmode="url" placeholder="https://example.com/thumb.jpg" />
                 </div>
             </div>
             <div class="modal-field">
-                <label class="modal-label">عنوان الفيديو *</label>
-                <input id="add-title" class="modal-input" type="text" placeholder="اسم الفيديو" oninput="clearAddError()" />
+                <label class="modal-label" data-i18n="modal.titleLabel">عنوان الفيديو *</label>
+                <input id="add-title" class="modal-input" type="text" placeholder="اسم الفيديو" data-i18n-placeholder="modal.titlePlaceholder" oninput="clearAddError()" />
             </div>
             <div class="modal-field">
-                <label class="modal-label">الوصف (اختياري)</label>
-                <input id="add-desc" class="modal-input" type="text" placeholder="وصف قصير..." />
+                <label class="modal-label" data-i18n="modal.descLabel">الوصف (اختياري)</label>
+                <input id="add-desc" class="modal-input" type="text" placeholder="وصف قصير..." data-i18n-placeholder="modal.descPlaceholder" />
             </div>
             <p id="add-error" class="modal-error"></p>
             <div class="modal-btns">
-                <button class="btn-cancel" onclick="closeAddModal()">إلغاء</button>
-                <button class="btn-confirm green" id="add-confirm-btn" onclick="submitAddVideo()">إضافة ✓</button>
+                <button class="btn-cancel" onclick="closeAddModal()" data-i18n="modal.cancelBtn">إلغاء</button>
+                <button class="btn-confirm green" id="add-confirm-btn" onclick="submitAddVideo()" data-i18n="modal.addBtn">إضافة ✓</button>
             </div>
         </div>
     </div>
@@ -3263,18 +3263,18 @@
     <!-- ===== EDIT MODAL ===== -->
     <div id="edit-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeEditModal()">
         <div class="modal-box">
-            <h2 class="modal-title" style="display:flex;align-items:center;gap:8px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> تعديل الفيديو</h2>
+            <h2 class="modal-title" style="display:flex;align-items:center;gap:8px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> <span data-i18n="modal.editVideoTitle">تعديل الفيديو</span></h2>
             <div class="modal-field">
-                <label class="modal-label">العنوان</label>
+                <label class="modal-label" data-i18n="modal.editTitleLabel">العنوان</label>
                 <input id="edit-title" class="modal-input" type="text" />
             </div>
             <div class="modal-field">
-                <label class="modal-label">الوصف</label>
+                <label class="modal-label" data-i18n="modal.editDescLabel">الوصف</label>
                 <input id="edit-desc" class="modal-input" type="text" />
             </div>
             <div class="modal-btns">
-                <button class="btn-cancel" onclick="closeEditModal()">إلغاء</button>
-                <button class="btn-confirm blue" id="edit-confirm-btn" onclick="submitEdit()">حفظ ✓</button>
+                <button class="btn-cancel" onclick="closeEditModal()" data-i18n="modal.cancelBtn">إلغاء</button>
+                <button class="btn-confirm blue" id="edit-confirm-btn" onclick="submitEdit()" data-i18n="modal.saveBtn">حفظ ✓</button>
             </div>
         </div>
     </div>
@@ -3282,21 +3282,21 @@
     <!-- ===== ADD GAME MODAL (admin only) ===== -->
     <div id="add-game-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeAddGameModal()">
         <div class="modal-box">
-            <h2 class="modal-title" style="display:flex;align-items:center;gap:8px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="12" x2="10" y2="12"/><line x1="8" y1="10" x2="8" y2="14"/><circle cx="15" cy="12" r="1" fill="currentColor"/><circle cx="17" cy="10" r="1" fill="currentColor"/><path d="M6 8h12a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2z"/></svg> إضافة لعبة جديدة</h2>
+            <h2 class="modal-title" style="display:flex;align-items:center;gap:8px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="12" x2="10" y2="12"/><line x1="8" y1="10" x2="8" y2="14"/><circle cx="15" cy="12" r="1" fill="currentColor"/><circle cx="17" cy="10" r="1" fill="currentColor"/><path d="M6 8h12a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2z"/></svg> <span data-i18n="modal.addGameTitle">إضافة لعبة جديدة</span></h2>
             <div class="modal-field">
-                <label class="modal-label">عنوان اللعبة *</label>
-                <input id="add-game-title" class="modal-input" type="text" placeholder="اسم اللعبة" oninput="clearAddGameError()" />
+                <label class="modal-label" data-i18n="modal.gameTitleLabel">عنوان اللعبة *</label>
+                <input id="add-game-title" class="modal-input" type="text" placeholder="اسم اللعبة" data-i18n-placeholder="modal.gameTitlePlaceholder" oninput="clearAddGameError()" />
             </div>
             <div class="modal-field">
-                <label class="modal-label">الوصف (اختياري)</label>
-                <input id="add-game-desc" class="modal-input" type="text" placeholder="وصف قصير..." />
+                <label class="modal-label" data-i18n="modal.descLabel">الوصف (اختياري)</label>
+                <input id="add-game-desc" class="modal-input" type="text" placeholder="وصف قصير..." data-i18n-placeholder="modal.descPlaceholder" />
             </div>
             <div class="modal-field">
-                <label class="modal-label">أيقونة (إيموجي، اختياري)</label>
+                <label class="modal-label" data-i18n="modal.gameIconLabel">أيقونة (إيموجي، اختياري)</label>
                 <input id="add-game-icon" class="modal-input" type="text" placeholder="🎮" maxlength="4" />
             </div>
             <div class="modal-field">
-                <label class="modal-label">صورة مصغرة (رابط عادي أو رابط جوجل درايف — اختياري)</label>
+                <label class="modal-label" data-i18n="modal.gameImageLabel">صورة مصغرة (رابط عادي أو رابط جوجل درايف — اختياري)</label>
                 <input id="add-game-image" class="modal-input" type="url" inputmode="url" placeholder="https://drive.google.com/file/d/.../view" />
             </div>
             <div class="modal-field">
@@ -3626,6 +3626,14 @@
                 'toast.onlyMainAdminCanSuspend': 'فقط المشرف الرئيسي يقدر يوقف حسابات', 'toast.enterUid': 'أدخل UID المستخدم', 'confirm.suspendAccount': 'تأكيد توقيف الحساب: {uid}؟', 'toast.accountSuspended': 'تم توقيف الحساب', 'toast.onlyMainAdminCanUnsuspend': 'فقط المشرف الرئيسي يقدر يرفع التوقيف', 'confirm.unsuspendAccount': 'رفع توقيف الحساب: {uid}؟', 'toast.accountUnsuspended': 'تم رفع التوقيف', 'toast.cantSuspendSelf': 'ما تقدرش توقف حسابك الشخصي', 'verb.unsuspend': 'رفع التوقيف عن', 'verb.suspend': 'توقيف', 'confirm.confirmVerbAccount': 'تأكيد {verb} حساب {name}؟', 'toast.unsuspendedName': 'تم رفع التوقيف عن {name}', 'toast.suspendedName': 'تم توقيف {name}',
                 'profile.title': 'الملف الشخصي', 'profile.coverPhoto': 'صورة الغلاف (الخلفية)', 'profile.coverPhotoLabel': 'رابط صورة الغلاف اللي تظهر ورا الشعار (Google Drive)', 'profile.profilePhoto': 'صورة البروفايل', 'profile.profilePhotoLabel': 'رابط صورة البروفايل (Google Drive)', 'profile.ringColor': 'لون الدائرة حول صورتك', 'profile.ringColorHint': 'اختار أي لون يعجبك للدائرة المضيئة حوالين صورتك', 'profile.defaultBtn': 'افتراضي', 'profile.ringtone': 'نغمة رنين المكالمات', 'profile.ringtoneHint': 'اختار النغمة اللي هتسمعها وقت ما حد يتصل بيك — كل شخص يقدر يختار نغمته الخاصة، أو يضيف نغمته الشخصية (رابط واحد بس لكل حساب)', 'profile.personalInfo': 'المعلومات الشخصية', 'profile.nameLabel': 'الاسم', 'profile.namePlaceholder': 'اسمك...', 'profile.genderLabel': 'النوع', 'profile.genderChoose': '-- اختر --', 'profile.genderMale': 'ذكر', 'profile.genderFemale': 'أنثى', 'profile.genderPreferNot': 'أفضل عدم الذكر', 'profile.nationalityLabel': 'الجنسية', 'profile.nationalityPlaceholder': 'مثال: مصري، سعودي...', 'profile.saveSuccess': 'تم حفظ التغييرات', 'profile.saveBtn': 'حفظ التغييرات',
                 'common.edit': '✏ تعديل', 'common.delete': '🗑 حذف', 'common.lock': '🔒 قفل', 'common.unlock': '🔓 فتح', 'common.playNow': 'العب الآن ›', 'common.untitledGame': 'لعبة', 'common.uploadVideo': 'رفع فيديو',
+                'hero.tag': 'منصة الجيمنج الأولى', 'hero.sub': 'اكتشف أفضل فيديوهات الجيمنج في مكان واحد', 'hero.statVideo': 'فيديو', 'hero.statFree': 'مفتوح', 'hero.statLocked': 'مقفول', 'hero.exploreBtn': 'استكشف الفيديوهات ↓',
+                'search.placeholder': 'ابحث عن أي فيديو...',
+                'section.unlockedTitle': 'فيديوهات مفتوحة', 'section.lockedTitle': 'فيديوهات مقفولة', 'section.emptyUnlocked': 'لا توجد فيديوهات مفتوحة', 'section.emptyLocked': 'لا توجد فيديوهات مقفولة',
+                'footer.brandLine': 'منصة الجيمنج الاحترافية', 'footer.rights': 'جميع الحقوق محفوظة',
+                'modal.addVideoTitle': 'رفع فيديو جديد', 'modal.tabYoutube': 'يوتيوب', 'modal.tabDrive': 'Google Drive', 'modal.youtubeLinkLabel': 'رابط يوتيوب *', 'modal.driveLinkLabel': 'رابط Google Drive *', 'modal.thumbLabel': 'صورة مصغرة (URL اختياري)', 'modal.titleLabel': 'عنوان الفيديو *', 'modal.titlePlaceholder': 'اسم الفيديو', 'modal.descLabel': 'الوصف (اختياري)', 'modal.descPlaceholder': 'وصف قصير...', 'modal.cancelBtn': 'إلغاء', 'modal.addBtn': 'إضافة ✓',
+                'modal.editVideoTitle': 'تعديل الفيديو', 'modal.editTitleLabel': 'العنوان', 'modal.editDescLabel': 'الوصف', 'modal.saveBtn': 'حفظ ✓',
+                'modal.addGameTitle': 'إضافة لعبة جديدة', 'modal.gameTitleLabel': 'عنوان اللعبة *', 'modal.gameTitlePlaceholder': 'اسم اللعبة', 'modal.gameIconLabel': 'أيقونة (إيموجي، اختياري)', 'modal.gameImageLabel': 'صورة مصغرة (رابط عادي أو رابط جوجل درايف — اختياري)',
+                'ringtone.classic': 'كلاسيكي', 'ringtone.chime': 'جرس', 'ringtone.digital': 'رقمي', 'ringtone.marimba': 'ماريمبا', 'ringtone.gentle': 'هادئة', 'ringtone.retro': 'ريترو', 'ringtone.myCustom': 'نغمتي الخاصة', 'ringtone.changeMine': 'تغيير نغمتي', 'ringtone.addMine': 'إضافة نغمتي الخاصة',
             },
             en: {
                 'menu.navSection': 'Navigation', 'menu.home': 'Home', 'menu.unlockedVideos': 'Unlocked Videos',
@@ -3664,6 +3672,14 @@
                 'toast.onlyMainAdminCanSuspend': 'Only the main admin can suspend accounts', 'toast.enterUid': 'Enter the user UID', 'confirm.suspendAccount': 'Confirm suspending account: {uid}?', 'toast.accountSuspended': 'Account suspended', 'toast.onlyMainAdminCanUnsuspend': 'Only the main admin can unsuspend accounts', 'confirm.unsuspendAccount': 'Unsuspend account: {uid}?', 'toast.accountUnsuspended': 'Account unsuspended', 'toast.cantSuspendSelf': "You can\'t suspend your own account", 'verb.unsuspend': 'unsuspend', 'verb.suspend': 'suspend', 'confirm.confirmVerbAccount': 'Confirm {verb} account {name}?', 'toast.unsuspendedName': 'Unsuspended {name}', 'toast.suspendedName': 'Suspended {name}',
                 'profile.title': 'Profile', 'profile.coverPhoto': 'Cover Photo (Background)', 'profile.coverPhotoLabel': 'Cover photo link shown behind your logo (Google Drive)', 'profile.profilePhoto': 'Profile Photo', 'profile.profilePhotoLabel': 'Profile photo link (Google Drive)', 'profile.ringColor': 'Ring color around your photo', 'profile.ringColorHint': 'Pick any color you like for the glowing ring around your photo', 'profile.defaultBtn': 'Default', 'profile.ringtone': 'Call Ringtone', 'profile.ringtoneHint': 'Choose the tone you\'ll hear when someone calls you — each person can pick their own tone, or add a personal one (one link per account)', 'profile.personalInfo': 'Personal Information', 'profile.nameLabel': 'Name', 'profile.namePlaceholder': 'Your name...', 'profile.genderLabel': 'Gender', 'profile.genderChoose': '-- Select --', 'profile.genderMale': 'Male', 'profile.genderFemale': 'Female', 'profile.genderPreferNot': 'Prefer not to say', 'profile.nationalityLabel': 'Nationality', 'profile.nationalityPlaceholder': 'e.g. Egyptian, Saudi...', 'profile.saveSuccess': 'Changes saved', 'profile.saveBtn': 'Save Changes',
                 'common.edit': '✏ Edit', 'common.delete': '🗑 Delete', 'common.lock': '🔒 Lock', 'common.unlock': '🔓 Unlock', 'common.playNow': 'Play now ›', 'common.untitledGame': 'Game', 'common.uploadVideo': 'Upload video',
+                'hero.tag': 'The #1 Gaming Platform', 'hero.sub': 'Discover the best gaming videos in one place', 'hero.statVideo': 'Video', 'hero.statFree': 'Free', 'hero.statLocked': 'Locked', 'hero.exploreBtn': 'Explore Videos ↓',
+                'search.placeholder': 'Search for any video...',
+                'section.unlockedTitle': 'Unlocked Videos', 'section.lockedTitle': 'Locked Videos', 'section.emptyUnlocked': 'No unlocked videos', 'section.emptyLocked': 'No locked videos',
+                'footer.brandLine': 'Professional Gaming Platform', 'footer.rights': 'All rights reserved',
+                'modal.addVideoTitle': 'Upload New Video', 'modal.tabYoutube': 'YouTube', 'modal.tabDrive': 'Google Drive', 'modal.youtubeLinkLabel': 'YouTube Link *', 'modal.driveLinkLabel': 'Google Drive Link *', 'modal.thumbLabel': 'Thumbnail (optional URL)', 'modal.titleLabel': 'Video Title *', 'modal.titlePlaceholder': 'Video name', 'modal.descLabel': 'Description (optional)', 'modal.descPlaceholder': 'Short description...', 'modal.cancelBtn': 'Cancel', 'modal.addBtn': 'Add ✓',
+                'modal.editVideoTitle': 'Edit Video', 'modal.editTitleLabel': 'Title', 'modal.editDescLabel': 'Description', 'modal.saveBtn': 'Save ✓',
+                'modal.addGameTitle': 'Add New Game', 'modal.gameTitleLabel': 'Game Title *', 'modal.gameTitlePlaceholder': 'Game name', 'modal.gameIconLabel': 'Icon (emoji, optional)', 'modal.gameImageLabel': 'Thumbnail (normal link or Google Drive link — optional)',
+                'ringtone.classic': 'Classic', 'ringtone.chime': 'Chime', 'ringtone.digital': 'Digital', 'ringtone.marimba': 'Marimba', 'ringtone.gentle': 'Gentle', 'ringtone.retro': 'Retro', 'ringtone.myCustom': 'My custom ringtone', 'ringtone.changeMine': 'Change my ringtone', 'ringtone.addMine': 'Add my custom ringtone',
             },
             fr: {
                 'menu.navSection': 'Navigation', 'menu.home': 'Accueil', 'menu.unlockedVideos': 'Vidéos débloquées',
@@ -3702,6 +3718,14 @@
                 'toast.onlyMainAdminCanSuspend': 'Seul l\'admin principal peut suspendre des comptes', 'toast.enterUid': 'Entrez l\'UID de l\'utilisateur', 'confirm.suspendAccount': 'Confirmer la suspension du compte : {uid} ?', 'toast.accountSuspended': 'Compte suspendu', 'toast.onlyMainAdminCanUnsuspend': 'Seul l\'admin principal peut réactiver des comptes', 'confirm.unsuspendAccount': 'Réactiver le compte : {uid} ?', 'toast.accountUnsuspended': 'Compte réactivé', 'toast.cantSuspendSelf': 'Vous ne pouvez pas suspendre votre propre compte', 'verb.unsuspend': 'réactiver', 'verb.suspend': 'suspendre', 'confirm.confirmVerbAccount': 'Confirmer {verb} le compte {name} ?', 'toast.unsuspendedName': '{name} réactivé', 'toast.suspendedName': '{name} suspendu',
                 'profile.title': 'Profil', 'profile.coverPhoto': 'Photo de couverture (arrière-plan)', 'profile.coverPhotoLabel': 'Lien de la photo de couverture affichée derrière le logo (Google Drive)', 'profile.profilePhoto': 'Photo de profil', 'profile.profilePhotoLabel': 'Lien de la photo de profil (Google Drive)', 'profile.ringColor': 'Couleur de l\'anneau autour de votre photo', 'profile.ringColorHint': 'Choisissez la couleur que vous préférez pour l\'anneau lumineux autour de votre photo', 'profile.defaultBtn': 'Par défaut', 'profile.ringtone': 'Sonnerie d\'appel', 'profile.ringtoneHint': 'Choisissez la sonnerie que vous entendrez quand quelqu\'un vous appelle — chacun peut choisir sa propre sonnerie ou en ajouter une personnelle (un seul lien par compte)', 'profile.personalInfo': 'Informations personnelles', 'profile.nameLabel': 'Nom', 'profile.namePlaceholder': 'Votre nom...', 'profile.genderLabel': 'Genre', 'profile.genderChoose': '-- Choisir --', 'profile.genderMale': 'Homme', 'profile.genderFemale': 'Femme', 'profile.genderPreferNot': 'Préfère ne pas préciser', 'profile.nationalityLabel': 'Nationalité', 'profile.nationalityPlaceholder': 'ex : Égyptien, Saoudien...', 'profile.saveSuccess': 'Modifications enregistrées', 'profile.saveBtn': 'Enregistrer les modifications',
                 'common.edit': '✏ Modifier', 'common.delete': '🗑 Supprimer', 'common.lock': '🔒 Verrouiller', 'common.unlock': '🔓 Déverrouiller', 'common.playNow': 'Jouer maintenant ›', 'common.untitledGame': 'Jeu', 'common.uploadVideo': 'Ajouter une vidéo',
+                'hero.tag': 'La 1ère plateforme de gaming', 'hero.sub': 'Découvrez les meilleures vidéos de gaming en un seul endroit', 'hero.statVideo': 'Vidéo', 'hero.statFree': 'Gratuit', 'hero.statLocked': 'Verrouillé', 'hero.exploreBtn': 'Explorer les vidéos ↓',
+                'search.placeholder': 'Rechercher une vidéo...',
+                'section.unlockedTitle': 'Vidéos déverrouillées', 'section.lockedTitle': 'Vidéos verrouillées', 'section.emptyUnlocked': 'Aucune vidéo déverrouillée', 'section.emptyLocked': 'Aucune vidéo verrouillée',
+                'footer.brandLine': 'Plateforme de gaming professionnelle', 'footer.rights': 'Tous droits réservés',
+                'modal.addVideoTitle': 'Ajouter une nouvelle vidéo', 'modal.tabYoutube': 'YouTube', 'modal.tabDrive': 'Google Drive', 'modal.youtubeLinkLabel': 'Lien YouTube *', 'modal.driveLinkLabel': 'Lien Google Drive *', 'modal.thumbLabel': 'Miniature (URL facultative)', 'modal.titleLabel': 'Titre de la vidéo *', 'modal.titlePlaceholder': 'Nom de la vidéo', 'modal.descLabel': 'Description (facultatif)', 'modal.descPlaceholder': 'Courte description...', 'modal.cancelBtn': 'Annuler', 'modal.addBtn': 'Ajouter ✓',
+                'modal.editVideoTitle': 'Modifier la vidéo', 'modal.editTitleLabel': 'Titre', 'modal.editDescLabel': 'Description', 'modal.saveBtn': 'Enregistrer ✓',
+                'modal.addGameTitle': 'Ajouter un nouveau jeu', 'modal.gameTitleLabel': 'Titre du jeu *', 'modal.gameTitlePlaceholder': 'Nom du jeu', 'modal.gameIconLabel': 'Icône (emoji, facultatif)', 'modal.gameImageLabel': 'Miniature (lien normal ou lien Google Drive — facultatif)',
+                'ringtone.classic': 'Classique', 'ringtone.chime': 'Carillon', 'ringtone.digital': 'Numérique', 'ringtone.marimba': 'Marimba', 'ringtone.gentle': 'Douce', 'ringtone.retro': 'Rétro', 'ringtone.myCustom': 'Ma sonnerie personnelle', 'ringtone.changeMine': 'Changer ma sonnerie', 'ringtone.addMine': 'Ajouter ma sonnerie personnelle',
             },
             de: {
                 'menu.navSection': 'Navigation', 'menu.home': 'Startseite', 'menu.unlockedVideos': 'Freigeschaltete Videos',
@@ -3740,6 +3764,14 @@
                 'toast.onlyMainAdminCanSuspend': 'Nur der Hauptadmin kann Konten sperren', 'toast.enterUid': 'Gib die Benutzer-UID ein', 'confirm.suspendAccount': 'Konto sperren bestätigen: {uid}?', 'toast.accountSuspended': 'Konto gesperrt', 'toast.onlyMainAdminCanUnsuspend': 'Nur der Hauptadmin kann Konten entsperren', 'confirm.unsuspendAccount': 'Konto entsperren: {uid}?', 'toast.accountUnsuspended': 'Konto entsperrt', 'toast.cantSuspendSelf': 'Du kannst dein eigenes Konto nicht sperren', 'verb.unsuspend': 'entsperren', 'verb.suspend': 'sperren', 'confirm.confirmVerbAccount': 'Konto {name} {verb} bestätigen?', 'toast.unsuspendedName': '{name} entsperrt', 'toast.suspendedName': '{name} gesperrt',
                 'profile.title': 'Profil', 'profile.coverPhoto': 'Titelbild (Hintergrund)', 'profile.coverPhotoLabel': 'Link zum Titelbild, das hinter dem Logo angezeigt wird (Google Drive)', 'profile.profilePhoto': 'Profilbild', 'profile.profilePhotoLabel': 'Link zum Profilbild (Google Drive)', 'profile.ringColor': 'Ringfarbe um dein Bild', 'profile.ringColorHint': 'Wähle eine beliebige Farbe für den leuchtenden Ring um dein Bild', 'profile.defaultBtn': 'Standard', 'profile.ringtone': 'Anruf-Klingelton', 'profile.ringtoneHint': 'Wähle den Ton, den du hörst, wenn dich jemand anruft — jeder kann seinen eigenen Ton wählen oder einen persönlichen hinzufügen (ein Link pro Konto)', 'profile.personalInfo': 'Persönliche Informationen', 'profile.nameLabel': 'Name', 'profile.namePlaceholder': 'Dein Name...', 'profile.genderLabel': 'Geschlecht', 'profile.genderChoose': '-- Auswählen --', 'profile.genderMale': 'Männlich', 'profile.genderFemale': 'Weiblich', 'profile.genderPreferNot': 'Keine Angabe', 'profile.nationalityLabel': 'Nationalität', 'profile.nationalityPlaceholder': 'z. B. Ägyptisch, Saudisch...', 'profile.saveSuccess': 'Änderungen gespeichert', 'profile.saveBtn': 'Änderungen speichern',
                 'common.edit': '✏ Bearbeiten', 'common.delete': '🗑 Löschen', 'common.lock': '🔒 Sperren', 'common.unlock': '🔓 Entsperren', 'common.playNow': 'Jetzt spielen ›', 'common.untitledGame': 'Spiel', 'common.uploadVideo': 'Video hochladen',
+                'hero.tag': 'Die Nr. 1 Gaming-Plattform', 'hero.sub': 'Entdecke die besten Gaming-Videos an einem Ort', 'hero.statVideo': 'Video', 'hero.statFree': 'Kostenlos', 'hero.statLocked': 'Gesperrt', 'hero.exploreBtn': 'Videos entdecken ↓',
+                'search.placeholder': 'Nach einem Video suchen...',
+                'section.unlockedTitle': 'Freigeschaltete Videos', 'section.lockedTitle': 'Gesperrte Videos', 'section.emptyUnlocked': 'Keine freigeschalteten Videos', 'section.emptyLocked': 'Keine gesperrten Videos',
+                'footer.brandLine': 'Professionelle Gaming-Plattform', 'footer.rights': 'Alle Rechte vorbehalten',
+                'modal.addVideoTitle': 'Neues Video hochladen', 'modal.tabYoutube': 'YouTube', 'modal.tabDrive': 'Google Drive', 'modal.youtubeLinkLabel': 'YouTube-Link *', 'modal.driveLinkLabel': 'Google-Drive-Link *', 'modal.thumbLabel': 'Vorschaubild (optionale URL)', 'modal.titleLabel': 'Videotitel *', 'modal.titlePlaceholder': 'Videoname', 'modal.descLabel': 'Beschreibung (optional)', 'modal.descPlaceholder': 'Kurze Beschreibung...', 'modal.cancelBtn': 'Abbrechen', 'modal.addBtn': 'Hinzufügen ✓',
+                'modal.editVideoTitle': 'Video bearbeiten', 'modal.editTitleLabel': 'Titel', 'modal.editDescLabel': 'Beschreibung', 'modal.saveBtn': 'Speichern ✓',
+                'modal.addGameTitle': 'Neues Spiel hinzufügen', 'modal.gameTitleLabel': 'Spieltitel *', 'modal.gameTitlePlaceholder': 'Spielname', 'modal.gameIconLabel': 'Symbol (Emoji, optional)', 'modal.gameImageLabel': 'Vorschaubild (normaler Link oder Google-Drive-Link — optional)',
+                'ringtone.classic': 'Klassisch', 'ringtone.chime': 'Glockenspiel', 'ringtone.digital': 'Digital', 'ringtone.marimba': 'Marimba', 'ringtone.gentle': 'Sanft', 'ringtone.retro': 'Retro', 'ringtone.myCustom': 'Mein eigener Klingelton', 'ringtone.changeMine': 'Klingelton ändern', 'ringtone.addMine': 'Eigenen Klingelton hinzufügen',
             },
             ru: {
                 'menu.navSection': 'Навигация', 'menu.home': 'Главная', 'menu.unlockedVideos': 'Открытые видео',
@@ -3778,6 +3810,14 @@
                 'toast.onlyMainAdminCanSuspend': 'Только главный админ может блокировать аккаунты', 'toast.enterUid': 'Введите UID пользователя', 'confirm.suspendAccount': 'Подтвердить блокировку аккаунта: {uid}?', 'toast.accountSuspended': 'Аккаунт заблокирован', 'toast.onlyMainAdminCanUnsuspend': 'Только главный админ может разблокировать аккаунты', 'confirm.unsuspendAccount': 'Разблокировать аккаунт: {uid}?', 'toast.accountUnsuspended': 'Аккаунт разблокирован', 'toast.cantSuspendSelf': 'Вы не можете заблокировать свой собственный аккаунт', 'verb.unsuspend': 'разблокировать', 'verb.suspend': 'заблокировать', 'confirm.confirmVerbAccount': 'Подтвердить {verb} аккаунт {name}?', 'toast.unsuspendedName': '{name} разблокирован', 'toast.suspendedName': '{name} заблокирован',
                 'profile.title': 'Профиль', 'profile.coverPhoto': 'Обложка (фон)', 'profile.coverPhotoLabel': 'Ссылка на фото обложки за логотипом (Google Drive)', 'profile.profilePhoto': 'Фото профиля', 'profile.profilePhotoLabel': 'Ссылка на фото профиля (Google Drive)', 'profile.ringColor': 'Цвет кольца вокруг вашего фото', 'profile.ringColorHint': 'Выберите любой понравившийся цвет для светящегося кольца вокруг фото', 'profile.defaultBtn': 'По умолчанию', 'profile.ringtone': 'Рингтон звонка', 'profile.ringtoneHint': 'Выберите тон, который вы услышите, когда кто-то вам позвонит — каждый может выбрать свой тон или добавить личный (одна ссылка на аккаунт)', 'profile.personalInfo': 'Личная информация', 'profile.nameLabel': 'Имя', 'profile.namePlaceholder': 'Ваше имя...', 'profile.genderLabel': 'Пол', 'profile.genderChoose': '-- Выбрать --', 'profile.genderMale': 'Мужской', 'profile.genderFemale': 'Женский', 'profile.genderPreferNot': 'Не указывать', 'profile.nationalityLabel': 'Национальность', 'profile.nationalityPlaceholder': 'например: египтянин, саудовец...', 'profile.saveSuccess': 'Изменения сохранены', 'profile.saveBtn': 'Сохранить изменения',
                 'common.edit': '✏ Изменить', 'common.delete': '🗑 Удалить', 'common.lock': '🔒 Заблокировать', 'common.unlock': '🔓 Разблокировать', 'common.playNow': 'Играть сейчас ›', 'common.untitledGame': 'Игра', 'common.uploadVideo': 'Загрузить видео',
+                'hero.tag': 'Игровая платформа №1', 'hero.sub': 'Найдите лучшие игровые видео в одном месте', 'hero.statVideo': 'Видео', 'hero.statFree': 'Открыто', 'hero.statLocked': 'Закрыто', 'hero.exploreBtn': 'Смотреть видео ↓',
+                'search.placeholder': 'Поиск видео...',
+                'section.unlockedTitle': 'Открытые видео', 'section.lockedTitle': 'Закрытые видео', 'section.emptyUnlocked': 'Нет открытых видео', 'section.emptyLocked': 'Нет закрытых видео',
+                'footer.brandLine': 'Профессиональная игровая платформа', 'footer.rights': 'Все права защищены',
+                'modal.addVideoTitle': 'Загрузить новое видео', 'modal.tabYoutube': 'YouTube', 'modal.tabDrive': 'Google Drive', 'modal.youtubeLinkLabel': 'Ссылка YouTube *', 'modal.driveLinkLabel': 'Ссылка Google Drive *', 'modal.thumbLabel': 'Миниатюра (необязательный URL)', 'modal.titleLabel': 'Название видео *', 'modal.titlePlaceholder': 'Название видео', 'modal.descLabel': 'Описание (необязательно)', 'modal.descPlaceholder': 'Краткое описание...', 'modal.cancelBtn': 'Отмена', 'modal.addBtn': 'Добавить ✓',
+                'modal.editVideoTitle': 'Редактировать видео', 'modal.editTitleLabel': 'Название', 'modal.editDescLabel': 'Описание', 'modal.saveBtn': 'Сохранить ✓',
+                'modal.addGameTitle': 'Добавить новую игру', 'modal.gameTitleLabel': 'Название игры *', 'modal.gameTitlePlaceholder': 'Название игры', 'modal.gameIconLabel': 'Иконка (эмодзи, необязательно)', 'modal.gameImageLabel': 'Миниатюра (обычная ссылка или ссылка Google Drive — необязательно)',
+                'ringtone.classic': 'Классический', 'ringtone.chime': 'Колокольчик', 'ringtone.digital': 'Цифровой', 'ringtone.marimba': 'Маримба', 'ringtone.gentle': 'Спокойный', 'ringtone.retro': 'Ретро', 'ringtone.myCustom': 'Моя мелодия', 'ringtone.changeMine': 'Изменить мою мелодию', 'ringtone.addMine': 'Добавить свою мелодию',
             },
             zh: {
                 'menu.navSection': '导航', 'menu.home': '主页', 'menu.unlockedVideos': '已解锁视频',
@@ -3816,6 +3856,14 @@
                 'toast.onlyMainAdminCanSuspend': '只有主管理员可以封禁账户', 'toast.enterUid': '请输入用户 UID', 'confirm.suspendAccount': '确认封禁账户：{uid}？', 'toast.accountSuspended': '账户已封禁', 'toast.onlyMainAdminCanUnsuspend': '只有主管理员可以解除封禁', 'confirm.unsuspendAccount': '解除封禁账户：{uid}？', 'toast.accountUnsuspended': '已解除封禁', 'toast.cantSuspendSelf': '你不能封禁自己的账户', 'verb.unsuspend': '解除封禁', 'verb.suspend': '封禁', 'confirm.confirmVerbAccount': '确认{verb}账户 {name}？', 'toast.unsuspendedName': '已解除封禁 {name}', 'toast.suspendedName': '已封禁 {name}',
                 'profile.title': '个人资料', 'profile.coverPhoto': '封面图片（背景）', 'profile.coverPhotoLabel': '显示在徽标后面的封面图片链接（Google Drive）', 'profile.profilePhoto': '头像照片', 'profile.profilePhotoLabel': '头像照片链接（Google Drive）', 'profile.ringColor': '照片周围的圆环颜色', 'profile.ringColorHint': '为你照片周围的发光圆环选择任意喜欢的颜色', 'profile.defaultBtn': '默认', 'profile.ringtone': '通话铃声', 'profile.ringtoneHint': '选择有人给你打电话时播放的铃声——每个人都可以选择自己的铃声，或添加个人铃声（每个账户仅限一个链接）', 'profile.personalInfo': '个人信息', 'profile.nameLabel': '姓名', 'profile.namePlaceholder': '你的名字...', 'profile.genderLabel': '性别', 'profile.genderChoose': '-- 选择 --', 'profile.genderMale': '男', 'profile.genderFemale': '女', 'profile.genderPreferNot': '不愿透露', 'profile.nationalityLabel': '国籍', 'profile.nationalityPlaceholder': '例如：埃及、沙特...', 'profile.saveSuccess': '更改已保存', 'profile.saveBtn': '保存更改',
                 'common.edit': '✏ 编辑', 'common.delete': '🗑 删除', 'common.lock': '🔒 锁定', 'common.unlock': '🔓 解锁', 'common.playNow': '立即玩 ›', 'common.untitledGame': '游戏', 'common.uploadVideo': '上传视频',
+                'hero.tag': '第一游戏平台', 'hero.sub': '在一个地方发现最好的游戏视频', 'hero.statVideo': '视频', 'hero.statFree': '免费', 'hero.statLocked': '已锁定', 'hero.exploreBtn': '探索视频 ↓',
+                'search.placeholder': '搜索任意视频...',
+                'section.unlockedTitle': '已解锁视频', 'section.lockedTitle': '已锁定视频', 'section.emptyUnlocked': '暂无已解锁视频', 'section.emptyLocked': '暂无已锁定视频',
+                'footer.brandLine': '专业游戏平台', 'footer.rights': '版权所有',
+                'modal.addVideoTitle': '上传新视频', 'modal.tabYoutube': 'YouTube', 'modal.tabDrive': 'Google Drive', 'modal.youtubeLinkLabel': 'YouTube 链接 *', 'modal.driveLinkLabel': 'Google Drive 链接 *', 'modal.thumbLabel': '缩略图（可选网址）', 'modal.titleLabel': '视频标题 *', 'modal.titlePlaceholder': '视频名称', 'modal.descLabel': '描述（可选）', 'modal.descPlaceholder': '简短描述...', 'modal.cancelBtn': '取消', 'modal.addBtn': '添加 ✓',
+                'modal.editVideoTitle': '编辑视频', 'modal.editTitleLabel': '标题', 'modal.editDescLabel': '描述', 'modal.saveBtn': '保存 ✓',
+                'modal.addGameTitle': '添加新游戏', 'modal.gameTitleLabel': '游戏标题 *', 'modal.gameTitlePlaceholder': '游戏名称', 'modal.gameIconLabel': '图标（表情符号，可选）', 'modal.gameImageLabel': '缩略图（普通链接或 Google Drive 链接 — 可选）',
+                'ringtone.classic': '经典', 'ringtone.chime': '铃声', 'ringtone.digital': '数字', 'ringtone.marimba': '马林巴', 'ringtone.gentle': '轻柔', 'ringtone.retro': '复古', 'ringtone.myCustom': '我的专属铃声', 'ringtone.changeMine': '更改我的铃声', 'ringtone.addMine': '添加我的专属铃声',
             },
         };
         function t(key) {
@@ -3928,6 +3976,10 @@
         // Called whenever the viewer changes their language.
         function retranslateDynamicContent() {
             retranslateWithin(document);
+            const ringtoneGrid = document.getElementById('profile-ringtone-grid');
+            if (ringtoneGrid && typeof _renderRingtoneOptions === 'function') {
+                _renderRingtoneOptions(ringtoneGrid.dataset.selected || 'classic', ringtoneGrid.dataset.customUrl || '');
+            }
         }
 
         // Called the first time a user picks a language on the gate screen, and
@@ -3942,6 +3994,7 @@
             try {
                 if (S.user && S.user.uid) {
                     await setDoc(doc(db, 'users', S.user.uid), { appLanguage: lang }, { merge: true });
+                    try { localStorage.setItem('gv_lang_' + S.user.uid, lang); } catch (e2) {}
                 }
             } catch (e) { console.error('appLanguage save error:', e); }
             retranslateDynamicContent();
@@ -3960,17 +4013,35 @@
         // once per account. updateUI() then decides whether to show the gate
         // screen or the app itself based on S.language — this just fills it in.
         async function ensureLanguageSelected(uid) {
+            // Fast path: use the last-known language for this account immediately,
+            // so there's no flash of the language gate while Firestore responds.
+            let cached = null;
+            try { cached = localStorage.getItem('gv_lang_' + uid); } catch (e) {}
+            if (cached && SUPPORTED_LANGS.includes(cached)) {
+                S.language = cached;
+                applyTranslations();
+            }
             try {
                 const snap = await getDoc(doc(db, 'users', uid));
                 const saved = snap.exists() ? snap.data().appLanguage : null;
                 if (saved && SUPPORTED_LANGS.includes(saved)) {
                     S.language = saved;
                     applyTranslations();
+                    try { localStorage.setItem('gv_lang_' + uid, saved); } catch (e) {}
                     return true;
                 }
-            } catch (e) { console.error('ensureLanguageSelected error:', e); }
-            S.language = null;
-            return false;
+                // Firestore reached us fine and confirmed there's genuinely no saved
+                // language yet (first-ever login) — only then should the gate show.
+                if (!cached) { S.language = null; return false; }
+                return true;
+            } catch (e) {
+                console.error('ensureLanguageSelected error:', e);
+                // A transient read error must NOT wipe a language we already know —
+                // that was forcing the language gate to reappear on ordinary app
+                // reopens, and it also made new chat messages get saved with the
+                // wrong lang, breaking auto-translation between members.
+                return !!cached;
+            }
         }
 
         // ===== HELPERS =====
@@ -4194,7 +4265,7 @@
             }
             if (videos.length === 0) {
                 empty.style.display = 'grid';
-                empty.querySelector('p').textContent = isLocked ? 'لا توجد فيديوهات مقفولة' : 'لا توجد فيديوهات مفتوحة';
+                empty.querySelector('p').textContent = isLocked ? t('section.emptyLocked') : t('section.emptyUnlocked');
             } else {
                 empty.style.display = 'none';
                 videos.forEach(v => grid.appendChild(buildCard(v)));
@@ -6243,12 +6314,12 @@
             play: '<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>'
         };
         const RINGTONES = {
-            classic: { label: 'كلاسيكي', wave: 'sine', notes: [[620, 500]], cycle: 1400 },
-            chime: { label: 'جرس', wave: 'triangle', notes: [[523, 160], [659, 160], [784, 260]], cycle: 1700 },
-            digital: { label: 'رقمي', wave: 'square', notes: [[700, 90], [0, 60], [700, 90], [0, 60], [700, 90]], cycle: 1250 },
-            marimba: { label: 'ماريمبا', wave: 'sine', notes: [[784, 140], [659, 140], [523, 220]], cycle: 1600 },
-            gentle: { label: 'هادئة', wave: 'sine', notes: [[440, 700]], cycle: 1900 },
-            retro: { label: 'ريترو', wave: 'sawtooth', notes: [[320, 90], [520, 90], [720, 90], [520, 90]], cycle: 1500 }
+            classic: { labelKey: 'ringtone.classic', wave: 'sine', notes: [[620, 500]], cycle: 1400 },
+            chime: { labelKey: 'ringtone.chime', wave: 'triangle', notes: [[523, 160], [659, 160], [784, 260]], cycle: 1700 },
+            digital: { labelKey: 'ringtone.digital', wave: 'square', notes: [[700, 90], [0, 60], [700, 90], [0, 60], [700, 90]], cycle: 1250 },
+            marimba: { labelKey: 'ringtone.marimba', wave: 'sine', notes: [[784, 140], [659, 140], [523, 220]], cycle: 1600 },
+            gentle: { labelKey: 'ringtone.gentle', wave: 'sine', notes: [[440, 700]], cycle: 1900 },
+            retro: { labelKey: 'ringtone.retro', wave: 'sawtooth', notes: [[320, 90], [520, 90], [720, 90], [520, 90]], cycle: 1500 }
         };
 
         // Turns a pasted link into playable-audio candidates, same idea as
@@ -6345,22 +6416,22 @@
             const key = (selected === 'custom' && hasCustom) ? 'custom' : (RINGTONES[selected] ? selected : 'classic');
             grid.dataset.selected = key;
             const presetTiles = Object.keys(RINGTONES).map(k => {
-                const t = RINGTONES[k];
+                const def = RINGTONES[k];
                 return `<button type="button" class="ringtone-opt${k === key ? ' active' : ''}" data-key="${k}" onclick="selectProfileRingtone('${k}')">
-                    <span class="ro-name"><span class="ro-icon">${RINGTONE_ICONS[k]}</span>${t.label}</span>
+                    <span class="ro-name"><span class="ro-icon">${RINGTONE_ICONS[k]}</span>${t(def.labelKey)}</span>
                     <span class="ro-play" onclick="event.stopPropagation();previewRingtone('${k}')">${RINGTONE_ICONS.play}</span>
                 </button>`;
             }).join('');
             const customTile = hasCustom
                 ? `<button type="button" class="ringtone-opt${key === 'custom' ? ' active' : ''}" data-key="custom" onclick="selectProfileRingtone('custom')">
-                    <span class="ro-name"><span class="ro-icon">${RINGTONE_ICONS.custom}</span>نغمتي الخاصة</span>
+                    <span class="ro-name"><span class="ro-icon">${RINGTONE_ICONS.custom}</span>${t('ringtone.myCustom')}</span>
                     <span class="ro-play" onclick="event.stopPropagation();previewRingtone('custom')">${RINGTONE_ICONS.play}</span>
                    </button>
                    <button type="button" class="ringtone-opt" onclick="event.stopPropagation();openCustomRingtoneForm()" style="justify-content:center;color:var(--text-dim)">
-                    <span class="ro-name"><span class="ro-icon">${RINGTONE_ICONS.edit}</span>تغيير نغمتي</span>
+                    <span class="ro-name"><span class="ro-icon">${RINGTONE_ICONS.edit}</span>${t('ringtone.changeMine')}</span>
                    </button>`
                 : `<button type="button" class="ringtone-opt" onclick="event.stopPropagation();openCustomRingtoneForm()" style="justify-content:center;color:var(--magenta)">
-                    <span class="ro-name"><span class="ro-icon">${RINGTONE_ICONS.add}</span>إضافة نغمتي الخاصة</span>
+                    <span class="ro-name"><span class="ro-icon">${RINGTONE_ICONS.add}</span>${t('ringtone.addMine')}</span>
                    </button>`;
             grid.innerHTML = presetTiles + customTile;
         };
