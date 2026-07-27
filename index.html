@@ -8161,9 +8161,13 @@
         }).catch(e => { console.error('Redirect result error:', e); });
 
         onAuthStateChanged(auth, async fbUser => {
-            // The very first callback tells us definitively whether a saved
-            // session exists — that's our cue to drop the restore overlay.
-            _hideSessionRestoreOverlay(!!fbUser);
+          // The overlay must stay up until the REAL state is ready (S.user set,
+          // language loaded, UI rendered) — not just the instant Firebase confirms
+          // a session exists. Hiding it too early was letting the login screen
+          // flash underneath for a moment before the app UI took over. It's
+          // dropped in the `finally` below so it always fires exactly once,
+          // however this callback's branch exits (including early returns).
+          try {
             if (fbUser && !S.user) {
                 S.fbLoading = true;
                 // Prime the language from cache BEFORE anything calls updateUI() —
@@ -8219,6 +8223,9 @@
                     setUpPresence(fbUser.uid);
                 }
             }
+          } finally {
+            _hideSessionRestoreOverlay(!!fbUser);
+          }
         });
 
         // Mark offline as soon as the tab/app is actually closing (onDisconnect
