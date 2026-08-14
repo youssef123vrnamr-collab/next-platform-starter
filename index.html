@@ -1499,7 +1499,8 @@
 
         #members-modal,
         #conversations-modal,
-        #games-modal {
+        #games-modal,
+        #competitions-modal {
             position: fixed;
             inset: 0;
             z-index: 9999;
@@ -1512,6 +1513,39 @@
         }
         .members-fs-body { padding: 18px 18px 30px; max-width: 560px; margin: 0 auto; width: 100%; flex: 1; }
         .members-fs-list { max-height: none; }
+
+        /* ===== Competitions (public) ===== */
+        .comp-public-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 12px; }
+        .comp-public-title { color: var(--bright); font-weight: 800; font-size: 16px; font-family: 'Rajdhani', sans-serif; }
+        .comp-public-server { color: var(--text-dim); font-size: 12px; margin-top: 3px; direction: ltr; text-align: right; }
+        .comp-public-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+        .comp-public-actions { margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; }
+        .comp-join-btn { padding: 9px 18px; background: var(--grad); border: none; border-radius: 9px; color: #0a0814; font-weight: 800; font-size: 13px; cursor: pointer; }
+        .comp-join-btn:disabled { opacity: .55; cursor: default; }
+        .comp-joined-tag { padding: 8px 14px; border-radius: 9px; background: rgba(34,197,94,0.12); border: 1px solid rgba(34,197,94,0.3); color: #86efac; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 5px; }
+        .comp-cert-btn { padding: 9px 18px; background: linear-gradient(135deg,#ffc862,#ffb020); border: none; border-radius: 9px; color: #3a2400; font-weight: 800; font-size: 13px; cursor: pointer; }
+        .comp-verify-bar { display: flex; gap: 8px; margin-top: 4px; margin-bottom: 18px; }
+        .comp-verify-bar input { flex: 1; padding: 10px 14px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 9px; color: #fff; font-size: 13px; outline: none; direction: ltr; text-align: right; }
+        .comp-verify-btn { padding: 10px 16px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 9px; color: var(--text); font-weight: 700; font-size: 13px; cursor: pointer; white-space: nowrap; }
+        .comp-verify-result { margin-top: 10px; padding: 12px 14px; border-radius: 10px; font-size: 13px; display: none; }
+        .comp-verify-result.valid { display: block; background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); color: #86efac; }
+        .comp-verify-result.invalid { display: block; background: rgba(255,70,70,0.1); border: 1px solid rgba(255,70,70,0.3); color: #ff9a9a; }
+
+        /* ===== Certificate modal ===== */
+        #certificate-modal .modal-box { text-align: center; }
+        #cert-canvas { width: 100%; max-width: 480px; border-radius: 10px; box-shadow: 0 10px 40px -12px rgba(192,38,211,0.5); }
+        .cert-download-btn { margin-top: 16px; padding: 10px 22px; background: var(--grad); border: none; border-radius: 9px; color: #0a0814; font-weight: 800; font-size: 13px; cursor: pointer; }
+
+        /* ===== Admin: competition participants ===== */
+        .comp-participants-toggle { background: none; border: 1px solid var(--border); color: var(--text-dim); border-radius: 8px; padding: 4px 10px; font-size: 11px; cursor: pointer; }
+        .comp-participants-list { margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 10px; display: none; }
+        .comp-participants-list.open { display: block; }
+        .comp-participant-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 12.5px; }
+        .comp-participant-row .cpr-info { display: flex; flex-direction: column; gap: 2px; }
+        .comp-participant-row .cpr-name { color: var(--text); font-weight: 700; }
+        .comp-participant-row .cpr-sub { color: var(--text-dim); font-size: 11px; direction: ltr; text-align: right; }
+        .comp-winner-tag { background: rgba(255,176,32,0.15); color: #ffc862; border: 1px solid rgba(255,176,32,0.3); font-size: 10px; padding: 2px 8px; border-radius: 10px; font-weight: 700; white-space: nowrap; }
+        .comp-declare-btn { background: rgba(34,197,94,0.12); border: 1px solid rgba(34,197,94,0.3); color: #86efac; font-size: 11px; padding: 4px 9px; border-radius: 8px; cursor: pointer; white-space: nowrap; }
 
         /* ===== Online Games hub ===== */
         .games-fs-body { padding: 18px 18px 40px; max-width: 620px; margin: 0 auto; width: 100%; flex: 1; }
@@ -2771,6 +2805,9 @@
                 <div class="menu-nav-item" onclick="closeMenuPanel();openGamesModal()">
                     <span class="menu-nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="12" x2="10" y2="12"/><line x1="8" y1="10" x2="8" y2="14"/><circle cx="15" cy="12" r="1" fill="currentColor"/><circle cx="17" cy="10" r="1" fill="currentColor"/><path d="M6 8h12a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2z"/></svg></span> <span data-i18n="menu.onlineGames">ألعاب أونلاين</span>
                 </div>
+                <div class="menu-nav-item" onclick="closeMenuPanel();openCompetitionsModal()">
+                    <span class="menu-nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0V4z"/><path d="M7 5H4a2 2 0 0 0 2 4"/><path d="M17 5h3a2 2 0 0 1-2 4"/></svg></span> <span data-i18n="menu.competitions">المسابقات</span>
+                </div>
 
                 <div class="menu-nav-divider"></div>
                 <div class="menu-section-title" data-i18n="menu.socialSection">التواصل</div>
@@ -3427,6 +3464,63 @@
         </div>
     </div>
 
+    <!-- ===== COMPETITIONS MODAL (public) ===== -->
+    <div id="competitions-modal">
+        <div class="profile-fs-header">
+            <button class="profile-fs-back" onclick="closeCompetitionsModal()">✕</button>
+            <span class="profile-fs-title" style="display:flex;align-items:center;gap:7px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0V4z"/><path d="M7 5H4a2 2 0 0 0 2 4"/><path d="M17 5h3a2 2 0 0 1-2 4"/></svg> <span data-i18n="menu.competitions">المسابقات</span></span>
+        </div>
+        <div class="members-fs-body">
+            <p class="directory-hint" data-i18n="comp.publicHint">سجّل في أي مسابقة عايز تلعب فيها، وبعد ما يتحدد الفائز هتلاقي شهادتك هنا</p>
+
+            <div class="comp-verify-bar">
+                <input type="text" id="comp-verify-input" data-i18n-placeholder="comp.verifyPlaceholder" placeholder="أدخل كود الشهادة للتحقق..." />
+                <button class="comp-verify-btn" onclick="handleVerifyCertificate()" data-i18n="comp.verifyBtn">تحقق</button>
+            </div>
+            <div id="comp-verify-result" class="comp-verify-result"></div>
+
+            <div id="competitions-public-list"></div>
+        </div>
+    </div>
+
+    <!-- ===== COMPETITION REGISTRATION MODAL ===== -->
+    <div id="comp-register-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeCompRegisterModal()">
+        <div class="modal-box">
+            <h2 class="modal-title" style="display:flex;align-items:center;gap:8px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0V4z"/><path d="M7 5H4a2 2 0 0 0 2 4"/><path d="M17 5h3a2 2 0 0 1-2 4"/></svg> <span id="comp-register-title" data-i18n="comp.registerTitle">التسجيل في المسابقة</span></h2>
+            <div class="modal-field">
+                <label class="modal-label" data-i18n="comp.fullNameLabel">الاسم الثلاثي (لطباعته على الشهادة) *</label>
+                <input id="comp-reg-fullname" class="modal-input" type="text" data-i18n-placeholder="comp.fullNamePlaceholder" placeholder="مثال: أحمد محمد علي" />
+            </div>
+            <div class="modal-field">
+                <label class="modal-label" data-i18n="comp.mcUsernameLabel">اسم المستخدم داخل ماين كرافت *</label>
+                <input id="comp-reg-mcuser" class="modal-input" type="text" data-i18n-placeholder="comp.mcUsernamePlaceholder" placeholder="Minecraft Username" style="direction:ltr;text-align:right" />
+            </div>
+            <div class="modal-field">
+                <label class="modal-label" data-i18n="comp.emailLabel">البريد الإلكتروني *</label>
+                <input id="comp-reg-email" class="modal-input" type="email" inputmode="email" data-i18n-placeholder="comp.emailPlaceholder2" placeholder="example@email.com" style="direction:ltr;text-align:right" />
+            </div>
+            <p id="comp-register-error" class="modal-error"></p>
+            <div class="modal-btns">
+                <button class="btn-cancel" onclick="closeCompRegisterModal()" data-i18n="modal.cancelBtn">إلغاء</button>
+                <button class="btn-confirm green" id="comp-register-confirm-btn" onclick="submitCompRegistration()" data-i18n="comp.registerBtn">تسجيل ✓</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== CERTIFICATE MODAL ===== -->
+    <div id="certificate-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeCertificateModal()">
+        <div class="modal-box">
+            <h2 class="modal-title" style="display:flex;align-items:center;gap:8px;justify-content:center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0V4z"/><path d="M7 5H4a2 2 0 0 0 2 4"/><path d="M17 5h3a2 2 0 0 1-2 4"/></svg> <span data-i18n="comp.certTitle">شهادة الفوز</span></h2>
+            <canvas id="cert-canvas" width="1000" height="700"></canvas>
+            <div>
+                <button class="cert-download-btn" onclick="downloadCertificate()" data-i18n="comp.downloadBtn">⬇ تحميل الشهادة</button>
+            </div>
+            <div class="modal-btns" style="margin-top:14px">
+                <button class="btn-cancel" onclick="closeCertificateModal()" data-i18n="modal.closeBtn">إغلاق</button>
+            </div>
+        </div>
+    </div>
+
     <!-- ===== ADD VIDEO MODAL ===== -->
     <div id="add-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeAddModal()">
         <div class="modal-box">
@@ -3812,6 +3906,17 @@
                 'panel.compServerPlaceholder': 'عنوان السيرفر (IP / Domain)', 'panel.statusUpcoming': 'قادمة', 'panel.statusOngoing': 'جارية', 'panel.statusFinished': 'منتهية',
                 'panel.compHasCashPrize': 'فيه مكسب مالي', 'panel.compPrizeAmount': 'قيمة الجائزة', 'panel.compPrizeTerms': 'شروط الجائزة (اختياري)',
                 'panel.createCompetitionBtn': 'إنشاء المسابقة', 'panel.currentCompetitions': 'المسابقات الحالية',
+                'modal.closeBtn': 'إغلاق',
+                'comp.publicHint': 'سجّل في أي مسابقة عايز تلعب فيها، وبعد ما يتحدد الفائز هتلاقي شهادتك هنا',
+                'comp.verifyPlaceholder': 'أدخل كود الشهادة للتحقق...', 'comp.verifyBtn': 'تحقق',
+                'comp.registerTitle': 'التسجيل في المسابقة', 'comp.fullNameLabel': 'الاسم الثلاثي (لطباعته على الشهادة) *', 'comp.fullNamePlaceholder': 'مثال: أحمد محمد علي',
+                'comp.mcUsernameLabel': 'اسم المستخدم داخل ماين كرافت *', 'comp.mcUsernamePlaceholder': 'Minecraft Username',
+                'comp.emailLabel': 'البريد الإلكتروني *', 'comp.emailPlaceholder2': 'example@email.com', 'comp.registerBtn': 'تسجيل ✓',
+                'comp.certTitle': 'شهادة الفوز', 'comp.downloadBtn': '⬇ تحميل الشهادة',
+                'comp.joinBtn': 'انضمام / تسجيل', 'comp.joinedTag': 'أنت مسجّل ✓', 'comp.winnerCertBtn': '🏆 عرض شهادتي',
+                'comp.noCompetitions': 'لا توجد مسابقات متاحة حالياً', 'comp.viewParticipants': 'عرض المتسابقين',
+                'comp.hideParticipants': 'إخفاء المتسابقين', 'comp.declareWinner': 'اعتماد الفائز', 'comp.winnerTag': '🏆 الفائز',
+                'comp.noParticipants': 'لا يوجد متسابقين بعد', 'comp.verifyValid': 'الشهادة صحيحة ✅', 'comp.verifyInvalid': 'الكود غير صحيح ❌',
                 'panel.editProfile': 'اضغط لتعديل الملف', 'panel.addVideo': '+ رفع فيديو',
                 'games.hint': 'ألعاب حصرية على GAMEVERSE — العب لوحدك وحاول تكسر رقمك القياسي', 'games.changeCount': 'غيّر العدد', 'games.addGame': '+ إضافة لعبة',
                 'role.mainAdmin': 'مشرف رئيسي', 'role.normalAdmin': 'مشرف عادي', 'role.user': 'مستخدم',
@@ -3862,6 +3967,17 @@
                 'panel.compServerPlaceholder': 'Server Address (IP / Domain)', 'panel.statusUpcoming': 'Upcoming', 'panel.statusOngoing': 'Ongoing', 'panel.statusFinished': 'Finished',
                 'panel.compHasCashPrize': 'Has cash prize', 'panel.compPrizeAmount': 'Prize amount', 'panel.compPrizeTerms': 'Prize terms (optional)',
                 'panel.createCompetitionBtn': 'Create Competition', 'panel.currentCompetitions': 'Current Competitions',
+                'modal.closeBtn': 'Close',
+                'comp.publicHint': 'Register for any competition you want to join, and once a winner is chosen your certificate will appear here',
+                'comp.verifyPlaceholder': 'Enter certificate code to verify...', 'comp.verifyBtn': 'Verify',
+                'comp.registerTitle': 'Competition Registration', 'comp.fullNameLabel': 'Full Name (printed on certificate) *', 'comp.fullNamePlaceholder': 'e.g. John Michael Smith',
+                'comp.mcUsernameLabel': 'Minecraft Username *', 'comp.mcUsernamePlaceholder': 'Minecraft Username',
+                'comp.emailLabel': 'Email *', 'comp.emailPlaceholder2': 'example@email.com', 'comp.registerBtn': 'Register ✓',
+                'comp.certTitle': 'Winner Certificate', 'comp.downloadBtn': '⬇ Download Certificate',
+                'comp.joinBtn': 'Join / Register', 'comp.joinedTag': 'Registered ✓', 'comp.winnerCertBtn': '🏆 View My Certificate',
+                'comp.noCompetitions': 'No competitions available right now', 'comp.viewParticipants': 'View Participants',
+                'comp.hideParticipants': 'Hide Participants', 'comp.declareWinner': 'Declare Winner', 'comp.winnerTag': '🏆 Winner',
+                'comp.noParticipants': 'No participants yet', 'comp.verifyValid': 'Certificate is valid ✅', 'comp.verifyInvalid': 'Invalid code ❌',
                 'panel.editProfile': 'Tap to edit profile', 'panel.addVideo': '+ Upload video',
                 'games.hint': 'Exclusive games on GAMEVERSE — play solo and try to beat your high score', 'games.changeCount': 'Change count', 'games.addGame': '+ Add game',
                 'role.mainAdmin': 'Main Admin', 'role.normalAdmin': 'Admin', 'role.user': 'Member',
@@ -3912,6 +4028,17 @@
                 'panel.compServerPlaceholder': 'Adresse du serveur (IP / Domaine)', 'panel.statusUpcoming': 'À venir', 'panel.statusOngoing': 'En cours', 'panel.statusFinished': 'Terminée',
                 'panel.compHasCashPrize': 'Prix en argent', 'panel.compPrizeAmount': 'Montant du prix', 'panel.compPrizeTerms': 'Conditions du prix (optionnel)',
                 'panel.createCompetitionBtn': 'Créer la compétition', 'panel.currentCompetitions': 'Compétitions actuelles',
+                'modal.closeBtn': 'Fermer',
+                'comp.publicHint': 'Inscrivez-vous à une compétition, et une fois le vainqueur désigné, votre certificat apparaîtra ici',
+                'comp.verifyPlaceholder': 'Entrez le code du certificat pour vérifier...', 'comp.verifyBtn': 'Vérifier',
+                'comp.registerTitle': 'Inscription à la compétition', 'comp.fullNameLabel': 'Nom complet (imprimé sur le certificat) *', 'comp.fullNamePlaceholder': 'ex. Jean Michel Dupont',
+                'comp.mcUsernameLabel': 'Nom d\'utilisateur Minecraft *', 'comp.mcUsernamePlaceholder': 'Minecraft Username',
+                'comp.emailLabel': 'E-mail *', 'comp.emailPlaceholder2': 'example@email.com', 'comp.registerBtn': 'S\'inscrire ✓',
+                'comp.certTitle': 'Certificat de victoire', 'comp.downloadBtn': '⬇ Télécharger le certificat',
+                'comp.joinBtn': 'Rejoindre / S\'inscrire', 'comp.joinedTag': 'Inscrit ✓', 'comp.winnerCertBtn': '🏆 Voir mon certificat',
+                'comp.noCompetitions': 'Aucune compétition disponible pour le moment', 'comp.viewParticipants': 'Voir les participants',
+                'comp.hideParticipants': 'Masquer les participants', 'comp.declareWinner': 'Désigner le vainqueur', 'comp.winnerTag': '🏆 Vainqueur',
+                'comp.noParticipants': 'Aucun participant pour le moment', 'comp.verifyValid': 'Certificat valide ✅', 'comp.verifyInvalid': 'Code invalide ❌',
                 'panel.editProfile': 'Touchez pour modifier le profil', 'panel.addVideo': '+ Ajouter une vidéo',
                 'games.hint': 'Jeux exclusifs sur GAMEVERSE — jouez seul et battez votre record', 'games.changeCount': 'Changer le nombre', 'games.addGame': '+ Ajouter un jeu',
                 'role.mainAdmin': 'Admin principal', 'role.normalAdmin': 'Admin', 'role.user': 'Membre',
@@ -3962,6 +4089,17 @@
                 'panel.compServerPlaceholder': 'Serveradresse (IP / Domain)', 'panel.statusUpcoming': 'Bevorstehend', 'panel.statusOngoing': 'Laufend', 'panel.statusFinished': 'Beendet',
                 'panel.compHasCashPrize': 'Geldpreis vorhanden', 'panel.compPrizeAmount': 'Preisbetrag', 'panel.compPrizeTerms': 'Preisbedingungen (optional)',
                 'panel.createCompetitionBtn': 'Wettbewerb erstellen', 'panel.currentCompetitions': 'Aktuelle Wettbewerbe',
+                'modal.closeBtn': 'Schließen',
+                'comp.publicHint': 'Melde dich für einen Wettbewerb an, an dem du teilnehmen möchtest — sobald ein Gewinner feststeht, erscheint dein Zertifikat hier',
+                'comp.verifyPlaceholder': 'Zertifikatscode zur Überprüfung eingeben...', 'comp.verifyBtn': 'Überprüfen',
+                'comp.registerTitle': 'Wettbewerbsanmeldung', 'comp.fullNameLabel': 'Vollständiger Name (auf dem Zertifikat) *', 'comp.fullNamePlaceholder': 'z.B. Max Mustermann',
+                'comp.mcUsernameLabel': 'Minecraft-Benutzername *', 'comp.mcUsernamePlaceholder': 'Minecraft Username',
+                'comp.emailLabel': 'E-Mail *', 'comp.emailPlaceholder2': 'example@email.com', 'comp.registerBtn': 'Anmelden ✓',
+                'comp.certTitle': 'Siegerzertifikat', 'comp.downloadBtn': '⬇ Zertifikat herunterladen',
+                'comp.joinBtn': 'Beitreten / Anmelden', 'comp.joinedTag': 'Angemeldet ✓', 'comp.winnerCertBtn': '🏆 Mein Zertifikat ansehen',
+                'comp.noCompetitions': 'Derzeit sind keine Wettbewerbe verfügbar', 'comp.viewParticipants': 'Teilnehmer anzeigen',
+                'comp.hideParticipants': 'Teilnehmer ausblenden', 'comp.declareWinner': 'Gewinner festlegen', 'comp.winnerTag': '🏆 Gewinner',
+                'comp.noParticipants': 'Noch keine Teilnehmer', 'comp.verifyValid': 'Zertifikat ist gültig ✅', 'comp.verifyInvalid': 'Ungültiger Code ❌',
                 'panel.editProfile': 'Zum Bearbeiten des Profils tippen', 'panel.addVideo': '+ Video hochladen',
                 'games.hint': 'Exklusive Spiele auf GAMEVERSE — spiele allein und knacke deinen Rekord', 'games.changeCount': 'Anzahl ändern', 'games.addGame': '+ Spiel hinzufügen',
                 'role.mainAdmin': 'Hauptadmin', 'role.normalAdmin': 'Admin', 'role.user': 'Mitglied',
@@ -4012,6 +4150,17 @@
                 'panel.compServerPlaceholder': 'Адрес сервера (IP / Домен)', 'panel.statusUpcoming': 'Предстоящее', 'panel.statusOngoing': 'Идёт', 'panel.statusFinished': 'Завершено',
                 'panel.compHasCashPrize': 'Есть денежный приз', 'panel.compPrizeAmount': 'Сумма приза', 'panel.compPrizeTerms': 'Условия приза (необязательно)',
                 'panel.createCompetitionBtn': 'Создать соревнование', 'panel.currentCompetitions': 'Текущие соревнования',
+                'modal.closeBtn': 'Закрыть',
+                'comp.publicHint': 'Зарегистрируйтесь на любое соревнование, и когда определится победитель, ваш сертификат появится здесь',
+                'comp.verifyPlaceholder': 'Введите код сертификата для проверки...', 'comp.verifyBtn': 'Проверить',
+                'comp.registerTitle': 'Регистрация на соревнование', 'comp.fullNameLabel': 'Полное имя (для сертификата) *', 'comp.fullNamePlaceholder': 'напр. Иван Иванович Иванов',
+                'comp.mcUsernameLabel': 'Имя пользователя в Minecraft *', 'comp.mcUsernamePlaceholder': 'Minecraft Username',
+                'comp.emailLabel': 'Эл. почта *', 'comp.emailPlaceholder2': 'example@email.com', 'comp.registerBtn': 'Зарегистрироваться ✓',
+                'comp.certTitle': 'Сертификат победителя', 'comp.downloadBtn': '⬇ Скачать сертификат',
+                'comp.joinBtn': 'Присоединиться / Зарегистрироваться', 'comp.joinedTag': 'Вы зарегистрированы ✓', 'comp.winnerCertBtn': '🏆 Посмотреть сертификат',
+                'comp.noCompetitions': 'Сейчас нет доступных соревнований', 'comp.viewParticipants': 'Показать участников',
+                'comp.hideParticipants': 'Скрыть участников', 'comp.declareWinner': 'Определить победителя', 'comp.winnerTag': '🏆 Победитель',
+                'comp.noParticipants': 'Пока нет участников', 'comp.verifyValid': 'Сертификат действителен ✅', 'comp.verifyInvalid': 'Неверный код ❌',
                 'panel.editProfile': 'Нажмите, чтобы изменить профиль', 'panel.addVideo': '+ Загрузить видео',
                 'games.hint': 'Эксклюзивные игры на GAMEVERSE — играйте в одиночку и побейте свой рекорд', 'games.changeCount': 'Изменить количество', 'games.addGame': '+ Добавить игру',
                 'role.mainAdmin': 'Главный админ', 'role.normalAdmin': 'Админ', 'role.user': 'Участник',
@@ -4062,6 +4211,17 @@
                 'panel.compServerPlaceholder': '服务器地址（IP / 域名）', 'panel.statusUpcoming': '即将开始', 'panel.statusOngoing': '进行中', 'panel.statusFinished': '已结束',
                 'panel.compHasCashPrize': '有现金奖励', 'panel.compPrizeAmount': '奖金金额', 'panel.compPrizeTerms': '奖励条件（可选）',
                 'panel.createCompetitionBtn': '创建比赛', 'panel.currentCompetitions': '当前比赛',
+                'modal.closeBtn': '关闭',
+                'comp.publicHint': '报名参加你想参与的比赛，赢家确定后你的证书会显示在这里',
+                'comp.verifyPlaceholder': '输入证书代码进行验证...', 'comp.verifyBtn': '验证',
+                'comp.registerTitle': '比赛报名', 'comp.fullNameLabel': '全名（将印在证书上）*', 'comp.fullNamePlaceholder': '例如：张三',
+                'comp.mcUsernameLabel': 'Minecraft 用户名 *', 'comp.mcUsernamePlaceholder': 'Minecraft Username',
+                'comp.emailLabel': '电子邮箱 *', 'comp.emailPlaceholder2': 'example@email.com', 'comp.registerBtn': '报名 ✓',
+                'comp.certTitle': '获奖证书', 'comp.downloadBtn': '⬇ 下载证书',
+                'comp.joinBtn': '加入 / 报名', 'comp.joinedTag': '已报名 ✓', 'comp.winnerCertBtn': '🏆 查看我的证书',
+                'comp.noCompetitions': '目前没有可用的比赛', 'comp.viewParticipants': '查看参赛者',
+                'comp.hideParticipants': '隐藏参赛者', 'comp.declareWinner': '确定获胜者', 'comp.winnerTag': '🏆 获胜者',
+                'comp.noParticipants': '暂无参赛者', 'comp.verifyValid': '证书有效 ✅', 'comp.verifyInvalid': '代码无效 ❌',
                 'panel.editProfile': '点击编辑资料', 'panel.addVideo': '+ 上传视频',
                 'games.hint': 'GAMEVERSE 独家游戏 — 独自游玩，尝试打破你的最高纪录', 'games.changeCount': '更改人数', 'games.addGame': '+ 添加游戏',
                 'role.mainAdmin': '主管理员', 'role.normalAdmin': '管理员', 'role.user': '普通用户',
@@ -5155,7 +5315,9 @@
                         <div class="comp-card-meta">
                             <button class="comp-status-badge ${c.status||'upcoming'}" onclick="cycleCompetitionStatus('${c.id}','${c.status||'upcoming'}')">${COMP_STATUS_LABEL[c.status||'upcoming']}</button>
                             ${c.hasCashPrize ? `<span class="comp-cash-badge">💰 ${c.prizeAmount ? c.prizeAmount : ''}</span>` : ''}
+                            <button class="comp-participants-toggle" onclick="toggleCompParticipants('${c.id}')" id="comp-toggle-${c.id}">${t('comp.viewParticipants')}</button>
                         </div>
+                        <div class="comp-participants-list" id="comp-participants-${c.id}"></div>
                     </div>
                 `).join('');
             } catch (e) {
@@ -5178,6 +5340,75 @@
                 await deleteDoc(doc(db, 'competitions', id));
                 showToast('🗑 تم حذف المسابقة');
                 renderAdminCompetitions();
+            } catch (e) { showToast('❌ خطأ: ' + e.message, '#ff7a7a'); }
+        };
+
+        window.toggleCompParticipants = async function(compId) {
+            const listEl = document.getElementById('comp-participants-' + compId);
+            const btnEl = document.getElementById('comp-toggle-' + compId);
+            if (!listEl) return;
+            const isOpen = listEl.classList.contains('open');
+            if (isOpen) {
+                listEl.classList.remove('open');
+                if (btnEl) btnEl.textContent = t('comp.viewParticipants');
+                return;
+            }
+            listEl.classList.add('open');
+            if (btnEl) btnEl.textContent = t('comp.hideParticipants');
+            listEl.innerHTML = `<p style="color:var(--text-dim);font-size:12px">⏳...</p>`;
+            try {
+                const q = query(collection(db, 'participants'), where('competitionId', '==', compId));
+                const snap = await getDocs(q);
+                const participants = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                if (participants.length === 0) {
+                    listEl.innerHTML = `<p style="color:var(--text-dim);font-size:12px">${t('comp.noParticipants')}</p>`;
+                    return;
+                }
+                const comp = (S.competitionsList || []).find(c => c.id === compId);
+                const gameTitle = comp ? comp.gameTitle : '';
+                listEl.innerHTML = participants.map(p => `
+                    <div class="comp-participant-row">
+                        <div class="cpr-info">
+                            <span class="cpr-name">${_escapeHtml(p.fullName||'—')}</span>
+                            <span class="cpr-sub">${_escapeHtml(p.ingameUsername||'')} · ${_escapeHtml(p.email||'')}</span>
+                        </div>
+                        ${p.isWinner
+                            ? `<span class="comp-winner-tag">${t('comp.winnerTag')}</span>`
+                            : `<button class="comp-declare-btn" onclick="declareWinner('${compId}','${p.id}','${_escapeHtml(p.fullName||'').replace(/'/g,"\\'")}','${_escapeHtml(gameTitle).replace(/'/g,"\\'")}')">${t('comp.declareWinner')}</button>`}
+                    </div>
+                `).join('');
+            } catch (e) {
+                listEl.innerHTML = `<p style="color:var(--text-dim);font-size:12px">خطأ في تحميل المتسابقين</p>`;
+            }
+        };
+
+        // Generates a unique-looking certificate serial, e.g. CERT-MC-2026-X8F2Q1
+        function generateCertificateSerial() {
+            const year = new Date().getFullYear();
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+            let rand = '';
+            for (let i = 0; i < 6; i++) rand += chars[Math.floor(Math.random() * chars.length)];
+            return `CERT-MC-${year}-${rand}`;
+        }
+
+        window.declareWinner = async function(compId, participantId, participantName, gameTitle) {
+            if (!S.isAdmin) { showToast('🔑 سجّل دخولك كمشرف', '#ffb020'); return; }
+            if (!confirm(`اعتماد "${participantName}" فائز وتوليد شهادته؟`)) return;
+            try {
+                const serial = generateCertificateSerial();
+                await updateDoc(doc(db, 'participants', participantId), { isWinner: true });
+                await addDoc(collection(db, 'certificates'), {
+                    serial,
+                    participantId,
+                    competitionId: compId,
+                    participantName,
+                    gameTitle,
+                    issuedAt: serverTimestamp(),
+                });
+                await updateDoc(doc(db, 'competitions', compId), { winnerParticipantId: participantId, winnerName: participantName });
+                showToast('🏆 تم اعتماد الفائز وتوليد الشهادة');
+                toggleCompParticipants(compId);
+                toggleCompParticipants(compId);
             } catch (e) { showToast('❌ خطأ: ' + e.message, '#ff7a7a'); }
         };
 
@@ -6292,6 +6523,254 @@
         window.closeMembersModal = function() {
             document.getElementById('members-modal').style.display = 'none';
             document.body.style.overflow = '';
+        };
+
+        // ===== COMPETITIONS (public) =====
+        window.openCompetitionsModal = function() {
+            if (!S.user) { showToast('🔑 سجّل دخولك أولاً', '#ffb020'); return; }
+            closeMenuPanel();
+            document.getElementById('competitions-modal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            document.getElementById('comp-verify-input').value = '';
+            document.getElementById('comp-verify-result').className = 'comp-verify-result';
+            document.getElementById('comp-verify-result').textContent = '';
+            loadPublicCompetitions();
+        };
+
+        window.closeCompetitionsModal = function() {
+            document.getElementById('competitions-modal').style.display = 'none';
+            document.body.style.overflow = '';
+        };
+
+        async function loadPublicCompetitions() {
+            const listEl = document.getElementById('competitions-public-list');
+            if (!listEl) return;
+            listEl.innerHTML = `<p style="color:var(--text-dim);font-size:13px">⏳ ${t('panel.loading')}</p>`;
+            try {
+                const [compsSnap, myPartsSnap] = await Promise.all([
+                    getDocs(query(collection(db, 'competitions'), orderBy('createdAt', 'desc'))),
+                    S.user ? getDocs(query(collection(db, 'participants'), where('uid', '==', S.user.uid))) : Promise.resolve({ docs: [] }),
+                ]);
+                const comps = compsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+                const myParts = {};
+                myPartsSnap.docs.forEach(d => { myParts[d.data().competitionId] = { id: d.id, ...d.data() }; });
+                S.myCompetitionParticipations = myParts;
+
+                if (comps.length === 0) {
+                    listEl.innerHTML = `<p style="color:var(--text-dim);font-size:13px">${t('comp.noCompetitions')}</p>`;
+                    return;
+                }
+                listEl.innerHTML = comps.map(c => {
+                    const myPart = myParts[c.id];
+                    let actionHtml;
+                    if (myPart && myPart.isWinner) {
+                        actionHtml = `<button class="comp-cert-btn" onclick="openMyCertificate('${myPart.id}')">${t('comp.winnerCertBtn')}</button>`;
+                    } else if (myPart) {
+                        actionHtml = `<span class="comp-joined-tag">✅ ${t('comp.joinedTag')}</span>`;
+                    } else if (c.status === 'finished') {
+                        actionHtml = `<span class="comp-joined-tag" style="background:rgba(255,255,255,0.05);border-color:var(--border);color:var(--text-dim)">${COMP_STATUS_LABEL.finished}</span>`;
+                    } else {
+                        actionHtml = `<button class="comp-join-btn" onclick="openCompRegisterModal('${c.id}','${_escapeHtml(c.gameTitle||'').replace(/'/g,"\\'")}')">${t('comp.joinBtn')}</button>`;
+                    }
+                    return `
+                    <div class="comp-public-card">
+                        <div class="comp-public-title">${_escapeHtml(c.gameTitle||'—')}</div>
+                        ${c.serverIP ? `<div class="comp-public-server">${_escapeHtml(c.serverIP)}</div>` : ''}
+                        <div class="comp-public-meta">
+                            <span class="comp-status-badge ${c.status||'upcoming'}" style="cursor:default">${COMP_STATUS_LABEL[c.status||'upcoming']}</span>
+                            ${c.hasCashPrize ? `<span class="comp-cash-badge">💰 ${c.prizeAmount ? c.prizeAmount : ''}${c.prizeTerms ? ' — ' + _escapeHtml(c.prizeTerms) : ''}</span>` : ''}
+                        </div>
+                        <div class="comp-public-actions">${actionHtml}</div>
+                    </div>`;
+                }).join('');
+            } catch (e) {
+                listEl.innerHTML = `<p style="color:var(--text-dim);font-size:13px">خطأ في تحميل المسابقات</p>`;
+            }
+        }
+
+        window.openCompRegisterModal = function(compId, gameTitle) {
+            S.compRegisterTargetId = compId;
+            document.getElementById('comp-register-title').textContent = gameTitle ? `${t('comp.registerTitle')} — ${gameTitle}` : t('comp.registerTitle');
+            document.getElementById('comp-reg-fullname').value = S.userProfile?.displayName || S.user?.displayName || '';
+            document.getElementById('comp-reg-mcuser').value = '';
+            document.getElementById('comp-reg-email').value = S.user?.email || '';
+            document.getElementById('comp-register-error').textContent = '';
+            document.getElementById('comp-register-error').style.display = 'none';
+            document.getElementById('comp-register-modal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        };
+
+        window.closeCompRegisterModal = function() {
+            document.getElementById('comp-register-modal').style.display = 'none';
+            document.body.style.overflow = '';
+            S.compRegisterTargetId = null;
+        };
+
+        window.submitCompRegistration = async function() {
+            if (!S.user) { showToast('🔑 سجّل دخولك أولاً', '#ffb020'); return; }
+            const compId = S.compRegisterTargetId;
+            if (!compId) return;
+            const errEl = document.getElementById('comp-register-error');
+            const showErr = msg => { errEl.textContent = msg; errEl.style.display = 'block'; };
+            const fullName = (document.getElementById('comp-reg-fullname').value || '').trim();
+            const mcUser = (document.getElementById('comp-reg-mcuser').value || '').trim();
+            const email = (document.getElementById('comp-reg-email').value || '').trim();
+            if (!fullName) { showErr('اكتب الاسم الثلاثي'); return; }
+            if (!mcUser) { showErr('اكتب اسم المستخدم في ماين كرافت'); return; }
+            if (!email || !email.includes('@')) { showErr('اكتب بريد إلكتروني صحيح'); return; }
+
+            const btn = document.getElementById('comp-register-confirm-btn');
+            btn.disabled = true;
+            btn.textContent = '⏳...';
+            try {
+                await addDoc(collection(db, 'participants'), {
+                    competitionId: compId,
+                    uid: S.user.uid,
+                    fullName, ingameUsername: mcUser, email,
+                    isWinner: false,
+                    registeredAt: serverTimestamp(),
+                });
+                closeCompRegisterModal();
+                showToast('✅ تم التسجيل في المسابقة');
+                loadPublicCompetitions();
+            } catch (e) { showErr('خطأ: ' + e.message); }
+            btn.disabled = false;
+            btn.textContent = t('comp.registerBtn');
+        };
+
+        // ===== CERTIFICATES =====
+        function drawCertificate(canvas, data) {
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width, h = canvas.height;
+            const grad = ctx.createLinearGradient(0, 0, w, h);
+            grad.addColorStop(0, '#150f2c');
+            grad.addColorStop(1, '#0a0814');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, w, h);
+
+            ctx.strokeStyle = '#c026d3';
+            ctx.lineWidth = 6;
+            ctx.strokeRect(24, 24, w - 48, h - 48);
+            ctx.strokeStyle = 'rgba(230,168,255,0.5)';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(38, 38, w - 76, h - 76);
+
+            ctx.textAlign = 'center';
+            ctx.fillStyle = '#ffc862';
+            ctx.font = '900 30px Arial';
+            ctx.fillText('🏆', w / 2, 120);
+
+            ctx.fillStyle = '#e6a8ff';
+            ctx.font = '900 42px Arial';
+            ctx.fillText('CERTIFICATE OF VICTORY', w / 2, 185);
+
+            ctx.fillStyle = 'rgba(255,255,255,0.6)';
+            ctx.font = '600 18px Arial';
+            ctx.fillText('GAMEVERSE — ' + (data.gameTitle || ''), w / 2, 225);
+
+            ctx.strokeStyle = 'rgba(192,38,211,0.4)';
+            ctx.beginPath();
+            ctx.moveTo(w / 2 - 140, 255);
+            ctx.lineTo(w / 2 + 140, 255);
+            ctx.stroke();
+
+            ctx.fillStyle = 'rgba(255,255,255,0.55)';
+            ctx.font = '500 16px Arial';
+            ctx.fillText('This certificate is proudly presented to', w / 2, 300);
+
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '900 46px Arial';
+            ctx.fillText(data.participantName || '—', w / 2, 365);
+
+            ctx.fillStyle = 'rgba(255,255,255,0.55)';
+            ctx.font = '500 15px Arial';
+            ctx.fillText('for winning the competition', w / 2, 410);
+
+            ctx.fillStyle = '#e6a8ff';
+            ctx.font = '700 22px Arial';
+            ctx.fillText(data.gameTitle || '', w / 2, 445);
+
+            ctx.fillStyle = 'rgba(255,255,255,0.4)';
+            ctx.font = '500 13px Arial';
+            const dateStr = data.issuedAtDate ? data.issuedAtDate.toLocaleDateString('en-GB') : '';
+            ctx.fillText(dateStr, w / 2, 500);
+
+            ctx.font = '700 15px Arial';
+            ctx.fillStyle = '#7dd3fc';
+            ctx.fillText(data.serial || '', w / 2, h - 55);
+            ctx.fillStyle = 'rgba(255,255,255,0.35)';
+            ctx.font = '500 11px Arial';
+            ctx.fillText('Verify this certificate at GAMEVERSE — Competitions', w / 2, h - 32);
+        }
+
+        function tsToDate(ts) {
+            try {
+                if (!ts) return new Date();
+                if (typeof ts.toDate === 'function') return ts.toDate();
+                return new Date(ts);
+            } catch (e) { return new Date(); }
+        }
+
+        window.openMyCertificate = async function(participantId) {
+            try {
+                const q = query(collection(db, 'certificates'), where('participantId', '==', participantId), limit(1));
+                const snap = await getDocs(q);
+                if (snap.empty) { showToast('❌ الشهادة غير موجودة', '#ff7a7a'); return; }
+                const cert = { id: snap.docs[0].id, ...snap.docs[0].data() };
+                showCertificate(cert);
+            } catch (e) { showToast('❌ خطأ: ' + e.message, '#ff7a7a'); }
+        };
+
+        function showCertificate(cert) {
+            S.currentCertificate = cert;
+            const canvas = document.getElementById('cert-canvas');
+            drawCertificate(canvas, {
+                participantName: cert.participantName,
+                gameTitle: cert.gameTitle,
+                serial: cert.serial,
+                issuedAtDate: tsToDate(cert.issuedAt),
+            });
+            document.getElementById('certificate-modal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        window.closeCertificateModal = function() {
+            document.getElementById('certificate-modal').style.display = 'none';
+            document.body.style.overflow = '';
+        };
+
+        window.downloadCertificate = function() {
+            const canvas = document.getElementById('cert-canvas');
+            const link = document.createElement('a');
+            const serial = (S.currentCertificate && S.currentCertificate.serial) || 'certificate';
+            link.download = serial + '.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        };
+
+        window.handleVerifyCertificate = async function() {
+            const input = document.getElementById('comp-verify-input');
+            const resultEl = document.getElementById('comp-verify-result');
+            const code = (input.value || '').trim().toUpperCase();
+            if (!code) return;
+            resultEl.className = 'comp-verify-result';
+            resultEl.textContent = '';
+            try {
+                const q = query(collection(db, 'certificates'), where('serial', '==', code), limit(1));
+                const snap = await getDocs(q);
+                if (snap.empty) {
+                    resultEl.className = 'comp-verify-result invalid';
+                    resultEl.textContent = t('comp.verifyInvalid');
+                    return;
+                }
+                const cert = snap.docs[0].data();
+                resultEl.className = 'comp-verify-result valid';
+                const dateStr = tsToDate(cert.issuedAt).toLocaleDateString('en-GB');
+                resultEl.textContent = `${t('comp.verifyValid')} — ${cert.participantName} · ${cert.gameTitle} · ${dateStr}`;
+            } catch (e) {
+                resultEl.className = 'comp-verify-result invalid';
+                resultEl.textContent = 'خطأ: ' + e.message;
+            }
         };
 
         async function loadMembersList() {
@@ -8525,6 +9004,17 @@
         window.renderAdminCompetitions = renderAdminCompetitions;
         window.cycleCompetitionStatus = cycleCompetitionStatus;
         window.deleteCompetition = deleteCompetition;
+        window.toggleCompParticipants = toggleCompParticipants;
+        window.declareWinner = declareWinner;
+        window.openCompetitionsModal = openCompetitionsModal;
+        window.closeCompetitionsModal = closeCompetitionsModal;
+        window.openCompRegisterModal = openCompRegisterModal;
+        window.closeCompRegisterModal = closeCompRegisterModal;
+        window.submitCompRegistration = submitCompRegistration;
+        window.openMyCertificate = openMyCertificate;
+        window.closeCertificateModal = closeCertificateModal;
+        window.downloadCertificate = downloadCertificate;
+        window.handleVerifyCertificate = handleVerifyCertificate;
         window.switchPanelTab = switchPanelTab;
         window.handleMainLogin = handleMainLogin;
         window.handleAdminLogin = handleAdminLogin;
