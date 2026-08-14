@@ -1351,6 +1351,28 @@
         .admin-list-item .remove-admin { background: none; border: none; color: #ff7a7a; cursor: pointer; font-size: 14px; padding: 2px 6px; border-radius: 4px; transition: background .2s; }
         .admin-list-item .remove-admin:hover { background: rgba(255, 70, 70, 0.1); }
 
+        /* ===== COMPETITIONS ===== */
+        .comp-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; margin-bottom: 10px; }
+        .comp-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
+        .comp-card-title { color: var(--bright); font-weight: 700; font-size: 14px; }
+        .comp-card-server { color: var(--text-dim); font-size: 12px; margin-top: 2px; direction: ltr; text-align: right; }
+        .comp-card-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+        .comp-status-badge { font-size: 10px; padding: 2px 10px; border-radius: 12px; font-weight: 700; cursor: pointer; border: none; }
+        .comp-status-badge.upcoming { background: rgba(14, 165, 233, 0.15); color: #7dd3fc; border: 1px solid rgba(14, 165, 233, 0.3); }
+        .comp-status-badge.ongoing { background: rgba(34, 197, 94, 0.15); color: #86efac; border: 1px solid rgba(34, 197, 94, 0.3); }
+        .comp-status-badge.finished { background: rgba(255, 255, 255, 0.08); color: var(--text-dim); border: 1px solid var(--border); }
+        .comp-cash-badge { font-size: 10px; padding: 2px 10px; border-radius: 12px; font-weight: 700; background: rgba(255, 176, 32, 0.15); color: #ffc862; border: 1px solid rgba(255, 176, 32, 0.3); }
+        .comp-card-actions { display: flex; gap: 6px; margin-right: auto; }
+        .comp-card-actions button { background: none; border: none; cursor: pointer; padding: 4px; border-radius: 6px; color: var(--text-dim); transition: background .2s, color .2s; }
+        .comp-card-actions .comp-delete-btn:hover { background: rgba(255, 70, 70, 0.1); color: #ff7a7a; }
+        .comp-card-actions .comp-winner-btn:hover { background: rgba(34, 197, 94, 0.12); color: #86efac; }
+        .admin-mgmt-card .mgmt-row label.mgmt-check {
+            display: flex; align-items: center; gap: 6px; padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border);
+            border-radius: 8px; color: var(--text); font-size: 13px; cursor: pointer;
+        }
+        .admin-mgmt-card .mgmt-row label.mgmt-check input { width: 16px; height: 16px; accent-color: var(--magenta); cursor: pointer; }
+
         /* ===== ACCOUNTS / ADMIN DIRECTORY ===== */
         .directory-search {
             width: 100%; padding: 9px 12px; margin-bottom: 8px;
@@ -2770,6 +2792,9 @@
                     <div class="menu-nav-item" id="menu-accounts-btn" onclick="openAdminPanel('admin-users')">
                         <span class="menu-nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg></span> <span data-i18n="menu.manageAccounts">إدارة الحسابات</span>
                     </div>
+                    <div class="menu-nav-item" id="menu-competitions-btn" onclick="openAdminPanel('admin-competitions')">
+                        <span class="menu-nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0V4z"/><path d="M7 5H4a2 2 0 0 0 2 4"/><path d="M17 5h3a2 2 0 0 1-2 4"/></svg></span> <span data-i18n="menu.competitions">المسابقات</span>
+                    </div>
                     <div class="menu-nav-item" onclick="openAdminPanel('admin-ratings')">
                         <span class="menu-nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span> <span data-i18n="menu.ratings">التقييمات</span>
                     </div>
@@ -2861,6 +2886,7 @@
                         <button class="panel-tab" data-tab="admin-comments" onclick="switchPanelTab('admin-comments')" style="display:flex;align-items:center;gap:5px;justify-content:center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> <span data-i18n="panel.tabComments">تعليقات</span></button>
                         <button class="panel-tab" data-tab="admin-issues" onclick="switchPanelTab('admin-issues')" style="display:inline-flex;align-items:center;gap:4px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> <span data-i18n="panel.tabIssues">أعطال</span></button>
                         <button class="panel-tab" data-tab="admin-users" onclick="switchPanelTab('admin-users')" style="display:inline-flex;align-items:center;gap:4px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg> <span data-i18n="panel.tabUsers">المستخدمين</span></button>
+                        <button class="panel-tab" data-tab="admin-competitions" onclick="switchPanelTab('admin-competitions')" style="display:inline-flex;align-items:center;gap:4px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0V4z"/><path d="M7 5H4a2 2 0 0 0 2 4"/><path d="M17 5h3a2 2 0 0 1-2 4"/></svg> <span data-i18n="panel.tabCompetitions">مسابقات</span></button>
                     </div>
 
                     <!-- Admins -->
@@ -2918,6 +2944,40 @@
                             <button class="btn-suspend" onclick="suspendUser()" style="display:inline-flex;align-items:center;gap:5px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg> <span data-i18n="panel.suspendAccount">توقيف الحساب</span></button>
                             <button class="btn-unsuspend" onclick="unsuspendUser()" style="display:inline-flex;align-items:center;gap:5px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> <span data-i18n="panel.unsuspendAccount">رفع التوقيف</span></button>
                         </div>
+                    </div>
+
+                    <!-- Competitions -->
+                    <div class="panel-tab-content" id="tab-admin-competitions">
+                        <p class="panel-section-title" style="margin-top:0" data-i18n="panel.newCompetition">إنشاء مسابقة جديدة</p>
+                        <div class="admin-mgmt-card">
+                            <div class="mgmt-row">
+                                <input id="comp-title-input" type="text" data-i18n-placeholder="panel.compTitlePlaceholder" placeholder="اسم اللعبة / المسابقة" />
+                            </div>
+                            <div class="mgmt-row">
+                                <input id="comp-server-input" type="text" data-i18n-placeholder="panel.compServerPlaceholder" placeholder="عنوان السيرفر (IP / Domain)" style="direction:ltr;text-align:right" />
+                            </div>
+                            <div class="mgmt-row">
+                                <select id="comp-status-select">
+                                    <option value="upcoming" selected data-i18n="panel.statusUpcoming">قادمة</option>
+                                    <option value="ongoing" data-i18n="panel.statusOngoing">جارية</option>
+                                    <option value="finished" data-i18n="panel.statusFinished">منتهية</option>
+                                </select>
+                            </div>
+                            <div class="mgmt-row">
+                                <label class="mgmt-check">
+                                    <input type="checkbox" id="comp-cash-toggle" onchange="document.getElementById('comp-prize-row').style.display = this.checked ? 'flex' : 'none'" />
+                                    <span data-i18n="panel.compHasCashPrize">فيه مكسب مالي</span>
+                                </label>
+                            </div>
+                            <div class="mgmt-row" id="comp-prize-row" style="display:none">
+                                <input id="comp-prize-amount-input" type="number" min="0" step="0.01" data-i18n-placeholder="panel.compPrizeAmount" placeholder="قيمة الجائزة" />
+                                <input id="comp-prize-terms-input" type="text" data-i18n-placeholder="panel.compPrizeTerms" placeholder="شروط الجائزة (اختياري)" />
+                            </div>
+                            <button class="mgmt-btn" onclick="handleCreateCompetition()" style="display:inline-flex;align-items:center;gap:5px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> <span data-i18n="panel.createCompetitionBtn">إنشاء المسابقة</span></button>
+                        </div>
+
+                        <p class="panel-section-title" data-i18n="panel.currentCompetitions">المسابقات الحالية</p>
+                        <div id="admin-competitions-list"></div>
                     </div>
 
                     <button class="btn-signout" onclick="handleSignOut()" style="display:flex;align-items:center;gap:8px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> تسجيل الخروج</button>
@@ -3713,6 +3773,7 @@
             playerVideoId: null,
             currentUserRating: null,
             adminsList: [],
+            competitionsList: [],
             userProfile: null,
             usersDirectory: [],
             followingSet: new Set(),
@@ -3740,13 +3801,17 @@
                 'menu.navSection': 'التنقل', 'menu.home': 'الرئيسية', 'menu.unlockedVideos': 'فيديوهات مفتوحة',
                 'menu.lockedVideos': 'فيديوهات مقفولة', 'menu.onlineGames': 'ألعاب أونلاين',
                 'menu.socialSection': 'التواصل', 'menu.members': 'الأعضاء ومتابعتهم', 'menu.myChats': 'محادثاتي مع الأعضاء',
-                'menu.adminSection': 'إدارة المنصة', 'menu.manageAdmins': 'إضافة / إدارة المشرفين', 'menu.manageAccounts': 'إدارة الحسابات',
+                'menu.adminSection': 'إدارة المنصة', 'menu.manageAdmins': 'إضافة / إدارة المشرفين', 'menu.manageAccounts': 'إدارة الحسابات', 'menu.competitions': 'المسابقات',
                 'menu.ratings': 'التقييمات', 'menu.comments': 'التعليقات', 'menu.platformIssues': 'أعطال المنصة', 'menu.devSettings': 'إعدادات المطور',
                 'menu.signOut': 'تسجيل الخروج', 'menu.aria': 'القائمة', 'menu.changeLanguage': 'تغيير اللغة',
                 'panel.title': 'لوحة التحكم', 'panel.loading': 'جاري التحميل...', 'panel.noAdminTitle': 'لا يوجد مشرف بعد!',
                 'panel.noAdminBody': 'أنت أول شخص هنا.<br/>سجّل دخولك لتصبح المشرف الوحيد للمنصة.', 'panel.enterAsAdmin': 'ادخل كمشرف بـ Google',
                 'panel.blockedTitle': 'لا توجد صلاحيات كافية', 'panel.blockedBody': 'هذه المنصة لها مشرف بالفعل.<br/>لا يمكن إضافة مشرف آخر.',
                 'panel.tabAdmins': 'مشرفين', 'panel.tabRatings': 'تقييمات', 'panel.tabComments': 'تعليقات', 'panel.tabIssues': 'أعطال', 'panel.tabUsers': 'المستخدمين',
+                'panel.tabCompetitions': 'مسابقات', 'panel.newCompetition': 'إنشاء مسابقة جديدة', 'panel.compTitlePlaceholder': 'اسم اللعبة / المسابقة',
+                'panel.compServerPlaceholder': 'عنوان السيرفر (IP / Domain)', 'panel.statusUpcoming': 'قادمة', 'panel.statusOngoing': 'جارية', 'panel.statusFinished': 'منتهية',
+                'panel.compHasCashPrize': 'فيه مكسب مالي', 'panel.compPrizeAmount': 'قيمة الجائزة', 'panel.compPrizeTerms': 'شروط الجائزة (اختياري)',
+                'panel.createCompetitionBtn': 'إنشاء المسابقة', 'panel.currentCompetitions': 'المسابقات الحالية',
                 'panel.editProfile': 'اضغط لتعديل الملف', 'panel.addVideo': '+ رفع فيديو',
                 'games.hint': 'ألعاب حصرية على GAMEVERSE — العب لوحدك وحاول تكسر رقمك القياسي', 'games.changeCount': 'غيّر العدد', 'games.addGame': '+ إضافة لعبة',
                 'role.mainAdmin': 'مشرف رئيسي', 'role.normalAdmin': 'مشرف عادي', 'role.user': 'مستخدم',
@@ -3786,13 +3851,17 @@
                 'menu.navSection': 'Navigation', 'menu.home': 'Home', 'menu.unlockedVideos': 'Unlocked Videos',
                 'menu.lockedVideos': 'Locked Videos', 'menu.onlineGames': 'Online Games',
                 'menu.socialSection': 'Social', 'menu.members': 'Members & Following', 'menu.myChats': 'My Chats with Members',
-                'menu.adminSection': 'Platform Management', 'menu.manageAdmins': 'Add / Manage Admins', 'menu.manageAccounts': 'Manage Accounts',
+                'menu.adminSection': 'Platform Management', 'menu.manageAdmins': 'Add / Manage Admins', 'menu.manageAccounts': 'Manage Accounts', 'menu.competitions': 'Competitions',
                 'menu.ratings': 'Ratings', 'menu.comments': 'Comments', 'menu.platformIssues': 'Platform Issues', 'menu.devSettings': 'Developer Settings',
                 'menu.signOut': 'Sign Out', 'menu.aria': 'Menu', 'menu.changeLanguage': 'Change Language',
                 'panel.title': 'Dashboard', 'panel.loading': 'Loading...', 'panel.noAdminTitle': 'No admin yet!',
                 'panel.noAdminBody': "You\'re the first person here.<br/>Sign in to become the platform\'s sole admin.", 'panel.enterAsAdmin': 'Sign in as admin with Google',
                 'panel.blockedTitle': 'Insufficient permissions', 'panel.blockedBody': 'This platform already has an admin.<br/>Another admin cannot be added.',
                 'panel.tabAdmins': 'Admins', 'panel.tabRatings': 'Ratings', 'panel.tabComments': 'Comments', 'panel.tabIssues': 'Issues', 'panel.tabUsers': 'Users',
+                'panel.tabCompetitions': 'Competitions', 'panel.newCompetition': 'Create New Competition', 'panel.compTitlePlaceholder': 'Game / Competition Name',
+                'panel.compServerPlaceholder': 'Server Address (IP / Domain)', 'panel.statusUpcoming': 'Upcoming', 'panel.statusOngoing': 'Ongoing', 'panel.statusFinished': 'Finished',
+                'panel.compHasCashPrize': 'Has cash prize', 'panel.compPrizeAmount': 'Prize amount', 'panel.compPrizeTerms': 'Prize terms (optional)',
+                'panel.createCompetitionBtn': 'Create Competition', 'panel.currentCompetitions': 'Current Competitions',
                 'panel.editProfile': 'Tap to edit profile', 'panel.addVideo': '+ Upload video',
                 'games.hint': 'Exclusive games on GAMEVERSE — play solo and try to beat your high score', 'games.changeCount': 'Change count', 'games.addGame': '+ Add game',
                 'role.mainAdmin': 'Main Admin', 'role.normalAdmin': 'Admin', 'role.user': 'Member',
@@ -3832,13 +3901,17 @@
                 'menu.navSection': 'Navigation', 'menu.home': 'Accueil', 'menu.unlockedVideos': 'Vidéos débloquées',
                 'menu.lockedVideos': 'Vidéos verrouillées', 'menu.onlineGames': 'Jeux en ligne',
                 'menu.socialSection': 'Communauté', 'menu.members': 'Membres et abonnements', 'menu.myChats': 'Mes discussions avec les membres',
-                'menu.adminSection': 'Gestion de la plateforme', 'menu.manageAdmins': 'Ajouter / gérer les admins', 'menu.manageAccounts': 'Gérer les comptes',
+                'menu.adminSection': 'Gestion de la plateforme', 'menu.manageAdmins': 'Ajouter / gérer les admins', 'menu.manageAccounts': 'Gérer les comptes', 'menu.competitions': 'Compétitions',
                 'menu.ratings': 'Évaluations', 'menu.comments': 'Commentaires', 'menu.platformIssues': 'Problèmes de la plateforme', 'menu.devSettings': 'Paramètres développeur',
                 'menu.signOut': 'Déconnexion', 'menu.aria': 'Menu', 'menu.changeLanguage': 'Changer de langue',
                 'panel.title': 'Tableau de bord', 'panel.loading': 'Chargement...', 'panel.noAdminTitle': "Pas encore d\'admin !",
                 'panel.noAdminBody': 'Vous êtes la première personne ici.<br/>Connectez-vous pour devenir le seul admin de la plateforme.', 'panel.enterAsAdmin': 'Se connecter en admin avec Google',
                 'panel.blockedTitle': 'Permissions insuffisantes', 'panel.blockedBody': 'Cette plateforme a déjà un admin.<br/>Impossible d\'en ajouter un autre.',
                 'panel.tabAdmins': 'Admins', 'panel.tabRatings': 'Évaluations', 'panel.tabComments': 'Commentaires', 'panel.tabIssues': 'Problèmes', 'panel.tabUsers': 'Utilisateurs',
+                'panel.tabCompetitions': 'Compétitions', 'panel.newCompetition': 'Créer une nouvelle compétition', 'panel.compTitlePlaceholder': 'Nom du jeu / de la compétition',
+                'panel.compServerPlaceholder': 'Adresse du serveur (IP / Domaine)', 'panel.statusUpcoming': 'À venir', 'panel.statusOngoing': 'En cours', 'panel.statusFinished': 'Terminée',
+                'panel.compHasCashPrize': 'Prix en argent', 'panel.compPrizeAmount': 'Montant du prix', 'panel.compPrizeTerms': 'Conditions du prix (optionnel)',
+                'panel.createCompetitionBtn': 'Créer la compétition', 'panel.currentCompetitions': 'Compétitions actuelles',
                 'panel.editProfile': 'Touchez pour modifier le profil', 'panel.addVideo': '+ Ajouter une vidéo',
                 'games.hint': 'Jeux exclusifs sur GAMEVERSE — jouez seul et battez votre record', 'games.changeCount': 'Changer le nombre', 'games.addGame': '+ Ajouter un jeu',
                 'role.mainAdmin': 'Admin principal', 'role.normalAdmin': 'Admin', 'role.user': 'Membre',
@@ -3878,13 +3951,17 @@
                 'menu.navSection': 'Navigation', 'menu.home': 'Startseite', 'menu.unlockedVideos': 'Freigeschaltete Videos',
                 'menu.lockedVideos': 'Gesperrte Videos', 'menu.onlineGames': 'Online-Spiele',
                 'menu.socialSection': 'Community', 'menu.members': 'Mitglieder & Follower', 'menu.myChats': 'Meine Chats mit Mitgliedern',
-                'menu.adminSection': 'Plattformverwaltung', 'menu.manageAdmins': 'Admins hinzufügen / verwalten', 'menu.manageAccounts': 'Konten verwalten',
+                'menu.adminSection': 'Plattformverwaltung', 'menu.manageAdmins': 'Admins hinzufügen / verwalten', 'menu.manageAccounts': 'Konten verwalten', 'menu.competitions': 'Wettbewerbe',
                 'menu.ratings': 'Bewertungen', 'menu.comments': 'Kommentare', 'menu.platformIssues': 'Plattformprobleme', 'menu.devSettings': 'Entwicklereinstellungen',
                 'menu.signOut': 'Abmelden', 'menu.aria': 'Menü', 'menu.changeLanguage': 'Sprache ändern',
                 'panel.title': 'Dashboard', 'panel.loading': 'Wird geladen...', 'panel.noAdminTitle': 'Noch kein Admin!',
                 'panel.noAdminBody': 'Du bist die erste Person hier.<br/>Melde dich an, um alleiniger Admin der Plattform zu werden.', 'panel.enterAsAdmin': 'Als Admin mit Google anmelden',
                 'panel.blockedTitle': 'Unzureichende Berechtigungen', 'panel.blockedBody': 'Diese Plattform hat bereits einen Admin.<br/>Es kann kein weiterer hinzugefügt werden.',
                 'panel.tabAdmins': 'Admins', 'panel.tabRatings': 'Bewertungen', 'panel.tabComments': 'Kommentare', 'panel.tabIssues': 'Probleme', 'panel.tabUsers': 'Benutzer',
+                'panel.tabCompetitions': 'Wettbewerbe', 'panel.newCompetition': 'Neuen Wettbewerb erstellen', 'panel.compTitlePlaceholder': 'Spiel- / Wettbewerbsname',
+                'panel.compServerPlaceholder': 'Serveradresse (IP / Domain)', 'panel.statusUpcoming': 'Bevorstehend', 'panel.statusOngoing': 'Laufend', 'panel.statusFinished': 'Beendet',
+                'panel.compHasCashPrize': 'Geldpreis vorhanden', 'panel.compPrizeAmount': 'Preisbetrag', 'panel.compPrizeTerms': 'Preisbedingungen (optional)',
+                'panel.createCompetitionBtn': 'Wettbewerb erstellen', 'panel.currentCompetitions': 'Aktuelle Wettbewerbe',
                 'panel.editProfile': 'Zum Bearbeiten des Profils tippen', 'panel.addVideo': '+ Video hochladen',
                 'games.hint': 'Exklusive Spiele auf GAMEVERSE — spiele allein und knacke deinen Rekord', 'games.changeCount': 'Anzahl ändern', 'games.addGame': '+ Spiel hinzufügen',
                 'role.mainAdmin': 'Hauptadmin', 'role.normalAdmin': 'Admin', 'role.user': 'Mitglied',
@@ -3924,13 +4001,17 @@
                 'menu.navSection': 'Навигация', 'menu.home': 'Главная', 'menu.unlockedVideos': 'Открытые видео',
                 'menu.lockedVideos': 'Закрытые видео', 'menu.onlineGames': 'Онлайн-игры',
                 'menu.socialSection': 'Общение', 'menu.members': 'Участники и подписки', 'menu.myChats': 'Мои чаты с участниками',
-                'menu.adminSection': 'Управление платформой', 'menu.manageAdmins': 'Добавить / управлять админами', 'menu.manageAccounts': 'Управление аккаунтами',
+                'menu.adminSection': 'Управление платформой', 'menu.manageAdmins': 'Добавить / управлять админами', 'menu.manageAccounts': 'Управление аккаунтами', 'menu.competitions': 'Соревнования',
                 'menu.ratings': 'Оценки', 'menu.comments': 'Комментарии', 'menu.platformIssues': 'Проблемы платформы', 'menu.devSettings': 'Настройки разработчика',
                 'menu.signOut': 'Выйти', 'menu.aria': 'Меню', 'menu.changeLanguage': 'Изменить язык',
                 'panel.title': 'Панель управления', 'panel.loading': 'Загрузка...', 'panel.noAdminTitle': 'Пока нет админа!',
                 'panel.noAdminBody': 'Вы первый человек здесь.<br/>Войдите, чтобы стать единственным админом платформы.', 'panel.enterAsAdmin': 'Войти как админ через Google',
                 'panel.blockedTitle': 'Недостаточно прав', 'panel.blockedBody': 'У этой платформы уже есть админ.<br/>Добавить другого нельзя.',
                 'panel.tabAdmins': 'Админы', 'panel.tabRatings': 'Оценки', 'panel.tabComments': 'Комментарии', 'panel.tabIssues': 'Проблемы', 'panel.tabUsers': 'Пользователи',
+                'panel.tabCompetitions': 'Соревнования', 'panel.newCompetition': 'Создать новое соревнование', 'panel.compTitlePlaceholder': 'Название игры / соревнования',
+                'panel.compServerPlaceholder': 'Адрес сервера (IP / Домен)', 'panel.statusUpcoming': 'Предстоящее', 'panel.statusOngoing': 'Идёт', 'panel.statusFinished': 'Завершено',
+                'panel.compHasCashPrize': 'Есть денежный приз', 'panel.compPrizeAmount': 'Сумма приза', 'panel.compPrizeTerms': 'Условия приза (необязательно)',
+                'panel.createCompetitionBtn': 'Создать соревнование', 'panel.currentCompetitions': 'Текущие соревнования',
                 'panel.editProfile': 'Нажмите, чтобы изменить профиль', 'panel.addVideo': '+ Загрузить видео',
                 'games.hint': 'Эксклюзивные игры на GAMEVERSE — играйте в одиночку и побейте свой рекорд', 'games.changeCount': 'Изменить количество', 'games.addGame': '+ Добавить игру',
                 'role.mainAdmin': 'Главный админ', 'role.normalAdmin': 'Админ', 'role.user': 'Участник',
@@ -3970,13 +4051,17 @@
                 'menu.navSection': '导航', 'menu.home': '主页', 'menu.unlockedVideos': '已解锁视频',
                 'menu.lockedVideos': '已锁定视频', 'menu.onlineGames': '在线游戏',
                 'menu.socialSection': '社交', 'menu.members': '成员与关注', 'menu.myChats': '我与成员的聊天',
-                'menu.adminSection': '平台管理', 'menu.manageAdmins': '添加/管理管理员', 'menu.manageAccounts': '账户管理',
+                'menu.adminSection': '平台管理', 'menu.manageAdmins': '添加/管理管理员', 'menu.manageAccounts': '账户管理', 'menu.competitions': '比赛',
                 'menu.ratings': '评分', 'menu.comments': '评论', 'menu.platformIssues': '平台故障', 'menu.devSettings': '开发者设置',
                 'menu.signOut': '退出登录', 'menu.aria': '菜单', 'menu.changeLanguage': '更改语言',
                 'panel.title': '控制面板', 'panel.loading': '加载中...', 'panel.noAdminTitle': '还没有管理员！',
                 'panel.noAdminBody': '你是这里的第一个人。<br/>登录即可成为平台唯一的管理员。', 'panel.enterAsAdmin': '使用 Google 以管理员身份登录',
                 'panel.blockedTitle': '权限不足', 'panel.blockedBody': '该平台已有管理员。<br/>无法再添加其他管理员。',
                 'panel.tabAdmins': '管理员', 'panel.tabRatings': '评分', 'panel.tabComments': '评论', 'panel.tabIssues': '故障', 'panel.tabUsers': '用户',
+                'panel.tabCompetitions': '比赛', 'panel.newCompetition': '创建新比赛', 'panel.compTitlePlaceholder': '游戏 / 比赛名称',
+                'panel.compServerPlaceholder': '服务器地址（IP / 域名）', 'panel.statusUpcoming': '即将开始', 'panel.statusOngoing': '进行中', 'panel.statusFinished': '已结束',
+                'panel.compHasCashPrize': '有现金奖励', 'panel.compPrizeAmount': '奖金金额', 'panel.compPrizeTerms': '奖励条件（可选）',
+                'panel.createCompetitionBtn': '创建比赛', 'panel.currentCompetitions': '当前比赛',
                 'panel.editProfile': '点击编辑资料', 'panel.addVideo': '+ 上传视频',
                 'games.hint': 'GAMEVERSE 独家游戏 — 独自游玩，尝试打破你的最高纪录', 'games.changeCount': '更改人数', 'games.addGame': '+ 添加游戏',
                 'role.mainAdmin': '主管理员', 'role.normalAdmin': '管理员', 'role.user': '普通用户',
@@ -5000,6 +5085,99 @@
                 await deleteDoc(doc(db, 'admins', email.toLowerCase()));
                 showToast('✅ تم حذف المشرف');
                 renderAdminList();
+            } catch (e) { showToast('❌ خطأ: ' + e.message, '#ff7a7a'); }
+        };
+
+        // ===== COMPETITIONS =====
+        const COMP_STATUS_LABEL = { upcoming: 'قادمة', ongoing: 'جارية', finished: 'منتهية' };
+        const COMP_STATUS_CYCLE = { upcoming: 'ongoing', ongoing: 'finished', finished: 'upcoming' };
+
+        window.handleCreateCompetition = async function() {
+            if (!S.isAdmin) { showToast('🔑 سجّل دخولك كمشرف', '#ffb020'); return; }
+            const titleEl = document.getElementById('comp-title-input');
+            const serverEl = document.getElementById('comp-server-input');
+            const statusEl = document.getElementById('comp-status-select');
+            const cashEl = document.getElementById('comp-cash-toggle');
+            const prizeAmountEl = document.getElementById('comp-prize-amount-input');
+            const prizeTermsEl = document.getElementById('comp-prize-terms-input');
+
+            const gameTitle = (titleEl.value || '').trim();
+            const serverIP = (serverEl.value || '').trim();
+            if (!gameTitle) { showToast('❌ اكتب اسم المسابقة', '#ff7a7a'); return; }
+
+            const hasCashPrize = !!cashEl.checked;
+            const prizeAmount = hasCashPrize ? (parseFloat(prizeAmountEl.value) || 0) : 0;
+            const prizeTerms = hasCashPrize ? (prizeTermsEl.value || '').trim() : '';
+
+            const compData = {
+                gameTitle, serverIP,
+                status: statusEl.value || 'upcoming',
+                hasCashPrize, prizeAmount, prizeTerms,
+                createdAt: serverTimestamp(),
+                createdBy: S.user?.uid || '',
+            };
+
+            try {
+                await addDoc(collection(db, 'competitions'), compData);
+                titleEl.value = ''; serverEl.value = ''; prizeAmountEl.value = ''; prizeTermsEl.value = '';
+                cashEl.checked = false;
+                document.getElementById('comp-prize-row').style.display = 'none';
+                statusEl.value = 'upcoming';
+                showToast('✅ تم إنشاء المسابقة');
+                renderAdminCompetitions();
+            } catch (e) { showToast('❌ خطأ: ' + e.message, '#ff7a7a'); }
+        };
+
+        window.renderAdminCompetitions = async function() {
+            const container = document.getElementById('admin-competitions-list');
+            if (!container) return;
+            container.innerHTML = `<p style="color:var(--text-dim);font-size:13px">⏳ جاري التحميل...</p>`;
+            try {
+                const q = query(collection(db, 'competitions'), orderBy('createdAt', 'desc'));
+                const snap = await getDocs(q);
+                const comps = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                S.competitionsList = comps;
+                if (comps.length === 0) {
+                    container.innerHTML = `<p style="color:var(--text-dim);font-size:13px">لا توجد مسابقات بعد</p>`;
+                    return;
+                }
+                container.innerHTML = comps.map(c => `
+                    <div class="comp-card">
+                        <div class="comp-card-top">
+                            <div>
+                                <div class="comp-card-title">${_escapeHtml(c.gameTitle||'—')}</div>
+                                ${c.serverIP ? `<div class="comp-card-server">${_escapeHtml(c.serverIP)}</div>` : ''}
+                            </div>
+                            <div class="comp-card-actions">
+                                <button class="comp-delete-btn" title="حذف" onclick="deleteCompetition('${c.id}')"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
+                            </div>
+                        </div>
+                        <div class="comp-card-meta">
+                            <button class="comp-status-badge ${c.status||'upcoming'}" onclick="cycleCompetitionStatus('${c.id}','${c.status||'upcoming'}')">${COMP_STATUS_LABEL[c.status||'upcoming']}</button>
+                            ${c.hasCashPrize ? `<span class="comp-cash-badge">💰 ${c.prizeAmount ? c.prizeAmount : ''}</span>` : ''}
+                        </div>
+                    </div>
+                `).join('');
+            } catch (e) {
+                container.innerHTML = `<p style="color:var(--text-dim);font-size:13px">خطأ في تحميل المسابقات</p>`;
+            }
+        };
+
+        window.cycleCompetitionStatus = async function(id, currentStatus) {
+            const next = COMP_STATUS_CYCLE[currentStatus] || 'upcoming';
+            try {
+                await updateDoc(doc(db, 'competitions', id), { status: next });
+                showToast('✅ تم تحديث الحالة');
+                renderAdminCompetitions();
+            } catch (e) { showToast('❌ خطأ: ' + e.message, '#ff7a7a'); }
+        };
+
+        window.deleteCompetition = async function(id) {
+            if (!confirm('حذف المسابقة؟ (هيتم حذفها فقط، مش تسجيلات اللاعبين)')) return;
+            try {
+                await deleteDoc(doc(db, 'competitions', id));
+                showToast('🗑 تم حذف المسابقة');
+                renderAdminCompetitions();
             } catch (e) { showToast('❌ خطأ: ' + e.message, '#ff7a7a'); }
         };
 
@@ -7690,6 +7868,7 @@
             if (tabId === 'admin-admins') { renderAdminList(); renderUsersDirectory(); }
             if (tabId === 'admin-videos') renderAdminVideoList();
             if (tabId === 'admin-users') renderUsersDirectory();
+            if (tabId === 'admin-competitions') renderAdminCompetitions();
         };
 
         // ===== ADD / EDIT MODALS =====
@@ -7898,6 +8077,7 @@
             renderAdminComments();
             renderAdminVideoList();
             renderUsersDirectory();
+            renderAdminCompetitions();
             const panel = document.getElementById('side-panel');
             const ov = document.getElementById('overlay');
             panel.classList.add('open');
@@ -8341,6 +8521,10 @@
         window.renderAdminList = renderAdminList;
         window.removeAdmin = removeAdmin;
         window.handleAddAdmin = handleAddAdmin;
+        window.handleCreateCompetition = handleCreateCompetition;
+        window.renderAdminCompetitions = renderAdminCompetitions;
+        window.cycleCompetitionStatus = cycleCompetitionStatus;
+        window.deleteCompetition = deleteCompetition;
         window.switchPanelTab = switchPanelTab;
         window.handleMainLogin = handleMainLogin;
         window.handleAdminLogin = handleAdminLogin;
