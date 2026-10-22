@@ -6916,10 +6916,10 @@ html{scroll-padding-top:70px}
         function _ensureWaChatListener() {
             if (_wachatUnsub || !S.user) return; // already running, or not logged in
             try {
-                const q = query(collection(db, 'chatMessages'), orderBy('timestamp', 'asc'));
+                const q = query(collection(db, 'chatMessages'), orderBy('timestamp', 'desc'), limit(100));
                 _wachatUnsub = onSnapshot(q, snap => {
                     _wachatListenerRetry = 0;
-                    const msgs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                    const msgs = snap.docs.map(d => ({ id: d.id, ...d.data() })).reverse();
                     _wachatLastMsgs = msgs;
                     // Drop any pending messages that now exist in the confirmed list
                     // (same sender + same text, sent within the last 2 minutes)
@@ -6962,9 +6962,9 @@ html{scroll-padding-top:70px}
         async function _wachatHardRefresh() {
             if (!S.user) return;
             try {
-                const q = query(collection(db, 'chatMessages'), orderBy('timestamp', 'asc'));
+                const q = query(collection(db, 'chatMessages'), orderBy('timestamp', 'desc'), limit(100));
                 const snap = await getDocs(q);
-                const msgs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                const msgs = snap.docs.map(d => ({ id: d.id, ...d.data() })).reverse();
                 _wachatLastMsgs = msgs;
                 _wachatPending = _wachatPending.filter(p => {
                     const stillPending = !msgs.some(m => m.sender === p.sender && m.text === p.text);
@@ -6979,9 +6979,10 @@ html{scroll-padding-top:70px}
 
         // If the realtime connection is stuck (zombie subscription), force it to reconnect.
         function _wachatForceReconnect() {
+            const m = document.getElementById('wachat-modal');
+            if (!m || !m.classList.contains('open')) return;   // chat closed: no need to re-read anything
             if (_wachatUnsub) { _wachatUnsub(); _wachatUnsub = null; }
             _ensureWaChatListener();
-            _wachatHardRefresh();
         }
 
         window.addEventListener('online', _wachatForceReconnect);
@@ -7025,7 +7026,7 @@ html{scroll-padding-top:70px}
             // This catches a "zombie" realtime connection that doesn't error but also stops
             // delivering new messages, so a reply never just sits there unseen.
             if (_wachatPollInterval) clearInterval(_wachatPollInterval);
-            _wachatPollInterval = setInterval(_wachatHardRefresh, 12000);
+            // (12s safety-net polling removed: it re-read the chat collection constantly and burned the daily quota)
         };
 
         window.closeWaChat = function() {
@@ -7685,8 +7686,21 @@ html{scroll-padding-top:70px}
             try { const c = JSON.parse(localStorage.getItem('gv_dir_cache_' + uid) || 'null'); if (Array.isArray(c) && c.length && !S.membersDirectory) S.membersDirectory = c; } catch (e) {}
             try { const c = JSON.parse(localStorage.getItem('gv_conv_cache_' + uid) || 'null'); if (Array.isArray(c)) S.convRows = c; } catch (e) {}
             const fail = () => setTimeout(() => { if (!S.membersLoaded && S.user) _loadMembersListFallback(); }, 1200);
-            _liveUnsubs.push(onSnapshot(collection(db, 'users'), snap => { _dirUsersSnap = snap; _dirSchedule(); }, fail));
-            _liveUnsubs.push(onSnapshot(collection(db, 'admins'), snap => { _dirAdminsSnap = snap; _dirSchedule(); }, () => {}));
+            // Directory is fetched once + refreshed every 10 min (was a live listener on ALL users/admins = huge read cost).
+            // Online/offline status comes from Realtime Database, so it is not affected.
+            let _dirBusy = false;
+            const _dirFetch = async () => {
+                if (_dirBusy || _liveUid !== uid) return; _dirBusy = true;
+                try {
+                    const [us, as] = await Promise.all([getDocs(collection(db, 'users')), getDocs(collection(db, 'admins')).catch(() => null)]);
+                    if (_liveUid !== uid) return;
+                    _dirUsersSnap = us; if (as) _dirAdminsSnap = as; _dirSchedule();
+                } catch (e) { fail(); }
+                finally { _dirBusy = false; }
+            };
+            _dirFetch();
+            const _dirIv = setInterval(() => { if (document.visibilityState === 'visible') _dirFetch(); }, 600000);
+            _liveUnsubs.push(() => clearInterval(_dirIv));
             _liveUnsubs.push(onSnapshot(query(collection(db, 'friendsChat'), where('participants', 'array-contains', uid)), snap => _convRebuild(snap), () => {}));
         }
         function _dirSchedule() { if (_dirTimer) return; _dirTimer = setTimeout(() => { _dirTimer = null; _dirRebuild(); }, S.membersLoaded ? 250 : 0); }
@@ -10123,7 +10137,7 @@ html{scroll-padding-top:70px}
         function _refreshAllSilently() {
             if (!S.user) return;   // Firestore rules: every read needs a signed-in user
             // the live listener already keeps data fresh; only fall back to a plain fetch when it has been quiet for a while
-            const stale = n => Date.now() - (_lastLive[n] || 0) > 60000;
+            const stale = n => _lastLive[n] === 0;   // fallback fetch only if the live listener actually errored (saves Firestore reads)
             if (stale('videos')) _silentFetch('videos', _applyVideos);
             if (stale('games')) _silentFetch('games', _applyGames);
         }
