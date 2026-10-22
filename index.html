@@ -5273,12 +5273,16 @@ html{scroll-padding-top:70px}
             renderGrid('grid-locked', 'empty-locked', locked, true);
         };
 
+        // Keyed reconcile: cards that did not change are kept as-is (no flash, no thumbnail reload,
+        // comment panels stay open). Only added / changed / removed videos touch the DOM.
+        function _cardSig(v) {
+            return JSON.stringify(v, (k, x) => (x && typeof x === 'object' && typeof x.toMillis === 'function') ? x.toMillis() : x);
+        }
         function renderGrid(gridId, emptyId, videos, isLocked) {
             const grid = document.getElementById(gridId);
             const empty = document.getElementById(emptyId);
-            [...grid.querySelectorAll('.video-card')].forEach(el => el.remove());
-            [...grid.querySelectorAll('.skeleton-card')].forEach(el => el.remove());
             if (!S.initialized) {
+                [...grid.querySelectorAll('.video-card, .skeleton-card')].forEach(el => el.remove());
                 empty.style.display = 'none';
                 for (let i = 0; i < 3; i++) {
                     const sk = document.createElement('div');
@@ -5288,12 +5292,39 @@ html{scroll-padding-top:70px}
                 }
                 return;
             }
+            [...grid.querySelectorAll('.skeleton-card')].forEach(el => el.remove());
+            const existing = new Map();
+            [...grid.querySelectorAll('.video-card')].forEach(el => existing.set(el.dataset.id, el));
             if (videos.length === 0) {
+                existing.forEach(el => el.remove());
                 empty.style.display = 'grid';
                 empty.querySelector('p').textContent = isLocked ? t('section.emptyLocked') : t('section.emptyUnlocked');
-            } else {
-                empty.style.display = 'none';
-                videos.forEach(v => grid.appendChild(buildCard(v)));
+                return;
+            }
+            empty.style.display = 'none';
+            const ctx = (S.isAdmin ? 'a' : 'u') + (S.user ? S.user.uid : '') + (S.language || '');
+            const ordered = videos.map(v => {
+                const sig = ctx + '|' + _cardSig(v);
+                let card = existing.get(v.id);
+                existing.delete(v.id);
+                if (!card || card._sig !== sig) {
+                    const fresh = buildCard(v);
+                    fresh._sig = sig;
+                    if (card) {
+                        const wasOpen = card.querySelector('.comments-section.open');
+                        const cs = fresh.querySelector('.comments-section');
+                        if (wasOpen && cs) cs.classList.add('open');
+                        card.replaceWith(fresh);
+                    }
+                    card = fresh;
+                }
+                return card;
+            });
+            existing.forEach(el => el.remove());               // videos that no longer exist
+            let ref = null;                                    // put cards in order, moving only what is out of place
+            for (let i = ordered.length - 1; i >= 0; i--) {
+                if (ordered[i].parentNode !== grid || ordered[i].nextSibling !== ref) grid.insertBefore(ordered[i], ref);
+                ref = ordered[i];
             }
         }
 
