@@ -3065,6 +3065,73 @@ html{scroll-padding-top:70px}
 #platform-strip .ps-r{background:linear-gradient(270deg,transparent,rgba(59,130,246,.7))}
 #platform-strip .ps-gem{width:9px;height:9px;transform:rotate(45deg);background:#3b82f6;border-radius:2px;box-shadow:0 0 12px 2px rgba(59,130,246,.65)}
 </style>
+<style id="gv-callpro">
+/* ===== Call screen — professional redesign ===== */
+#call-modal{background:#07050e;overflow:hidden}
+#call-modal::before{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;background:radial-gradient(900px 520px at 50% -8%,rgba(59,130,246,.30),transparent 62%),radial-gradient(760px 480px at 50% 112%,rgba(124,58,237,.26),transparent 60%),linear-gradient(180deg,#0b0818,#07050e)}
+#call-modal .call-bgblur{position:absolute;inset:-40px;z-index:0;pointer-events:none;background:center/cover no-repeat;filter:blur(55px) saturate(1.5);opacity:.42;transform:scale(1.2);transition:opacity .6s}
+#call-modal .call-remote-wrap,#call-modal .call-sheet{position:relative;z-index:1}
+#call-remote-video{background:transparent}
+.call-remote-placeholder{background:transparent;gap:10px;padding:0 20px}
+.cp-avatar-wrap{position:relative;width:156px;height:156px;display:flex;align-items:center;justify-content:center;margin-bottom:12px}
+.cp-rings i{position:absolute;inset:0;border-radius:50%;border:2px solid rgba(96,165,250,.55);opacity:0;pointer-events:none}
+#call-modal.ringing .cp-rings i{animation:cpRing 2.6s cubic-bezier(.2,.6,.3,1) infinite}
+#call-modal.ringing .cp-rings i:nth-child(2){animation-delay:.85s}
+#call-modal.ringing .cp-rings i:nth-child(3){animation-delay:1.7s}
+@keyframes cpRing{0%{transform:scale(1);opacity:.7}100%{transform:scale(2.2);opacity:0}}
+.call-remote-placeholder .cp-avatar{position:relative;width:156px;height:156px;border:0;overflow:hidden;font-size:58px;background:linear-gradient(145deg,#2b1f4a,#14102a);box-shadow:0 0 0 3px rgba(255,255,255,.14),0 0 0 7px rgba(59,130,246,.30),0 22px 54px rgba(0,0,0,.6),0 0 80px rgba(59,130,246,.32);transition:box-shadow .18s ease,transform .18s ease}
+.call-remote-placeholder .cp-avatar.speaking{box-shadow:0 0 0 3px #34d399,0 0 0 10px rgba(52,211,153,.28),0 22px 54px rgba(0,0,0,.6),0 0 90px rgba(52,211,153,.5);transform:scale(1.035)}
+.cp-mutebadge{position:absolute;bottom:4px;right:4px;z-index:2;width:38px;height:38px;border-radius:50%;background:#ef4444;display:none;align-items:center;justify-content:center;border:3px solid #0b0818;box-shadow:0 4px 12px rgba(239,68,68,.5)}
+.cp-avatar-wrap.muted .cp-mutebadge{display:flex}
+.call-remote-placeholder .cp-name{font-size:28px;font-weight:800;letter-spacing:.2px;color:#fff;text-align:center;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-shadow:0 2px 16px rgba(0,0,0,.55)}
+.call-remote-placeholder .cp-status{display:inline-flex;align-items:center;gap:8px;padding:6px 15px;border-radius:999px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:#cbd5e1;font-size:13.5px;font-weight:600;backdrop-filter:blur(8px)}
+.call-remote-placeholder .cp-status::before{content:"";width:8px;height:8px;border-radius:50%;background:#64748b}
+#call-modal.ringing .cp-status::before{background:#fbbf24;animation:cpBlink 1s ease-in-out infinite}
+#call-modal.connected .cp-status{color:#86efac;background:rgba(34,197,94,.10);border-color:rgba(34,197,94,.32)}
+#call-modal.connected .cp-status::before{background:#22c55e;box-shadow:0 0 10px #22c55e}
+@keyframes cpBlink{0%,100%{opacity:1}50%{opacity:.25}}
+.cp-timer{display:none;font-size:36px;font-weight:300;font-variant-numeric:tabular-nums;letter-spacing:2px;color:#fff;margin-top:2px;text-shadow:0 2px 14px rgba(0,0,0,.5)}
+#call-modal.connected .cp-timer{display:block}
+.cp-meter{display:flex;align-items:flex-end;justify-content:center;gap:4px;height:28px;margin-top:12px;opacity:0;transition:opacity .4s}
+#call-modal.connected .cp-meter{opacity:.9}
+.cp-meter i{width:5px;height:4px;border-radius:3px;background:linear-gradient(180deg,#60a5fa,#a78bfa);transition:height .09s linear}
+/* top bar */
+#call-modal .call-topbar{padding:calc(14px + env(safe-area-inset-top,0px)) 14px 10px;gap:8px;transition:opacity .25s}
+#call-modal .call-topbar .ct-side{flex:1;display:flex;background:none;padding:0;border-radius:0}
+#call-modal .call-topbar .ct-left{justify-content:flex-start}
+#call-modal .call-topbar .ct-right{justify-content:flex-end}
+#call-modal .call-topbar .ct-chip,#call-modal .call-topbar .ct-quality{display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border-radius:999px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);color:#cbd5e1;font-size:11.5px;font-weight:700;backdrop-filter:blur(10px)}
+#call-modal .call-topbar b{font-weight:700;white-space:nowrap}
+#call-modal .call-topbar .ct-chip,#call-modal .call-topbar .ct-quality{white-space:nowrap;flex-shrink:0}
+#call-modal .call-topbar .qb{background:none;padding:0;border-radius:0}
+#call-modal .call-topbar #call-timer-text{max-width:42%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);backdrop-filter:blur(10px);font-size:12.5px}
+.qb{display:inline-flex;align-items:flex-end;gap:2px;height:14px}
+.qb i{width:3px;border-radius:2px;background:rgba(255,255,255,.22)}
+.qb i:nth-child(1){height:4px}.qb i:nth-child(2){height:7px}.qb i:nth-child(3){height:10px}.qb i:nth-child(4){height:14px}
+.ct-quality[data-level="4"] .qb i,.ct-quality[data-level="3"] .qb i:nth-child(-n+3){background:#34d399}
+.ct-quality[data-level="2"] .qb i:nth-child(-n+2){background:#fbbf24}
+.ct-quality[data-level="1"] .qb i:nth-child(1){background:#f87171}
+.ct-quality[data-level="4"] b,.ct-quality[data-level="3"] b{color:#86efac}
+.ct-quality[data-level="2"] b{color:#fcd34d}.ct-quality[data-level="1"] b{color:#fca5a5}
+/* self view */
+#call-local-video{width:96px;height:136px;border-radius:18px;top:calc(62px + env(safe-area-inset-top,0px));right:14px;left:auto;border:2px solid rgba(255,255,255,.3);touch-action:none;cursor:grab;box-shadow:0 10px 28px rgba(0,0,0,.55)}
+/* bottom sheet */
+#call-modal .call-sheet{padding:20px 18px calc(22px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;align-items:center;gap:20px;background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.03));backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-top:1px solid rgba(255,255,255,.11);border-radius:30px 30px 0 0;box-shadow:0 -22px 54px rgba(0,0,0,.38);transition:opacity .25s}
+#call-modal .call-controls{padding:0;gap:0;width:100%;max-width:420px;justify-content:space-between;align-items:flex-start}
+.cc-item{display:flex;flex-direction:column;align-items:center;gap:9px;flex:1;min-width:0}
+.cc-item .call-ctrl-btn{width:62px;height:62px}
+.cc-label{font-size:11.5px;color:#cbd5e1;font-weight:600;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+.call-hangup{width:100%;max-width:340px;height:58px;border:0;border-radius:30px;cursor:pointer;color:#fff;font:inherit;font-size:16px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:10px;background:linear-gradient(135deg,#ff6b6b,#ef4444 50%,#b91c1c);box-shadow:0 12px 30px rgba(239,68,68,.45),inset 0 1px 0 rgba(255,255,255,.35);transition:transform .12s}
+.call-hangup:active{transform:scale(.97)}
+.call-hangup svg{transform:rotate(135deg)}
+#call-modal #call-more-menu{bottom:100%;top:auto;left:50%;margin-bottom:10px;min-width:262px;max-width:92vw;background:rgba(24,17,38,.94);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.12);border-radius:18px;box-shadow:0 18px 44px rgba(0,0,0,.55)}
+#call-more-menu .cm-vol{display:flex;align-items:center;gap:12px;padding:13px 14px;color:#fff}
+#call-more-menu .cm-vol svg{width:18px;height:18px;flex-shrink:0}
+#call-more-menu .cm-vol input{flex:1;accent-color:#60a5fa;height:4px}
+#call-modal.ui-hidden .call-topbar,#call-modal.ui-hidden .call-sheet{opacity:0;pointer-events:none}
+@media (max-height:640px){.call-remote-placeholder .cp-avatar,.cp-avatar-wrap{width:120px;height:120px}.call-remote-placeholder .cp-name{font-size:23px}.cp-timer{font-size:28px}}
+@media (prefers-reduced-motion:reduce){#call-modal.ringing .cp-rings i,#call-modal.ringing .cp-status::before{animation:none!important}}
+</style>
 </head>
 <body>
 
@@ -3802,44 +3869,41 @@ html{scroll-padding-top:70px}
 
     <!-- ===== CALL SCREEN ===== -->
     <div id="call-modal">
+        <div class="call-bgblur" id="call-bgblur"></div>
         <div class="call-remote-wrap">
             <video id="call-remote-video" autoplay playsinline></video>
             <div class="call-remote-placeholder" id="call-remote-placeholder">
-                <div class="cp-avatar" id="call-peer-avatar">?</div>
+                <div class="cp-avatar-wrap" id="call-avatar-wrap">
+                    <div class="cp-rings"><i></i><i></i><i></i></div>
+                    <div class="cp-avatar" id="call-peer-avatar">?</div>
+                    <span class="cp-mutebadge"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="1" y1="1" x2="23" y2="23"/><path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"/><path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"/></svg></span>
+                </div>
                 <div class="cp-name" id="call-peer-name">مستخدم</div>
                 <div class="cp-status" id="call-status-text">جاري الاتصال...</div>
+                <div class="cp-timer" id="call-big-timer">00:00</div>
+                <div class="cp-meter" id="call-meter"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
             </div>
             <video id="call-local-video" autoplay playsinline muted></video>
             <div class="call-topbar">
-                <span style="width:38px"></span>
+                <span class="ct-side ct-left"><span class="ct-chip" id="call-enc-chip"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><b id="call-enc-text">مشفّرة</b></span></span>
                 <span id="call-timer-text" data-phone-prefix="1">مكالمة</span>
-                <span style="width:38px"></span>
+                <span class="ct-side ct-right"><span class="ct-quality" id="call-quality" data-level="0"><span class="qb"><i></i><i></i><i></i><i></i></span><b id="call-quality-text">—</b></span></span>
             </div>
         </div>
-        <div class="call-controls">
-            <button class="call-ctrl-btn" id="call-mic-btn" onclick="toggleCallMic()" title="كتم الصوت"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></button>
-            <button class="call-ctrl-btn" id="call-cam-btn" onclick="toggleCallCam()" title="الكاميرا"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg></button>
-            <button class="call-ctrl-btn" id="call-min-btn" onclick="minimizeCall()" title="تصغير المكالمة وكمّل تلعب">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2.2"/><rect x="12.3" y="12.2" width="8" height="5.8" rx="1" fill="currentColor" stroke="none"/></svg>
-            </button>
-            <div style="position:relative">
-                <button class="call-ctrl-btn" id="call-more-btn" onclick="toggleCallMoreMenu()" title="المزيد">
-                    <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>
-                </button>
-                <div id="call-more-menu">
-                    <button onclick="switchCallCamera()" id="call-switch-cam-btn">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
-                        <span>تبديل الكاميرا (أمامية/خلفية)</span>
-                    </button>
-                    <button onclick="toggleCallFullscreen()">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
-                        <span>ملء الشاشة</span>
-                    </button>
-                </div>
+        <div class="call-sheet">
+            <div id="call-more-menu">
+                <button onclick="switchCallCamera()" id="call-switch-cam-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg><span id="cm-switch">تبديل الكاميرا (أمامية/خلفية)</span></button>
+                <button onclick="toggleCallFullscreen()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg><span id="cm-full">ملء الشاشة</span></button>
+                <button onclick="toggleCallNoise()" id="call-noise-btn" class="active-feature"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h2M6 8v8M10 4v16M14 7v10M18 9v6M22 12h-1"/></svg><span id="cm-noise">عزل الضوضاء</span></button>
+                <div class="cm-vol"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/></svg><input type="range" id="call-vol" min="0" max="100" value="100" oninput="setCallVolume(this.value)" aria-label="Volume"/></div>
             </div>
-            <button class="call-ctrl-btn hangup" onclick="hangUpCall()" title="إنهاء المكالمة">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style="transform:rotate(135deg)"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1C10.61 21 3 13.39 3 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.25 1.01l-2.2 2.2z"/></svg>
-            </button>
+            <div class="call-controls">
+                <div class="cc-item"><button class="call-ctrl-btn" id="call-mic-btn" onclick="toggleCallMic()" title="كتم الصوت"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></button><span class="cc-label" id="cl-mic">كتم</span></div>
+                <div class="cc-item"><button class="call-ctrl-btn" id="call-cam-btn" onclick="toggleCallCam()" title="الكاميرا"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg></button><span class="cc-label" id="cl-cam">الكاميرا</span></div>
+                <div class="cc-item"><button class="call-ctrl-btn" id="call-min-btn" onclick="minimizeCall()" title="تصغير المكالمة وكمّل تلعب"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2.2"/><rect x="12.3" y="12.2" width="8" height="5.8" rx="1" fill="currentColor" stroke="none"/></svg></button><span class="cc-label" id="cl-min">تصغير</span></div>
+                <div class="cc-item"><button class="call-ctrl-btn" id="call-more-btn" onclick="toggleCallMoreMenu()" title="المزيد"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button><span class="cc-label" id="cl-more">المزيد</span></div>
+            </div>
+            <button class="call-hangup" onclick="hangUpCall()" title="إنهاء المكالمة"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" style="transform:rotate(135deg)"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1C10.61 21 3 13.39 3 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.46.57 3.58a1 1 0 01-.25 1.01l-2.2 2.2z"/></svg><span id="cl-hang">إنهاء المكالمة</span></button>
         </div>
     </div>
 
@@ -8185,6 +8249,7 @@ html{scroll-padding-top:70px}
             document.getElementById('call-cam-btn').innerHTML = CALL_ICONS.camOn;
             document.getElementById('call-local-video').classList.remove('show');
             document.getElementById('call-timer-text').textContent = _call.peerName;
+            _callProOpen();
             modal.classList.add('open');
             document.body.style.overflow = 'hidden';
             // Reset the floating widget too, in case a previous call left it in a stale state.
@@ -8201,17 +8266,161 @@ html{scroll-padding-top:70px}
             _stopRingtone();
             document.getElementById('call-status-text').textContent = 'متصل الآن';
             _call.startedAt = Date.now();
+            _callProConnected();
             if (_callTimerInterval) clearInterval(_callTimerInterval);
             _callTimerInterval = setInterval(() => {
                 if (!_call || !_call.startedAt) return;
                 const secs = Math.floor((Date.now() - _call.startedAt) / 1000);
                 const m = String(Math.floor(secs / 60)).padStart(2, '0');
                 const s = String(secs % 60).padStart(2, '0');
+                const _bt = document.getElementById('call-big-timer'); if (_bt) _bt.textContent = `${m}:${s}`;
                 document.getElementById('call-timer-text').textContent = `${_call.peerName} • ${m}:${s}`;
                 const cmwTimer = document.getElementById('cmw-timer');
                 if (cmwTimer) cmwTimer.textContent = `${m}:${s}`;
             }, 1000);
         }
+
+        // ===== CALL SCREEN PRO: speaking ring, mic meter, connection quality, wake lock, tap-to-hide, draggable self-view =====
+        const _cx = { ctx: null, lA: null, rA: null, rStream: null, tick: null, stats: null, wake: null, prevLost: 0, prevRecv: 0, obs: null };
+        const _cxSet = (id, txt) => { const e = document.getElementById(id); if (e) e.textContent = txt; };
+        function _callProLabels() {
+            _cxSet('cl-mic', dv('كتم', 'Mute')); _cxSet('cl-cam', dv('الكاميرا', 'Camera')); _cxSet('cl-min', dv('تصغير', 'Minimize'));
+            _cxSet('cl-more', dv('المزيد', 'More')); _cxSet('cl-hang', dv('إنهاء المكالمة', 'End call'));
+            _cxSet('cm-switch', dv('تبديل الكاميرا (أمامية/خلفية)', 'Switch camera (front/back)')); _cxSet('cm-full', dv('ملء الشاشة', 'Full screen'));
+            _cxSet('cm-noise', dv('عزل الضوضاء', 'Noise suppression'));
+        }
+        function _callProOpen() {
+            const m = document.getElementById('call-modal');
+            m.classList.add('ringing'); m.classList.remove('connected', 'ui-hidden');
+            _callProLabels();
+            _cxSet('call-enc-text', _call && _call.isPractice ? dv('وضع تجربة', 'Test mode') : dv('مشفّرة', 'Encrypted'));
+            _cxSet('call-big-timer', '00:00'); _cxSet('call-quality-text', '—');
+            const q = document.getElementById('call-quality'); if (q) q.dataset.level = '0';
+            const bg = document.getElementById('call-bgblur');
+            if (bg) bg.style.backgroundImage = (_call && _call.peerPhoto) ? 'url("' + String(_call.peerPhoto).replace(/"/g, '%22') + '")' : 'none';
+            const vol = document.getElementById('call-vol'); if (vol) vol.value = 100;
+            const rv = document.getElementById('call-remote-video'); if (rv) rv.volume = 1;
+            const nb = document.getElementById('call-noise-btn'); if (nb) nb.classList.add('active-feature');
+            document.getElementById('call-avatar-wrap').classList.remove('muted');
+            document.getElementById('call-peer-avatar').classList.remove('speaking');
+            const mb = document.getElementById('call-mic-btn');
+            if (mb && !_cx.obs) {
+                _cx.obs = new MutationObserver(() => {
+                    const muted = mb.classList.contains('active');
+                    document.getElementById('call-avatar-wrap').classList.toggle('muted', muted);
+                    _cxSet('cl-mic', muted ? dv('مكتوم', 'Muted') : dv('كتم', 'Mute'));
+                });
+                _cx.obs.observe(mb, { attributes: true, attributeFilter: ['class'] });
+            }
+            _cxSet('cl-mic', dv('كتم', 'Mute'));
+            _cxStartMeter();
+            try { if (navigator.wakeLock) navigator.wakeLock.request('screen').then(w => { _cx.wake = w; }).catch(() => {}); } catch (e) {}
+            if (_cx.stats) clearInterval(_cx.stats);
+            _cx.prevLost = 0; _cx.prevRecv = 0;
+            _cx.stats = setInterval(_cxStats, 2500);
+        }
+        function _callProConnected() {
+            const m = document.getElementById('call-modal');
+            m.classList.remove('ringing'); m.classList.add('connected');
+            _cxSet('call-status-text', dv('متصل الآن', 'Connected'));
+            _cxStats();
+        }
+        function _callProStop() {
+            const m = document.getElementById('call-modal'); if (m) m.classList.remove('ringing', 'connected', 'ui-hidden');
+            _cxStopMeter();
+            if (_cx.stats) { clearInterval(_cx.stats); _cx.stats = null; }
+            try { if (_cx.wake) { _cx.wake.release(); _cx.wake = null; } } catch (e) {}
+            const av = document.getElementById('call-peer-avatar'); if (av) av.classList.remove('speaking');
+            const mu = document.getElementById('call-avatar-wrap'); if (mu) mu.classList.remove('muted');
+        }
+        function _cxStartMeter() {
+            _cxStopMeter();
+            try {
+                const AC = window.AudioContext || window.webkitAudioContext; if (!AC || !_call || !_call.localStream) return;
+                const ctx = _cx.ctx = new AC(); ctx.resume().catch(() => {});
+                const tr = _call.localStream.getAudioTracks()[0];
+                if (tr) { const a = ctx.createAnalyser(); a.fftSize = 256; a.smoothingTimeConstant = 0.6; ctx.createMediaStreamSource(new MediaStream([tr])).connect(a); _cx.lA = a; }
+                _cx.tick = setInterval(_cxTick, 90);
+            } catch (e) {}
+        }
+        function _cxStopMeter() {
+            if (_cx.tick) { clearInterval(_cx.tick); _cx.tick = null; }
+            try { if (_cx.ctx) _cx.ctx.close(); } catch (e) {}
+            _cx.ctx = null; _cx.lA = null; _cx.rA = null; _cx.rStream = null;
+            document.querySelectorAll('#call-meter i').forEach(i => { i.style.height = ''; });
+        }
+        function _cxLevel(an) {
+            const buf = new Uint8Array(an.fftSize); an.getByteTimeDomainData(buf);
+            let sum = 0; for (let i = 0; i < buf.length; i++) { const v = (buf[i] - 128) / 128; sum += v * v; }
+            return Math.sqrt(sum / buf.length);
+        }
+        function _cxTick() {
+            if (!_call || !_cx.ctx) return;
+            const rv = document.getElementById('call-remote-video'), rs = rv && rv.srcObject;
+            if (rs && rs !== _cx.rStream && rs.getAudioTracks && rs.getAudioTracks().length) {
+                try { _cx.rStream = rs; const a = _cx.ctx.createAnalyser(); a.fftSize = 256; _cx.ctx.createMediaStreamSource(rs).connect(a); _cx.rA = a; } catch (e) { _cx.rA = null; }
+            }
+            const mine = (_cx.lA && _call.micOn !== false) ? _cxLevel(_cx.lA) : 0;
+            const bars = document.querySelectorAll('#call-meter i');
+            const shape = [0.45, 0.7, 0.9, 1, 0.9, 0.7, 0.45];
+            bars.forEach((b, i) => { b.style.height = (4 + Math.min(1, mine * 7) * 22 * shape[i % shape.length]) + 'px'; });
+            const theirs = _cx.rA ? _cxLevel(_cx.rA) : 0;
+            document.getElementById('call-peer-avatar').classList.toggle('speaking', theirs > 0.02);
+        }
+        async function _cxStats() {
+            const q = document.getElementById('call-quality'); if (!q || !_call) return;
+            let level = 0;
+            if (_call.isPractice) level = _call.startedAt ? 4 : 0;
+            else if (_call.pc && _call.startedAt) {
+                try {
+                    const rep = await _call.pc.getStats(); let rtt = null, lost = 0, recv = 0;
+                    rep.forEach(r => {
+                        if (r.type === 'candidate-pair' && r.state === 'succeeded' && (r.nominated || r.selected) && typeof r.currentRoundTripTime === 'number') rtt = r.currentRoundTripTime;
+                        if (r.type === 'inbound-rtp' && r.kind === 'audio') { lost += r.packetsLost || 0; recv += r.packetsReceived || 0; }
+                    });
+                    const dl = lost - _cx.prevLost, dr = recv - _cx.prevRecv; _cx.prevLost = lost; _cx.prevRecv = recv;
+                    const loss = (dl + dr) > 0 ? Math.max(0, dl) / (dl + dr) : 0;
+                    level = 4;
+                    if (rtt != null) { if (rtt > 0.15) level = 3; if (rtt > 0.3) level = 2; if (rtt > 0.6) level = 1; }
+                    if (loss > 0.03) level = Math.min(level, 3); if (loss > 0.08) level = Math.min(level, 2); if (loss > 0.15) level = 1;
+                } catch (e) { level = 0; }
+            }
+            q.dataset.level = String(level);
+            _cxSet('call-quality-text', [dv('—', '—'), dv('ضعيفة', 'Poor'), dv('متوسطة', 'Fair'), dv('جيدة', 'Good'), dv('ممتازة', 'Excellent')][level]);
+        }
+        window.toggleCallNoise = async function() {
+            if (!_call || !_call.localAudioTrack) return;
+            const on = !(_call.nsOn !== false); _call.nsOn = on;
+            try { await _call.localAudioTrack.applyConstraints({ noiseSuppression: on, echoCancellation: true, autoGainControl: true }); } catch (e) {}
+            const nb = document.getElementById('call-noise-btn'); if (nb) nb.classList.toggle('active-feature', on);
+            showToast(on ? dv('✅ عزل الضوضاء شغال', '✅ Noise suppression on') : dv('عزل الضوضاء متوقف', 'Noise suppression off'), '#60a5fa');
+        };
+        window.setCallVolume = function(v) { const rv = document.getElementById('call-remote-video'); if (rv) rv.volume = Math.max(0, Math.min(1, (+v || 0) / 100)); };
+        (function _cxInit() {
+            const modal = document.getElementById('call-modal'); if (!modal) return;
+            // light haptics on control taps
+            modal.querySelector('.call-controls').addEventListener('click', () => { try { navigator.vibrate && navigator.vibrate(12); } catch (e) {} });
+            // tap the video to hide/show the controls (only while the other side's video is showing)
+            modal.querySelector('.call-remote-wrap').addEventListener('click', e => {
+                if (e.target.closest('.call-topbar, #call-local-video')) return;
+                const ph = document.getElementById('call-remote-placeholder');
+                if (ph && getComputedStyle(ph).display === 'none') modal.classList.toggle('ui-hidden');
+            });
+            // draggable self-view
+            const lv = document.getElementById('call-local-video'); let drag = null;
+            lv.addEventListener('pointerdown', e => { const r = lv.getBoundingClientRect(); drag = { dx: e.clientX - r.left, dy: e.clientY - r.top }; try { lv.setPointerCapture(e.pointerId); } catch (er) {} });
+            lv.addEventListener('pointermove', e => {
+                if (!drag) return; e.preventDefault();
+                const x = Math.max(6, Math.min(window.innerWidth - lv.offsetWidth - 6, e.clientX - drag.dx));
+                const y = Math.max(6, Math.min(window.innerHeight - lv.offsetHeight - 6, e.clientY - drag.dy));
+                lv.style.left = x + 'px'; lv.style.top = y + 'px'; lv.style.right = 'auto';
+            });
+            const endD = () => { drag = null; };
+            lv.addEventListener('pointerup', endD); lv.addEventListener('pointercancel', endD);
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'visible' && _call && navigator.wakeLock) navigator.wakeLock.request('screen').then(w => { _cx.wake = w; }).catch(() => {});
+            });
+        })();
 
         // ===== PRACTICE CALL (developer test accounts) =====
         // A test account made in "إعدادات المطور" isn't signed in on any other
@@ -8251,12 +8460,11 @@ html{scroll-padding-top:70px}
             if (!peerUid) { showToast('❌ تعذر تحديد المستخدم', '#ff7a7a'); return; }
             if (peerUid === S.user.uid) { showToast('❌ ما تقدرش تتصل بنفسك 😅', '#ffb020'); return; }
             if (_call) { showToast('📞 عندك مكالمة شغالة بالفعل', '#ffb020'); return; }
-            // Dev mode: the real (main) account can't be signed in on the same phone as a test account, so nobody could pick up.
-            // Calling it from a test account now rings briefly and auto-answers, so the whole call screen can be tried solo.
+            // Dev mode: a test account is a fake account living on this same phone, so no real person can pick up its calls.
+            // Calling any real account (incl. your own Google account) from a test account rings briefly and auto-answers.
             try {
-                const _mn = (_devStore.get().main) || {}, _pe = (S.membersDirectory || []).find(m => m.uid === peerUid);
-                const _isMain = (_mn.uid && _mn.uid === peerUid) || (_pe && _mn.email && _pe.email && _pe.email.toLowerCase() === String(_mn.email).toLowerCase());
-                if (S.user.isTestAccount && _isMain) return _startPracticeCall(peerUid, peerName, peerPhoto);
+                const _pe = (S.membersDirectory || []).find(m => m.uid === peerUid);
+                if (S.user.isTestAccount && !(_pe && _pe.isTestAccount)) return _startPracticeCall(peerUid, peerName, peerPhoto);
             } catch (e) {}
             if (!isUserOnline(peerUid)) { showToast('⚠️ الشخص ده مش موجود على المنصة دلوقتي', '#ff7a7a'); return; }
             if (isUserBusy(peerUid)) { showToast('📞 الشخص ده مشغول بمكالمة تانية دلوقتي', '#ffb020'); return; }
@@ -8469,6 +8677,7 @@ html{scroll-padding-top:70px}
         function _endCallCleanup() {
             _setBusyStatus(false);
             _stopRingtone();
+            _callProStop();
             if (_callTimerInterval) { clearInterval(_callTimerInterval); _callTimerInterval = null; }
             if (_call) {
                 if (_call.ringTimeout) clearTimeout(_call.ringTimeout);
