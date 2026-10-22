@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
 <head>
+    <script>try{var _t=localStorage.getItem('gv_theme')||'dark';document.documentElement.setAttribute('data-theme',_t==='light'?'light':'dark')}catch(e){document.documentElement.setAttribute('data-theme','dark')}</script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
     <title>GAMEVERSE</title>
@@ -2947,7 +2948,7 @@ var P={
 '⏱':'<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M9 2h6"/>'};
 var EM=/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B50}\u{2B06}\u{2B07}\u{23F3}\u{23F1}\u{2705}\u{274C}][\uFE0F\u200D]?/gu;
 var HAS=/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B50}\u{2B06}\u{2B07}\u{23F3}\u{23F1}\u{2705}\u{274C}]/u;
-var SEL='button,.menu-nav-item,.panel-tab,.modal-title,h1,h2,h3,h4,label,.panel-section-title,.menu-section-title,.section-title,.act-btn,.role-badge,.directory-hint,.profile-fs-title,.profile-fs-card-title,#toast,.hero-btn,.hero-tag,.comp-card-title,.comp-status-badge,.comp-cash-badge,.comp-winner-tag,.comp-joined-tag,.login-trust,.chat-cta-title,.chat-cta-sub,.section-empty,#call-status-text,.game-hub-play,.game-back-btn,.sus-icon,.dev-sw-list';
+var SEL='button,.menu-nav-item,.panel-tab,.modal-title,h1,h2,h3,h4,label,.panel-section-title,.menu-section-title,.section-title,.act-btn,.role-badge,.directory-hint,.profile-fs-title,.profile-fs-card-title,#toast,.hero-btn,.hero-tag,.comp-card-title,.comp-status-badge,.comp-cash-badge,.comp-winner-tag,.comp-joined-tag,.login-trust,.chat-cta-title,.chat-cta-sub,.section-empty,#call-status-text,.game-hub-play,.game-back-btn,.sus-icon,.dev-sw-list,.video-ratings,.rating-btn,.badge-locked,.drive-badge,.comp-card-meta,.comp-public-meta';
 var SKIP='[data-ar-text],[data-msg-html],textarea,input,script,style,[contenteditable="true"]';
 function strip(t){return t.replace(EM,'').replace(/ {2,}/g,' ')}
 function icon(ch){var k=ch.replace(/[\uFE0F\u200D]/g,'');var d=P[k];if(!d)return null;var e=document.createElement('span');e.className='gvi'+(k==='⏳'?' spin':'');e.setAttribute('aria-hidden','true');e.innerHTML='<svg viewBox="0 0 24 24">'+d+'</svg>';return e}
@@ -2981,6 +2982,50 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 var _a=window.alert,_c=window.confirm;
 window.alert=function(m){return _a.call(window,strip(String(m)).trim())};
 window.confirm=function(m){return _c.call(window,strip(String(m)).trim())};
+})();
+</script>
+
+<style id="gv-theme">
+/* ===== Dark / Light theme (smart-invert: every colour flips consistently, media stays natural) ===== */
+html[data-theme="light"]{filter:invert(1) hue-rotate(180deg);color-scheme:light;--void:#060606;--void-2:#101010}
+html[data-theme="light"] :is(img,video,iframe,canvas,picture,[style*="background-image"]){filter:invert(1) hue-rotate(180deg)}
+html[data-theme="light"] [style*="background-image"] img{filter:none}
+html[data-theme="light"] :is(.modal-box,#side-panel,#menu-panel,.dv-box,.video-card,#navbar){box-shadow:none!important}
+html[data-theme="light"] #navbar{border-bottom-color:rgba(255,255,255,.14)!important}
+html.theme-anim,html.theme-anim *{transition:background-color .4s ease,color .4s ease,border-color .4s ease,fill .4s ease!important}
+::view-transition-old(root),::view-transition-new(root){animation:none;mix-blend-mode:normal}
+::view-transition-new(root){animation:gvReveal .65s cubic-bezier(.22,.8,.2,1) both}
+@keyframes gvReveal{from{clip-path:circle(0 at var(--tx,50%) var(--ty,0))}to{clip-path:circle(160% at var(--tx,50%) var(--ty,0))}}
+.theme-toggle{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--bright);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;margin-inline:6px;transition:background .2s,transform .3s var(--ease),border-color .2s}
+.theme-toggle:hover{background:var(--surface-2);border-color:rgba(255,255,255,.25);transform:rotate(18deg)}
+.theme-toggle svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#login-screen .theme-toggle{position:absolute;top:max(16px,env(safe-area-inset-top));inset-inline-end:16px;z-index:5}
+@media (prefers-reduced-motion:reduce){::view-transition-new(root){animation:none}}
+</style>
+<script>
+(function(){
+var SUN='<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>',
+    MOON='<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>',root=document.documentElement;
+function cur(){return root.getAttribute('data-theme')==='light'?'light':'dark'}
+function paint(){
+  var l=cur()==='light';
+  document.querySelectorAll('.theme-toggle').forEach(function(b){b.innerHTML='<svg viewBox="0 0 24 24">'+(l?MOON:SUN)+'</svg>';b.setAttribute('aria-label',l?'Switch to dark mode':'Switch to light mode');b.title=l?'Dark mode':'Light mode'});
+  var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute('content',l?'#f9f9f9':'#0f0f0f');
+}
+function set(t,btn){
+  var go=function(){root.setAttribute('data-theme',t);try{localStorage.setItem('gv_theme',t)}catch(e){}paint()};
+  var calm=window.matchMedia&&matchMedia('(prefers-reduced-motion:reduce)').matches;
+  if(document.startViewTransition&&!calm&&btn){var r=btn.getBoundingClientRect();root.style.setProperty('--tx',(r.left+r.width/2)+'px');root.style.setProperty('--ty',(r.top+r.height/2)+'px');document.startViewTransition(go)}
+  else{root.classList.add('theme-anim');go();setTimeout(function(){root.classList.remove('theme-anim')},450)}
+}
+function make(){var b=document.createElement('button');b.type='button';b.className='theme-toggle';b.onclick=function(){set(cur()==='light'?'dark':'light',b)};return b}
+function init(){
+  var nr=document.querySelector('.nav-right'),hb=document.getElementById('hamburger-btn'),ls=document.getElementById('login-screen');
+  if(nr&&!nr.querySelector('.theme-toggle'))nr.insertBefore(make(),hb&&hb.parentNode===nr?hb:nr.firstChild);
+  if(ls&&!ls.querySelector('.theme-toggle'))ls.appendChild(make());
+  paint();
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 </script>
 </head>
