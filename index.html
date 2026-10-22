@@ -2644,30 +2644,6 @@
             .video-card, .chat-cta-card, .menu-nav-item { will-change: transform; }
         }
     </style>
-<style id="gv-modern-polish">
-:root{--gv-ease:cubic-bezier(.22,1,.36,1)}
-.modal-box,.menu-user-info,.video-card,.chat-cta-card,.admin-mgmt-card,.profile-fs-card{backdrop-filter:blur(18px) saturate(140%);-webkit-backdrop-filter:blur(18px) saturate(140%);box-shadow:0 10px 40px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.06)}
-.modal-overlay[style*="flex"] .modal-box{animation:gvPop .45s var(--gv-ease)}
-@keyframes gvPop{from{opacity:0;transform:translateY(18px) scale(.95)}to{opacity:1;transform:none}}
-.video-card,.menu-nav-item,.panel-tab,button{transition:transform .25s var(--gv-ease),box-shadow .25s var(--gv-ease),background .25s,border-color .25s}
-.video-card:hover{transform:translateY(-4px) scale(1.015);box-shadow:0 16px 40px rgba(168,85,247,.28)}
-.menu-nav-item:hover{transform:translateX(-4px)}
-button:active{transform:scale(.95)}
-.wabubble,.wachat-msg,[class*="bubble"]{border-radius:20px;animation:gvMsg .35s var(--gv-ease) both}
-@keyframes gvMsg{from{opacity:0;transform:translateY(10px) scale(.96)}to{opacity:1;transform:none}}
-.dev-acct{border:1px solid var(--border);border-radius:12px;padding:10px;margin-bottom:8px;background:rgba(255,255,255,.03)}
-.dev-acct-top{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap}
-.dev-acct select{background:#1a1335;color:#fff;border:1px solid var(--border);border-radius:8px;padding:4px 8px}
-.dev-feats{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px;font-size:12px}
-.dev-feats label{display:flex;gap:6px;align-items:center;cursor:pointer}
-#dev-switcher{position:fixed;bottom:18px;left:14px;z-index:99999;display:flex;flex-direction:column;align-items:flex-start;gap:8px}
-.dev-fab{width:48px;height:48px;border-radius:50%;border:0;font-size:22px;background:linear-gradient(135deg,#c026d3,#7c3aed);box-shadow:0 8px 24px rgba(124,58,237,.5)}
-.dev-sw-list{display:none;flex-direction:column;gap:6px;background:rgba(20,14,40,.92);backdrop-filter:blur(14px);padding:8px;border-radius:14px;border:1px solid var(--border);max-width:240px}
-#dev-switcher.open .dev-sw-list{display:flex;animation:gvPop .3s var(--gv-ease)}
-.dev-sw-list button{background:transparent;color:#fff;border:1px solid transparent;border-radius:10px;padding:8px 10px;text-align:start;font:inherit;font-size:13px}
-.dev-sw-list button.on{background:rgba(192,38,211,.25);border-color:rgba(192,38,211,.5)}
-@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
-</style>
 </head>
 <body>
 
@@ -3704,7 +3680,7 @@ button:active{transform:scale(.95)}
             </p>
 
             <div class="modal-field">
-                <label class="modal-label">نوع الحساب</label><select id="dev-test-role" class="modal-input"><option value="admin">🛡 مشرف (بصلاحيات تتحكم فيها)</option><option value="user">👤 مستخدم عادي</option></select></div><div class="modal-field"><label class="modal-label">اسم الحساب التجريبي (اختياري)</label>
+                <label class="modal-label">اسم الحساب التجريبي (اختياري)</label>
                 <input id="dev-test-account-name" class="modal-input" type="text" placeholder="مثلاً: تجريبي 1" />
             </div>
             <div class="modal-btns" style="margin-bottom:6px">
@@ -3787,7 +3763,7 @@ button:active{transform:scale(.95)}
             signInWithPopup,
             signInWithRedirect,
             getRedirectResult,
-            signInAnonymously, createUserWithEmailAndPassword, signInWithEmailAndPassword,
+            signInAnonymously,
             updateProfile,
             signOut,
             onAuthStateChanged,
@@ -5604,133 +5580,6 @@ button:active{transform:scale(.95)}
                 btn.textContent = '🗑 حذف كل الحسابات التجريبية';
             }
         };
-
-        
-        // ===== DEV ACCOUNTS v2: supervisor test accounts, feature toggles, switching, auto-wipe =====
-        const DEV_DOMAIN = '@gv-dev.invalid';
-        const DEV_FEATURES = { 'admin-users': ['الحسابات','Accounts'], 'admin-competitions': ['المسابقات','Competitions'], 'admin-ratings': ['التقييمات','Ratings'], 'admin-comments': ['التعليقات','Comments'], 'admin-issues': ['الأعطال','Issues'], 'games': ['إدارة الألعاب','Games'] };
-        const dv = (ar, en) => (S.language && S.language !== 'ar') ? en : ar;
-        const _devStore = { get(){ try{return JSON.parse(localStorage.getItem('gv_dev_accts')||'{}');}catch(e){return {};} }, set(v){ try{localStorage.setItem('gv_dev_accts',JSON.stringify(v));}catch(e){} } };
-        const _devPrev = +(localStorage.getItem('gv_dev_alive')||0);
-        let _devStale = !_devPrev || Date.now() - _devPrev > 20000;
-        if (_devStale) _devStore.set({});
-        setInterval(() => { try{localStorage.setItem('gv_dev_alive', Date.now());}catch(e){} }, 4000);
-        try{localStorage.setItem('gv_dev_alive', Date.now());}catch(e){}
-
-        async function _devApplyTestSession(fbUser) {
-            if (_devStale) { S.user = null; await signOut(auth); throw new Error('dev session expired'); }
-            S.isMainAdmin = false; S.isAdmin = false; S.devFeatures = {};
-            onSnapshot(doc(db, 'users', fbUser.uid), s => {
-                if (!s.exists()) { handleSignOut(); return; }
-                const d = s.data();
-                S.isAdmin = d.testRole === 'admin'; S.devFeatures = d.devFeatures || {};
-                try{ updateUI(); }catch(e){}
-            });
-        }
-        window._devGateMenu = function() {
-            const isT = S.user && S.user.isTestAccount;
-            document.querySelectorAll('#menu-admin-section .menu-nav-item').forEach(el => {
-                const oc = el.getAttribute('onclick') || '';
-                let hide = false;
-                if (isT) {
-                    if (oc.includes('admin-admins') || oc.includes('openDeveloperSettings')) hide = true;
-                    for (const k in DEV_FEATURES) if (oc.includes("'" + k + "'") && S.devFeatures && S.devFeatures[k] === false) hide = true;
-                }
-                el.style.display = hide ? 'none' : '';
-            });
-        };
-
-        async function _devSweep(silent) {
-            try {
-                const snap = await getDocs(query(collection(db, 'users'), where('isTestAccount', '==', true)));
-                const uids = snap.docs.map(d => d.id);
-                const adm = await getDocs(query(collection(db, 'admins'), where('isTestAccount', '==', true)));
-                await Promise.all(adm.docs.map(d => deleteDoc(d.ref)));
-                if (uids.length) { await Promise.all(uids.map(u => deleteDoc(doc(db, 'users', u)))); await _wipeTestAccountData(uids); }
-                _devStore.set({});
-                if (!silent) showToast('🧹 ' + dv('اتمسحت كل الحسابات التجريبية', 'All test accounts wiped'), '#4ade80');
-            } catch (e) { console.error('devSweep', e); }
-        }
-        // First time the main admin is seen after the platform was fully closed -> wipe leftovers everywhere.
-        setInterval(() => { if (S.isMainAdmin && _devStale) { _devStale = false; _devSweep(true); } }, 1500);
-        window.addEventListener('pagehide', () => { const s = _devStore.get(); if (S.isMainAdmin && s.accts && s.accts.length) { _devSweep(true); } });
-
-        window.createTestAccount = async function() {
-            if (!S.isMainAdmin) return;
-            const btn = document.getElementById('dev-create-test-btn'), errEl = document.getElementById('dev-test-error');
-            errEl.style.display = 'none'; btn.disabled = true; btn.textContent = '⏳ ...';
-            try {
-                const role = (document.getElementById('dev-test-role') || {}).value || 'admin';
-                const name = (document.getElementById('dev-test-account-name').value || '').trim() || ((role === 'admin' ? 'مشرف تجريبي #' : 'تجريبي #') + Math.floor(Math.random() * 900 + 100));
-                const email = 'dev' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6) + DEV_DOMAIN;
-                const pw = Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2) + 'Aa1';
-                const sec = initializeApp(FIREBASE_CONFIG, 'dev-' + Date.now());
-                const sa = getAuth(sec);
-                const cred = await createUserWithEmailAndPassword(sa, email, pw);
-                const uid = cred.user.uid;
-                await updateProfile(cred.user, { displayName: name });
-                await signOut(sa);
-                const features = {}; Object.keys(DEV_FEATURES).forEach(k => features[k] = true);
-                await setDoc(doc(db, 'users', uid), { uid, email: '', displayName: name, isTestAccount: true, testRole: role, devFeatures: features, createdAt: new Date() }, { merge: true });
-                if (role === 'admin') await setDoc(doc(db, 'admins', email), { email, displayName: name, role: 'normal', isTestAccount: true, createdAt: new Date() });
-                const st = _devStore.get(); st.main = st.main || { email: S.user.email, name: S.user.displayName };
-                st.accts = (st.accts || []).concat([{ uid, email, pw, name, role }]); _devStore.set(st);
-                closeDeveloperSettingsModal();
-                await _devSwitch(uid);
-            } catch (e) {
-                console.error(e);
-                errEl.textContent = '❌ ' + (e.code === 'auth/operation-not-allowed' ? dv('فعّل Email/Password من Firebase Console → Authentication', 'Enable Email/Password in Firebase Console → Authentication') : (e.message || 'error'));
-                errEl.style.display = 'block';
-            } finally { btn.disabled = false; btn.textContent = '➕ ' + dv('إنشاء حساب تجريبي وتسجيل الدخول بيه', 'Create test account & sign in'); }
-        };
-        async function _devSwitch(uid) {
-            const a = (_devStore.get().accts || []).find(x => x.uid === uid); if (!a) return;
-            await handleSignOut();
-            await signInWithEmailAndPassword(auth, a.email, a.pw);
-            showToast('🧪 ' + a.name, '#4ade80');
-        }
-        window.devSwitchTo = _devSwitch;
-        window.devBackToMain = async function() {
-            const m = _devStore.get().main || {};
-            await handleSignOut();
-            const p = new GoogleAuthProvider(); if (m.email) p.setCustomParameters({ login_hint: m.email });
-            await signInWithPopup(auth, p);
-        };
-        window.devSetRole = async (uid, role) => { await updateDoc(doc(db, 'users', uid), { testRole: role }); renderDeveloperTestAccounts(); };
-        window.devToggleFeature = async (uid, k, on) => { await updateDoc(doc(db, 'users', uid), { ['devFeatures.' + k]: on }); };
-
-        window.renderDeveloperTestAccounts = async function() {
-            const box = document.getElementById('dev-test-accounts-list'), cnt = document.getElementById('dev-test-count');
-            try {
-                const snap = await getDocs(query(collection(db, 'users'), where('isTestAccount', '==', true)));
-                const rows = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-                cnt.textContent = rows.length;
-                if (!rows.length) { box.innerHTML = '<p style="color:var(--text-dim);font-size:13px">' + dv('لسه معملتش أي حساب تجريبي', 'No test accounts yet') + '</p>'; return; }
-                const known = new Set((_devStore.get().accts || []).map(a => a.uid));
-                box.innerHTML = rows.map(r => {
-                    const feats = r.testRole === 'admin' ? '<div class="dev-feats">' + Object.keys(DEV_FEATURES).map(k => `<label><input type="checkbox" ${(r.devFeatures || {})[k] !== false ? 'checked' : ''} onchange="devToggleFeature('${r.id}','${k}',this.checked)"> ${DEV_FEATURES[k][S.language && S.language !== 'ar' ? 1 : 0]}</label>`).join('') + '</div>' : '';
-                    return `<div class="dev-acct"><div class="dev-acct-top"><b>${esc(r.displayName || '')}</b>
-                      <select onchange="devSetRole('${r.id}',this.value)"><option value="admin" ${r.testRole === 'admin' ? 'selected' : ''}>${dv('مشرف', 'Admin')}</option><option value="user" ${r.testRole !== 'admin' ? 'selected' : ''}>${dv('مستخدم', 'User')}</option></select>
-                      ${known.has(r.id) ? `<button class="btn-confirm green" onclick="closeDeveloperSettingsModal();devSwitchTo('${r.id}')">${dv('دخول', 'Enter')}</button>` : ''}</div>${feats}</div>`;
-                }).join('');
-            } catch (e) { box.innerHTML = '<p style="color:#ff7a7a">' + e.message + '</p>'; }
-        };
-        function esc(s) { return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
-
-        // Floating switcher: main admin <-> test accounts
-        let _devSig = '';
-        setInterval(() => {
-            const st = _devStore.get(), accts = st.accts || [];
-            const show = S.user && accts.length && (S.isMainAdmin || S.user.isTestAccount);
-            const sig = show ? S.user.uid + accts.map(a => a.uid).join() + S.language : '';
-            if (sig === _devSig) return; _devSig = sig;
-            let el = document.getElementById('dev-switcher');
-            if (!show) { if (el) el.remove(); return; }
-            if (!el) { el = document.createElement('div'); el.id = 'dev-switcher'; document.body.appendChild(el); }
-            el.innerHTML = '<button class="dev-fab" onclick="this.parentNode.classList.toggle(\'open\')">🧪</button><div class="dev-sw-list">' +
-                `<button onclick="devBackToMain()" class="${S.isMainAdmin ? 'on' : ''}">👑 ${dv('الحساب الرئيسي', 'Main account')}</button>` +
-                accts.map(a => `<button onclick="devSwitchTo('${a.uid}')" class="${S.user.uid === a.uid ? 'on' : ''}">${a.role === 'admin' ? '🛡' : '👤'} ${esc(a.name)}</button>`).join('') + '</div>';
-        }, 1200);
 
         // ===== ADMIN VIDEO LIST =====
         function renderAdminVideoList() {
@@ -8449,7 +8298,7 @@ button:active{transform:scale(.95)}
                 document.getElementById('menu-admin-section').style.display = S.isAdmin ? 'block' : 'none';
                 document.getElementById('menu-add-admin-btn').style.display = S.isMainAdmin ? '' : 'none';
                 document.getElementById('menu-accounts-btn').style.display = S.isMainAdmin ? '' : 'none';
-                document.getElementById('menu-dev-settings-btn').style.display = S.isMainAdmin ? '' : 'none'; try{_devGateMenu();}catch(e){}
+                document.getElementById('menu-dev-settings-btn').style.display = S.isMainAdmin ? '' : 'none';
             }
             panel.classList.add('open');
             ov.style.display = 'block';
@@ -8777,7 +8626,7 @@ button:active{transform:scale(.95)}
             try {
                 await Promise.race([(async () => {
                     await enableNetwork(db);
-                    const isTestAccount = !!fbUser.isAnonymous || /@gv-dev\.invalid$/i.test(fbUser.email||'');
+                    const isTestAccount = !!fbUser.isAnonymous;
                     const email = isTestAccount ? '' : (fbUser.email || '').toLowerCase().trim();
                     if (!isTestAccount && !email) { throw Object.assign(new Error('لا يوجد إيميل'), { code: 'no-email' }); }
                     const suspended = await checkSuspended(fbUser.uid);
@@ -8829,8 +8678,8 @@ button:active{transform:scale(.95)}
                     // feature of the platform as a "fake" logged-in member.
                     if (isTestAccount) {
                         S.user = { uid: fbUser.uid, email: '', displayName: fbUser.displayName || 'حساب تجريبي', photoURL: fbUser.photoURL || '', isTestAccount: true };
-                        await _devApplyTestSession(fbUser);
-                        
+                        S.isAdmin = false;
+                        S.isMainAdmin = false;
                         S.adminExists = true;
                         S.isBlocked = false;
                         S.fbLoading = false;
