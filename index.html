@@ -2663,6 +2663,9 @@ button:active{transform:scale(.95)}
 .dev-feats label{display:flex;gap:6px;align-items:center;cursor:pointer}
 #dev-switcher{position:fixed;bottom:18px;left:14px;z-index:99999;display:flex;flex-direction:column;align-items:flex-start;gap:8px}
 .dev-fab{width:48px;height:48px;border-radius:50%;border:0;font-size:22px;background:linear-gradient(135deg,#3b82f6,#2563eb);box-shadow:0 8px 24px rgba(37,99,235,.5)}
+#dev-switcher .dev-fab{touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab}
+#dev-switcher.up{flex-direction:column-reverse}
+#dev-switcher.rt{align-items:flex-end}
 .dev-sw-list{display:none;flex-direction:column;gap:6px;background:rgba(15,15,15,.92);backdrop-filter:blur(14px);padding:8px;border-radius:14px;border:1px solid var(--border);max-width:240px}
 #dev-switcher.open .dev-sw-list{display:flex;animation:gvPop .3s var(--gv-ease)}
 .dev-sw-list button{background:transparent;color:#fff;border:1px solid transparent;border-radius:10px;padding:8px 10px;text-align:start;font:inherit;font-size:13px}
@@ -6224,10 +6227,53 @@ html{scroll-padding-top:70px}
             try { ag.unsub && ag.unsub(); Object.values(ag.calls).forEach(c => c.unsub.forEach(u => { try { u(); } catch (e) {} })); await signOut(ag.au); await deleteApp(ag.app); } catch (e) {}
         }
         function _devSyncAgents() {
+            try {
+                if (S.user && S.devAccess && !S.user.isTestAccount) {
+                    const st = _devStore.get();
+                    if (!st.main || st.main.uid !== S.user.uid) { st.main = Object.assign({}, st.main || {}, { uid: S.user.uid, email: (st.main && st.main.email) || S.user.email, name: (st.main && st.main.name) || S.user.displayName }); _devStore.set(st); }
+                }
+            } catch (e) {}
             const accts = _devStore.get().accts || [], ok = S.user && (S.devAccess || S.user.isTestAccount) && !_devStale;
             const want = new Set(ok ? accts.filter(a => a.uid !== S.user.uid).map(a => a.uid) : []);
             Object.keys(_devAgents).forEach(u => { if (!want.has(u)) _devStopAgent(u); });
             if (ok) accts.forEach(a => { if (want.has(a.uid)) _devStartAgent(a); });
+        }
+
+        // Draggable dev button: drag the flask anywhere; position is remembered. A plain tap still opens the account list.
+        function _devMakeDraggable(el) {
+            const KEY = 'gv_dev_fab_pos', SZ = 48;
+            const clamp = (x, y) => [Math.max(4, Math.min(window.innerWidth - SZ - 4, x)), Math.max(4, Math.min(window.innerHeight - SZ - 4, y))];
+            const place = (x, y) => {
+                [x, y] = clamp(x, y);
+                el.style.left = x + 'px'; el.style.top = y + 'px'; el.style.bottom = 'auto'; el.style.right = 'auto';
+                el.classList.toggle('up', y > window.innerHeight / 2);
+                el.classList.toggle('rt', x > window.innerWidth / 2);
+            };
+            try { const p = JSON.parse(localStorage.getItem(KEY) || 'null'); if (p) place(p.x, p.y); } catch (e) {}
+            let sx = 0, sy = 0, ox = 0, oy = 0, dragging = false, moved = false, active = false;
+            el.addEventListener('pointerdown', e => {
+                if (!e.target.closest('.dev-fab')) return;
+                const r = el.getBoundingClientRect();
+                sx = e.clientX; sy = e.clientY; ox = r.left; oy = r.top; dragging = true; moved = false; active = true;
+                try { el.setPointerCapture(e.pointerId); } catch (er) {}
+            });
+            el.addEventListener('pointermove', e => {
+                if (!dragging) return;
+                const dx = e.clientX - sx, dy = e.clientY - sy;
+                if (!moved && Math.hypot(dx, dy) < 6) return;
+                moved = true; e.preventDefault();
+                place(ox + dx, oy + dy);
+            });
+            const end = e => {
+                if (!dragging) return;
+                dragging = false;
+                try { el.releasePointerCapture(e.pointerId); } catch (er) {}
+                if (moved) { const r = el.getBoundingClientRect(); try { localStorage.setItem(KEY, JSON.stringify({ x: r.left, y: r.top })); } catch (er) {} }
+            };
+            el.addEventListener('pointerup', end); el.addEventListener('pointercancel', end);
+            // swallow the click that follows a drag so the list doesn't toggle
+            el.addEventListener('click', e => { if (moved) { e.stopPropagation(); e.preventDefault(); moved = false; } }, true);
+            window.addEventListener('resize', () => { const r = el.getBoundingClientRect(); place(r.left, r.top); });
         }
 
         // Floating account switcher (main account <-> test accounts)
@@ -6240,7 +6286,7 @@ html{scroll-padding-top:70px}
             if (sig === _devSig) return; _devSig = sig;
             let el = document.getElementById('dev-switcher');
             if (!show) { if (el) el.remove(); return; }
-            if (!el) { el = document.createElement('div'); el.id = 'dev-switcher'; document.body.appendChild(el); }
+            if (!el) { el = document.createElement('div'); el.id = 'dev-switcher'; document.body.appendChild(el); _devMakeDraggable(el); }
             el.innerHTML = '<button class="dev-fab" aria-label="Accounts" onclick="this.parentNode.classList.toggle(\'open\')"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6M10 3v6L4.5 19a2 2 0 0 0 1.8 3h11.4a2 2 0 0 0 1.8-3L14 9V3"/></svg></button><div class="dev-sw-list">' +
                 `<button onclick="devBackToMain()" class="${S.devAccess ? 'on' : ''}"><i class="dv-dot main"></i>${dv('الحساب الرئيسي', 'Main account')}</button>` +
                 accts.map(a => `<button onclick="devSwitchTo('${a.uid}')" class="${S.user.uid === a.uid ? 'on' : ''}"><i class="dv-dot ${a.role === 'admin' ? 'admin' : ''}"></i>${esc(a.name)}</button>`).join('') + '</div>';
@@ -8205,6 +8251,13 @@ html{scroll-padding-top:70px}
             if (!peerUid) { showToast('❌ تعذر تحديد المستخدم', '#ff7a7a'); return; }
             if (peerUid === S.user.uid) { showToast('❌ ما تقدرش تتصل بنفسك 😅', '#ffb020'); return; }
             if (_call) { showToast('📞 عندك مكالمة شغالة بالفعل', '#ffb020'); return; }
+            // Dev mode: the real (main) account can't be signed in on the same phone as a test account, so nobody could pick up.
+            // Calling it from a test account now rings briefly and auto-answers, so the whole call screen can be tried solo.
+            try {
+                const _mn = (_devStore.get().main) || {}, _pe = (S.membersDirectory || []).find(m => m.uid === peerUid);
+                const _isMain = (_mn.uid && _mn.uid === peerUid) || (_pe && _mn.email && _pe.email && _pe.email.toLowerCase() === String(_mn.email).toLowerCase());
+                if (S.user.isTestAccount && _isMain) return _startPracticeCall(peerUid, peerName, peerPhoto);
+            } catch (e) {}
             if (!isUserOnline(peerUid)) { showToast('⚠️ الشخص ده مش موجود على المنصة دلوقتي', '#ff7a7a'); return; }
             if (isUserBusy(peerUid)) { showToast('📞 الشخص ده مشغول بمكالمة تانية دلوقتي', '#ffb020'); return; }
             const peerEntry = (S.membersDirectory || []).find(m => m.uid === peerUid);
