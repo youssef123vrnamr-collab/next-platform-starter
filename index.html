@@ -9415,9 +9415,7 @@ html{scroll-padding-top:70px}
             } catch (e) { showToast('❌ خطأ: ' + e.message, '#ff7a7a'); }
         };
 
-        async function loadGames() {
-            _listen('games', _applyGames);
-        }
+        async function loadGames() { _syncFeeds(); }
 
 
         async function loadConversationsList() {
@@ -10116,33 +10114,49 @@ html{scroll-padding-top:70px}
         }
         function _listen(name, apply) {
             try {
-                onSnapshot(collection(db, name), snap => {
+                return onSnapshot(collection(db, name), snap => {
                     _lastLive[name] = Date.now();
                     apply(snap.docs.map(d => ({ id: d.id, ...d.data() })).sort(_byNewest));
                 }, () => { _lastLive[name] = 0; _silentFetch(name, apply); });
-            } catch (e) { _silentFetch(name, apply); }
+            } catch (e) { _silentFetch(name, apply); return () => {}; }
         }
         function _refreshAllSilently() {
+            if (!S.user) return;   // Firestore rules: every read needs a signed-in user
             // the live listener already keeps data fresh; only fall back to a plain fetch when it has been quiet for a while
             const stale = n => Date.now() - (_lastLive[n] || 0) > 60000;
             if (stale('videos')) _silentFetch('videos', _applyVideos);
             if (stale('games')) _silentFetch('games', _applyGames);
         }
-        async function loadVideos() {
-            _listen('videos', _applyVideos);
+        // The rules only allow reads for signed-in users, so the feeds start AFTER login and stop on logout.
+        // (Starting them on the login screen made every listener / getDocs fail with permission-denied.)
+        let _feedUid = null, _feedUnsubs = [], _feedsWired = false;
+        function _syncFeeds() {
+            const uid = (S.user && S.user.uid) || null;
+            if (uid === _feedUid) return;
+            _feedUnsubs.forEach(u => { try { u(); } catch (e) {} }); _feedUnsubs = [];
+            _feedUid = uid;
+            _vidSig = ''; _gameSig = ''; S.games = null;
+            if (!uid) { S.initialized = false; S.videos = []; return; }
+            S.initialized = false;
+            _feedUnsubs.push(_listen('videos', _applyVideos), _listen('games', _applyGames));
             // if the listener never delivers (blocked network), do a plain fetch so the page isn't stuck on skeletons
-            setTimeout(() => { if (!S.initialized) _silentFetch('videos', _applyVideos); }, 4000);
-            setTimeout(() => { if (!S.initialized) { S.videos = S.videos || []; S.initialized = true; renderVideos(); } }, 12000);
-            setInterval(() => { if (document.visibilityState === 'visible') _refreshAllSilently(); }, 30000);
-            document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') _refreshAllSilently(); });
-            window.addEventListener('online', _refreshAllSilently);
-            window.addEventListener('focus', _refreshAllSilently);
+            setTimeout(() => { if (_feedUid === uid && !S.initialized) _silentFetch('videos', _applyVideos); }, 4000);
+            setTimeout(() => { if (_feedUid === uid && !S.initialized) { S.videos = S.videos || []; S.initialized = true; renderVideos(); } }, 12000);
+            if (!_feedsWired) {
+                _feedsWired = true;
+                setInterval(() => { if (document.visibilityState === 'visible') _refreshAllSilently(); }, 30000);
+                document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') _refreshAllSilently(); });
+                window.addEventListener('online', _refreshAllSilently);
+                window.addEventListener('focus', _refreshAllSilently);
+            }
         }
+        async function loadVideos() { _syncFeeds(); }
 
         // ===== UI UPDATE =====
         function _frontLocale() { document.documentElement.lang = 'en'; document.documentElement.dir = 'ltr'; }
         window.updateUI = function() {
             try { _gvLiveSync(); } catch (e) {}
+            try { _syncFeeds(); } catch (e) {}
             const { isAdmin, user, adminExists, isBlocked, fbLoading, isMainAdmin } = S;
             const appEl = document.getElementById('app');
             const loginScreen = document.getElementById('login-screen');
