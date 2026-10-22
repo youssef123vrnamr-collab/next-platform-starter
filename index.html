@@ -3053,6 +3053,8 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 #search-clear::after{content:"";position:absolute;inset:-9px}
 </style>
 <style id="gv-no-flicker">
+#admin-directory-list [class*="skel"],#accounts-list [class*="skel"],#admin-list [class*="skel"]{animation:none!important;background:rgba(255,255,255,.05)!important}
+#admin-directory-list .spinner-ring,#accounts-list .spinner-ring{animation:none!important}
 /* Admins / Users lists in the admin panel: no pulsing "lamp" glow on avatars, static soft ring instead */
 #admin-directory-list .directory-avatar,#accounts-list .directory-avatar,
 #admin-directory-list img.directory-avatar,#accounts-list img.directory-avatar{animation:none!important;-webkit-animation:none!important}
@@ -3473,9 +3475,9 @@ html{scroll-padding-top:70px}
                         <div id="admin-list" style="margin-bottom:16px"></div>
 
                         <p class="panel-section-title" data-i18n="panel.selectAdminFromAccounts">تحديد مشرف من الحسابات</p>
-                        <input type="text" id="directory-admins-search" class="directory-search" data-i18n-placeholder="panel.searchNameOrEmail" placeholder="دوّر بالاسم أو الإيميل..." oninput="renderUsersDirectory()" />
+                        <input type="text" id="directory-admins-search" class="directory-search" data-i18n-placeholder="panel.searchNameOrEmail" placeholder="دوّر بالاسم أو الإيميل..." oninput="filterUsersDirectory()" />
                         <p class="directory-hint" data-i18n="panel.roleHint">اضغط على الرتبة اللي عايزها لأي حساب عشان تخليه مشرف عادي أو رئيسي فورًا</p>
-                        <div id="admin-directory-list" class="directory-list"></div><div style="text-align:center;font-size:10px;opacity:.45;margin-top:8px;direction:ltr">build: no-flicker-v3</div>
+                        <div id="admin-directory-list" class="directory-list"></div><div style="text-align:center;font-size:10px;opacity:.45;margin-top:8px;direction:ltr">build: no-flicker-v4</div>
 
                         <p class="panel-section-title" data-i18n="panel.manualAddAdmin">إضافة يدوية (بالإيميل)</p>
                         <div class="admin-mgmt-card">
@@ -3511,8 +3513,8 @@ html{scroll-padding-top:70px}
                     <div class="panel-tab-content" id="tab-admin-users">
                         <p class="panel-section-title" style="margin-top:0" data-i18n="panel.manageAllAccounts">إدارة كل الحسابات</p>
                         <p class="directory-hint" data-i18n="panel.manageAccountsHint">قائمة بكل الحسابات اللي دخلت المنصة — اضغط "توقيف" عشان توقف أي حساب فورًا (كراش)، أو "رفع التوقيف" لإرجاعه</p>
-                        <input type="text" id="directory-users-search" class="directory-search" data-i18n-placeholder="panel.searchNameOrEmail" placeholder="دوّر بالاسم أو الإيميل..." oninput="renderUsersDirectory()" />
-                        <div id="accounts-list" class="directory-list"></div><div style="text-align:center;font-size:10px;opacity:.45;margin-top:8px;direction:ltr">build: no-flicker-v3</div>
+                        <input type="text" id="directory-users-search" class="directory-search" data-i18n-placeholder="panel.searchNameOrEmail" placeholder="دوّر بالاسم أو الإيميل..." oninput="filterUsersDirectory()" />
+                        <div id="accounts-list" class="directory-list"></div><div style="text-align:center;font-size:10px;opacity:.45;margin-top:8px;direction:ltr">build: no-flicker-v4</div>
 
                         <p class="panel-section-title" data-i18n="panel.manualSuspend">توقيف يدوي (بالـ UID)</p>
                         <div style="display:flex;gap:8px;margin-bottom:10px">
@@ -5859,7 +5861,7 @@ html{scroll-padding-top:70px}
                     container.innerHTML = `<p style="color:var(--text-dim);font-size:13px">لا يوجد مشرفين</p>`;
                     return;
                 }
-                container.innerHTML = admins.map(a => `
+                const _ah = admins.map(a => `
                     <div class="admin-list-item">
                         <span>${a.displayName||a.email} <span style="color:var(--text-dim);font-size:11px">${a.email}</span></span>
                         <div style="display:flex;align-items:center;gap:8px">
@@ -5869,7 +5871,10 @@ html{scroll-padding-top:70px}
                         </div>
                     </div>
                 `).join('');
+                if (container.dataset.sig === _ah) return;
+                container.dataset.sig = _ah; container.innerHTML = _ah;
             } catch (e) {
+                container.dataset.sig = '';
                 container.innerHTML = `<p style="color:var(--text-dim);font-size:13px">خطأ في تحميل المشرفين</p>`;
             }
         };
@@ -6721,12 +6726,23 @@ html{scroll-padding-top:70px}
         // Retries automatically on connection hiccups (Firestore's local cache/network
         // sometimes takes a moment to settle after opening the admin panel), so the
         // person doesn't have to close and reopen the panel to get the list to show.
+        function _usersDirRelease() { window._usersDirBusy = false; if (window._usersDirAgain) { window._usersDirAgain = false; setTimeout(() => window.renderUsersDirectory(), 0); } }
+        // typing in the search boxes only filters what is already loaded (no refetch, no re-flash)
+        window.filterUsersDirectory = function() {
+            if (S.usersDirectory) { _renderAdminDirectory(S.usersDirectory); _renderAccountsDirectory(S.usersDirectory); }
+            else window.renderUsersDirectory();
+        };
         window.renderUsersDirectory = async function(_attempt = 1) {
             if (!S.isMainAdmin) return;
             const adminsList = document.getElementById('admin-directory-list');
             const accountsList = document.getElementById('accounts-list');
             if (!adminsList && !accountsList) return;
 
+            if (_attempt === 1) {
+                if (window._usersDirBusy) { window._usersDirAgain = true; return; }   // already loading: don't restart (that caused the flashing)
+                window._usersDirBusy = true;
+                if (S.usersDirectory) { if (adminsList) _renderAdminDirectory(S.usersDirectory); if (accountsList) _renderAccountsDirectory(S.usersDirectory); }
+            }
             if (_attempt === 1) {
                 // show the shimmer skeleton only on the very first load; when rows are already on screen
                 // keep them in place (no flash/flicker) and just swap in the fresh data
@@ -6765,6 +6781,7 @@ html{scroll-padding-top:70px}
                 S.usersDirectory = directory;
                 if (adminsList) _renderAdminDirectory(directory);
                 if (accountsList) _renderAccountsDirectory(directory);
+                _usersDirRelease();
             } catch (e) {
                 console.error('renderUsersDirectory error (attempt ' + _attempt + '):', e);
                 // Auto-retry up to 3 times with increasing delay (network/cache hiccups
@@ -6779,6 +6796,7 @@ html{scroll-padding-top:70px}
                 </div>`;
                 if (adminsList) { adminsList.dataset.sig = ''; adminsList.innerHTML = errHtml; }
                 if (accountsList) { accountsList.dataset.sig = ''; accountsList.innerHTML = errHtml; }
+                _usersDirRelease();
             }
         };
 
