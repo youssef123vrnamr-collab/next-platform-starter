@@ -3052,6 +3052,14 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 /* bigger invisible tap area around the X without changing its look */
 #search-clear::after{content:"";position:absolute;inset:-9px}
 </style>
+<style id="gv-no-flicker">
+/* Admins / Users lists in the admin panel: no pulsing "lamp" glow on avatars, static soft ring instead */
+#admin-directory-list .directory-avatar,#accounts-list .directory-avatar,
+#admin-directory-list img.directory-avatar,#accounts-list img.directory-avatar{animation:none!important;-webkit-animation:none!important}
+#admin-directory-list .directory-avatar:not([style*="box-shadow"]),#accounts-list .directory-avatar:not([style*="box-shadow"]){box-shadow:0 0 0 2px rgba(59,130,246,.45)}
+#admin-directory-list .directory-item,#accounts-list .directory-item{animation:none!important;transition:none!important}
+#admin-directory-list .directory-item:active,#accounts-list .directory-item:active{transform:none!important}
+</style>
 <style id="gv-conv-select">
 #conversations-list .directory-item{position:relative;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;transition:background .15s,border-color .15s,transform .12s}
 #conversations-list .directory-item:active{transform:scale(.99)}
@@ -6720,9 +6728,11 @@ html{scroll-padding-top:70px}
             if (!adminsList && !accountsList) return;
 
             if (_attempt === 1) {
+                // show the shimmer skeleton only on the very first load; when rows are already on screen
+                // keep them in place (no flash/flicker) and just swap in the fresh data
                 const skel = _directorySkeletonHtml();
-                if (adminsList) adminsList.innerHTML = skel;
-                if (accountsList) accountsList.innerHTML = skel;
+                if (adminsList && !adminsList.querySelector('.directory-item')) adminsList.innerHTML = skel;
+                if (accountsList && !accountsList.querySelector('.directory-item')) accountsList.innerHTML = skel;
             } else {
                 const retryingHtml = `<div class="directory-retrying-box"><span class="spinner-ring light"></span> ${t('directory.retrying')} (${_attempt}/4)...</div>`;
                 if (adminsList) adminsList.innerHTML = retryingHtml;
