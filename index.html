@@ -10099,22 +10099,34 @@ html{scroll-padding-top:70px}
             const t = x => { const c = x.createdAt; return !c ? 0 : (typeof c.toMillis === 'function' ? c.toMillis() : (c.seconds ? c.seconds * 1000 : +new Date(c) || 0)); };
             return t(b) - t(a);
         };
+        // One getDocs at a time per collection, and never right after a live snapshot just arrived.
+        // Firing several getDocs() on a collection that already has an onSnapshot() listener (interval + focus +
+        // visibilitychange + online all fire together) can trip Firestore's "INTERNAL ASSERTION FAILED" bug.
+        const _fetching = {}, _lastLive = {}, _lastFetch = {};
         async function _silentFetch(name, apply) {
+            if (_fetching[name]) return;
+            if (Date.now() - (_lastFetch[name] || 0) < 5000) return;
+            _fetching[name] = true;
             try {
                 const snap = await getDocs(collection(db, name));
+                _lastFetch[name] = Date.now();
                 apply(snap.docs.map(d => ({ id: d.id, ...d.data() })).sort(_byNewest));
             } catch (e) { /* stay quiet, try again next tick */ }
+            finally { _fetching[name] = false; }
         }
         function _listen(name, apply) {
             try {
                 onSnapshot(collection(db, name), snap => {
+                    _lastLive[name] = Date.now();
                     apply(snap.docs.map(d => ({ id: d.id, ...d.data() })).sort(_byNewest));
-                }, () => { _silentFetch(name, apply); });
+                }, () => { _lastLive[name] = 0; _silentFetch(name, apply); });
             } catch (e) { _silentFetch(name, apply); }
         }
         function _refreshAllSilently() {
-            _silentFetch('videos', _applyVideos);
-            _silentFetch('games', _applyGames);
+            // the live listener already keeps data fresh; only fall back to a plain fetch when it has been quiet for a while
+            const stale = n => Date.now() - (_lastLive[n] || 0) > 60000;
+            if (stale('videos')) _silentFetch('videos', _applyVideos);
+            if (stale('games')) _silentFetch('games', _applyGames);
         }
         async function loadVideos() {
             _listen('videos', _applyVideos);
