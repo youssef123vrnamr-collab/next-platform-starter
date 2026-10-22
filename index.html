@@ -4944,7 +4944,9 @@ window.addEventListener('scroll',n,{passive:true});document.addEventListener('DO
             info.appendChild(commentsSection);
 
             const actions = document.createElement('div');
-            actions.className = 'admin-actions' + (S.isAdmin ? ' visible' : '');
+            const _own = !!(S.user && v.uploaderUid && v.uploaderUid === S.user.uid);
+            actions.className = 'admin-actions' + ((S.isAdmin || _own) ? ' visible' : '');
+            if (_own && !S.isAdmin) actions.dataset.owner = '1';
             const lockBtn = document.createElement('button');
             lockBtn.className = 'act-btn ' + (v.locked ? 'btn-unlock' : 'btn-lock');
             lockBtn.setAttribute('data-i18n', v.locked ? 'common.unlock' : 'common.lock');
@@ -4960,7 +4962,7 @@ window.addEventListener('scroll',n,{passive:true});document.addEventListener('DO
             delBtn.setAttribute('data-i18n', 'common.delete');
             delBtn.textContent = t('common.delete');
             delBtn.onclick = () => handleDelete(v.id);
-            actions.appendChild(lockBtn);
+            if (S.isAdmin) actions.appendChild(lockBtn);
             actions.appendChild(editBtn);
             actions.appendChild(delBtn);
             info.appendChild(actions);
@@ -5358,9 +5360,10 @@ window.addEventListener('scroll',n,{passive:true});document.addEventListener('DO
         };
 
         // ===== FIREBASE ACTIONS =====
+        const _canManageVideo = v => !!(v && S.user && (S.isAdmin || (v.uploaderUid && v.uploaderUid === S.user.uid)));
         window.handleToggleLock = async function(id) {
             const v = S.videos.find(v => v.id === id);
-            if (!v) return;
+            if (!v || !S.isAdmin) return;
             const newLocked = !v.locked;
             await updateDoc(doc(db, 'videos', id), { locked: newLocked });
             S.videos = S.videos.map(v => v.id === id ? { ...v, locked: newLocked } : v);
@@ -5370,6 +5373,7 @@ window.addEventListener('scroll',n,{passive:true});document.addEventListener('DO
         };
 
         window.handleDelete = async function(id) {
+            if (!_canManageVideo(S.videos.find(v => v.id === id))) { showToast('❌ ' + (S.language === 'ar' ? 'تقدر تحذف فيديوهاتك أنت بس' : 'You can only delete your own videos'), '#ff7a7a'); return; }
             if (!confirm('هل أنت متأكد من حذف هذا الفيديو؟')) return;
             await deleteDoc(doc(db, 'videos', id));
             S.videos = S.videos.filter(v => v.id !== id);
@@ -8695,6 +8699,8 @@ window.addEventListener('scroll',n,{passive:true});document.addEventListener('DO
             btn.disabled = true;
             btn.textContent = '⏳...';
             try {
+                if (!S.user) { showAddError('Sign in first'); btn.disabled = false; return; }
+                videoData.uploaderUid = S.user.uid;
                 const ref = await addDoc(collection(db, 'videos'), videoData);
                 S.videos.unshift({ id: ref.id, ...videoData });
                 closeAddModal();
@@ -8721,6 +8727,7 @@ window.addEventListener('scroll',n,{passive:true});document.addEventListener('DO
         window.submitEdit = async function() {
             const title = (document.getElementById('edit-title').value || '').trim();
             const desc = (document.getElementById('edit-desc').value || '').trim();
+            if (!_canManageVideo(S.videos.find(v => v.id === S.editingId))) { alert(S.language === 'ar' ? 'تقدر تعدّل فيديوهاتك أنت بس' : 'You can only edit your own videos'); return; }
             if (!title) { alert('العنوان مطلوب'); return; }
             const btn = document.getElementById('edit-confirm-btn');
             btn.disabled = true;
@@ -9144,7 +9151,7 @@ window.addEventListener('scroll',n,{passive:true});document.addEventListener('DO
                 roleSpan.style.color = isAdmin ? '#ffc862' : '#d8a8ff';
                 roleSpan.style.borderColor = isAdmin ? 'rgba(255,176,32,0.2)' : 'rgba(168,85,247,0.2)';
             }
-            document.getElementById('add-video-btn').style.display = isAdmin ? 'block' : 'none';
+            document.getElementById('add-video-btn').style.display = user ? 'block' : 'none';
             const addGameBtn = document.getElementById('add-game-btn');
             if (addGameBtn) addGameBtn.style.display = isAdmin ? 'block' : 'none';
             // Panel states
@@ -9178,7 +9185,7 @@ window.addEventListener('scroll',n,{passive:true});document.addEventListener('DO
                 setImgWithFallback(document.getElementById('user-avatar'), currentAvatarUrl(), () => {});
                 document.getElementById('user-name').textContent = (S.userProfile && S.userProfile.displayName) || user.displayName || 'مستخدم';
             }
-            document.querySelectorAll('.admin-actions').forEach(el => { el.classList.toggle('visible', isAdmin); });
+            document.querySelectorAll('.admin-actions').forEach(el => { el.classList.toggle('visible', isAdmin || el.dataset.owner === '1'); });
             renderVideos();
             if (document.getElementById('games-hub') && document.getElementById('games-hub').style.display !== 'none') renderGamesHub();
             if (isAdmin) {
