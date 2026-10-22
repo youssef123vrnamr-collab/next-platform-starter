@@ -3034,10 +3034,39 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <style id="gv-search">
 /* one neutral clear button only: hide the browser's built-in one */
 #main-search::-webkit-search-cancel-button,#main-search::-webkit-search-decoration,#main-search::-webkit-search-results-button{-webkit-appearance:none!important;appearance:none!important;display:none!important}
-#main-search{-webkit-appearance:none;appearance:none}
-#search-clear{width:24px;height:24px;padding:0!important;border-radius:50%!important;background:rgba(255,255,255,.12)!important;color:var(--text)!important;align-items:center;justify-content:center;transition:background .2s,color .2s}
-#search-clear:hover{background:rgba(255,255,255,.2)!important;color:#fff!important}
-#search-clear svg{display:block}
+#main-search{-webkit-appearance:none;appearance:none;padding:14px 50px 14px 48px!important;height:50px;box-sizing:border-box;text-align:start;font-size:16px!important}
+#main-search::placeholder{text-align:start}
+/* search icon: perfectly centred, never intercepts taps */
+.search-icon{right:18px!important;left:auto!important;width:20px;height:20px;justify-content:center}
+.search-icon svg{display:block}
+/* clear (X) button: round, centred, only shown while there is text (class .show, not inline display) */
+#search-clear{position:absolute;left:12px!important;right:auto!important;top:50%;transform:translateY(-50%)!important;
+  width:26px;height:26px;min-width:26px;padding:0!important;margin:0;border:0!important;border-radius:50%!important;
+  background:rgba(255,255,255,.14)!important;color:var(--text)!important;line-height:0;
+  display:none!important;align-items:center;justify-content:center;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;transition:background .2s,color .2s}
+#search-clear.show{display:inline-flex!important}
+#search-clear:hover{background:rgba(255,255,255,.22)!important;color:#fff!important}
+#search-clear:active{background:rgba(255,255,255,.3)!important}
+#search-clear svg{display:block;width:12px;height:12px;flex:0 0 12px;margin:0}
+/* bigger invisible tap area around the X without changing its look */
+#search-clear::after{content:"";position:absolute;inset:-9px}
+</style>
+<style id="gv-conv-select">
+#conversations-list .directory-item{position:relative;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;transition:background .15s,border-color .15s,transform .12s}
+#conversations-list .directory-item:active{transform:scale(.99)}
+#conversations-list .directory-item .conv-check{display:none;flex:0 0 24px;width:24px;height:24px;border-radius:50%;border:2px solid rgba(255,255,255,.35);align-items:center;justify-content:center;margin-inline-start:auto;transition:background .15s,border-color .15s}
+#conversations-list.sel-mode .directory-item .conv-check{display:flex}
+#conversations-list .directory-item .conv-check svg{width:14px;height:14px;opacity:0;stroke:#fff}
+#conversations-list .directory-item.conv-selected{background:rgba(59,130,246,.16)!important;border-color:rgba(59,130,246,.7)!important}
+#conversations-list .directory-item.conv-selected .conv-check{background:#3b82f6;border-color:#3b82f6}
+#conversations-list .directory-item.conv-selected .conv-check svg{opacity:1}
+#conv-selbar{display:none;position:sticky;top:0;z-index:5;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 12px;padding:10px 12px;border-radius:14px;background:#181818;border:1px solid rgba(59,130,246,.5);box-shadow:0 6px 18px rgba(0,0,0,.4)}
+#conv-selbar.show{display:flex}
+#conv-selbar .cs-count{font-weight:800;font-size:14px;color:#fff;flex:1 1 auto;min-width:80px}
+#conv-selbar button{font:inherit;font-size:13px;font-weight:700;padding:8px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:#fff;cursor:pointer;-webkit-tap-highlight-color:transparent}
+#conv-selbar button.cs-del{background:rgba(239,68,68,.14);border-color:rgba(239,68,68,.5);color:#f87171}
+#conv-selbar button:disabled{opacity:.4;pointer-events:none}
 </style>
 <style id="gv-menu-fix">
 /* Menu: even spacing, no stuck-hover band / GPU-layer glitches on mobile */
@@ -3770,6 +3799,7 @@ html{scroll-padding-top:70px}
         </div>
         <div class="members-fs-body">
             <p class="directory-hint" data-i18n="chats.hint">كل المحادثات اللي بدأتها مع الأعضاء — دوس على أي حد عشان تكمل الكلام. عايز تبدأ محادثة جديدة؟ روح لصفحة "الأعضاء"</p>
+            <div id="conv-selbar"><span class="cs-count" id="conv-sel-count"></span><button type="button" id="conv-sel-all" onclick="convSelectAll()"></button><button type="button" class="cs-del" id="conv-sel-del" onclick="convDeleteSelected()"></button><button type="button" id="conv-sel-cancel" onclick="convExitSelect()"></button></div>
             <div id="conversations-list" class="directory-list members-fs-list"></div>
         </div>
     </div>
@@ -5191,7 +5221,7 @@ html{scroll-padding-top:70px}
             return t.split(' ').every(tok => _tokScore(tok, text, words) > 0);
         }
         window.onSearch = function(inp) {
-            document.getElementById('search-clear').style.display = inp.value ? 'block' : 'none';
+            document.getElementById('search-clear').classList.toggle('show', !!inp.value);
             renderVideos();
             clearTimeout(_qTimer);
             const q = inp.value.trim();
@@ -5213,7 +5243,7 @@ html{scroll-padding-top:70px}
         window.clearSearch = function() {
             const inp = document.getElementById('main-search');
             inp.value = '';
-            document.getElementById('search-clear').style.display = 'none';
+            document.getElementById('search-clear').classList.remove('show');
             renderVideos();
             inp.focus();
         };
@@ -7638,28 +7668,107 @@ html{scroll-padding-top:70px}
             const m = document.getElementById('conversations-modal');
             if (m && m.style.display === 'flex') _convRender();
         }
+        // ---- conversations: long-press to select, multi-select, delete (hidden on this device) ----
+        const _CV = {
+            ar: { sel: n => n + ' محدد', all: 'تحديد الكل', none: 'إلغاء الكل', del: 'مسح', cancel: 'إلغاء', confirm: n => n === 1 ? 'تمسح المحادثة دي من عندك؟' : 'تمسح ' + n + ' محادثات من عندك؟' },
+            en: { sel: n => n + ' selected', all: 'Select all', none: 'Deselect', del: 'Delete', cancel: 'Cancel', confirm: n => n === 1 ? 'Delete this chat from your list?' : 'Delete ' + n + ' chats from your list?' },
+            de: { sel: n => n + ' ausgewählt', all: 'Alle', none: 'Keine', del: 'Löschen', cancel: 'Abbrechen', confirm: n => n === 1 ? 'Diesen Chat aus deiner Liste löschen?' : n + ' Chats aus deiner Liste löschen?' },
+            fr: { sel: n => n + ' sélectionné(s)', all: 'Tout', none: 'Aucun', del: 'Supprimer', cancel: 'Annuler', confirm: n => n === 1 ? 'Supprimer cette discussion de votre liste ?' : 'Supprimer ' + n + ' discussions de votre liste ?' },
+            ru: { sel: n => 'Выбрано: ' + n, all: 'Все', none: 'Снять', del: 'Удалить', cancel: 'Отмена', confirm: n => 'Удалить из списка: ' + n + '?' },
+            zh: { sel: n => '已选 ' + n, all: '全选', none: '取消全选', del: '删除', cancel: '取消', confirm: n => '从列表中删除 ' + n + ' 个聊天？' }
+        };
+        const _cv = () => _CV[S.language] || _CV.en;
+        const _convSel = new Set();
+        let _convSelMode = false, _convBound = false;
+        function _convHiddenKey() { return 'gv_conv_hidden_' + (S.user ? S.user.uid : ''); }
+        function _convHidden() { try { return JSON.parse(localStorage.getItem(_convHiddenKey()) || '{}') || {}; } catch (e) { return {}; } }
+        function _convVisibleRows() {
+            const hid = _convHidden();
+            return (S.convRows || []).filter(r => !(hid[r.uid] && r.ts <= hid[r.uid]));
+        }
+        function _convUpdateBar() {
+            const bar = document.getElementById('conv-selbar'), list = document.getElementById('conversations-list');
+            if (!bar || !list) return;
+            const L = _cv(), n = _convSel.size, total = _convVisibleRows().length;
+            bar.classList.toggle('show', _convSelMode);
+            list.classList.toggle('sel-mode', _convSelMode);
+            document.getElementById('conv-sel-count').textContent = L.sel(n);
+            document.getElementById('conv-sel-all').textContent = (n >= total && total > 0) ? L.none : L.all;
+            document.getElementById('conv-sel-del').textContent = L.del;
+            document.getElementById('conv-sel-del').disabled = n === 0;
+            document.getElementById('conv-sel-cancel').textContent = L.cancel;
+            list.querySelectorAll('.directory-item[data-uid]').forEach(el => el.classList.toggle('conv-selected', _convSel.has(el.dataset.uid)));
+        }
+        window.convExitSelect = function() { _convSelMode = false; _convSel.clear(); _convUpdateBar(); };
+        window.convSelectAll = function() {
+            const rows = _convVisibleRows();
+            if (_convSel.size >= rows.length) _convSel.clear(); else rows.forEach(r => _convSel.add(r.uid));
+            _convUpdateBar();
+        };
+        window.convDeleteSelected = function() {
+            const n = _convSel.size; if (!n) return;
+            if (!confirm(_cv().confirm(n))) return;
+            const hid = _convHidden(), now = Date.now() + 5000;
+            _convSel.forEach(uid => { hid[uid] = now; });
+            try { localStorage.setItem(_convHiddenKey(), JSON.stringify(hid)); } catch (e) {}
+            _convSel.clear(); _convSelMode = false;
+            _convRender();
+        };
+        function _convBind(listEl) {
+            if (_convBound) return; _convBound = true;
+            let timer = null, sx = 0, sy = 0, fired = false;
+            const cancel = () => { if (timer) { clearTimeout(timer); timer = null; } };
+            const rowOf = e => e.target.closest && e.target.closest('.directory-item[data-uid]');
+            listEl.addEventListener('pointerdown', e => {
+                const row = rowOf(e); if (!row || (e.pointerType === 'mouse' && e.button !== 0)) return;
+                fired = false; sx = e.clientX; sy = e.clientY; cancel();
+                timer = setTimeout(() => {
+                    timer = null; fired = true;
+                    if (navigator.vibrate) try { navigator.vibrate(25); } catch (x) {}
+                    _convSelMode = true; _convSel.add(row.dataset.uid); _convUpdateBar();
+                }, 450);
+            });
+            listEl.addEventListener('pointermove', e => { if (timer && (Math.abs(e.clientX - sx) > 10 || Math.abs(e.clientY - sy) > 10)) cancel(); });
+            ['pointerup', 'pointercancel', 'pointerleave'].forEach(ev => listEl.addEventListener(ev, cancel));
+            listEl.addEventListener('contextmenu', e => { if (rowOf(e)) e.preventDefault(); });
+            listEl.addEventListener('click', e => {
+                const row = rowOf(e); if (!row) return;
+                if (fired) { fired = false; return; }          // the click that ends a long-press
+                const uid = row.dataset.uid;
+                if (_convSelMode) {
+                    if (_convSel.has(uid)) _convSel.delete(uid); else _convSel.add(uid);
+                    if (_convSel.size === 0) _convSelMode = false;
+                    _convUpdateBar(); return;
+                }
+                const r = (S.convRows || []).find(x => x.uid === uid); if (!r) return;
+                openFriendChat(r.uid, r.name || '', r.photo || '');
+            });
+        }
         function _convRender() {
             const listEl = document.getElementById('conversations-list');
             if (!listEl) return;
-            const rows = S.convRows;
-            if (rows == null) { listEl.innerHTML = _skelRows(5); return; }
-            if (rows.length === 0) { listEl.innerHTML = `<p class="directory-empty">${t('chats.empty')}</p>`; return; }
+            _convBind(listEl);
+            if (S.convRows == null) { listEl.innerHTML = _skelRows(5); return; }
+            const rows = _convVisibleRows();
+            const alive = new Set(rows.map(r => r.uid));
+            [..._convSel].forEach(u => { if (!alive.has(u)) _convSel.delete(u); });
+            if (rows.length === 0) { _convSelMode = false; _convSel.clear(); listEl.innerHTML = `<p class="directory-empty">${t('chats.empty')}</p>`; _convUpdateBar(); return; }
             const st = listEl.scrollTop;
             listEl.innerHTML = rows.map(r => {
                 const initial = (r.name || '?').charAt(0).toUpperCase();
                 const avatar = avatarImgHtml(r.photo, 'directory-avatar', initial) || `<div class="directory-avatar">${_escapeHtml(initial)}</div>`;
-                const safeName = _escapeHtml(r.name).replace(/'/g, "\\'");
-                const safePhoto = (r.photo || '').replace(/'/g, "\\'");
                 return `
-                    <div class="directory-item" style="cursor:pointer" onclick="openFriendChat('${r.uid}','${safeName}','${safePhoto}')">
+                    <div class="directory-item" style="cursor:pointer" data-uid="${_escapeHtml(r.uid)}">
                         ${avatar}
                         <div class="directory-info">
                             <div class="directory-name">${_escapeHtml(r.name)}</div>
                             <div class="directory-email">${_escapeHtml((r.lastText || '').slice(0, 40))}</div>
                         </div>
+                        <span class="conv-check"><svg viewBox="0 0 24 24" fill="none" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
                     </div>`;
             }).join('');
             listEl.scrollTop = st;
+            _convUpdateBar();
         }
         const _skelRows = n => Array.from({ length: n }, () => '<div class="dir-skel"></div>').join('');
         async function loadMembersList() {
@@ -9030,6 +9139,7 @@ html{scroll-padding-top:70px}
         };
 
         window.closeConversationsModal = function() {
+            if (window.convExitSelect) window.convExitSelect();
             document.getElementById('conversations-modal').style.display = 'none';
             document.body.style.overflow = '';
         };
