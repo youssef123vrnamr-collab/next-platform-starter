@@ -3055,6 +3055,12 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 #hero{display:none!important}
 #search-section{padding-top:20px!important;padding-bottom:8px!important;margin-top:0!important}
 html{scroll-padding-top:70px}
+/* Black platform strip right under the search bar */
+#platform-strip{display:flex;align-items:center;justify-content:center;gap:14px;height:54px;margin:0;padding:0 24px;background:#000;border-top:1px solid rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.05);position:relative;z-index:1}
+#platform-strip .ps-line{flex:1;max-width:260px;height:1px}
+#platform-strip .ps-l{background:linear-gradient(90deg,transparent,rgba(59,130,246,.7))}
+#platform-strip .ps-r{background:linear-gradient(270deg,transparent,rgba(59,130,246,.7))}
+#platform-strip .ps-gem{width:9px;height:9px;transform:rotate(45deg);background:#3b82f6;border-radius:2px;box-shadow:0 0 12px 2px rgba(59,130,246,.65)}
 </style>
 </head>
 <body>
@@ -3492,6 +3498,13 @@ html{scroll-padding-top:70px}
                 <input id="main-search" type="search" placeholder="ابحث عن أي فيديو..." data-i18n-placeholder="search.placeholder" oninput="onSearch(this)" />
                 <button class="search-clear" id="search-clear" onclick="clearSearch()" aria-label="Clear"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
             </div>
+        </div>
+
+        <!-- ===== PLATFORM STRIP (black band under search) ===== -->
+        <div id="platform-strip" aria-hidden="true">
+            <span class="ps-line ps-l"></span>
+            <span class="ps-gem"></span>
+            <span class="ps-line ps-r"></span>
         </div>
 
         <!-- ===== MAIN CONTENT ===== -->
@@ -8733,17 +8746,7 @@ html{scroll-padding-top:70px}
         };
 
         async function loadGames() {
-            try {
-                const q = query(collection(db, 'games'), orderBy('createdAt', 'desc'));
-                const snap = await getDocs(q);
-                S.games = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-            } catch (e) {
-                try {
-                    const snap = await getDocs(collection(db, 'games'));
-                    S.games = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-                } catch { S.games = []; }
-            }
-            renderGamesHub();
+            _listen('games', _applyGames);
         }
 
 
@@ -9434,20 +9437,68 @@ html{scroll-padding-top:70px}
             }
         }
 
-        // ===== LOAD VIDEOS =====
-        async function loadVideos() {
-            try {
-                const q = query(collection(db, 'videos'), orderBy('createdAt', 'desc'));
-                const snap = await getDocs(q);
-                S.videos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-            } catch {
-                try {
-                    const snap = await getDocs(collection(db, 'videos'));
-                    S.videos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-                } catch { S.videos = []; }
-            }
+        // ===== LOAD VIDEOS (silent live sync) =====
+        // Data stays fresh on its own: realtime listener + background re-fetch on
+        // wake / reconnect / every 30s. UI only re-renders when something really changed,
+        // so the user never sees a reload, flash or skeleton after the first load.
+        const _sig = list => JSON.stringify(list, (k, v) => (v && typeof v === 'object' && typeof v.toMillis === 'function') ? v.toMillis() : v);
+        let _vidSig = '', _gameSig = '';
+        function _userIsTyping() {
+            const a = document.activeElement;
+            return !!(a && (a.tagName === 'TEXTAREA' || (a.tagName === 'INPUT' && a.type !== 'button')) && a.closest && a.closest('.video-card, .games-hub, #games-hub'));
+        }
+        function _applyVideos(list) {
+            const sig = _sig(list);
+            const first = !S.initialized;
+            if (!first && sig === _vidSig) return;
+            if (!first && _userIsTyping()) { setTimeout(() => _applyVideos(list), 1500); return; }
+            _vidSig = sig;
+            S.videos = list;
             S.initialized = true;
+            const y = window.scrollY;
             renderVideos();
+            if (!first && Math.abs(window.scrollY - y) > 2) window.scrollTo(0, y);
+        }
+        function _applyGames(list) {
+            const sig = _sig(list);
+            if (S.games && sig === _gameSig) return;
+            if (_userIsTyping()) { setTimeout(() => _applyGames(list), 1500); return; }
+            _gameSig = sig;
+            S.games = list;
+            const y = window.scrollY;
+            renderGamesHub();
+            if (Math.abs(window.scrollY - y) > 2) window.scrollTo(0, y);
+        }
+        const _byNewest = (a, b) => {
+            const t = x => { const c = x.createdAt; return !c ? 0 : (typeof c.toMillis === 'function' ? c.toMillis() : (c.seconds ? c.seconds * 1000 : +new Date(c) || 0)); };
+            return t(b) - t(a);
+        };
+        async function _silentFetch(name, apply) {
+            try {
+                const snap = await getDocs(collection(db, name));
+                apply(snap.docs.map(d => ({ id: d.id, ...d.data() })).sort(_byNewest));
+            } catch (e) { /* stay quiet, try again next tick */ }
+        }
+        function _listen(name, apply) {
+            try {
+                onSnapshot(collection(db, name), snap => {
+                    apply(snap.docs.map(d => ({ id: d.id, ...d.data() })).sort(_byNewest));
+                }, () => { _silentFetch(name, apply); });
+            } catch (e) { _silentFetch(name, apply); }
+        }
+        function _refreshAllSilently() {
+            _silentFetch('videos', _applyVideos);
+            _silentFetch('games', _applyGames);
+        }
+        async function loadVideos() {
+            _listen('videos', _applyVideos);
+            // if the listener never delivers (blocked network), do a plain fetch so the page isn't stuck on skeletons
+            setTimeout(() => { if (!S.initialized) _silentFetch('videos', _applyVideos); }, 4000);
+            setTimeout(() => { if (!S.initialized) { S.videos = S.videos || []; S.initialized = true; renderVideos(); } }, 12000);
+            setInterval(() => { if (document.visibilityState === 'visible') _refreshAllSilently(); }, 30000);
+            document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') _refreshAllSilently(); });
+            window.addEventListener('online', _refreshAllSilently);
+            window.addEventListener('focus', _refreshAllSilently);
         }
 
         // ===== UI UPDATE =====
