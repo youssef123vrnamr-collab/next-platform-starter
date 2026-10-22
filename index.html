@@ -6731,8 +6731,8 @@ html{scroll-padding-top:70px}
                 // show the shimmer skeleton only on the very first load; when rows are already on screen
                 // keep them in place (no flash/flicker) and just swap in the fresh data
                 const skel = _directorySkeletonHtml();
-                if (adminsList && !adminsList.querySelector('.directory-item')) adminsList.innerHTML = skel;
-                if (accountsList && !accountsList.querySelector('.directory-item')) accountsList.innerHTML = skel;
+                if (adminsList && !adminsList.querySelector('.directory-item')) { adminsList.dataset.sig = ''; adminsList.innerHTML = skel; }
+                if (accountsList && !accountsList.querySelector('.directory-item')) { accountsList.dataset.sig = ''; accountsList.innerHTML = skel; }
             } else {
                 const retryingHtml = `<div class="directory-retrying-box"><span class="spinner-ring light"></span> ${t('directory.retrying')} (${_attempt}/4)...</div>`;
                 if (adminsList) adminsList.innerHTML = retryingHtml;
@@ -6777,8 +6777,8 @@ html{scroll-padding-top:70px}
                     <p>⚠️ ${t('directory.connectError')}</p>
                     <button class="directory-retry-btn" onclick="renderUsersDirectory()">🔄 ${t('directory.retry')}</button>
                 </div>`;
-                if (adminsList) adminsList.innerHTML = errHtml;
-                if (accountsList) accountsList.innerHTML = errHtml;
+                if (adminsList) { adminsList.dataset.sig = ''; adminsList.innerHTML = errHtml; }
+                if (accountsList) { accountsList.dataset.sig = ''; accountsList.innerHTML = errHtml; }
             }
         };
 
@@ -6794,10 +6794,10 @@ html{scroll-padding-top:70px}
             const term = (document.getElementById('directory-admins-search')?.value || '').trim();
             const rows = directory.filter(e => _matchesSearch(e, term));
             if (rows.length === 0) {
-                container.innerHTML = `<p class="directory-empty">لا يوجد حسابات مطابقة</p>`;
+                container.dataset.sig = ''; container.innerHTML = `<p class="directory-empty">لا يوجد حسابات مطابقة</p>`;
                 return;
             }
-            container.innerHTML = rows.map(e => {
+            const _html = rows.map(e => {
                 const initial = (e.displayName || '?').charAt(0).toUpperCase();
                 const avatar = avatarImgHtml(e.photoURL, 'directory-avatar', initial, e.ringColor) || `<div class="directory-avatar">${_escapeHtml(initial)}</div>`;
                 const role = e.adminRole || 'none';
@@ -6816,6 +6816,8 @@ html{scroll-padding-top:70px}
                     </div>
                 </div>`;
             }).join('');
+            if (container.dataset.sig === _html) return;   // identical content: leave the DOM alone (no re-flash)
+            container.dataset.sig = _html; container.innerHTML = _html;
         }
 
         function _renderAccountsDirectory(directory) {
@@ -6824,10 +6826,10 @@ html{scroll-padding-top:70px}
             const term = (document.getElementById('directory-users-search')?.value || '').trim();
             const rows = directory.filter(e => _matchesSearch(e, term));
             if (rows.length === 0) {
-                container.innerHTML = `<p class="directory-empty">لا يوجد حسابات مطابقة</p>`;
+                container.dataset.sig = ''; container.innerHTML = `<p class="directory-empty">لا يوجد حسابات مطابقة</p>`;
                 return;
             }
-            container.innerHTML = rows.map(e => {
+            const _html = rows.map(e => {
                 const initial = (e.displayName || '?').charAt(0).toUpperCase();
                 const avatar = avatarImgHtml(e.photoURL, 'directory-avatar', initial, e.ringColor) || `<div class="directory-avatar">${_escapeHtml(initial)}</div>`;
                 const isSelf = e.uid === S.user?.uid;
@@ -6844,6 +6846,8 @@ html{scroll-padding-top:70px}
                     </div>
                 </div>`;
             }).join('');
+            if (container.dataset.sig === _html) return;
+            container.dataset.sig = _html; container.innerHTML = _html;
         }
 
         // ===== WHATSAPP-STYLE ADMIN CHAT ENGINE =====
