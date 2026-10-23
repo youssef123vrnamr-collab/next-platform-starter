@@ -3895,6 +3895,14 @@ html{scroll-padding-top:70px}
                 <p>لا توجد رسائل بعد<br/>ابدأ المحادثة!</p>
             </div>
         </div>
+        <div class="wachat-reply-preview" id="friend-reply-preview" style="display:none">
+            <div class="wachat-reply-preview-bar"></div>
+            <div class="wachat-reply-preview-body">
+                <span class="wachat-reply-preview-label" id="friend-reply-label">رد على</span>
+                <span class="wachat-reply-preview-text" id="friend-reply-text"></span>
+            </div>
+            <button class="wachat-reply-preview-close" onclick="friendCancelReply()">✕</button>
+        </div>
         <div class="wachat-input-bar">
             <input type="text" class="wachat-input" id="friend-chat-input" placeholder="اكتب رسالة..." onkeydown="if(event.key==='Enter')sendFriendMsg()" />
             <button class="wachat-send-btn" id="friend-chat-send-btn" onclick="sendFriendMsg()">
@@ -4833,8 +4841,18 @@ html{scroll-padding-top:70px}
         const TRANSLATE_CACHE_KEY = 'gv_translate_cache_v1';
         let translateCache = {};
         try { translateCache = JSON.parse(localStorage.getItem(TRANSLATE_CACHE_KEY) || '{}'); } catch (e) { translateCache = {}; }
+        // Debounced + capped: it used to re-serialise the WHOLE cache to localStorage after every single translation.
+        let _trSaveT = null;
         function saveTranslateCache() {
-            try { localStorage.setItem(TRANSLATE_CACHE_KEY, JSON.stringify(translateCache)); } catch (e) {}
+            if (_trSaveT) return;
+            _trSaveT = setTimeout(() => {
+                _trSaveT = null;
+                try {
+                    const ks = Object.keys(translateCache);
+                    if (ks.length > 800) ks.slice(0, ks.length - 600).forEach(k => delete translateCache[k]);   // drop the oldest entries
+                    localStorage.setItem(TRANSLATE_CACHE_KEY, JSON.stringify(translateCache));
+                } catch (e) {}
+            }, 2000);
         }
         // sourceLang lets us translate content that wasn't typed in Arabic —
         // e.g. a chat message someone typed while their own app language was
@@ -4843,27 +4861,50 @@ html{scroll-padding-top:70px}
         // exactly as before.
         // Engine: Google's translate endpoint first (fast, handles 'auto' source detection), MyMemory as a fallback.
         const _GL = c => ({ zh: 'zh-CN' }[c] || c);
-        async function autoTranslate(text, targetLang, sourceLang) {
-            sourceLang = sourceLang || 'ar';
-            if (!text || !text.trim() || !targetLang) return text;
+        // --- network layer (unchanged engines: Google first, MyMemory as backup) ---
+        async function _trFetch(text, targetLang, sourceLang) {
             const auto = sourceLang === 'auto';
-            if (!auto && targetLang === sourceLang) return text;
-            const key = sourceLang + '>' + targetLang + '::' + text;
-            if (translateCache[key]) return translateCache[key];
-            const done = out => { translateCache[key] = out; saveTranslateCache(); return out; };
             try {
                 const res = await fetch('https://translate.googleapis.com/translate_a/single?client=gtx&sl=' + (auto ? 'auto' : _GL(sourceLang)) + '&tl=' + _GL(targetLang) + '&dt=t&q=' + encodeURIComponent(text));
                 const data = await res.json();
                 const out = (data && data[0] || []).map(x => (x && x[0]) || '').join('');
-                if (out && out.trim()) return done(out);
+                if (out && out.trim()) return out;
             } catch (e) { /* fall through to the backup engine */ }
             try {
                 const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${auto ? 'Autodetect' : _GL(sourceLang)}|${_GL(targetLang)}`);
                 const data = await res.json();
                 const translated = data && data.responseData && data.responseData.translatedText;
-                if (translated && !/MYMEMORY WARNING/i.test(translated)) return done(translated);
+                if (translated && !/MYMEMORY WARNING/i.test(translated)) return translated;
             } catch (e) { console.error('autoTranslate error:', e); }
-            return text;
+            return null;
+        }
+        // --- request economy: one request per unique text, max 3 in parallel, no hammering after a failure ---
+        const _trInflight = new Map(), _trFail = new Map(), _trWait = []; let _trActive = 0;
+        const _trSlot = () => new Promise(res => { if (_trActive < 3) { _trActive++; res(); } else _trWait.push(res); });
+        const _trFree = () => { const n = _trWait.shift(); if (n) n(); else _trActive--; };
+        async function autoTranslate(text, targetLang, sourceLang) {
+            sourceLang = sourceLang || 'ar';
+            if (!text || !text.trim() || !targetLang) return text;
+            const auto = sourceLang === 'auto';
+            if (!auto && targetLang === sourceLang) return text;
+            if (!/\p{L}/u.test(text)) return text;                       // numbers / emoji / symbols only: nothing to translate
+            const key = sourceLang + '>' + targetLang + '::' + text;
+            if (translateCache[key]) return translateCache[key];
+            const ft = _trFail.get(key); if (ft && Date.now() - ft < 60000) return text;   // failed a moment ago: don't retry on every re-render
+            if (navigator.onLine === false) return text;
+            let p = _trInflight.get(key);
+            if (!p) {
+                p = (async () => {
+                    await _trSlot();
+                    try {
+                        const out = await _trFetch(text, targetLang, sourceLang);
+                        if (out) { translateCache[key] = out; saveTranslateCache(); _trFail.delete(key); return out; }
+                        _trFail.set(key, Date.now()); return text;
+                    } finally { _trFree(); _trInflight.delete(key); }
+                })();
+                _trInflight.set(key, p);
+            }
+            return p;
         }
         // Chat bubbles: if the message is written in a different script than the viewer's language (e.g. someone typed
         // German while their app was set to Arabic), translate it anyway using auto-detection.
@@ -4909,6 +4950,8 @@ html{scroll-padding-top:70px}
             el.innerHTML = _escapeHtml(sourceText).replace(/\n/g, '<br>');
             const _sl = sourceText ? _effSrc(sourceText, lang, sourceLang) : null;
             if (!_sl) return;
+            const _hit = translateCache[_sl + '>' + lang + '::' + sourceText];
+            if (_hit) { el.innerHTML = _escapeHtml(_hit).replace(/\n/g, '<br>'); return; }
             autoTranslate(sourceText, lang, _sl).then(translated => {
                 if ((S.language || 'ar') === lang && el.isConnected) el.innerHTML = _escapeHtml(translated).replace(/\n/g, '<br>');
             });
@@ -7072,11 +7115,6 @@ html{scroll-padding-top:70px}
                     lastDate = dateStr;
                 }
                 const avatarHtml = avatarImgHtml(photo, 'wabubble-avatar', initial) || `<div class="wabubble-avatar">${_escapeHtml(initial)}</div>`;
-                const canDelete = !msg._pending && (S.isAdmin || isMine);
-                const canEdit = !msg._pending && isMine;
-                const deleteBtn = canDelete ? `<button class="wabubble-delete-btn" onclick="deleteWaMsg('${msg.id}')" title="حذف الرسالة">🗑</button>` : '';
-                const editBtn = canEdit ? `<button class="wabubble-action-btn" onclick='wachatEditMsg(${JSON.stringify(msg.id)})' title="تعديل الرسالة">✏️</button>` : '';
-                const replyBtn = (!msg._pending && S.isAdmin) ? `<button class="wabubble-action-btn" onclick='wachatReplyTo(${JSON.stringify(msg.id)},${JSON.stringify(name)},${JSON.stringify(msg.text)})' title="رد على الرسالة">↩️</button>` : '';
                 let statusHtml = '';
                 if (msg._failed) {
                     statusHtml = '<span class="wabubble-status failed" title="فشل الإرسال">⚠️ فشل</span>';
@@ -7101,9 +7139,6 @@ html{scroll-padding-top:70px}
                         ${quoteHtml}
                         <div class="wabubble-text" id="watext-${msg.id}"></div>
                         <div class="wabubble-meta">
-                            ${replyBtn}
-                            ${editBtn}
-                            ${deleteBtn}
                             <span class="wabubble-time">${timeStr}</span>
                             ${editedTag}
                             ${statusHtml}
@@ -7186,14 +7221,106 @@ html{scroll-padding-top:70px}
             }
         };
 
-        window.sendWaChat = async function() {
+        // ===== LONG-PRESS MESSAGE MENU (reply / copy / edit / resend / delete) — replaces the buttons that sat under every message =====
+        window.friendReplyTo = function (id, name, text) {
+            _friendReplyTo = { id, senderName: name, text };
+            const pv = document.getElementById('friend-reply-preview'); if (!pv) return;
+            document.getElementById('friend-reply-label').textContent = dv('رد على ', 'Reply to ') + name;
+            document.getElementById('friend-reply-text').textContent = text;
+            pv.style.display = 'flex';
+            const inp = document.getElementById('friend-chat-input'); if (inp) inp.focus();
+        };
+        window.friendCancelReply = function () {
+            _friendReplyTo = null;
+            const pv = document.getElementById('friend-reply-preview'); if (pv) pv.style.display = 'none';
+        };
+        window.friendScrollToMsg = function (id) {
+            const el = id && document.getElementById('frmsg-' + id);
+            if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.style.outline = '2px solid var(--violet)'; setTimeout(() => el.style.outline = '', 900); }
+        };
+        (function () { const st = document.createElement('style'); st.textContent =
+            '#gv-msg-menu{position:fixed;inset:0;z-index:100000;display:none;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.45)}' +
+            '#gv-msg-menu.open{display:flex}' +
+            '#gv-msg-menu .gvm-sheet{width:min(440px,100%);background:var(--surface-2,#171a24);border:1px solid rgba(255,255,255,.1);border-radius:18px 18px 0 0;padding:8px 8px calc(8px + env(safe-area-inset-bottom,0px));animation:gvmUp .16s ease-out}' +
+            '@keyframes gvmUp{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}' +
+            '#gv-msg-menu .gvm-prev{padding:10px 14px;font-size:12px;opacity:.7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:4px}' +
+            '#gv-msg-menu button{display:flex;align-items:center;gap:12px;width:100%;padding:14px;background:none;border:0;border-radius:12px;color:inherit;font:inherit;font-size:15px;text-align:start;cursor:pointer}' +
+            '#gv-msg-menu button:active{background:rgba(255,255,255,.08)}#gv-msg-menu button.danger{color:#ff7a7a}' +
+            '.wabubble{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}';
+            document.head.appendChild(st); })();
+        let _gvMenuEl = null;
+        function _gvMenuClose() { if (_gvMenuEl) _gvMenuEl.classList.remove('open'); }
+        function _gvMenuOpen(preview, items) {
+            if (!_gvMenuEl) {
+                _gvMenuEl = document.createElement('div'); _gvMenuEl.id = 'gv-msg-menu';
+                _gvMenuEl.addEventListener('click', e => { if (e.target === _gvMenuEl) _gvMenuClose(); });
+                document.body.appendChild(_gvMenuEl);
+            }
+            const sheet = document.createElement('div'); sheet.className = 'gvm-sheet';
+            const pv = document.createElement('div'); pv.className = 'gvm-prev'; pv.textContent = preview || ''; sheet.appendChild(pv);
+            items.forEach(it => {
+                const b = document.createElement('button'); if (it.danger) b.className = 'danger';
+                b.textContent = it.icon + '  ' + it.label;
+                b.onclick = () => { _gvMenuClose(); try { it.run(); } catch (e) { console.error(e); } };
+                sheet.appendChild(b);
+            });
+            _gvMenuEl.replaceChildren(sheet); _gvMenuEl.classList.add('open');
+        }
+        function _gvMsgItems(kind, id) {
+            const copy = text => () => { try { navigator.clipboard.writeText(text); showToast(dv('✅ تم النسخ', '✅ Copied')); } catch (e) {} };
+            const L = { reply: dv('رد', 'Reply'), copy: dv('نسخ', 'Copy'), edit: dv('تعديل', 'Edit'), resend: dv('إعادة إرسال', 'Resend'), del: dv('حذف', 'Delete') };
+            const items = [];
+            if (kind === 'wa') {
+                const m = _wachatLastMsgs.concat(_wachatPending).find(x => x.id === id); if (!m) return null;
+                if (m._pending && !m._failed) return null;                       // still sending
+                const mine = m.sender === S.user.uid, text = m.text || '';
+                if (!m._failed) items.push({ icon: '↩️', label: L.reply, run: () => wachatReplyTo(id, mine ? dv('أنت', 'You') : (m.senderName || 'مستخدم'), text.slice(0, 120)) });
+                items.push({ icon: '📋', label: L.copy, run: copy(text) });
+                if (mine && !m._failed) items.push({ icon: '✏️', label: L.edit, run: () => wachatEditMsg(id) });
+                if (mine) items.push({ icon: '🔁', label: L.resend, run: () => { if (m._failed) { _wachatPending = _wachatPending.filter(x => x.id !== id); } sendWaChat({ text }); } });
+                if (m._failed) items.push({ icon: '🗑', label: L.del, danger: true, run: () => { _wachatPending = _wachatPending.filter(x => x.id !== id); _renderWaMsgs(_wachatLastMsgs.concat(_wachatPending)); } });
+                else if (S.isAdmin || mine) items.push({ icon: '🗑', label: L.del, danger: true, run: () => deleteWaMsg(id) });
+                return { preview: text, items };
+            }
+            const m = _friendLastMsgs.find(x => x.id === id); if (!m) return null;
+            const mine = m.uid === S.user.uid, text = m.text || '';
+            items.push({ icon: '↩️', label: L.reply, run: () => friendReplyTo(id, mine ? dv('أنت', 'You') : (m.senderName || 'مستخدم'), text.slice(0, 120)) });
+            items.push({ icon: '📋', label: L.copy, run: copy(text) });
+            if (mine) items.push({ icon: '🔁', label: L.resend, run: () => sendFriendMsg({ text }) });
+            if (mine || S.isAdmin) items.push({ icon: '🗑', label: L.del, danger: true, run: () => deleteFriendMsg(id) });
+            return { preview: text, items };
+        }
+        const _gvLP = { t: 0, timer: null, x: 0, y: 0 }, _gvLPSel = '#wachat-messages-area .wabubble, #friend-chat-messages-area .wabubble';
+        const _gvLPCancel = () => { if (_gvLP.timer) { clearTimeout(_gvLP.timer); _gvLP.timer = null; } };
+        document.addEventListener('pointerdown', e => {
+            if (e.pointerType === 'mouse' && e.button !== 0) return;
+            const b = e.target && e.target.closest && e.target.closest(_gvLPSel); if (!b || !S.user) return;
+            _gvLPCancel(); _gvLP.x = e.clientX; _gvLP.y = e.clientY;
+            _gvLP.timer = setTimeout(() => {
+                _gvLP.timer = null;
+                const isWa = !!b.closest('#wachat-messages-area'), id = b.id.replace(isWa ? 'wamsg-' : 'frmsg-', '');
+                const r = _gvMsgItems(isWa ? 'wa' : 'fr', id); if (!r) return;
+                _gvLP.t = Date.now();
+                try { navigator.vibrate && navigator.vibrate(12); } catch (x) {}
+                _gvMenuOpen(r.preview, r.items);
+            }, 450);
+        }, true);
+        ['pointerup', 'pointercancel'].forEach(ev => document.addEventListener(ev, _gvLPCancel, true));
+        document.addEventListener('pointermove', e => { if (_gvLP.timer && Math.hypot(e.clientX - _gvLP.x, e.clientY - _gvLP.y) > 10) _gvLPCancel(); }, true);
+        document.addEventListener('contextmenu', e => { if (e.target && e.target.closest && e.target.closest(_gvLPSel)) e.preventDefault(); }, true);
+        document.addEventListener('click', e => { if (Date.now() - _gvLP.t < 500) { e.stopPropagation(); e.preventDefault(); } }, true);   // the release after a long-press must not trigger the bubble underneath
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') _gvMenuClose(); });
+        // ===== END LONG-PRESS MESSAGE MENU =====
+
+        window.sendWaChat = async function(opts) {
             if (!S.user) return;
             const input = document.getElementById('wachat-input');
-            const text = (input.value || '').trim();
+            const resend = !!(opts && typeof opts.text === 'string');   // "resend" from the long-press menu: same text, no reply/edit state
+            const text = resend ? opts.text.trim() : (input.value || '').trim();
             if (!text) return;
 
             // ===== EDIT MODE: saving changes to an existing message =====
-            if (_wachatEditingId) {
+            if (!resend && _wachatEditingId) {
                 const msgId = _wachatEditingId;
                 input.value = '';
                 _wachatEditingId = null;
@@ -7212,11 +7339,11 @@ html{scroll-padding-top:70px}
                 return;
             }
 
-            input.value = '';
+            if (!resend) input.value = '';
             const name = S.userProfile?.displayName || S.user.displayName || 'مستخدم';
             const photo = S.userProfile?.photoURL || S.user.photoURL || '';
-            const replyTo = _wachatReplyTo ? { id: _wachatReplyTo.id, senderName: _wachatReplyTo.senderName, text: _wachatReplyTo.text } : null;
-            wachatCancelReply();
+            const replyTo = (!resend && _wachatReplyTo) ? { id: _wachatReplyTo.id, senderName: _wachatReplyTo.senderName, text: _wachatReplyTo.text } : null;
+            if (!resend) wachatCancelReply();
 
             // Remember the language the sender had selected at the moment of
             // sending, so anyone viewing this message later — in any language —
@@ -7241,7 +7368,14 @@ html{scroll-padding-top:70px}
                     isAdmin: S.isAdmin
                 };
                 if (replyTo) payload.replyTo = replyTo;
-                await addDoc(collection(db, 'chatMessages'), payload);
+                try { await addDoc(collection(db, 'chatMessages'), payload); }
+                catch (e0) {
+                    if (replyTo && e0 && e0.code === 'permission-denied') {   // rules refuse the replyTo field for this user: send it as plain text with a visible quote
+                        delete payload.replyTo; payload.text = '↩️ «' + replyTo.text.slice(0, 60) + '»\n' + text;
+                        await addDoc(collection(db, 'chatMessages'), payload);
+                        _wachatPending = _wachatPending.filter(x => x.id !== localId);
+                    } else throw e0;
+                }
                 // Real snapshot will arrive via onSnapshot and replace the pending bubble.
             } catch (e) {
                 console.error('WaChat send error:', e);
@@ -8036,8 +8170,10 @@ html{scroll-padding-top:70px}
         let _friendChatUnsub = null;
         let _friendChatCid = null;
         let _friendChatWith = null; // { uid, name, photo }
+        let _friendLastMsgs = [], _friendReplyTo = null;
 
         function _renderFriendMsgs(msgs) {
+            _friendLastMsgs = msgs;
             const area = document.getElementById('friend-chat-messages-area');
             if (!area) return;
             if (msgs.length === 0) {
@@ -8060,16 +8196,19 @@ html{scroll-padding-top:70px}
                 }
                 const initial = (msg.senderName || '?').charAt(0).toUpperCase();
                 const avatarHtml = !isMine ? (avatarImgHtml(msg.senderPhoto, 'wabubble-avatar', initial) || `<div class="wabubble-avatar">${_escapeHtml(initial)}</div>`) : '';
-                const deleteBtn = isMine ? `<button class="wabubble-delete-btn" onclick="deleteFriendMsg('${msg.id}')" title="حذف الرسالة">🗑</button>` : '';
+                const quoteHtml = (msg.replyTo && msg.replyTo.text) ? `<div class="wabubble-quote" onclick="friendScrollToMsg('${_escapeHtml(msg.replyTo.id || '')}')">
+                        <span class="wabubble-quote-name">${_escapeHtml(msg.replyTo.senderName || 'مستخدم')}</span>
+                        <span class="wabubble-quote-text">${_escapeHtml(msg.replyTo.text)}</span>
+                    </div>` : '';
                 const statusHtml = isMine ? '<span class="wabubble-tick">✓✓</span>' : '';
                 html += `
                 <div class="wabubble ${isMine ? 'mine' : 'theirs'}" id="frmsg-${msg.id}">
                     ${!isMine ? avatarHtml : ''}
                     <div class="wabubble-content">
                         ${!isMine ? `<span class="wabubble-sender">${_escapeHtml(name)}</span>` : ''}
+                        ${quoteHtml}
                         <div class="wabubble-text" id="frtext-${msg.id}"></div>
                         <div class="wabubble-meta">
-                            ${deleteBtn}
                             <span class="wabubble-time">${timeStr}</span>
                             ${statusHtml}
                         </div>
@@ -8119,34 +8258,45 @@ html{scroll-padding-top:70px}
             if (_friendChatUnsub) { _friendChatUnsub(); _friendChatUnsub = null; }
             _friendChatCid = null;
             _friendChatWith = null;
+            try { friendCancelReply(); } catch (e) {}
         };
 
-        window.sendFriendMsg = async function() {
+        window.sendFriendMsg = async function(opts) {
             if (!S.user || !_friendChatWith) return;
             const input = document.getElementById('friend-chat-input');
-            const text = (input.value || '').trim();
+            const resend = !!(opts && typeof opts.text === 'string');   // "resend" from the long-press menu
+            const text = resend ? opts.text.trim() : (input.value || '').trim();
             if (!text) return;
-            input.value = '';
+            const replyTo = (!resend && _friendReplyTo) ? { id: _friendReplyTo.id, senderName: _friendReplyTo.senderName, text: _friendReplyTo.text } : null;
+            if (!resend) { input.value = ''; friendCancelReply(); }
             const myName = S.userProfile?.displayName || S.user.displayName || 'مستخدم';
             const myPhoto = S.userProfile?.photoURL || S.user.photoURL || '';
+            const payload = {
+                uid: S.user.uid,
+                toUid: _friendChatWith.uid,
+                participants: [S.user.uid, _friendChatWith.uid].sort(),
+                conversationId: _friendChatCid,
+                senderName: myName,
+                senderPhoto: myPhoto,
+                toName: _friendChatWith.name,
+                toPhoto: _friendChatWith.photo,
+                text,
+                lang: S.language || 'ar',
+                timestamp: serverTimestamp()
+            };
+            if (replyTo) payload.replyTo = replyTo;
             try {
-                await addDoc(collection(db, 'friendsChat'), {
-                    uid: S.user.uid,
-                    toUid: _friendChatWith.uid,
-                    participants: [S.user.uid, _friendChatWith.uid].sort(),
-                    conversationId: _friendChatCid,
-                    senderName: myName,
-                    senderPhoto: myPhoto,
-                    toName: _friendChatWith.name,
-                    toPhoto: _friendChatWith.photo,
-                    text,
-                    lang: S.language || 'ar',
-                    timestamp: serverTimestamp()
-                });
+                await addDoc(collection(db, 'friendsChat'), payload);
             } catch (e) {
+                if (replyTo && e && e.code === 'permission-denied') {   // rules refuse the new field: send as plain text with a visible quote
+                    try {
+                        delete payload.replyTo; payload.text = '↩️ «' + replyTo.text.slice(0, 60) + '»\n' + text;
+                        await addDoc(collection(db, 'friendsChat'), payload); return;
+                    } catch (e2) { e = e2; }
+                }
                 console.error('sendFriendMsg error:', e);
                 showToast('❌ فشل الإرسال: ' + e.message, '#ff7a7a');
-                input.value = text;
+                if (!resend) input.value = text;
             }
         };
 
@@ -8428,6 +8578,11 @@ html{scroll-padding-top:70px}
 
         function _createPeerConnection() {
             const pc = new RTCPeerConnection(ICE_SERVERS);
+            // data channel for live-translation captions: peer-to-peer, costs no Firestore reads/writes
+            try {
+                if (_call && _call.role === 'caller') _ltBindDC(pc.createDataChannel('lt', { ordered: true }));
+                pc.ondatachannel = e => { if (e.channel && e.channel.label === 'lt') _ltBindDC(e.channel); };
+            } catch (e) {}
             pc.onicecandidate = e => {
                 if (!e.candidate || !_call) return;
                 addDoc(collection(db, 'calls', _call.id, 'candidates'), {
@@ -8738,6 +8893,56 @@ html{scroll-padding-top:70px}
         // the other side translates it into their language, shows subtitles and reads it aloud (original voice is ducked).
         const _LT = { LOC: { ar: 'ar-EG', en: 'en-US', fr: 'fr-FR', de: 'de-DE', ru: 'ru-RU', zh: 'zh-CN' }, on: false, peerWants: false, rec: null, wantRec: false, unsub: null, seeded: false, lastN: 0, errs: 0 };
         const _ltMyLang = () => S.language || 'ar';
+        // ---- data channel helpers ----
+        function _ltBindDC(dc) {
+            if (!dc || !_call) return;
+            _call.ltDC = dc;
+            dc.onmessage = e => { try { const m = JSON.parse(e.data); if (m && m.text && _LT.on && m.n !== _LT.lastN) { _LT.lastN = m.n; _ltIncoming(m); } } catch (x) {} };
+        }
+        function _ltDCSend(obj) {
+            try { const dc = _call && _call.ltDC; if (dc && dc.readyState === 'open') { dc.send(JSON.stringify(obj)); return true; } } catch (e) {}
+            return false;
+        }
+        // ---- speaker pitch (measured locally while someone wants a translation of us; only a number is sent) ----
+        const _LTP = { ctx: null, src: null, an: null, buf: null, iv: null, f0s: [] };
+        function _ltPitchStart() {
+            if (_LTP.iv || !_call || !_call.localStream) return;
+            try {
+                const AC = window.AudioContext || window.webkitAudioContext; if (!AC) return;
+                _LTP.ctx = new AC(); _LTP.src = _LTP.ctx.createMediaStreamSource(_call.localStream);
+                _LTP.an = _LTP.ctx.createAnalyser(); _LTP.an.fftSize = 2048; _LTP.src.connect(_LTP.an);
+                _LTP.buf = new Float32Array(_LTP.an.fftSize); _LTP.f0s = [];
+                _LTP.iv = setInterval(_ltPitchTick, 300);
+            } catch (e) { _ltPitchStop(); }
+        }
+        function _ltPitchStop() {
+            if (_LTP.iv) clearInterval(_LTP.iv); _LTP.iv = null;
+            try { if (_LTP.src) _LTP.src.disconnect(); } catch (e) {}
+            try { if (_LTP.ctx) _LTP.ctx.close(); } catch (e) {}
+            _LTP.ctx = _LTP.src = _LTP.an = _LTP.buf = null;
+        }
+        function _ltF0(b, sr) {   // autocorrelation pitch estimate, 70-400 Hz; 0 when silent/unvoiced
+            const n = b.length; let rms = 0;
+            for (let i = 0; i < n; i++) rms += b[i] * b[i];
+            if (Math.sqrt(rms / n) < 0.02) return 0;
+            const minL = Math.floor(sr / 400), maxL = Math.floor(sr / 70), m = n - maxL, corr = new Float32Array(maxL + 2);
+            let c0 = 0, best = 0;
+            for (let i = 0; i < m; i++) c0 += b[i] * b[i];
+            for (let L = minL; L <= maxL; L++) { let sum = 0; for (let i = 0; i < m; i++) sum += b[i] * b[i + L]; corr[L] = sum; if (sum > best) best = sum; }
+            if (!c0 || best / c0 < 0.5) return 0;                       // not clearly voiced
+            for (let L = minL + 1; L < maxL; L++) if (corr[L] >= 0.9 * best && corr[L] >= corr[L - 1] && corr[L] >= corr[L + 1]) return sr / L;   // first strong peak (avoids octave errors)
+            return 0;
+        }
+        function _ltPitchTick() {
+            if (!_LTP.an) return;
+            _LTP.an.getFloatTimeDomainData(_LTP.buf);
+            const f = _ltF0(_LTP.buf, _LTP.ctx.sampleRate);
+            if (f >= 70 && f <= 400) { _LTP.f0s.push(f); if (_LTP.f0s.length > 30) _LTP.f0s.shift(); }
+        }
+        function _ltMyF0() {
+            const a = _LTP.f0s.slice().sort((x, y) => x - y);
+            return a.length >= 5 ? Math.round(a[a.length >> 1]) : 0;
+        }
         function _ltUI() {
             const b = document.getElementById('call-lt-btn'); if (b) b.classList.toggle('active-feature', _LT.on);
             const chip = document.getElementById('call-lt-chip'); if (chip) chip.style.display = _LT.on ? 'inline-flex' : 'none';
@@ -8801,8 +9006,9 @@ html{scroll-padding-top:70px}
             };
             r.onend = () => { if (_LT.rec === r) { _LT.rec = null; if (_LT.wantRec && _call && _LT.errs < 3) setTimeout(_ltStartRec, 300); } };
             try { r.start(); } catch (e) { _LT.rec = null; }
+            _ltPitchStart();
         }
-        function _ltStopRec() { const r = _LT.rec; _LT.rec = null; if (r) { try { r.onend = null; r.abort(); } catch (e) {} } }
+        function _ltStopRec() { const r = _LT.rec; _LT.rec = null; if (r) { try { r.onend = null; r.abort(); } catch (e) {} } _ltPitchStop(); }
         async function _ltSend(tx) {
             if (!_call || _call.micOn === false) return;
             const my = _ltMyLang();
@@ -8811,13 +9017,14 @@ html{scroll-padding-top:70px}
                 _ltShow(tx, await autoTranslate(tx, tgt, my), true); return;
             }
             _ltShow(tx, '', true);
-            updateDoc(_callDocRef(_call.id), { ['cap_' + S.user.uid]: { text: tx, lang: my, n: Date.now() } }).catch(() => {});
+            const pk = { text: tx, lang: my, n: Date.now(), f0: _ltMyF0() };
+            if (!_ltDCSend(pk)) updateDoc(_callDocRef(_call.id), { ['cap_' + S.user.uid]: pk }).catch(() => {});   // fallback only if the P2P channel isn't open
         }
         async function _ltIncoming(c) {
             const my = _ltMyLang(), diff = c.lang && c.lang !== my;
             const out = diff ? await autoTranslate(c.text, my, c.lang) : c.text;
             _ltShow(c.text, diff ? out : '', false);
-            if (diff) _ltSpeak(out, my);
+            if (diff) _ltSpeak(out, my, c.f0);
         }
         function _ltShow(orig, trans, mine) {
             const box = document.getElementById('call-captions'); if (!box) return;
@@ -8828,16 +9035,40 @@ html{scroll-padding-top:70px}
             while (box.children.length > 3) box.removeChild(box.firstChild);
             setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 450); }, 8000);
         }
-        function _ltSpeak(text, lang) {
+        // Prefer natural/network voices over the default robotic one; remembered per language.
+        const _ltVoiceCache = {};
+        function _ltPickVoice(lang) {
+            if (_ltVoiceCache[lang]) return _ltVoiceCache[lang];
+            const loc = _LT.LOC[lang] || lang, vs = (window.speechSynthesis && speechSynthesis.getVoices()) || [];
+            let best = null, bs = -1;
+            vs.forEach(v => {
+                const vl = (v.lang || '').replace('_', '-');
+                if (!(vl === loc || vl.toLowerCase().startsWith(lang))) return;
+                const sc = (vl === loc ? 2 : 0) + (/natural|neural|online/i.test(v.name) ? 3 : 0) + (v.localService ? 0 : 2) + (/google/i.test(v.name) ? 1 : 0);
+                if (sc > bs) { bs = sc; best = v; }
+            });
+            if (best) _ltVoiceCache[lang] = best;
+            return best;
+        }
+        let _ltQ = 0;
+        function _ltSpeak(text, lang, f0) {
             try {
                 const ss = window.speechSynthesis; if (!ss || !text) return;
                 const u = new SpeechSynthesisUtterance(text), loc = _LT.LOC[lang] || lang; u.lang = loc;
-                const vs = ss.getVoices(), v = vs.find(x => x.lang === loc) || vs.find(x => (x.lang || '').toLowerCase().startsWith(lang));
-                if (v) u.voice = v;
+                const v = _ltPickVoice(lang); if (v) u.voice = v;
+                // match the speaker's own pitch: shift the voice relative to its typical register (male-sounding ~120 Hz, otherwise ~200 Hz)
+                if (f0 > 0) {
+                    const base = v && /\bmale\b|david|mark|naayf|shakir|hamed|stefan|conrad|henri|maxim|pavel|ivan|kangkang|daniel|thomas|hans/i.test(v.name) && !/female/i.test(v.name) ? 120 : 200;
+                    const ratio = Math.max(0.6, Math.min(1.5, f0 / base));
+                    u.pitch = Math.abs(ratio - 1) < 0.12 ? 1 : ratio;
+                }
+                if (_ltQ >= 3) { ss.cancel(); _ltQ = 0; }                 // too far behind: drop the backlog instead of lagging more and more
+                u.rate = _ltQ > 0 ? 1.15 : 1;                              // catch up a little when sentences queue
+                _ltQ++;
                 const rv = document.getElementById('call-remote-video');
                 const sv = () => (+(document.getElementById('call-vol') || {}).value || 100) / 100;
                 u.onstart = () => { if (rv) rv.volume = 0.12; };      // duck the original voice while the translation speaks
-                const restore = () => { if (rv && !ss.speaking && !ss.pending) rv.volume = sv(); };
+                const restore = () => { _ltQ = Math.max(0, _ltQ - 1); if (rv && !ss.speaking && !ss.pending) rv.volume = sv(); };
                 u.onend = restore; u.onerror = restore;
                 ss.speak(u);
             } catch (e) {}
@@ -9198,6 +9429,8 @@ html{scroll-padding-top:70px}
 
         window.deleteFriendMsg = async function(msgId) {
             if (!S.user) return;
+            const _m = _friendLastMsgs.find(x => x.id === msgId);
+            if (!S.isAdmin && (!_m || _m.uid !== S.user.uid)) { showToast('❌ لا يمكنك حذف رسائل الآخرين', '#ff7a7a'); return; }   // users: own messages only; admins: any
             if (!confirm('حذف الرسالة؟')) return;
             try {
                 await deleteDoc(doc(db, 'friendsChat', msgId));
