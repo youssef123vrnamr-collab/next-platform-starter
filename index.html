@@ -3191,45 +3191,6 @@ html{scroll-padding-top:70px}
 .wachat-input:focus{border-color:rgba(96,165,250,.55);background:rgba(255,255,255,.09);box-shadow:0 0 0 3px rgba(59,130,246,.15)}
 .wachat-input-bar.editing .wachat-input{border-color:#ffc862;box-shadow:0 0 0 3px rgba(255,200,98,.15)}
 </style>
-<style id="gv-smooth">
-/* ===== smooth layer: lighter on the GPU, calmer motion, softer surfaces ===== */
-:root{--gv-ease:cubic-bezier(.22,1,.36,1);--line:rgba(255,255,255,.07);--border:rgba(255,255,255,.08);--line-strong:rgba(255,255,255,.11)}
-html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
-body{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
-a,button,[onclick],input,select,textarea,label,.video-card{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
-::selection{background:rgba(59,130,246,.35)}
-*{scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.18) transparent}
-*::-webkit-scrollbar{width:8px;height:8px}*::-webkit-scrollbar-thumb{background:rgba(255,255,255,.16);border-radius:8px}*::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.28)}*::-webkit-scrollbar-track{background:transparent}
-:focus-visible{outline:2px solid rgba(96,165,250,.7);outline-offset:2px}
-
-/* heavy effects that cost frames and show nothing: blur on every video card (the card is transparent), blur on the navbar (already 92% opaque) */
-.video-card,.admin-mgmt-card,.chat-cta-card,.menu-user-info,.hero-stat,.hero-tag,#navbar{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
-#navbar{background:rgba(15,15,15,.96)!important}
-@media (pointer:coarse),(max-width:900px){
-  .modal-overlay,.modal-box,.profile-fs-card{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
-  .modal-overlay{background:rgba(6,4,14,.8)}
-}
-/* scrolling that feels right inside panels/chats (no page scroll-chaining) */
-.wachat-messages,.modal-box,.menu-panel,#friend-chat-messages-area,#wachat-messages-area{overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
-
-/* soft entrance for the chat screens and incoming content (opacity/transform only = compositor, no layout) */
-@keyframes gvFadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
-@keyframes gvFade{from{opacity:0}to{opacity:1}}
-#friend-chat-modal.open,#wachat-modal.open{animation:gvFadeUp .26s var(--gv-ease) both}
-.wachat-reply-preview{animation:gvFade .18s ease both}
-
-/* touch/click feedback */
-button:not(:disabled):active{filter:brightness(.88)}   /* no transform: many buttons are positioned with their own translate() */
-.video-card:active{transform:scale(.985)}
-@media (hover:hover){
-  .video-card{transition:transform .28s var(--gv-ease)}
-  .video-card:hover{transform:translateY(-3px)}
-}
-.wachat-input,.modal-box input,.modal-box textarea,.modal-box select{transition:border-color .2s,box-shadow .2s,background-color .2s}
-
-/* respect "reduce motion" */
-@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
-</style>
 </head>
 <body>
 
@@ -5186,7 +5147,7 @@ button:not(:disabled):active{filter:brightness(.88)}   /* no transform: many but
             const list = candidates.map(u => u.replace(/"/g, '&quot;')).join('|');
             const initialAttr = fallbackInitial ? ` data-fallback-initial="${fallbackInitial}"` : '';
             const ringStyle = ringColorStyleAttr(ringColor);
-            return `<img class="${cssClass}" loading="lazy" decoding="async" src="${candidates[0]}" data-fallbacks="${list}" data-i="0"${initialAttr}${ringStyle}
+            return `<img class="${cssClass}" src="${candidates[0]}" data-fallbacks="${list}" data-i="0"${initialAttr}${ringStyle}
                 onerror="window.__avatarFallback(this)" />`;
         }
 
@@ -5247,10 +5208,9 @@ button:not(:disabled):active{filter:brightness(.88)}   /* no transform: many but
                     ctx.fillStyle = `rgba(${s.hue},${(Math.random()*.35+.12).toFixed(2)})`;
                     ctx.fill();
                 });
-                if (!document.hidden) requestAnimationFrame(frame); else document.addEventListener('visibilitychange', function _r() { if (!document.hidden) { document.removeEventListener('visibilitychange', _r); requestAnimationFrame(frame); } });
+                requestAnimationFrame(frame);
             }
-            // the canvas is hidden by the stylesheet in the current design: don't burn CPU/battery animating something nobody can see
-            if (getComputedStyle(canvas).display !== 'none') frame();
+            frame();
         })();
 
         // ===== STATS =====
