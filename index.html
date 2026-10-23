@@ -3182,6 +3182,15 @@ html{scroll-padding-top:70px}
 .dir-skel{height:64px;border-radius:14px;margin-bottom:10px;background:linear-gradient(90deg,rgba(255,255,255,.04),rgba(255,255,255,.10),rgba(255,255,255,.04));background-size:200% 100%;animation:dirShimmer 1.2s linear infinite}
 @keyframes dirShimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 </style>
+<style>
+/* chat composer: input only (send with the keyboard's send/enter key); content centred on wide screens */
+.wachat-messages{padding-inline:max(12px,calc((100% - 760px)/2))}
+.wachat-reply-preview{padding-inline:max(14px,calc((100% - 760px)/2))}
+.wachat-input-bar{margin:0;padding:10px max(12px,calc((100% - 760px)/2)) calc(10px + env(safe-area-inset-bottom,0px))}
+.wachat-input{flex:1;width:100%;min-width:0;box-sizing:border-box;min-height:48px;padding:12px 20px;font-size:16px;line-height:1.4;border-radius:26px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);transition:border-color .2s,box-shadow .2s,background .2s}
+.wachat-input:focus{border-color:rgba(96,165,250,.55);background:rgba(255,255,255,.09);box-shadow:0 0 0 3px rgba(59,130,246,.15)}
+.wachat-input-bar.editing .wachat-input{border-color:#ffc862;box-shadow:0 0 0 3px rgba(255,200,98,.15)}
+</style>
 </head>
 <body>
 
@@ -3903,12 +3912,9 @@ html{scroll-padding-top:70px}
             </div>
             <button class="wachat-reply-preview-close" onclick="friendCancelReply()">✕</button>
         </div>
-        <div class="wachat-input-bar">
-            <input type="text" class="wachat-input" id="friend-chat-input" placeholder="اكتب رسالة..." onkeydown="if(event.key==='Enter')sendFriendMsg()" />
-            <button class="wachat-send-btn" id="friend-chat-send-btn" onclick="sendFriendMsg()">
-                <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
-            </button>
-        </div>
+        <form class="wachat-input-bar" id="friend-chat-bar" autocomplete="off" onsubmit="sendFriendMsg();return false;">
+            <input type="text" class="wachat-input" id="friend-chat-input" placeholder="اكتب رسالة..." enterkeyhint="send" autocomplete="off" autocapitalize="sentences" maxlength="2000" />
+        </form>
     </div>
 
     <!-- ===== INCOMING CALL BANNER ===== -->
@@ -4014,12 +4020,9 @@ html{scroll-padding-top:70px}
             </div>
             <button class="wachat-reply-preview-close" onclick="wachatCancelReply()">✕</button>
         </div>
-        <div class="wachat-input-bar">
-            <input type="text" class="wachat-input" id="wachat-input" placeholder="اكتب رسالة..." onkeydown="if(event.key==='Enter')sendWaChat()" />
-            <button class="wachat-send-btn" id="wachat-send-btn" onclick="sendWaChat()">
-                <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
-            </button>
-        </div>
+        <form class="wachat-input-bar" id="wachat-input-bar" autocomplete="off" onsubmit="sendWaChat();return false;">
+            <input type="text" class="wachat-input" id="wachat-input" placeholder="اكتب رسالة..." enterkeyhint="send" autocomplete="off" autocapitalize="sentences" maxlength="2000" />
+        </form>
     </div>
 
     <!-- ===== COMPETITIONS MODAL (public) ===== -->
@@ -7167,7 +7170,7 @@ html{scroll-padding-top:70px}
         window.wachatReplyTo = function(id, senderName, text) {
             _wachatEditingId = null;
             _wachatReplyTo = { id, senderName, text };
-            const bar = document.getElementById('wachat-input-bar') || document.querySelector('.wachat-input-bar');
+            const bar = document.getElementById('wachat-input-bar') || document.getElementById('wachat-input-bar');
             if (bar) bar.classList.remove('editing');
             document.getElementById('wachat-reply-preview-label').textContent = 'رد على ' + senderName;
             document.getElementById('wachat-reply-preview-text').textContent = text;
@@ -7189,14 +7192,14 @@ html{scroll-padding-top:70px}
             const input = document.getElementById('wachat-input');
             input.value = msg.text;
             input.focus();
-            const bar = document.querySelector('.wachat-input-bar');
+            const bar = document.getElementById('wachat-input-bar');
             if (bar) bar.classList.add('editing');
         };
 
         window.wachatCancelEdit = function() {
             _wachatEditingId = null;
             document.getElementById('wachat-input').value = '';
-            const bar = document.querySelector('.wachat-input-bar');
+            const bar = document.getElementById('wachat-input-bar');
             if (bar) bar.classList.remove('editing');
         };
 
@@ -7362,7 +7365,7 @@ html{scroll-padding-top:70px}
                 const msgId = _wachatEditingId;
                 input.value = '';
                 _wachatEditingId = null;
-                const bar = document.querySelector('.wachat-input-bar');
+                const bar = document.getElementById('wachat-input-bar');
                 if (bar) bar.classList.remove('editing');
                 const cached = _wachatLastMsgs.find(m => m.id === msgId);
                 if (cached) cached.text = text, cached.lang = S.language || 'ar', cached.editedAt = new Date();
